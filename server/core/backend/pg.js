@@ -80,6 +80,11 @@ function makePgAdapter({ connectionString } = {}) {
       [m.user_id, m.tenant, m.role, m.person_name || null, m.email || null]),
     deleteMember: (userId, slug) => q('delete from pearl_members where user_id = $1 and tenant = $2', [userId, slug]),
     isPlatformAdmin: userId => q('select 1 from pearl_platform_admins where user_id = $1', [userId]).then(r => r.length > 0),
+    countPlatformAdmins: () => q('select count(*)::int as n from pearl_platform_admins').then(r => r[0].n),
+    getSetting: key => q('select value from pearl_settings where key = $1', [key]).then(r => (r[0] ? r[0].value : null)),
+    setSetting: (key, value) => q(`insert into pearl_settings (key, value) values ($1, $2::jsonb)
+      on conflict (key) do update set value = excluded.value, updated_at = now()`, [key, JSON.stringify(value)]),
+    deleteSetting: key => q('delete from pearl_settings where key = $1', [key]),
     addPlatformAdmin: userId => q('insert into pearl_platform_admins (user_id) values ($1) on conflict do nothing', [userId]),
     end: () => pool.end(),
   };

@@ -14,6 +14,23 @@ Pearl fonctionne de deux façons :
 - **Mono-organisation** (par défaut) : une instance, données dans `data/`,
   comme décrit dans la suite de ce README.
 
+### Déployer sur Vercel (avec l'intégration Supabase)
+
+Rien à configurer à la main : `vercel.json` fait passer toutes les
+requêtes par le serveur (`api/index.js`), et Pearl se règle seul à partir
+des variables créées par l'intégration Supabase (`SUPABASE_URL`,
+`SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`) : stockage Supabase,
+multi-tenant, espaces à l'adresse `/o/<organisation>`.
+
+- `/` : page d'accueil ; `/signup` : création d'un espace ;
+  `/o/<organisation>` : un espace ; `/console` : administration.
+- Première visite de `/console` : saisir le code d'installation à usage
+  unique (ou définir `PEARL_SETUP_CODE`) pour créer le compte administrateur.
+- Facultatif : `CRON_SECRET` (envois programmés via Vercel Cron),
+  `SUPABASE_ACCESS_TOKEN` (migrations appliquées au build).
+- Avec un domaine personnel et un DNS générique (`*.mondomaine.com`) :
+  `PEARL_BASE_DOMAIN=mondomaine.com` et `PEARL_TENANT_URLS=subdomain`.
+
 ### Démarrer en SaaS, en local
 
 ```bash

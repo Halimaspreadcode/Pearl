@@ -51,7 +51,7 @@
       .then(r => (r.ok ? r.json() : fetch('/api/platform/brand', { credentials: 'same-origin' }).then(x => x.json()).then(j => ({ brandOnly: j }))))
       .then(j => {
         if (j.brandOnly) {
-          Object.assign(window.PearlOrg, { accounts: !!j.brandOnly.accounts, pret: true });
+          Object.assign(window.PearlOrg, { accounts: !!j.brandOnly.accounts, switch_url: j.brandOnly.switch_url || null, pret: true });
           appliquerMarque(j.brandOnly.name, j.brandOnly.branding);
           return;
         }

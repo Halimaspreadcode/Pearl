@@ -22,6 +22,16 @@
     <button class="btn primary" style="margin-top:12px;width:100%">Se connecter</button>
   </form>
 
+  <form class="panel card" id="setup" hidden>
+    <h2 style="margin:0 0 6px">Installation de la console</h2>
+    <p class="hint">Première connexion : saisissez le code d'installation reçu, puis choisissez vos identifiants d'administrateur. Le code ne sert qu'une fois.</p>
+    <label for="s-code">Code d'installation</label><input id="s-code" autocomplete="one-time-code" spellcheck="false" required>
+    <label for="s-email">Email</label><input id="s-email" type="email" autocomplete="username" required>
+    <label for="s-pw">Mot de passe (10 caractères minimum)</label><input id="s-pw" type="password" autocomplete="new-password" minlength="10" required>
+    <div class="err" id="s-err" role="alert"></div>
+    <button class="btn primary" style="margin-top:12px;width:100%">Créer mon compte administrateur</button>
+  </form>
+
   <main id="app" hidden>
     <section class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
@@ -94,9 +104,18 @@ async function start() {
     $('n-pack').innerHTML = C.packs.map(p => `<option value="${esc(p.id)}">${esc(p.label)}</option>`).join('');
     await load();
   } catch (e) {
-    $('login').hidden = false; $('app').hidden = true;
+    $('app').hidden = true;
+    const st = await api('/api/platform/console/setup').catch(() => ({ open: false }));
+    $('setup').hidden = !st.open; $('login').hidden = !!st.open;
   }
 }
+$('setup').addEventListener('submit', async e => {
+  e.preventDefault(); $('s-err').textContent = '';
+  try {
+    await api('/api/platform/console/setup', 'POST', { code: $('s-code').value.trim(), email: $('s-email').value.trim(), password: $('s-pw').value });
+    $('setup').hidden = true; start();
+  } catch (er) { $('s-err').textContent = er.message; }
+});
 async function load() {
   C.tenants = await api('/api/platform/console/tenants');
   $('count').textContent = `(${C.tenants.length})`;

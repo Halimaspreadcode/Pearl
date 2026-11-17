@@ -33,3 +33,5 @@ data/tls/
 # Vecteurs de la base de connaissances (recherche par le sens) : binaires
 # volumineux, recalculés par l'application à partir des documents.
 data/ai_kb_vec/
+.vercel
+.vercel-static

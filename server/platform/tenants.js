@@ -56,6 +56,20 @@ const invalidate = slug => { for (const [k, v] of _cache) if (k === slug || (v.t
 
 const getTenant = slug => cached(`slug:${slug}`, () => registry().getTenant(slug));
 
+// Mode « chemin » (pearl.app/o/acme) : l'organisation est retenue dans un
+// cookie posé par /o/<slug>. Ces chemins restent ceux de la plateforme,
+// quel que soit le cookie (inscription, console, changement d'espace).
+const ORG_COOKIE = 'pearl_org';
+const TOUJOURS_PLATEFORME = /^\/(signup|console|platform\/|o\/|o$|api\/platform\/(signup|slug|packs|console)(\/|$))/;
+function orgCookie(req) {
+  const m = /(?:^|;\s*)pearl_org=([^;]+)/.exec(req.headers.cookie || '');
+  const v = m ? decodeURIComponent(m[1]) : '';
+  return SLUG_RE.test(v) ? v : '';
+}
+function forcePlateforme(req) {
+  return TOUJOURS_PLATEFORME.test(req.path) || (req.method === 'GET' && req.path === '/api/platform/modules');
+}
+
 async function resolveTenant(req) {
   if (!isMultiTenant()) return { kind: 'tenant', tenant: { slug: DEFAULT_TENANT, name: null, status: 'active', modules: [], branding: {} } };
   if (process.env.PEARL_TENANT_HEADER === '1' && req.headers['x-pearl-tenant']) {
@@ -64,16 +78,24 @@ async function resolveTenant(req) {
     return t ? { kind: 'tenant', tenant: t } : { kind: 'unknown' };
   }
   const p = parseHost(hostOf(req));
-  if (p.kind === 'platform') return { kind: 'platform' };
   if (p.kind === 'slug') {
     const t = await getTenant(p.slug);
     return t ? { kind: 'tenant', tenant: t } : { kind: 'unknown' };
   }
   if (p.kind === 'domain') {
     const t = await cached(`domain:${p.host}`, () => registry().findTenantByDomain(p.host));
-    return t ? { kind: 'tenant', tenant: t } : { kind: 'unknown' };
+    if (t) return { kind: 'tenant', tenant: t };
+    // Mode chemin : tout hôte qui n'est pas un domaine de client (domaine
+    // du déploiement, prévisualisations) est la plateforme.
+    if (require('../config/runtime').tenantUrlMode() !== 'path') return { kind: 'unknown' };
+  } else if (p.kind !== 'platform') return { kind: 'unknown' };
+  // Plateforme, ou espace choisi par /o/<slug>.
+  const slug = !forcePlateforme(req) && orgCookie(req);
+  if (slug) {
+    const t = await getTenant(slug);
+    if (t) return { kind: 'tenant', tenant: t };
   }
-  return { kind: 'unknown' };
+  return { kind: 'platform' };
 }
 
 // Chemins servis sans tenant ni chargement de données : fichiers statiques
@@ -107,6 +129,15 @@ function tenantMiddleware() {
         : res.status(402).type('html').send(pageSimple('Espace suspendu', "Cet espace est suspendu. Contactez l'administrateur de votre organisation."));
     }
     if (STATIQUE.test(req.path)) return runAsTenant(t.slug, () => next());
+    const { isServerless } = require('../config/runtime');
+    if (isServerless()) {
+      // Plusieurs instances peuvent servir le même tenant : on relit ses
+      // données à chaque requête, et la réponse ne part qu'une fois les
+      // écritures enregistrées (la fonction est figée juste après).
+      if (backend().evict) backend().evict(t.slug);
+      const end = res.end.bind(res);
+      res.end = (...args) => { backend().flush().catch(() => {}).finally(() => end(...args)); return res; };
+    }
     try { await backend().ensureTenant(t.slug); }
     catch (e) {
       console.error(`[tenant] chargement de ${t.slug} impossible :`, e.message);
@@ -148,4 +179,4 @@ main{max-width:440px;background:#fff;border-radius:14px;padding:28px;box-shadow:
 <body><main><h1>${esc(titre)}</h1><p>${esc(texte)}</p></main></body></html>`;
 }
 
-module.exports = { tenantMiddleware, resolveTenant, parseHost, forEachTenant, getTenant, invalidate, isReservedSlug, baseDomain, pageSimple };
+module.exports = { ORG_COOKIE, orgCookie, tenantMiddleware, resolveTenant, parseHost, forEachTenant, getTenant, invalidate, isReservedSlug, baseDomain, pageSimple };

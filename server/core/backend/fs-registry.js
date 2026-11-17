@@ -58,6 +58,10 @@ function makeFsRegistry({ dataDir }) {
     async insertUser(u) { const d = read(); d.users.push({ ...u, created_at: new Date().toISOString() }); write(d); },
     async updateUserPassword(id, hash) { const d = read(); const u = d.users.find(x => x.id === id); if (u) { u.password_hash = hash; write(d); } },
     async isPlatformAdmin(userId) { return read().admins.includes(userId); },
+    async countPlatformAdmins() { return read().admins.length; },
+    async getSetting(key) { return clone((read().settings || {})[key] ?? null); },
+    async setSetting(key, value) { const d = read(); d.settings = { ...(d.settings || {}), [key]: value }; write(d); },
+    async deleteSetting(key) { const d = read(); if (d.settings) delete d.settings[key]; write(d); },
     async addPlatformAdmin(userId) { const d = read(); if (!d.admins.includes(userId)) d.admins.push(userId); write(d); },
   };
 }

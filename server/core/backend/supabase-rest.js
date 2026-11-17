@@ -68,6 +68,10 @@ function makeSupabaseAdapter({ url, serviceKey, schema = 'public' } = {}) {
     upsertMember: m => call('POST', '/pearl_members?on_conflict=user_id,tenant', [m], upsert),
     deleteMember: (userId, slug) => call('DELETE', `/pearl_members?user_id=eq.${enc(userId)}&${t(slug)}`),
     async isPlatformAdmin(userId) { const r = await call('GET', `/pearl_platform_admins?select=user_id&user_id=eq.${enc(userId)}`); return r.length > 0; },
+    async countPlatformAdmins() { return (await call('GET', '/pearl_platform_admins?select=user_id')).length; },
+    async getSetting(key) { const r = await call('GET', `/pearl_settings?select=value&key=eq.${enc(key)}`); return r.length ? r[0].value : null; },
+    setSetting: (key, value) => call('POST', '/pearl_settings?on_conflict=key', [{ key, value, updated_at: new Date().toISOString() }], upsert),
+    deleteSetting: key => call('DELETE', `/pearl_settings?key=eq.${enc(key)}`),
     addPlatformAdmin: userId => call('POST', '/pearl_platform_admins?on_conflict=user_id', [{ user_id: userId }], upsert),
   };
 }

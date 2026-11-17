@@ -1,3 +1,4 @@
+require('./config/runtime').applyRuntimeDefaults();
 // ══════════════════════════════════════════════════════════════
 // APPLICATION EXPRESS
 //
@@ -68,7 +69,7 @@ const app  = express();
 // sur la machine elle-même (nginx) est maintenant cru.
 // TRUST_PROXY (facultatif) : adresse du proxy de l'entreprise dont on croit
 // le X-Forwarded-For, ex. TRUST_PROXY=loopback,172.18.208.222.
-app.set('trust proxy', (process.env.TRUST_PROXY || 'loopback').split(',').map(s => s.trim()).filter(Boolean));
+app.set('trust proxy', process.env.TRUST_PROXY === 'true' ? true : (process.env.TRUST_PROXY || 'loopback').split(',').map(s => s.trim()).filter(Boolean));
 
 app.use(securityHeaders);
 app.use(tls.hstsEtRedirection);

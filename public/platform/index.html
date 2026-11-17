@@ -16,7 +16,13 @@
   <section class="hero">
     <h1>Pilotez votre équipe opérationnelle, à vos couleurs.</h1>
     <p>Tickets et délais par site, plannings, absences, objectifs, formation et rapports diffusés automatiquement. Un espace par entreprise, prêt en deux minutes.</p>
-    <a class="btn primary" href="/signup">Créer mon espace</a>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <a class="btn primary" href="/signup">Créer mon espace</a>
+      <form id="go" style="display:flex;gap:8px;align-items:center;margin:0">
+        <input id="go-slug" placeholder="adresse de mon espace" aria-label="Adresse de votre espace" spellcheck="false" style="width:220px">
+        <button class="btn">Accéder</button>
+      </form>
+    </div>
   </section>
 
   <section class="section">
@@ -30,6 +36,11 @@
   </section>
 </div>
 <script>
+document.getElementById('go').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = document.getElementById('go-slug').value.trim().toLowerCase().replace(/^https?:\/\//, '').split(/[./]/)[0];
+  if (v) location.href = '/o/' + encodeURIComponent(v);
+});
 const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 fetch('/api/platform/packs').then(r => r.json()).then(list => {
   document.getElementById('packs').innerHTML = list.map(p => `<div class="card"><h3>${esc(p.label)}</h3><p>${esc(p.desc)}</p></div>`).join('');

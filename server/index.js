@@ -22,6 +22,7 @@ if (parseInt(process.versions.node, 10) < NODE_MIN) {
 // `dotenv` doit être chargé AVANT tout autre module : plusieurs lisent
 // process.env dès leur chargement (secrets, DATA_DIR, LOG_HTTP…).
 require('dotenv').config({ quiet: true });   // sans la publicité de dotenv 17 dans le journal
+require('./config/runtime').applyRuntimeDefaults();
 
 const { DATA_DIR } = require('./config/paths');
 const { _locks, getPendingWrites } = require('./core/store');

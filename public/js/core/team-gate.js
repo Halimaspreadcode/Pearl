@@ -91,7 +91,7 @@
           '<div class="tg-brand"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round"/>' +
           '<path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round" opacity=".7"/>' +
           '<path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round" opacity=".45"/>' +
-          '<circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg><span>Pearl<small>FRONT OFFICE</small></span></div>' +
+          '<circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg><span class="tg-org">Pearl<small class="tg-org-sub"></small></span></div>' +
           '<div><h2 class="tg-hero">Every ticket, every shift, <em>one place.</em></h2>' +
           '<ul class="tg-feat"><li><i>⚡</i>Tickets for every site, with live SLA countdowns</li>' +
           '<li><i>✦</i>Your space: tasks, requests, score and quizzes</li>' +
@@ -111,6 +111,7 @@
         '<div class="tg-err" role="alert"></div>' +
         '<button class="tg-btn" type="submit">Sign in</button>' +
         '<button class="tg-lien" type="button"></button>' +
+        '<a class="tg-lien tg-switch" href="/o/-" hidden style="text-align:center;text-decoration:none">Changer d’organisation</a>' +
         '</form></main>';
       document.body.appendChild(ov);
       var form = ov.querySelector('form'), pw = ov.querySelector('#tg-pw'), id = ov.querySelector('#tg-id');
@@ -145,6 +146,17 @@
         err.textContent = '';
       };
       mode();
+      // Mode chemin (pearl.app/o/acme) : revenir au choix de l'espace.
+      var sw = ov.querySelector('.tg-switch');
+      var montreSwitch = function () { if (sw) sw.hidden = !(window.PearlOrg && window.PearlOrg.switch_url); };
+      montreSwitch(); setTimeout(montreSwitch, 800);
+      // Nom de l'organisation sur l'écran de connexion (marque blanche).
+      fetchOrig('/api/platform/brand', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (j) {
+        var o = ov.querySelector('.tg-org');
+        if (o && j && j.name) o.firstChild.textContent = j.name;
+        var sub = ov.querySelector('.tg-org-sub');
+        if (sub && j && j.branding && j.branding.tagline) sub.textContent = j.branding.tagline;
+      }).catch(function () {});
       lien.addEventListener('click', function () {
         if (compte) { compte = false; perso = true; } else perso = !perso;
         mode(); (perso ? id : pw).focus();

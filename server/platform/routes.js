@@ -29,8 +29,13 @@ const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch
   send(res, e);
 });
 
-// Adresse d'un espace : https://<slug>.<domaine> (port conservé en local).
+// Adresse d'un espace : https://<slug>.<domaine> (port conservé en local),
+// ou <origine>/o/<slug> en mode chemin (Vercel, pas de DNS générique).
 function tenantUrl(req, slug, chemin = '/') {
+  if (require('../config/runtime').tenantUrlMode() === 'path') {
+    const proto = req.protocol || 'https';
+    return `${proto}://${req.headers.host}/o/${slug}${chemin === '/' ? '' : chemin}`;
+  }
   const host = String(req.headers.host || '');
   const port = host.includes(':') ? `:${host.split(':')[1]}` : '';
   const proto = req.secure ? 'https' : (tenants.baseDomain() === 'localhost' ? 'http' : 'https');
@@ -54,6 +59,21 @@ const publicTenant = t => ({
 const platform = express.Router();
 
 platform.get('/', (req, res) => res.sendFile(path.join(PLATFORM_DIR, 'index.html')));
+
+// Entrée d'un espace en mode chemin : /o/acme (puis /o/acme/<chemin>).
+// Le cookie retient l'organisation ; /o/- revient à la plateforme.
+platform.get(/^\/o\/([^/]+)(\/.*)?$/, wrap(async (req, res) => {
+  const slug = String(req.params[0] || '').toLowerCase();
+  const reste = req.params[1] || '/';
+  const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
+  if (slug === '-') { res.clearCookie(tenants.ORG_COOKIE, { path: '/' }); return res.redirect('/'); }
+  if (!SLUG_RE.test(slug) || !(await tenants.getTenant(slug)))
+    return res.status(404).type('html').send(tenants.pageSimple('Organisation introuvable', "Cette adresse ne correspond à aucun espace Pearl. Vérifiez le lien reçu."));
+  res.cookie(tenants.ORG_COOKIE, slug, { httpOnly: true, sameSite: 'lax', secure: req.secure, maxAge: 365 * 86400000, path: '/' });
+  // Seuls des chemins internes : jamais de redirection vers un autre site.
+  const cible = /^\/[^/\\]/.test(reste) || reste === '/' ? reste : '/';
+  res.redirect(cible + qs);
+}));
 platform.get('/signup', (req, res) => res.sendFile(path.join(PLATFORM_DIR, 'signup.html')));
 platform.get('/console', (req, res) => res.sendFile(path.join(PLATFORM_DIR, 'console.html')));
 platform.get('/platform/:file', (req, res, next) => {
@@ -94,6 +114,34 @@ platform.post('/api/platform/console/login', authLimiter, wrap(async (req, res) 
   accounts.setAccountCookie(req, res, u, null);
   res.json({ ok: true, email: u.email });
 }));
+// Première installation : tant qu'aucun administrateur n'existe, le code
+// d'installation (empreinte bcrypt en base, ou PEARL_SETUP_CODE) crée le
+// premier compte. Le code est détruit une fois utilisé.
+async function setupOuvert() {
+  try { return (await registry().countPlatformAdmins()) === 0; } catch { return false; }
+}
+platform.get('/api/platform/console/setup', wrap(async (req, res) => res.json({ open: await setupOuvert() })));
+platform.post('/api/platform/console/setup', authLimiter, wrap(async (req, res) => {
+  if (!(await setupOuvert())) return res.status(403).json({ error: 'La console est déjà installée.' });
+  const b = req.body || {};
+  const code = String(b.code || '').trim();
+  const stored = await registry().getSetting('console_setup');
+  const bcrypt = require('bcryptjs');
+  const ok = code && ((stored && stored.hash && bcrypt.compareSync(code, stored.hash))
+    || (process.env.PEARL_SETUP_CODE && code === process.env.PEARL_SETUP_CODE));
+  if (!ok) return res.status(401).json({ error: "Code d'installation incorrect." });
+  if (!accounts.validEmail(b.email)) return res.status(400).json({ error: 'Email invalide.' });
+  const pwErr = accounts.validPassword(b.password);
+  if (pwErr) return res.status(400).json({ error: pwErr });
+  const p = accounts.provider();
+  let user = await p.findByEmail(b.email);
+  if (user) await p.setPassword(user.id, b.password); else user = await p.createUser(b.email, b.password);
+  await registry().addPlatformAdmin(user.id);
+  await registry().deleteSetting('console_setup');
+  accounts.setAccountCookie(req, res, user, null);
+  res.json({ ok: true, email: user.email });
+}));
+
 platform.post('/api/platform/console/logout', (req, res) => { accounts.clearAccountCookie(res); res.json({ ok: true }); });
 
 const requirePlatformAdmin = wrap(async (req, res, next) => {
@@ -159,6 +207,17 @@ platform.get('/api/platform/console/tenants/:slug/members', requirePlatformAdmin
   res.json(await registry().listMembers(req.params.slug));
 }));
 
+// Tâches planifiées en serverless (Vercel Cron) : diffusion des rapports
+// pour chaque organisation. Protégé par CRON_SECRET (envoyé par Vercel).
+platform.get('/api/cron/tick', wrap(async (req, res) => {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || req.get('authorization') !== `Bearer ${secret}`) return res.status(401).json({ error: 'Unauthorized' });
+  const { tickDiffusion } = require('../services/mail/scheduler');
+  await tenants.forEachTenant(() => tickDiffusion());
+  await backend().flush();
+  res.json({ ok: true });
+}));
+
 // Fichiers statiques communs ; tout le reste n'existe pas sur la plateforme.
 platform.use((req, res, next) => {
   if (STATIQUE.test(req.path)) return next();
@@ -176,7 +235,9 @@ tenantRouter.get('/api/platform/brand', (req, res) => {
   const t = req.tenant;
   const b = (t && t.branding) || {};
   const cfg = require('../core/store').readCfg();
-  res.json({ name: b.name || t.name || cfg.org_name || 'Pearl', branding: b, accounts: accountsEnabled() });
+  res.json({ name: b.name || t.name || cfg.org_name || 'Pearl', branding: b, accounts: accountsEnabled(),
+    // Mode chemin : lien pour changer d'organisation.
+    switch_url: require('../config/runtime').tenantUrlMode() === 'path' ? '/o/-' : null });
 });
 
 // Comptes actifs : toujours en multi-tenant ; en mono-tenant si ACCOUNTS=1.
