@@ -279,14 +279,10 @@ function causeReseau(e, base, proxy) {
 }
 
 function lireFichier() {
-  try { return JSON.parse(fs.readFileSync(FILES.ai_secret, 'utf8')) || {}; }
-  catch { return {}; }
+  return require('../core/store').readJSON(FILES.ai_secret, {}) || {};
 }
 function ecrireFichier(d) {
-  const tmp = FILES.ai_secret + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(d, null, 2), { mode: 0o600 });
-  fs.renameSync(tmp, FILES.ai_secret);
-  try { fs.chmodSync(FILES.ai_secret, 0o600); } catch {}
+  require('../core/store').writeJSON(FILES.ai_secret, d, { mode: 0o600 });
 }
 
 // Réglages effectifs. L'environnement prime : c'est la place d'un secret

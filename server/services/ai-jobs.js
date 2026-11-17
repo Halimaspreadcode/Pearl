@@ -17,7 +17,7 @@ const GARDE_MS = 60 * 60 * 1000;   // résultat gardé une heure
 const MAX = 30;                    // tâches gardées au plus
 const ROTATION_MS = 4500;          // une phrase d'attente toutes les 4,5 s
 
-const JOBS = new Map();
+const JOBS = require('../core/scoped').scopedMap();
 
 function purger() {
   const limite = Date.now() - GARDE_MS;

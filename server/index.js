@@ -104,6 +104,12 @@ app.use(express.json({ limit: '10mb' }));
 
 app.use(requestLog);
 
+// Organisation (tenant) de la requête : sous-domaine ou domaine
+// personnalisé (platform/tenants.js). Tout ce qui suit s'exécute dans son
+// contexte ; le domaine nu de la plateforme est servi par platformRoutes.
+app.use(require('./platform/tenants').tenantMiddleware());
+app.use(require('./platform/routes'));
+
 app.use('/api', apiRateLimit);
 // Verrou d'équipe (auth/team-gate.js) : toute l'API exige une session dès
 // qu'un mot de passe d'équipe est défini.
@@ -131,7 +137,7 @@ app.use(boRoutes);
 app.use(configRoutes);
 app.use(authRoutes);
 app.use(kpiConfigRoutes);
-app.use(suggestRoutes);   // avant tickets : /api/sn/suggest n'est pas /api/sn/:id
+app.use(suggestRoutes);   // avant tickets : /api/tickets/:site/suggest n'est pas …/:id
 app.use(ticketsRoutes);
 app.use(observationsRoutes);
 app.use(reportLayoutRoutes);
@@ -185,14 +191,16 @@ setInterval(backupData, 24 * 60 * 60 * 1000).unref();
 
 // Corrections de nom d'agent demandées (services/rename-agent.js), après la
 // sauvegarde : en cas de souci, la copie du jour a l'état d'avant.
-require('./services/rename-agent').appliquerCorrections().catch(e => console.error('[Pearl] Corrections :', e.message));
+require('./platform/tenants').forEachTenant(() => require('./services/rename-agent').appliquerCorrections())
+  .catch(e => console.error('[Pearl] Corrections :', e.message));
 
 // Insights des agents : passes automatiques (services/ai-insight.js).
 try { require('./services/ai-insight').demarrerAuto(); } catch (e) { console.error('[Pearl] Insights :', e.message); }
 
 const server = app.listen(PORT, HOST, () => {
   console.log(`\n  Pearl running at http://localhost:${PORT}  (écoute ${HOST}:${PORT})`);
-  console.log(`  données : ${DATA_DIR}\n`);
+  const { backend } = require('./core/backend');
+  console.log(`  stockage : ${backend().kind}${backend().kind === 'fs' ? ` (${DATA_DIR})` : ''} · ${require('./core/tenant').isMultiTenant() ? `multi-tenant (*.${require('./platform/tenants').baseDomain()})` : 'mono-tenant'}\n`);
 });
 // HTTPS en plus, si un certificat est configuré (voir http/tls.js).
 const serverTls = tls.demarrer(app, HOST);
@@ -221,6 +229,11 @@ async function gracefulShutdown(signal) {
       new Promise(r => setTimeout(r, 5000)),   // filet : on ne bloque pas indéfiniment
     ]);
   } catch { /* une écriture ratée ne doit pas empêcher l'arrêt */ }
+
+  // Stockage distant : attendre que les écritures en arrière-plan partent.
+  try {
+    await Promise.race([require('./core/backend').backend().flush(), new Promise(r => setTimeout(r, 8000))]);
+  } catch { /* idem */ }
 
   if (getPendingWrites() > 0)
     console.warn(`[Pearl] Shutting down with ${getPendingWrites()} write(s) still queued.`);

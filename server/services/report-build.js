@@ -35,7 +35,7 @@ async function buildReportFile(kind, countryIn) {
   const { PAYS, normPays } = require('./mail/bodies');
   const country = normPays(countryIn);
   const P = PAYS[country];
-  const code = country === 'ALL' ? 'SN-CI' : country;
+  const code = country === 'ALL' ? 'ALL' : country;
 
   // Priorité au classeur déposé par la page : c'est le rapport mis en
   // forme que l'équipe relit. À défaut d'un classeur du jour, on reprend
@@ -44,9 +44,9 @@ async function buildReportFile(kind, countryIn) {
   // ne sert que si la page n'a jamais été ouverte.
   // Le classeur déposé ne sert que s'il a été produit pour ce pays : la
   // page dépose celui du pays affiché à l'écran.
-  const frais = readReportFile(kind, jour, country);
+  const frais = await readReportFile(kind, jour, country);
   if (frais) return frais;
-  const dernier = readReportFile(kind, null, country);
+  const dernier = await readReportFile(kind, null, country);
   if (dernier) return dernier;
 
   const wb = new ExcelJSSrv.Workbook();

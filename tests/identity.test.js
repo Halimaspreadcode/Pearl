@@ -65,7 +65,7 @@ test('impossible d\'écrire au nom d\'un collègue', async () => {
   assert.equal(p.status, 403);
   assert.equal(readFixture(dir, 'weekly_progress.json').find(x => x.id === 'w1').status, 'Planned');
   // Ticket : l'auteur de la modification est celui de la session.
-  await fetch(`${base}/api/sn/T1`, { method: 'PUT', headers: { ...json, cookie }, body: '{"modified_by":"Jeanne DUPONT","status":"Open"}' });
+  await fetch(`${base}/api/tickets/sn/T1`, { method: 'PUT', headers: { ...json, cookie }, body: '{"modified_by":"Jeanne DUPONT","status":"Open"}' });
   assert.equal(readFixture(dir, 'sn.json')[0].modified_by, 'Awa');
 });
 

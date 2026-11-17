@@ -1,4 +1,4 @@
-const { readCI, readSN } = require('./store');
+const { readTracker, siteCodes, normSite } = require('./store');
 const { enrichTicket } = require('./sla');
 const { workedMs } = require('./time');
 
@@ -21,80 +21,69 @@ function avgMs(tickets, fn) {
   const vals = tickets.map(fn).filter(v => v !== null && !isNaN(v) && v >= 0);
   return vals.length ? vals.reduce((a,b) => a+b, 0) / vals.length : null;
 }
-// `country` : 'SN' | 'CI' | 'ALL' (ou absent) — le sélecteur de site de
-// l'en-tête. Les rapports l'ignoraient et cumulaient toujours les deux
-// trackers, donc un rapport « CI » affichait les chiffres de SN.
-/* Le fichier d'origine ne fait pas foi à lui seul. Des tickets ivoiriens
-   se retrouvent dans sn.json : transférés depuis Abidjan, ou saisis là par
-   erreur. Ils portent alors des marques sans ambiguïté — un numéro IMOC en
-   « OCI… », un FO de la rota d'Abidjan — et se retrouvaient comptés dans
-   les chiffres de Dakar.
-
-   On qualifie donc chaque ticket, sans écraser une valeur explicite :
-   `country`/`tracker` posé sur la ligne l'emporte toujours. */
-function ciFoNames(cfg) {
-  const out = new Set();
-  for (const site of (cfg.rota_config && cfg.rota_config.sites) || []) {
-    if (String(site.tracker || '').toUpperCase() !== 'CI') continue;
-    for (const team of site.teams || [])
-      for (const m of team.members || []) out.add(String(m).trim().toLowerCase());
-  }
-  // Le mapping FO → tracker de la config sert de second recours.
-  for (const [name, tr] of Object.entries(cfg.fo_trackers || {}))
-    if (String(tr).toUpperCase() === 'CI') out.add(String(name).trim().toLowerCase());
-  return out;
-}
-
-// Un nom est « de CI » s'il figure dans la rota d'Abidjan. On compare sur
-// une forme normalisée : les extractions varient sur les accents et la
-// casse, et une comparaison stricte laisserait passer les variantes.
+// `country` : code d'un site (« SN », « LYON »…), 'ALL' ou absent — le
+// sélecteur de site de l'en-tête. Le nom `country` est historique : un
+// site peut être un pays, une ville, une agence, un plateau.
+/* Le fichier d'origine ne fait pas foi à lui seul : un ticket transféré
+   d'un site à l'autre, ou saisi dans le mauvais tracker, porte des marques
+   sans ambiguïté. On qualifie donc chaque ticket, sans écraser une valeur
+   explicite (`country`/`tracker` posé sur la ligne l'emporte toujours) :
+     1. la référence externe commence par un préfixe déclaré pour un site
+        (site.ref_prefixes, ex. ["OCI"]) ;
+     2. le porteur n'appartient qu'à un seul site (rotations par site,
+        puis rattachement fo_trackers). */
 const normName = n => String(n || '').trim().toLowerCase()
   .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-function ticketCountry(t, ciFo, snFo) {
+// nom normalisé → ensemble des codes de site où la personne travaille.
+function personSites(cfg) {
+  const out = new Map();
+  const add = (name, code) => {
+    const n = normName(name), c = String(code || '').toUpperCase();
+    if (!n || !c) return;
+    (out.get(n) || out.set(n, new Set()).get(n)).add(c);
+  };
+  for (const site of (cfg.rota_config && cfg.rota_config.sites) || [])
+    for (const team of site.teams || [])
+      for (const m of team.members || []) add(m, site.tracker);
+  for (const [name, tr] of Object.entries(cfg.fo_trackers || {})) add(name, tr);
+  return out;
+}
+
+function ticketSite(t, sites, people) {
+  const codes = sites.map(s => s.code);
   const explicit = String(t.country || t.tracker || '').trim().toUpperCase();
-  if (explicit === 'SN' || explicit === 'CI') return explicit;
+  if (codes.includes(explicit)) return explicit;
 
-  // Numéro IMOC : « OCI… » désigne le tracker ivoirien, « OSN… » le
-  // sénégalais. C'est la marque la plus fiable dont on dispose.
-  const imoc = String(t.imoc_tt || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-  if (imoc.startsWith('OCI')) return 'CI';
-  if (imoc.startsWith('OSN')) return 'SN';
+  const ref = String(t.imoc_tt || t.external_ref || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (ref) for (const s of sites)
+    for (const p of s.ref_prefixes || [])
+      if (p && ref.startsWith(String(p).toUpperCase())) return s.code;
 
-  // À défaut, le porteur. On ne conclut « CI » que si le nom est dans la
-  // rota d'Abidjan ET absent de celle de Dakar : un FO de Dakar qui
-  // reprend un ticket transféré reste du périmètre de Dakar.
   const fo = normName(t.fo_owner || t.assigned_to);
-  if (fo && ciFo.has(fo) && !snFo.has(fo)) return 'CI';
+  const set = fo && people.get(fo);
+  if (set && set.size === 1) { const c = [...set][0]; if (codes.includes(c)) return c; }
   return null;   // indéterminé — on garde le fichier d'origine
 }
 
 function allEnriched(cfg, country) {
-  const wantSN = !country || country === 'ALL' || country === 'SN';
-  const wantCI = !country || country === 'ALL' || country === 'CI';
-
-  const ciFo = new Set([...ciFoNames(cfg)].map(normName));
-  const snFo = new Set((cfg.fo_list || []).map(normName));
-  // Le tracker retenu est celui déduit du ticket, à défaut son fichier.
-  const tag = (t, file) => ({
+  const raw = Array.isArray(cfg.sites) ? cfg.sites : [];
+  const sites = raw.map(r => ({ ...normSite(r), ref_prefixes: (r && r.ref_prefixes) || [] }))
+    .filter(s => /^[A-Z0-9]{2,8}$/.test(s.code));
+  const want = c => !country || country === 'ALL' || country === c;
+  const people = personSites(cfg);
+  return sites.flatMap(s => readTracker(s.code).map(t => ({
     ...enrichTicket(t, cfg),
-    tracker: ticketCountry(t, ciFo, snFo) || file,
-  });
-
-  return [
-    ...readSN().map(t => tag(t, 'SN')),
-    ...readCI().map(t => tag(t, 'CI')),
-  ].filter(t => t.tracker === 'SN' ? wantSN : wantCI);
+    tracker: ticketSite(t, sites, people) || s.code,
+  }))).filter(t => want(t.tracker));
 }
 
-// Normalise le paramètre de requête : tout ce qui n'est pas SN ou CI
-// vaut « pas de filtre ».
+// Normalise le paramètre de requête : un code de site connu, 'ALL', ou
+// undefined (chaque route choisit alors son défaut).
 function reqCountry(req) {
   const c = String(req.query.country || '').toUpperCase();
-  if (c === 'SN' || c === 'CI') return c;
-  // 'ALL' est un choix explicite (les deux trackers) ; l'absence de
-  // paramètre laisse chaque route décider de son défaut.
-  return c === 'ALL' ? 'ALL' : undefined;
+  if (c === 'ALL') return 'ALL';
+  return siteCodes().includes(c) ? c : undefined;
 }
 
 // Is `iso` inside [from, to]? Tolerates missing/unparseable dates.

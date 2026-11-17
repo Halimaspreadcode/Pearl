@@ -228,7 +228,9 @@ async function tickDiffusion() {
 // Démarré une seule fois, par server/index.js.
 function startScheduler() {
   // unref() : ce minuteur ne doit pas empêcher l'arrêt propre du process.
-  setInterval(() => { tickDiffusion().catch(() => {}); }, 60 * 1000).unref();
+  // Chaque organisation a ses planifications : un passage par tenant.
+  const { forEachTenant } = require('../../platform/tenants');
+  setInterval(() => { forEachTenant(() => tickDiffusion().catch(() => {})).catch(() => {}); }, 60 * 1000).unref();
 }
 
 module.exports = {

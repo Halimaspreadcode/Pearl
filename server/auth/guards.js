@@ -6,13 +6,16 @@ const { absenceSessions, sessionValid } = require('./sessions');
 // bcrypt.compareSync est déjà à temps constant et intègre le sel : plus
 // besoin de timingSafeEqual ici. Le coût du hash (~100 ms en facteur 12)
 // freine aussi le bruteforce, en plus du rate-limit.
+// En multi-tenant, le mot de passe admin de .env ne vaut pour aucune
+// organisation : l'administration passe par les comptes (rôles owner/admin).
 function pwMatches(given) {
+  if (require('../core/tenant').isMultiTenant()) return false;
   return !!CONFIG_PW_HASH && bcrypt.compareSync(String(given || ''), CONFIG_PW_HASH);
 }
 // Le hash défini depuis l'admin (config.json) prime sur celui de
 // l'environnement : c'est lui qui reflète le dernier changement voulu.
 function absencePwMatches(given) {
-  const stored = readCfg().absence_password_hash || ABSENCE_PW_HASH;
+  const stored = readCfg().absence_password_hash || (require('../core/tenant').isMultiTenant() ? '' : ABSENCE_PW_HASH);
   return !!stored && bcrypt.compareSync(String(given || ''), stored);
 }
 

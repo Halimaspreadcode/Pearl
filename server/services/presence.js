@@ -7,13 +7,13 @@ const { readBO, readCfg } = require('../core/store');
 // tabs), falling back to the name.
 const PRESENCE_TTL_MS   = 90 * 1000;  // a client is "online" if seen within 90s
 const PRESENCE_SWEEP_MS = 60 * 1000;
-const presence = new Map();
+const presence = require('../core/scoped').scopedMap();
 
 // Sessions coupées par un administrateur. Sans cette mémoire, retirer une
 // entrée de `presence` serait sans effet : le client repingue 30 s plus tard
 // et réapparaît. La révocation expire, pour ne pas bannir définitivement.
 const REVOKE_TTL_MS = 10 * 60 * 1000;
-const revokedPresence = new Map();
+const revokedPresence = require('../core/scoped').scopedMap();
 
 function livePresence() {
   const cutoff = Date.now() - PRESENCE_TTL_MS;

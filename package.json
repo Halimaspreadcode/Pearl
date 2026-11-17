@@ -27,6 +27,7 @@
     "express-rate-limit": "^8.5.2",
     "helmet": "^7.1.0",
     "jszip": "^3.10.1",
+    "pg": "^8.23.1",
     "playwright-core": "1.63.0",
     "pptxgenjs": "^4.0.1",
     "undici": "^6.29.0",

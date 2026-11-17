@@ -1472,16 +1472,17 @@ function paginateFo(fo) {
 //
 // Un champ pays vide est conservé : c'est une saisie qui ne le renseigne
 // pas, pas une donnée d'un autre pays.
-// Périmètre du deck en cours de génération : 'SN' (défaut), 'CI' ou 'ALL'.
+// Périmètre du deck en cours de génération : un code de site ou 'ALL'.
 // Posé par buildWeeklyPptx à l'entrée ; la génération des slides est
 // synchrone, deux decks ne se construisent donc pas en même temps.
-let SCOPE = 'SN';
-let VILLE = 'Dakar';
-const NOMS_PAYS = { SN: ['SN', 'SENEGAL', 'SÉNÉGAL'], CI: ['CI', "COTE D'IVOIRE", "CÔTE D'IVOIRE", 'CIV'] };
+let SCOPE = 'ALL';
+let VILLE = '';
+// Noms acceptés pour le site du périmètre : son code, son nom, sa ville.
+let NOMS_SITE = [];
 function inScope(v) {
   if (SCOPE === 'ALL') return true;
   const c = String(v == null ? '' : v).trim().toUpperCase();
-  return !c || (NOMS_PAYS[SCOPE] || [SCOPE]).includes(c);
+  return !c || c === SCOPE || NOMS_SITE.includes(c);
 }
 
 function buildPagedSections(data, form = {}) {
@@ -1576,7 +1577,7 @@ function buildPagedSections(data, form = {}) {
 
   const breaches = (data.active_tickets || [])
     .filter(t => t.sla_status === 'Breach')
-    // `tracker` est posé par allEnriched() : 'SN' ou 'CI'.
+    // `tracker` est posé par allEnriched() : le code du site.
     .filter(t => inScope(t.tracker || t.country))
     .sort((a, b) => new Date(a.open_date) - new Date(b.open_date))
     .map(t => ({
@@ -1719,11 +1720,11 @@ function buildPagedSections(data, form = {}) {
 }
 
 
-// Réduit le jeu de données au seul périmètre Sénégal. Le serveur le fait
-// déjà (buildWeeklyReport est appelé avec 'SN'), mais l'export accepte
-// aussi un appel direct à l'API : sans cette reprise, un `data` construit
-// en 'ALL' produirait un deck estampillé Dakar contenant des tickets CI.
-function scopeToSenegal(data) {
+// Réduit le jeu de données au périmètre du deck. Le serveur le fait déjà
+// (buildWeeklyReport reçoit le périmètre), mais l'export accepte aussi un
+// appel direct : sans cette reprise, un `data` construit sur tous les
+// sites produirait un deck d'un site contenant les tickets des autres.
+function scopeData(data) {
   if (SCOPE === 'ALL') return { ...(data || {}) };
   const d = { ...(data || {}) };
   const keep = t => inScope(t && (t.tracker || t.country));
@@ -1739,12 +1740,14 @@ function scopeToSenegal(data) {
   // historique compris — on ne peut donc pas le recomposer depuis les
   // seuls tickets de la semaine sans perdre les agents dont l'activité est
   // entièrement soldée. On le restreint plutôt aux agents du roster FO,
-  // qui est déjà le roster Sénégal.
-  // Hors Sénégal, le roster est celui des agents rattachés au pays
-  // (fo_trackers) : fo_list est la liste de l'équipe de Dakar.
-  const parPays = Object.entries(d.fo_trackers || {})
-    .filter(([, tr]) => [].concat(tr).map(x => String(x).toUpperCase()).includes(SCOPE)).map(([n]) => n);
-  const roster = new Set((SCOPE === 'SN' ? (d.fo_list || []) : parPays).map(n => String(n).trim()));
+  // Le roster est celui des agents rattachés au site (fo_trackers) ; un
+  // agent sans rattachement compte pour le premier site.
+  const premier = (d.site_codes || [])[0];
+  const parSite = (d.fo_list || []).filter(n => {
+    const tr = [].concat((d.fo_trackers || {})[n] || premier || []).map(x => String(x).toUpperCase());
+    return tr.includes(SCOPE);
+  });
+  const roster = new Set(parSite.map(n => String(n).trim()));
   if (roster.size) {
     d.by_fo = Object.fromEntries(
       Object.entries(d.by_fo || {}).filter(([fo]) => roster.has(String(fo).trim())));
@@ -1757,12 +1760,15 @@ function scopeToSenegal(data) {
    `form`  : sections rédigées côté client {author, site, highlights,
              risks, actions, notes} ; facultatif. */
 async function buildWeeklyPptx(rawData, form = {}) {
-  // Périmètre Sénégal appliqué une fois, à l'entrée : toutes les lectures
-  // en aval (KPI, graphiques, listes) partent donc d'un jeu déjà filtré,
-  // plutôt que de dépendre d'un filtre répété à chaque point d'usage.
-  SCOPE = ['SN', 'CI', 'ALL'].includes(form.country) ? form.country : 'SN';
-  VILLE = { SN: 'Dakar', CI: 'Abidjan', ALL: 'Dakar + Abidjan' }[SCOPE];
-  const data = scopeToSenegal({ ...(rawData || {}), fo_trackers: (rawData && rawData.fo_trackers) || form.fo_trackers || {} });
+  // Périmètre appliqué une fois, à l'entrée : toutes les lectures en aval
+  // (KPI, graphiques, listes) partent d'un jeu déjà filtré.
+  const { normScope, scopeLabel, siteByCode, siteCodes } = require('../core/store');
+  SCOPE = normScope(form.country, 'ALL');
+  VILLE = scopeLabel(SCOPE);
+  const site = SCOPE === 'ALL' ? null : siteByCode(SCOPE);
+  NOMS_SITE = site ? [site.name, site.city, site.country].filter(Boolean).map(x => x.toUpperCase()) : [];
+  const data = scopeData({ ...(rawData || {}), site_codes: siteCodes(),
+    fo_trackers: (rawData && rawData.fo_trackers) || form.fo_trackers || {} });
 
   const pptx = new PptxGenJS();
   pptx.layout = 'LAYOUT_WIDE';           // 13.33 x 7.5 pouces

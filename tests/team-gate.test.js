@@ -34,7 +34,7 @@ before(async () => {
 after(() => srv.close());
 
 test('sans mot de passe d\'équipe, rien ne change', async () => {
-  assert.equal((await fetch(`${base}/api/sn`)).status, 200);
+  assert.equal((await fetch(`${base}/api/tickets/sn`)).status, 200);
   { const j = await (await fetch(`${base}/api/team/session`)).json(); assert.equal(j.actif, false); assert.equal(j.ok, true); }
 });
 
@@ -46,7 +46,7 @@ test('seul l\'admin définit le mot de passe, avec une longueur minimale', async
 });
 
 test('verrou actif : lecture refusée sans session, sondes ouvertes', async () => {
-  const r = await fetch(`${base}/api/sn`);
+  const r = await fetch(`${base}/api/tickets/sn`);
   assert.equal(r.status, 401);
   assert.equal(r.headers.get('x-team-auth'), 'required');
   assert.equal((await fetch(`${base}/api/status`)).status, 200);
@@ -59,8 +59,8 @@ test('mauvais mot de passe refusé, bon mot de passe → cookie qui ouvre l\'API
   assert.equal(r.status, 200);
   const sc = r.headers.get('set-cookie');
   assert.match(sc, /HttpOnly/i); assert.match(sc, /SameSite=Strict/i);
-  assert.equal((await fetch(`${base}/api/sn`, { headers: { cookie: cookieDe(r) } })).status, 200);
-  assert.equal((await fetch(`${base}/api/sn`, { headers: { cookie: 'fo_team=forge' } })).status, 401);
+  assert.equal((await fetch(`${base}/api/tickets/sn`, { headers: { cookie: cookieDe(r) } })).status, 200);
+  assert.equal((await fetch(`${base}/api/tickets/sn`, { headers: { cookie: 'fo_team=forge' } })).status, 401);
 });
 
 test('code personnel d\'agent et mot de passe admin ouvrent aussi', async () => {
@@ -68,21 +68,21 @@ test('code personnel d\'agent et mot de passe admin ouvrent aussi', async () => 
   assert.equal(bad.status, 401);
   const ag = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"employeeId":"A00123456","password":"CODE2345"}' });
   assert.equal(ag.status, 200);
-  assert.equal((await fetch(`${base}/api/sn`, { headers: { cookie: cookieDe(ag) } })).status, 200);
+  assert.equal((await fetch(`${base}/api/tickets/sn`, { headers: { cookie: cookieDe(ag) } })).status, 200);
   const ad = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"password":"admin-pw"}' });
   assert.equal(ad.status, 200);
 });
 
 test('les sessions admin et agent existantes passent le verrou', async () => {
-  assert.equal((await fetch(`${base}/api/sn`, { headers: admin() })).status, 200);
-  assert.equal((await fetch(`${base}/api/sn`, { headers: { 'X-FO-Token': issueFoSession('Awa').token } })).status, 200);
+  assert.equal((await fetch(`${base}/api/tickets/sn`, { headers: admin() })).status, 200);
+  assert.equal((await fetch(`${base}/api/tickets/sn`, { headers: { 'X-FO-Token': issueFoSession('Awa').token } })).status, 200);
 });
 
 test('changer le mot de passe ferme les sessions d\'équipe', async () => {
   const r = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"password":"equipe-2026!"}' });
   const c = cookieDe(r);
   await fetch(`${base}/api/team/password`, { method: 'PUT', headers: admin(), body: '{"password":"nouveau-2026!"}' });
-  assert.equal((await fetch(`${base}/api/sn`, { headers: { cookie: c } })).status, 401);
+  assert.equal((await fetch(`${base}/api/tickets/sn`, { headers: { cookie: c } })).status, 401);
 });
 
 test('le condensé n\'est jamais renvoyé', async () => {
@@ -94,7 +94,7 @@ test('le condensé n\'est jamais renvoyé', async () => {
 test('désactivation par l\'admin : l\'API se rouvre', async () => {
   assert.equal((await fetch(`${base}/api/team/password`, { method: 'DELETE' })).status, 401);
   assert.equal((await fetch(`${base}/api/team/password`, { method: 'DELETE', headers: admin() })).status, 200);
-  assert.equal((await fetch(`${base}/api/sn`)).status, 200);
+  assert.equal((await fetch(`${base}/api/tickets/sn`)).status, 200);
 });
 
 test('CORS : une autre origine, même privée, n\'est pas autorisée', async () => {

@@ -2,6 +2,8 @@ const fs          = require('fs');
 const crypto      = require('crypto');
 const bcrypt      = require('bcryptjs');
 const { FILES } = require('../config/paths');
+const { readJSON, writeJSON, removeDoc } = require('../core/store');
+const { isMultiTenant } = require('../core/tenant');
 const {
   ADMIN_COOKIE, readCookie, sessionValid, absenceSessions, foSessionOwner,
 } = require('./sessions');
@@ -26,18 +28,22 @@ const {
 
 const TEAM_COOKIE = 'fo_team';
 const TEAM_TTL_MS = 12 * 60 * 60 * 1000;   // une journée de travail, garde comprise
-const teamSessions = new Map();            // token -> { expires, qui }
+const teamSessions = require('../core/scoped').scopedMap();            // token -> { expires, qui }
 
 function lireSecret() {
-  try { return JSON.parse(fs.readFileSync(FILES.team_secret, 'utf8')) || {}; }
-  catch { return {}; }
+  return readJSON(FILES.team_secret, {}) || {};
 }
 
+// TEAM_PW_HASH (.env) ne vaut qu'en mono-tenant : en multi-tenant, chaque
+// organisation a son propre mot de passe d'équipe.
 function teamHash() {
-  return process.env.TEAM_PW_HASH || lireSecret().hash || '';
+  return (!isMultiTenant() && process.env.TEAM_PW_HASH) || lireSecret().hash || '';
 }
 
-function teamGateActif() { return !!teamHash(); }
+// En multi-tenant, l'accès exige toujours une connexion (compte, code
+// personnel ou mot de passe d'équipe) : les données d'une organisation ne
+// sont jamais lisibles par un inconnu.
+function teamGateActif() { return isMultiTenant() || !!teamHash(); }
 
 function teamPwMatches(given) {
   const h = teamHash();
@@ -46,10 +52,7 @@ function teamPwMatches(given) {
 
 function definirMotDePasse(pw) {
   const data = { hash: bcrypt.hashSync(String(pw), 12), updated_at: new Date().toISOString() };
-  const tmp = FILES.team_secret + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(data), { mode: 0o600 });
-  fs.renameSync(tmp, FILES.team_secret);
-  try { fs.chmodSync(FILES.team_secret, 0o600); } catch {}
+  writeJSON(FILES.team_secret, data, { mode: 0o600 });
   // Changer le mot de passe ferme les sessions d'équipe ouvertes avec
   // l'ancien : sinon le changement ne mettrait personne dehors.
   teamSessions.clear();
@@ -57,7 +60,7 @@ function definirMotDePasse(pw) {
 }
 
 function desactiver() {
-  try { fs.unlinkSync(FILES.team_secret); } catch {}
+  removeDoc(FILES.team_secret);
   teamSessions.clear();
 }
 
@@ -78,6 +81,7 @@ function ouvrirSession(res, req, qui) {
   res.cookie(TEAM_COOKIE, token, {
     httpOnly: true, sameSite: 'strict', secure: req.secure, maxAge: TEAM_TTL_MS, path: '/',
   });
+  return token;
 }
 
 function fermerSession(req, res) {
@@ -117,6 +121,7 @@ const OUVERTES = new Set([
   '/config/auth', '/config/session', '/config/logout',
   '/fo-access/login', '/fo-access/logout',
   '/absences/auth', '/absences/session', '/absences/logout',
+  '/team/account-login', '/team/account-logout', '/platform/brand',
 ]);
 
 // Monté sur /api : req.path est donc relatif (« /sn », « /dashboard »…).

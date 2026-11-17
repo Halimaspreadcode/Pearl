@@ -161,7 +161,7 @@ function identite(req, res, next) {
   }
 
   // Tickets : modified_by est l'auteur de la modification.
-  if (b && /^\/(sn|ci)(\/[^/]+)?$/.test(req.path)) b.modified_by = moi;
+  if (b && /^\/tickets\/[^/]+(\/[^/]+)?$/.test(req.path)) b.modified_by = moi;
 
   // Tâches : un agent crée les siennes et ne touche qu'aux siennes.
   if (req.path === '/weekly-progress' && req.method === 'POST' && b) {

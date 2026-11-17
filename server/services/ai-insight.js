@@ -175,7 +175,7 @@ async function genererPour(fo, { force } = {}) {
 }
 
 // ── Passe de génération, agent par agent ─────────────────────
-const JOB = { encours: false, liste: [], courant: null, fait: 0, debut: null, fin: null, motif: '', etats: {} };
+const JOB = require('../core/scoped').scopedObject(() => ({ encours: false, liste: [], courant: null, fait: 0, debut: null, fin: null, motif: '', etats: {} }));
 const RESEAU = /injoignable|délai|tunnel|proxy|refus|connexion|ECONN|ENOTFOUND|ETIMEDOUT/i;
 
 function lancerPasse({ fo, force } = {}) {
@@ -219,7 +219,10 @@ function lancerPasse({ fo, force } = {}) {
 let _minuteur = null;
 function demarrerAuto() {
   if (_minuteur) return;
-  const tick = () => { try { if (reglages().enabled) lancerPasse(); } catch (e) { console.error('[ai] passe insights :', e.message); } };
+  const { forEachTenant } = require('../platform/tenants');
+  const tick = () => forEachTenant(() => {
+    try { if (reglages().enabled) lancerPasse(); } catch (e) { console.error('[ai] passe insights :', e.message); }
+  }).catch(() => {});
   setTimeout(tick, 90 * 1000).unref();
   _minuteur = setInterval(tick, 20 * 60 * 1000);
   _minuteur.unref();

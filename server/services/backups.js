@@ -1,6 +1,6 @@
 const fs          = require('fs');
 const path        = require('path');
-const { DATA_DIR } = require('../config/paths');
+const { DATA_DIR, tenantDir } = require('../config/paths');
 
 // ── SAUVEGARDES ───────────────────────────────────────────────
 // Les données de production vivent dans des fichiers JSON sur un poste
@@ -11,7 +11,8 @@ const { DATA_DIR } = require('../config/paths');
 // pour peu de valeur. On ne les rétablit pas : une copie par jour, avec
 // une rétention bornée, couvre le besoin réel sans revenir au défaut qui
 // avait motivé leur suppression. `BACKUP_RETENTION_DAYS=0` les désactive.
-const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
+// Un dossier backups/ par tenant, dans son propre dossier de données. En
+// base (STORE=supabase|pg), les sauvegardes sont celles de la base.
 const BACKUP_RETENTION = Number.isFinite(Number(process.env.BACKUP_RETENTION_DAYS))
   ? Number(process.env.BACKUP_RETENTION_DAYS) : 14;
 
@@ -19,24 +20,33 @@ const BACKUP_RETENTION = Number.isFinite(Number(process.env.BACKUP_RETENTION_DAY
 // idempotente, donc un redémarrage en série ne crée pas dix copies.
 function backupData() {
   if (BACKUP_RETENTION <= 0) return;
+  if (require('../core/backend').backend().kind !== 'fs') return;
+  const slugs = ['default'];
+  try { for (const d of fs.readdirSync(path.join(DATA_DIR, 'tenants'))) slugs.push(d); } catch {}
+  for (const slug of slugs) backupDir(tenantDir(slug));
+}
+
+function backupDir(dataDir) {
+  if (!fs.existsSync(dataDir)) return;
+  const BACKUPS_DIR = path.join(dataDir, 'backups');
   const day = new Date().toISOString().slice(0, 10);
   const dest = path.join(BACKUPS_DIR, day);
   try {
     if (fs.existsSync(dest)) return;                  // déjà sauvegardé aujourd'hui
     fs.mkdirSync(dest, { recursive: true });
     let n = 0;
-    for (const f of fs.readdirSync(DATA_DIR)) {
+    for (const f of fs.readdirSync(dataDir)) {
       // Uniquement les .json à la racine de data/ : ni le dossier
       // backups/ lui-même (qui se copierait en cascade), ni les .tmp
       // d'une écriture en cours, qui sont par nature incomplets.
       if (!f.endsWith('.json')) continue;
-      const src = path.join(DATA_DIR, f);
+      const src = path.join(dataDir, f);
       if (!fs.statSync(src).isFile()) continue;
       fs.copyFileSync(src, path.join(dest, f));
       n++;
     }
     console.log(`[Pearl] Sauvegarde ${day} : ${n} fichier(s) → ${dest}`);
-    pruneBackups();
+    pruneBackups(BACKUPS_DIR);
   } catch (err) {
     // Une sauvegarde ratée ne doit jamais empêcher l'app de tourner.
     console.error('[Pearl] Sauvegarde impossible :', err.message);
@@ -45,7 +55,7 @@ function backupData() {
 
 // Rétention : au-delà de N dossiers, les plus anciens partent. Sans cela
 // la sauvegarde règlerait un problème en en créant un autre — le disque.
-function pruneBackups() {
+function pruneBackups(BACKUPS_DIR) {
   let dirs;
   try { dirs = fs.readdirSync(BACKUPS_DIR).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)); }
   catch { return; }

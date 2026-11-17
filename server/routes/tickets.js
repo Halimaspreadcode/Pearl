@@ -1,7 +1,7 @@
 const express     = require('express');
 const { v4: uuidv4 } = require('uuid');
-const { FILES } = require('../config/paths');
-const { readCfg, readTracker, withFileLock, writeTracker } = require('../core/store');
+const { FILES, siteFile } = require('../config/paths');
+const { readCfg, readTracker, withFileLock, writeTracker, readSites, siteCodes } = require('../core/store');
 const { addAudit } = require('../core/audit');
 const { cleanBody } = require('../core/sanitize');
 const { majAttentes } = require('../core/holds');
@@ -10,22 +10,39 @@ const { enrichTicket } = require('../core/sla');
 const router = express.Router();
 
 // ── TICKETS ──────────────────────────────────────────────────
-['sn', 'ci'].forEach(tracker => {
-  router.get(`/api/${tracker}`, (req, res) => {
-    const cfg     = readCfg();
-    const tickets = readTracker(tracker);
-    res.json(tickets.map(t => enrichTicket(t, cfg)));
-  });
+// Un tracker par site configuré (cfg.sites). `:site` est le code du site,
+// en minuscules ou majuscules ; un code inconnu donne 404.
+//   GET    /api/tickets              → { sites, tickets: { CODE: [...] } }
+//   GET    /api/tickets/:site        → tickets du site
+//   GET    /api/tickets/:site/:id
+//   POST   /api/tickets/:site
+//   PUT    /api/tickets/:site/:id
+//   DELETE /api/tickets/:site/:id
+router.get('/api/tickets', (req, res) => {
+  const cfg = readCfg();
+  const tickets = {};
+  for (const s of readSites(cfg)) tickets[s.code] = readTracker(s.code).map(t => enrichTicket(t, cfg));
+  res.json({ sites: readSites(cfg), tickets });
+});
 
-  router.get(`/api/${tracker}/:id`, (req, res) => {
-    const cfg     = readCfg();
-    const tickets = readTracker(tracker);
-    const ticket  = tickets.find(t => t.id === req.params.id);
-    if (!ticket) return res.status(404).json({ error: 'Not found' });
-    res.json(enrichTicket(ticket, cfg));
-  });
+router.param('site', (req, res, next, site) => {
+  const code = String(site || '').toUpperCase();
+  if (!siteCodes().includes(code)) return res.status(404).json({ error: `Site inconnu : ${site}` });
+  req.site = code;
+  next();
+});
 
-  const trackerFile = tracker === 'sn' ? FILES.sn : FILES.ci;
+router.get('/api/tickets/:site', (req, res) => {
+  const cfg = readCfg();
+  res.json(readTracker(req.site).map(t => enrichTicket(t, cfg)));
+});
+
+router.get('/api/tickets/:site/:id', (req, res) => {
+  const cfg    = readCfg();
+  const ticket = readTracker(req.site).find(t => t.id === req.params.id);
+  if (!ticket) return res.status(404).json({ error: 'Not found' });
+  res.json(enrichTicket(ticket, cfg));
+});
 
   // Champs sans lesquels le SLA ne se calcule pas. Un ticket créé sans
   // eux passait en « N/A » et sortait de tous les taux de conformité : le
@@ -54,7 +71,8 @@ const router = express.Router();
     return erreurs;
   }
 
-  router.post(`/api/${tracker}`, (req, res) => {
+  router.post('/api/tickets/:site', (req, res) => {
+    const tracker = req.site.toLowerCase(), trackerFile = siteFile(req.site);
     const erreurs = champsSLAInvalides(req.body || {}, readCfg(), true);
     if (erreurs.length) return res.status(400).json({ error: erreurs.join(' · '), fields: erreurs });
     withFileLock(trackerFile, () => {
@@ -79,7 +97,8 @@ const router = express.Router();
     }).catch(err => res.status(500).json({ error: err.message }));
   });
 
-  router.put(`/api/${tracker}/:id`, (req, res) => {
+  router.put('/api/tickets/:site/:id', (req, res) => {
+    const tracker = req.site.toLowerCase(), trackerFile = siteFile(req.site);
     const erreurs = champsSLAInvalides(req.body || {}, readCfg(), false);
     if (erreurs.length) return res.status(400).json({ error: erreurs.join(' · '), fields: erreurs });
     withFileLock(trackerFile, () => {
@@ -125,7 +144,8 @@ const router = express.Router();
     }).catch(err => res.status(500).json({ error: err.message }));
   });
 
-  router.delete(`/api/${tracker}/:id`, (req, res) => {
+  router.delete('/api/tickets/:site/:id', (req, res) => {
+    const tracker = req.site.toLowerCase(), trackerFile = siteFile(req.site);
     withFileLock(trackerFile, () => {
       const tickets = readTracker(tracker);
       const idx     = tickets.findIndex(t => t.id === req.params.id);
@@ -139,6 +159,5 @@ const router = express.Router();
       res.json({ ok: true });
     }).catch(err => res.status(500).json({ error: err.message }));
   });
-});
 
 module.exports = router;

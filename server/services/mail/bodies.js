@@ -14,17 +14,24 @@ const { slaTargetLabel } = require('../../core/sla');
 // « Nothing to report » d'affilée noyaient le reste.
 //
 // HTML de mail : tableaux et styles en ligne uniquement.
-// ── PAYS D'UN RAPPORT ─────────────────────────────────────────
-// Chaque envoi programmé choisit son périmètre : Sénégal, Côte d'Ivoire ou
-// les deux. Le code sert aux filtres ('SN' | 'CI' | 'ALL'), le libellé au
-// mail et au classeur (la ville remplace « Dakar » écrit en dur).
-const PAYS = {
-  SN:  { code: 'SN', en: 'Senegal', ville: 'Dakar' },
-  CI:  { code: 'CI', en: "Côte d'Ivoire", ville: 'Abidjan' },
-  ALL: { code: 'SN + CI', en: 'Senegal + Côte d\'Ivoire', ville: 'Dakar + Abidjan' },
-};
-// Valeur absente ou inconnue : Sénégal, le périmètre historique du deck.
-function normPays(v) { return PAYS[v] ? v : 'SN'; }
+// ── PÉRIMÈTRE D'UN RAPPORT ────────────────────────────────────
+// Chaque envoi programmé choisit son périmètre : un site de l'organisation
+// ou tous ('ALL'). Le code sert aux filtres, le libellé au mail et au
+// classeur. Les sites viennent de la configuration (cfg.sites).
+const { normScope, siteByCode, scopeLabel, scopeCodes, readSites } = require('../../core/store');
+function paysInfo(code) {
+  if (code === 'ALL') {
+    const sites = readSites();
+    return { code: scopeCodes('ALL'), en: sites.map(s => s.country || s.name).filter((v, i, a) => a.indexOf(v) === i).join(' + ') || 'All sites', ville: scopeLabel('ALL') };
+  }
+  const s = siteByCode(code);
+  return s ? { code: s.code, en: s.country || s.name, ville: s.city || s.name }
+           : { code: String(code || ''), en: String(code || ''), ville: String(code || '') };
+}
+// PAYS[code] reste lisible comme avant (PAYS.LYO.ville…), mais calculé.
+const PAYS = new Proxy({}, { get: (_, k) => (typeof k === 'string' ? paysInfo(k) : undefined) });
+// Valeur absente ou inconnue : le premier site.
+function normPays(v) { return normScope(v, 'first'); }
 
 // Un highlight clôturé n'a plus rien à signaler : il reste dans la page
 // (historique de la journée) mais sort du mail et du classeur.
@@ -39,7 +46,7 @@ function highlightsOuverts(liste) {
 // métriques colorées, cellules colorées selon le statut. Qui lit le mail
 // puis ouvre l'Excel retrouve le même document. Tableaux et styles en
 // ligne : les clients mail ignorent les feuilles de style.
-function corpsDaily(d, br, _dateStr, pays = 'SN') {
+function corpsDaily(d, br, _dateStr, pays) {
   const k = d.kpis || {};
   const P = PAYS[normPays(pays)];
   const esc = v => String(v ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -191,7 +198,7 @@ function mailSubject(kind, modele, now = new Date(), pays) {
 // HTML de mail (tableaux et styles en ligne — les clients mail ignorent
 // les feuilles de style). Le lecteur a les chiffres de la semaine sans
 // ouvrir le PowerPoint ; le deck reste en pièce jointe pour le détail.
-function corpsWeeklyOverview(data, pays = 'SN') {
+function corpsWeeklyOverview(data, pays) {
   const esc = v => String(v ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const k = data.kpis || {};
   const fmtD = v => new Date(v).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });

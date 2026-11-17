@@ -1,6 +1,7 @@
 const fs   = require('fs');
 const path = require('path');
-const { DATA_DIR, FILES } = require('../config/paths');
+const { dataDir, FILES } = require('../config/paths');
+const { backend } = require('../core/backend');
 const { readJSON, writeJSON, withFileLock, readCfg, writeCfg } = require('../core/store');
 const { foSessions } = require('../auth/sessions');
 
@@ -44,9 +45,8 @@ function remplacerDans(valeur, re, nouveau, compte) {
 }
 
 function fichiersDeDonnees() {
-  return fs.readdirSync(DATA_DIR)
-    .filter(f => f.endsWith('.json'))
-    .map(f => path.join(DATA_DIR, f));
+  const dir = dataDir();
+  return backend().listDocs(dir).map(f => path.join(dir, f));
 }
 
 // `fusion` : si l'agent cible existe déjà (doublon créé à la main), ses
@@ -103,9 +103,12 @@ async function appliquerCorrections(liste = CORRECTIONS) {
     try {
       // Copie complète juste avant : la sauvegarde du jour peut dater de
       // ce matin, celle-ci est l'état exact d'avant le renommage.
-      const dest = path.join(DATA_DIR, 'backups', `avant-renommage-${new Date().toISOString().replace(/[:.]/g, '-')}`);
-      fs.mkdirSync(dest, { recursive: true });
-      for (const f of fichiersDeDonnees()) fs.copyFileSync(f, path.join(dest, path.basename(f)));
+      // (En base, les sauvegardes sont celles de la base elle-même.)
+      if (backend().kind === 'fs') {
+        const dest = path.join(dataDir(), 'backups', `avant-renommage-${new Date().toISOString().replace(/[:.]/g, '-')}`);
+        fs.mkdirSync(dest, { recursive: true });
+        for (const f of fichiersDeDonnees()) fs.copyFileSync(f, path.join(dest, path.basename(f)));
+      }
       const r = await renommerAgent(ancien, nouveau, { fusion: true });
       require('../core/audit').addAudit('config', r.nouveau, 'system', 'fo-rename', { from: ancien, to: r.nouveau, total: r.total, fusion: r.fusion });
       console.log(`[Pearl] Agent renommé : ${ancien} → ${r.nouveau} (${r.total} mention(s)${r.fusion ? ', fusion' : ''}).`);
