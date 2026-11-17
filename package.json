@@ -16,7 +16,9 @@
     "dev": "node --watch server/index.js",
     "test:run": "PORT=3001 DATA_DIR=./data-test node server/index.js",
     "test:seed": "rm -rf ./data-test && cp -R ./data ./data-test && rm -rf ./data-test/backups",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "db:migrate": "node scripts/db-migrate.js",
+    "tenant:create": "node scripts/tenant-create.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
