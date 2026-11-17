@@ -1,4 +1,4 @@
-const { readCfg, readObs } = require('../core/store');
+const { readCfg, readObs, readSites, siteCodes, readHolidays } = require('../core/store');
 const { buildWeeklyReport } = require('./reports');
 const {
   readAbsences, ABSENCE_TYPES, eachDay, holidaySetFor, defaultNotice, noticeOk,
@@ -7,10 +7,10 @@ const {
 // ══════════════════════════════════════════════════════════════
 // WEEKLY PERFORMANCE — DAKAR × ABIDJAN
 //
-// Le Weekly Report est un rapport Sénégal. Celui-ci présente la même
+// Le Weekly Report porte sur un site. Celui-ci présente la même
 // semaine aux deux équipes, côte à côte, avec une règle de plus : ce qui
 // sort de l'ordinaire doit être expliqué. Le serveur repère donc ce qui
-// appelle une explication — pics d'activité, absences à Dakar, incidents
+// appelle une explication — pics d'activité, absences, incidents
 // de plateforme — et propose ce que les Observations en disent déjà.
 // Le client complète, le deck affiche ; une explication manquante reste
 // visible sur la slide au lieu de disparaître.
@@ -19,10 +19,8 @@ const {
 // que le texte saisi côté client retrouve sa place dans le deck.
 // ══════════════════════════════════════════════════════════════
 
-const SITES = [
-  { code: 'SN', ville: 'Dakar' },
-  { code: 'CI', ville: 'Abidjan' },
-];
+// Sites de l'organisation (cfg.sites), « ville » = ville sinon nom.
+const sitesDe = cfg => readSites(cfg).map(s => ({ code: s.code, ville: s.city || s.name }));
 
 // Un incident de plateforme se reconnaît à son vocabulaire : les
 // Observations sont du texte libre, sans catégorie. Mots FR et EN,
@@ -44,7 +42,7 @@ const dayLabel = iso => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB',
 
 // ── Activité d'un site ────────────────────────────────────────
 // Un pic se juge contre l'habitude du site, pas contre l'autre site :
-// Abidjan et Dakar n'ont pas le même volume. La référence est la moyenne
+// Les sites n'ont pas le même volume. La référence est la moyenne
 // journalière des sept semaines précédentes.
 //
 // Un jour est un pic s'il atteint au moins deux fois cette moyenne, avec
@@ -127,17 +125,17 @@ function siteActivity(data, code, ville, obsBySite) {
   };
 }
 
-// ── Assiduité de l'équipe de Dakar ────────────────────────────
+// ── Assiduité de l'équipe (tous sites) ────────────────────────
 // Agrégée, jamais nominative : le deck est diffusé aux deux équipes. On
 // ne sort ni nom, ni motif, ni type précis — seulement planifié / non
 // planifié / formation, ce qui suffit à la lecture opérationnelle.
 // « On-Site (Delivery) » n'est pas une absence : l'agent travaille.
-function dakarAttendance(weekStart, weekEnd, cfg) {
-  const trackers = cfg.fo_trackers || {};
-  const equipe = (cfg.fo_list || []).filter(fo =>
-    [].concat(trackers[fo] || 'SN').map(x => String(x).toUpperCase()).includes('SN'));
+function teamAttendance(weekStart, weekEnd, cfg) {
+  const equipe = (cfg.fo_list || []).slice();
   const membres = new Set(equipe);
-  const feries = holidaySetFor('SN');
+  // Fériés communs à tous les sites (un férié propre à un site ne retire
+  // pas la journée à toute l'équipe).
+  const feries = new Set(readHolidays().filter(h => !h.country).map(h => h.date));
   const all = readAbsences().filter(a => membres.has(a.fo_name)
     && (a.status === 'Validée' || a.status === 'Demandée')
     && a.type !== 'On-Site (Delivery)');
@@ -194,7 +192,7 @@ function dakarAttendance(weekStart, weekEnd, cfg) {
     headcount: equipe.length,
     labels: semaine.per_day.map(d => dayLabel(d.iso)),
     trend,
-    key: 'attendance-SN',
+    key: 'attendance',
     // Toute absence de la semaine s'explique en revue — planifiée ou non.
     // La formation seule n'appelle pas d'explication : c'est un choix.
     required: semaine.absence_days > 0,
@@ -216,7 +214,7 @@ function weekObservations(weekStart, weekEnd) {
     || o.status === 'In Progress'))
     .map(o => {
       const src = String(o.source || '').trim().toUpperCase();
-      const site = src === 'SN' || src === 'CI' ? src : 'ALL';
+      const site = siteCodes().includes(src) ? src : 'ALL';
       const outage = isOutage(o);
       const explication = [o.impact && `Impact: ${o.impact}`,
         o.proposed_solution && `Action: ${o.proposed_solution}`].filter(Boolean).join(' · ');
@@ -237,32 +235,35 @@ function weekObservations(weekStart, weekEnd) {
 
 function buildCombinedAnalysis(dateQuery) {
   const cfg = readCfg();
+  const SITES = sitesDe(cfg);
   const reports = SITES.map(s => buildWeeklyReport(dateQuery, s.code));
-  const ref = reports[0];
+  // Sans site configuré : une analyse vide mais bien formée (semaine, assiduité).
+  const ref = reports[0] || buildWeeklyReport(dateQuery, 'ALL');
   const observations = weekObservations(ref.week_start, ref.week_end);
-  const obsBySite = { SN: [], CI: [] };
+  const obsBySite = Object.fromEntries(SITES.map(s => [s.code, []]));
   observations.forEach(o => {
-    if (o.site === 'ALL') { obsBySite.SN.push(raw(o)); obsBySite.CI.push(raw(o)); }
-    else obsBySite[o.site].push(raw(o));
+    if (o.site === 'ALL') SITES.forEach(s => obsBySite[s.code].push(raw(o)));
+    else if (obsBySite[o.site]) obsBySite[o.site].push(raw(o));
   });
   function raw(o) { return { observation: o.text, impact: '', date: o.date }; }
+  const villeDe = code => (SITES.find(s => s.code === code) || {}).ville || code;
 
   const sites = SITES.map((s, i) => siteActivity(reports[i], s.code, s.ville, obsBySite));
-  const attendance = dakarAttendance(ref.week_start, ref.week_end, cfg);
+  const attendance = teamAttendance(ref.week_start, ref.week_end, cfg);
 
   // Liste unique de ce qui demande une explication, dans l'ordre du deck.
   const toExplain = [
     ...sites.flatMap(s => [...(s.week_peak ? [s.week_peak] : []), ...s.peaks]),
     ...(attendance.required ? [{
-      key: attendance.key, kind: 'attendance', site: 'SN', ville: 'Dakar', required: true,
-      title: `Dakar: ${attendance.absence_days} absence day(s) this week`
+      key: attendance.key, kind: 'attendance', site: 'ALL', ville: 'Team', required: true,
+      title: `Team: ${attendance.absence_days} absence day(s) this week`
         + ` (${attendance.absence_rate}% of capacity, ${attendance.unplanned_days} unplanned)`,
       suggestion: '',
     }] : []),
     ...observations.filter(o => o.outage).map(o => ({
       key: o.key, kind: 'outage', site: o.site,
-      ville: o.site === 'SN' ? 'Dakar' : o.site === 'CI' ? 'Abidjan' : 'Both sites',
-      required: true, title: `${o.site === 'ALL' ? 'Both sites' : o.site === 'SN' ? 'Dakar' : 'Abidjan'}`
+      ville: o.site === 'ALL' ? 'All sites' : villeDe(o.site),
+      required: true, title: `${o.site === 'ALL' ? 'All sites' : villeDe(o.site)}`
         + `: platform incident, ${o.text}`,
       suggestion: o.suggestion,
     })),

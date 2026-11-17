@@ -36,8 +36,7 @@ function foToggleLegend() {
 function _foWindowAgg(daysBack, daysSpan) {
   const tracker = (document.getElementById('fo-dash-tracker') || {}).value || 'both';
   let pool = [];
-  if (tracker !== 'ci') pool = pool.concat(state.sn);
-  if (tracker !== 'sn') pool = pool.concat(state.ci);
+  pool = pool.concat(tracker === 'both' ? allTicketsRaw() : ticketsOf(tracker));
 
   const to   = Date.now() - daysBack * 86400000;
   const from = to - daysSpan * 86400000;
@@ -60,8 +59,7 @@ function _foWindowAgg(daysBack, daysSpan) {
 function _foDailySeries(days = 10) {
   const tracker = (document.getElementById('fo-dash-tracker') || {}).value || 'both';
   let pool = [];
-  if (tracker !== 'ci') pool = pool.concat(state.sn);
-  if (tracker !== 'sn') pool = pool.concat(state.ci);
+  pool = pool.concat(tracker === 'both' ? allTicketsRaw() : ticketsOf(tracker));
   const out = [];
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - i);
@@ -78,7 +76,7 @@ async function renderFoDashboard() {
   // d'encadrement, pas un contenu de tableau de bord d'équipe.
   const vis    = await _loadKpiVisibility();
   const foList = (state.config.fo_list || []).filter(fo =>
-    getActiveCountry() === 'ALL' || ((state.config.fo_trackers || {})[fo] || 'SN') === getActiveCountry());
+    getActiveCountry() === 'ALL' || personInScope(fo, getActiveCountry()));
   let ranked = foList.map(fo => {
     const stats = _calcFoStats(fo);
     const quizBonus = _foQuizBonus(fo);
@@ -97,7 +95,7 @@ async function renderFoDashboard() {
     agg.breach     += r.breach;
     agg.p1         += r.p1;
   });
-  const allTickets = [...state.sn, ...state.ci];
+  const allTickets = allTicketsRaw();
   const withSLA    = allTickets.filter(t => t.sla_status && !['N/A', 'On Hold'].includes(t.sla_status));
   const inSLA      = withSLA.filter(t => t.sla_status === 'In SLA');
   agg.slaRate      = withSLA.length ? Math.round((inSLA.length / withSLA.length) * 100) : 100;
@@ -227,8 +225,8 @@ async function renderFoDashboard() {
 
   rankTable.innerHTML = `<div class="fo-rank">${displayed.map((r) => {
     const rankIndex = ranked.indexOf(r);
-    const tr        = (state.config.fo_trackers || {})[r.fo] || 'SN';
-    const trCls     = tr === 'CI' ? 'ci' : 'sn';
+    const tr        = personSite(r.fo);
+    const trCls     = String(tr || '').toLowerCase();
     const safeFo    = esc(r.fo).replace(/'/g,"\\'");
     const rowId     = `fo-detail-${rankIndex}`;
     const initials  = foInitials(r.fo);

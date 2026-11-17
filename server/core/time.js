@@ -4,7 +4,7 @@ const { DRILL_END_H, DRILL_START_H } = require('./sla');
 // Period boundaries (a "day", a "week", a "month") must be anchored to the
 // operations timezone, not to whatever the host VM happens to be set to.
 // Without this, moving the app to a VM in another timezone silently shifts
-// tickets into the wrong report. Defaults to UTC, which is Dakar's offset.
+// tickets into the wrong report. Defaults to UTC.
 function reportTZ(cfg) {
   return (cfg && cfg.timezone) || process.env.REPORT_TZ || 'UTC';
 }

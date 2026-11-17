@@ -18,8 +18,7 @@ function renderFOHeatmap(period) {
   const country = typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL';
   const range   = typeof getDashPeriodRange === 'function' ? getDashPeriodRange() : null;
   let allTickets = [
-    ...(country !== 'CI' ? (state.sn || []) : []),
-    ...(country !== 'SN' ? (state.ci || []) : []),
+    ...ticketsInScope(country),
   ];
   if (range) {
     allTickets = allTickets.filter(t => {
@@ -178,7 +177,7 @@ const STATUS_ORDER  = ['Open','In Progress','Resolved','Closed'];
 const PRIO_ORDER    = ['P1','P2','P3','P4'];
 
 function _domainBreakdown(domain) {
-  const tickets = [...(state.sn||[]), ...(state.ci||[])].filter(t => t.domain === domain);
+  const tickets = allTicketsRaw().filter(t => t.domain === domain);
   const byStatus = {}, byPrio = {};
   tickets.forEach(t => {
     const s = t.status   || 'Unknown';
@@ -297,12 +296,12 @@ function _showDomainDetail(domain, idx, rowEl) {
 
 function filterDomainDash(domain) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const navEl = document.querySelector('.nav-item[data-page="sn"]');
+  const navEl = document.querySelector('.nav-item[data-page="site"]');
   if (navEl) navEl.classList.add('active');
-  renderPage('sn');
+  renderPage('site');
   setTimeout(() => {
     const df = document.getElementById('sn-filter-domain');
-    if (df) { df.value = domain; filterTable('sn'); }
+    if (df) { df.value = domain; filterTable('site'); }
   }, 60);
 }
 

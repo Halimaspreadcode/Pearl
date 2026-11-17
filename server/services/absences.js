@@ -1,5 +1,5 @@
 const { FILES } = require('../config/paths');
-const { readCfg, readHolidays, readJSON, readShiftsPlan, writeJSON } = require('../core/store');
+const { readCfg, readHolidays, readJSON, readShiftsPlan, writeJSON, personSiteCodes } = require('../core/store');
 
 // ── ABSENCES ──────────────────────────────────────────────────
 // Toutes les routes sont derrière `requireAbsence` : le verrou est
@@ -145,7 +145,7 @@ function defaultNotice(a) {
 // Calcul de la synthèse, partagé par la route JSON, le rapport PDF et
 // la diffusion e-mail. Paramètres au format de la query string.
 // `agentsDuPays` : ne garder que les agents rattachés au pays (fo_trackers,
-// Sénégal par défaut) et leurs absences — pour le rapport envoyé par pays.
+// premier site par défaut) et leurs absences — pour le rapport envoyé par site.
 // Sans lui, le pays ne règle que les jours fériés, comme la page Absences.
 function computeAbsenceSummary({ country: qCountry, year: qYear, from: qFrom, to: qTo, agentsDuPays = false } = {}) {
     const cfg      = readCfg();
@@ -154,7 +154,7 @@ function computeAbsenceSummary({ country: qCountry, year: qYear, from: qFrom, to
     const from     = qFrom || `${year}-01-01`;
     const to       = qTo   || `${year}-12-31`;
     const holidays = holidaySetFor(country);
-    const trackerDe = n => [].concat((cfg.fo_trackers || {})[n] || 'SN').map(x => String(x).toUpperCase());
+    const trackerDe = n => personSiteCodes(n, cfg);
     const agentsPays = agentsDuPays && country ? (cfg.fo_list || []).filter(n => trackerDe(n).includes(country)) : null;
     const all      = agentsPays ? readAbsences().filter(a => agentsPays.includes(a.fo_name)) : readAbsences();
 

@@ -212,7 +212,7 @@ const NF = {
     const items = [];
     const today = new Date().toISOString().slice(0, 10);
     const weekStart = this._weekStart();
-    const myTracker = (state.config?.fo_trackers || {})[me] || 'SN';
+    const myTracker = personSite(me);
     const shift = this._todayShift();
 
     // 1 ── Weekly progress de la semaine en cours.
@@ -252,13 +252,13 @@ const NF = {
 
     // 2 ── Saisie des tickets, pendant le shift uniquement.
     if (shift?.active) {
-      const pool = myTracker === 'CI' ? (state.ci || []) : (state.sn || []);
+      const pool = ticketsOf(myTracker);
       const minesToday = pool.filter(t =>
         (t.fo_owner === me || t.assigned_to === me) &&
         String(t.created_at || '').slice(0, 10) === today);
       items.push({
         id: 'tk-shift', tone: 'due', icon: 'ticket',
-        page: myTracker === 'CI' ? 'ci' : 'sn',
+        page: myTracker.toLowerCase(),
         title: minesToday.length ? 'Keep your tickets up to date' : 'Log your tickets',
         desc: minesToday.length
           ? `${minesToday.length} ticket${minesToday.length > 1 ? 's' : ''} logged today. Complete the statuses before the end of the shift (${shift.shift.end}).`
@@ -273,7 +273,7 @@ const NF = {
       if (stale.length) {
         items.push({
           id: 'tk-open', tone: 'info', icon: 'ticket',
-          page: myTracker === 'CI' ? 'ci' : 'sn',
+          page: myTracker.toLowerCase(),
           title: `${stale.length} ticket${stale.length > 1 ? 's' : ''} still open`,
           desc: 'Move them to Resolved or update the current action so tracking stays accurate.',
           tag: `Tracker ${myTracker}`,

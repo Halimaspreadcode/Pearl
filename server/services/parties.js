@@ -10,7 +10,7 @@
 //
 // Un rôle créé ici est un rôle à part entière : session nominative (le
 // code personnel), vue par profil de la barre latérale, présence,
-// reconnaissance dans IMOC.
+// reconnaissance dans les outils externes.
 //
 // Stockage : config.parties = { roles: [...], people: [...] }, écrit par
 // ses propres routes (jamais par PUT /api/config, qui l'écraserait).
@@ -23,7 +23,8 @@ const { readCfg, writeCfg, withFileLock, readBO } = require('../core/store');
 // Général) : ils figurent ici en lecture, pour l'affichage.
 const RESERVES = ['FO', 'BO', 'OBSERVER', 'GUEST', 'ADMIN', 'INVALID'];
 const COULEURS = ['#3D7FD9', '#8E5BD9', '#2E9E5B', '#E8833A', '#D64545', '#14B8A6', '#B8860B', '#EC4899'];
-const PAYS = { SN: 'Sénégal', CI: 'Côte d\'Ivoire', '': '—' };
+// Site de rattachement d'une partie prenante : un code de cfg.sites ou ''.
+const PAYS = new Proxy({ '': '—' }, { get: (t, k) => (k in t ? t[k] : (typeof k === 'string' ? ((require('../core/store').siteByCode(k) || {}).name || k) : undefined)) });
 
 const str = (v, n) => String(v ?? '').trim().replace(/\s+/g, ' ').slice(0, n);
 const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -86,7 +87,7 @@ async function majPersonne(b) {
     if (doublon) throw Object.assign(new Error(`${doublon.name} existe déjà.`), { status: 409 });
     if ((cfg.fo_list || []).some(f => norm(f) === norm(name))) throw Object.assign(new Error(`${name} est déjà dans la liste des FO.`), { status: 409 });
     const x = { id: i >= 0 ? p.people[i].id : crypto.randomBytes(5).toString('hex'), name, role: b.role,
-      country: ['SN', 'CI'].includes(b.country) ? b.country : '', aliases,
+      country: require('../core/store').siteCodes(cfg).includes(String(b.country || '').toUpperCase()) ? String(b.country).toUpperCase() : '', aliases,
       email: str(b.email, 120), phone: str(b.phone, 40), note: str(b.note, 200) };
     if (i >= 0) p.people[i] = x; else p.people.push(x);
     return x;
@@ -100,7 +101,7 @@ async function retirerPersonne(id) {
     return { ok: true };
   });
 }
-// Graphie vue ailleurs (IMOC…) rattachée à une personne : elle sera
+// Graphie vue ailleurs (outil externe…) rattachée à une personne : elle sera
 // reconnue d'office la prochaine fois.
 async function ajouterAlias(id, alias) {
   const a = str(alias, 120);

@@ -438,7 +438,7 @@ async function o2oPushActionToTasks(fo, meetingId, actionId) {
         week_start: _o2oTaskWeek(a.due),
         status: O2O_TO_WP_STATUS[a.status] || 'Planned',
         modified_by: fo,
-        tracker: (state.config.fo_trackers || {})[fo] || 'SN',
+        tracker: personSite(fo),
         // Origin markers: they carry the dedicated styling and the way
         // back to the review the action came from.
         o2o_action: actionId,
@@ -470,7 +470,7 @@ async function o2oPushAllActions(fo) {
     if (!ok) return;
   }
 
-  const tracker = (state.config.fo_trackers || {})[fo] || 'SN';
+  const tracker = personSite(fo);
   const res = await Promise.allSettled(todo.map(a => fetch(`${API}/api/weekly-progress`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

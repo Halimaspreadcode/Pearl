@@ -2,8 +2,8 @@
 // RÔLES ET PARTIES PRENANTES (Configuration)
 //
 // FO et BO, plus les autres acteurs des tickets : SMC, DRPS… L'admin crée
-// un rôle, y range des personnes (pays, graphies vues dans IMOC). Le rôle
-// suit partout : vue par profil, code personnel, présence, IMOC.
+// un rôle, y range des personnes (pays, graphies vues dans vos autres outils). Le rôle
+// suit partout : vue par profil, code personnel, présence, outils externes.
 // ══════════════════════════════════════════════════════════════
 const PTY = { data: null, sel: '', err: '', edit: null, editRole: null, test: '', res: null };
 
@@ -21,7 +21,7 @@ async function renderParties() {
   if (typeof state !== 'undefined' && state.config) state.config.parties = { roles: PTY.data.roles, people: PTY.data.people.map(({ id, name, role, country }) => ({ id, name, role, country })) };
 }
 
-const _ptyPays = c => ({ SN: '🇸🇳 Sénégal', CI: '🇨🇮 Côte d\'Ivoire' }[c] || '—');
+const _ptyPays = c => (c && isSiteCode(c) ? siteName(c) : '—');
 
 function _ptyPaint() {
   const root = document.getElementById('parties-root');
@@ -39,7 +39,7 @@ function _ptyPaint() {
   if (PTY.editRole !== null) corps = _ptyRoleForm();
   else if (PTY.sel === 'FO' || PTY.sel === 'BO') corps = `<section class="pt-card">
       <h2>${PTY.sel === 'FO' ? 'Front Office' : 'Back Office'}</h2>
-      <p class="pt-mute">Les ${PTY.sel} se gèrent dans leur liste habituelle : ${PTY.sel === 'FO' ? 'Configuration › Général (équipe FO) et la Shift Rota' : 'Configuration › Données (équipe Back Office)'}. Ils sont reconnus ici comme les autres rôles, notamment dans IMOC.</p>
+      <p class="pt-mute">Les ${PTY.sel} se gèrent dans leur liste habituelle : ${PTY.sel === 'FO' ? 'Configuration › Général (équipe FO) et la Shift Rota' : 'Configuration › Données (équipe Back Office)'}. Ils sont reconnus ici comme les autres rôles, notamment dans vos autres outils.</p>
       <button type="button" class="pt-btn" onclick="renderPage('${PTY.sel === 'FO' ? 'cfg-general' : 'cfg-data'}')">Ouvrir la liste ${PTY.sel}</button></section>`;
   else if (role) {
     const gens = D.people.filter(p => p.role === role.key).sort((a, b) => a.name.localeCompare(b.name));
@@ -60,7 +60,7 @@ function _ptyPaint() {
   const r = PTY.res;
   const test = `<section class="pt-card pt-test">
     <h3>Reconnaître un nom vu ailleurs</h3>
-    <p class="pt-mute">Colle un nom tel qu'il apparaît dans IMOC (Initiator, Managing Owner technician…) : Pearl dit à qui il correspond.</p>
+    <p class="pt-mute">Colle un nom tel qu'il apparaît dans vos autres outils (Initiator, Managing Owner technician…) : Pearl dit à qui il correspond.</p>
     <form onsubmit="event.preventDefault();ptyTester(this.q.value)"><input name="q" value="${esc(PTY.test)}" placeholder="ex. DIR/OPS/SMC-N/QSM MOREAU PIERRE ANTOINE" autocomplete="off"><button type="submit" class="pt-btn">Reconnaître</button></form>
     ${r ? (r.sur ? `<div class="pt-res is-ok"><span class="pt-tag" style="--c:${esc(r.color || '#141518')}"><i></i>${esc(r.role)}</span><b>${esc(r.name)}</b><small>${esc(r.role_label)}${r.country ? ` · ${_ptyPays(r.country)}` : ''} · reconnu par ${esc(r.via)}</small></div>`
       : `<div class="pt-res"><p>Nom lu : <b>${esc(r.nom)}</b>${r.org ? ` <small>· organisation « ${esc(r.org)} »</small>` : ''} — personne de connu.</p>
@@ -68,14 +68,14 @@ function _ptyPaint() {
         ${D.roles.length ? `<form class="pt-quick" onsubmit="event.preventDefault();ptyCreerDepuis(this)">
           <input name="name" value="${esc(r.nom)}" aria-label="Nom">
           <select name="role">${D.roles.map(x => `<option value="${esc(x.key)}"${x.key === r.role_devine ? ' selected' : ''}>${esc(x.key)} — ${esc(x.label)}</option>`).join('')}</select>
-          <select name="country"><option value="">Pays…</option><option value="SN">Sénégal</option><option value="CI">Côte d'Ivoire</option></select>
+          <select name="country"><option value="">Site…</option>${siteList().map(s => `<option value="${esc(s.code)}">${esc(siteName(s.code))}</option>`).join('')}</select>
           <button type="submit" class="pt-btn is-pri">Ajouter</button></form>
           <p class="pt-mute">La graphie « ${esc(r.brut)} » sera retenue : ce nom sera reconnu d'office la prochaine fois.</p>` : '<p class="pt-mute">Crée d\'abord un rôle pour pouvoir l\'y ranger.</p>'}</div>`) : ''}
   </section>`;
 
   root.innerHTML = `<div class="pt">
     <header class="pt-head"><div><h1 class="page-title">Rôles et parties prenantes</h1>
-      <p class="page-sub">FO et BO, plus les autres acteurs des tickets (SMC, DRPS…). Un rôle créé ici a sa vue par profil, ses codes personnels, et ses membres sont reconnus dans IMOC.</p></div></header>
+      <p class="page-sub">FO et BO, plus les autres acteurs des tickets (SMC, DRPS…). Un rôle créé ici a sa vue par profil, ses codes personnels, et ses membres sont reconnus dans vos autres outils.</p></div></header>
     ${PTY.err ? `<div class="pt-alert">${esc(PTY.err)}</div>` : ''}
     <div class="pt-cols"><nav class="pt-rail">${rail}</nav><div class="pt-main">${corps}${test}</div></div>
   </div>`;
@@ -96,10 +96,10 @@ function _ptyPersonneForm(p) {
   return `<form class="pt-form pt-p-form" onsubmit="event.preventDefault();ptyPersonneSave(this,${escAttrArg(p.id || '')})">
     <label class="is-wide"><span>Nom</span><input name="name" value="${esc(p.name || '')}" placeholder="Pierre Antoine Moreau" required></label>
     <label><span>Rôle</span><select name="role">${PTY.data.roles.map(x => `<option value="${esc(x.key)}"${x.key === p.role ? ' selected' : ''}>${esc(x.key)}</option>`).join('')}</select></label>
-    <label><span>Pays</span><select name="country"><option value="">—</option><option value="SN"${p.country === 'SN' ? ' selected' : ''}>Sénégal</option><option value="CI"${p.country === 'CI' ? ' selected' : ''}>Côte d'Ivoire</option></select></label>
+    <label><span>Site</span><select name="country"><option value="">—</option>${siteList().map(s => `<option value="${esc(s.code)}"${p.country === s.code ? ' selected' : ''}>${esc(siteName(s.code))}</option>`).join('')}</select></label>
     <label><span>E-mail</span><input name="email" value="${esc(p.email || '')}"></label>
     <label><span>Téléphone</span><input name="phone" value="${esc(p.phone || '')}"></label>
-    <label class="is-full"><span>Graphies reconnues (une par ligne, telles que dans IMOC)</span><textarea name="aliases" rows="2" placeholder="DIR/OPS/SMC-N/QSM MOREAU PIERRE ANTOINE">${esc((p.aliases || []).join('\n'))}</textarea></label>
+    <label class="is-full"><span>Graphies reconnues (une par ligne, telles que dans vos autres outils)</span><textarea name="aliases" rows="2" placeholder="DIR/OPS/SMC-N/QSM MOREAU PIERRE ANTOINE">${esc((p.aliases || []).join('\n'))}</textarea></label>
     <div class="pt-form-a">${p.id ? `<button type="button" class="pt-btn is-ghost" onclick="ptyPersonneSuppr(${escAttrArg(p.id)})">Retirer</button>` : ''}
       <button type="button" class="pt-btn" onclick="PTY.edit=null;_ptyPaint()">Annuler</button><button type="submit" class="pt-btn is-pri">Enregistrer</button></div>
   </form>`;

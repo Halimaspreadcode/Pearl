@@ -29,7 +29,7 @@ function avgMs(tickets, fn) {
    sans ambiguïté. On qualifie donc chaque ticket, sans écraser une valeur
    explicite (`country`/`tracker` posé sur la ligne l'emporte toujours) :
      1. la référence externe commence par un préfixe déclaré pour un site
-        (site.ref_prefixes, ex. ["OCI"]) ;
+        (site.ref_prefixes, ex. ["LYO-"]) ;
      2. le porteur n'appartient qu'à un seul site (rotations par site,
         puis rattachement fo_trackers). */
 const normName = n => String(n || '').trim().toLowerCase()

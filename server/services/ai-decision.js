@@ -152,7 +152,7 @@ function donneesDecision({ periode = 'semaine', perimetre = 'ALL' } = {}) {
 
   const donnees = {
     periode: `${periode === 'mois' ? '30 derniers jours' : '7 derniers jours'} (${iso(debut)} → ${iso(finP)})`,
-    perimetre: perimetre === 'ALL' ? 'Dakar et Abidjan' : perimetre === 'SN' ? 'Dakar (SN)' : 'Abidjan (CI)',
+    perimetre: require('../core/store').scopeLabel(perimetre),
     indicateurs,
     origine_des_ruptures: {
       par_type_priorite: top(cur._ruptures, t => `${t.type || '?'} ${t.priority || ''}`.trim()),

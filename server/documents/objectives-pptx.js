@@ -30,9 +30,9 @@ const {
 
 // Ville et libellé d'équipe du deck en cours : posés par
 // buildObjectivesPptx selon sess.team (SN, CI ou les deux).
-let VILLE = 'Dakar';
-let EQUIPE = 'Front Office Team';
-let FOOTER_TEXT = 'Pearl · Dakar · Internal distribution';
+let VILLE = '';
+let EQUIPE = 'Team';
+let FOOTER_TEXT = 'Pearl · Internal distribution';
 const SMART_PASS = 70;
 const DAY = 86400000;
 
@@ -436,8 +436,10 @@ async function buildObjectivesPptx({ sess, lignes, cfg }) {
   pptx.layout = 'LAYOUT_WIDE';
   pptx.author = 'Pearl';
   pptx.company = 'Pearl';
-  VILLE = { SN: 'Dakar', CI: 'Abidjan' }[sess.team] || (sess.team === 'ALL' || !sess.team ? 'Dakar + Abidjan' : 'Dakar');
-  EQUIPE = sess.team === 'SN' ? 'Front Office Team · Senegal' : sess.team === 'CI' ? "Front Office Team · Côte d'Ivoire" : 'Front Office Team';
+  const { scopeLabel, normScope } = require('../core/store');
+  const scope = normScope(sess.team, 'ALL');
+  VILLE = scopeLabel(scope);
+  EQUIPE = scope === 'ALL' ? 'Team' : `Team · ${VILLE}`;
   FOOTER_TEXT = `Pearl · ${VILLE} · Internal distribution`;
   pptx.title = `Objectives Review · ${clip(sess.name || sess.id || '')}`;
 

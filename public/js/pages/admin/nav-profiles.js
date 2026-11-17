@@ -56,9 +56,8 @@ const NVP_PAGES = [
     { id: 'quiz',            l: 'Quiz',        alias: 'onglet de My Space' },
   ]},
   { grp: 'Trackers', items: [
-    { id: 'sn',          l: 'Tracker SN' },
-    { id: 'ci',          l: 'Tracker CI' },
-    { id: 'global',      l: 'Tracker Global' },
+    { id: 'site',        l: 'Tracker du site' },
+    { id: 'global',      l: 'Tracker tous sites' },
   ]},
   { grp: 'Opérationnel', items: [
     { id: 'observations',    l: 'Observations' },
@@ -100,7 +99,7 @@ const NVP_PAGES = [
 // Ce que la barre fait de ces cases, pour que l'écran ne surprenne pas.
 const NVP_NOTES = {
   'My Space': 'Une seule entrée « My Space » dans la barre, avec les onglets cochés.',
-  'Trackers': 'Un seul tracker dans la barre : celui du pays choisi en haut. S\'il n\'est pas coché, c\'est un tracker coché qui s\'affiche à la place.',
+  'Trackers': 'Un seul tracker dans la barre : celui du site choisi en haut. S\'il n\'est pas coché, c\'est un tracker coché qui s\'affiche à la place.',
   'Rapports': 'Une seule entrée « Rapports » dans la barre, avec les rapports cochés en onglets.',
 };
 
@@ -114,10 +113,10 @@ function _nvpResItems(g) { return g.items.filter(i => !i.admin); }
 // Elle ne s'applique pas toute seule : c'est un point de départ à
 // accepter, pas une décision prise à la place de l'admin.
 const NVP_DEFAUTS = {
-  FO: ['dashboard', 'sn', 'ci', 'observations', 'fo-dashboard', 'fo-handover',
+  FO: ['dashboard', 'site', 'observations', 'fo-dashboard', 'fo-handover',
        'shift-planning', 'my-requests', 'my-perf', 'absences',
        'weekly-progress', 'quiz', 'daily-report', 'academy', 'ideas'],
-  BO: ['dashboard', 'sn', 'ci', 'global', 'observations', 'absences',
+  BO: ['dashboard', 'site', 'global', 'observations', 'absences',
        'daily-report', 'weekly-report', 'ideas'],
   Observer: ['dashboard', 'global', 'fo-dashboard', 'daily-report',
              'weekly-report', 'monthly-report'],

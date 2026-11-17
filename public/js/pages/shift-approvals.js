@@ -138,7 +138,7 @@ function _apScopedRequests() {
   const q = (document.getElementById('ap-search')?.value || '').trim().toLowerCase();
 
   return (state.shiftRequests || []).filter(r => {
-    if (country !== 'ALL' && (trackers[r.fo_name] || 'SN') !== country) return false;
+    if (country !== 'ALL' && !personInScope(r.fo_name, country)) return false;
     if (!q) return true;
     return [r.fo_name, r.requested_by, r.date, r.note, r.swap_with,
             r.current_shift_name, r.current_shift, AP_TYPE[r.type]?.label]

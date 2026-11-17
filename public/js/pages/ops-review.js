@@ -3,8 +3,8 @@
 // ══════════════════════════════════════════════════════════════
 
 let orUnlocked = false;
-let _orSnData  = [];
-let _orCiData  = [];
+// Tickets de tous les sites, marqués de leur site dans `_src` (code).
+let _orData = [];
 
 function _renderOpsReviewPage() {
   adminGate('or', () => { orUnlocked = true; _orLoadAndRender(); });
@@ -20,22 +20,17 @@ async function verifyOpsReview() {
 }
 
 async function _orLoadAndRender() {
-  const [sn, ci] = await Promise.all([
-    fetch(`${API}/api/sn`).then(r => r.json()),
-    fetch(`${API}/api/ci`).then(r => r.json()),
-  ]);
-  _orSnData = sn;
-  _orCiData = ci;
+  const st = await fetchSitesAndTickets();
+  _orData = Object.entries(st.tickets || {}).flatMap(([code, list]) => (list || []).map(t => ({ ...t, _src: code })));
   _orPopulateFilters();
   renderOpsReview();
 }
 
-// Le périmètre pays de la page, comme partout ailleurs dans l'app :
-// 'SN' / 'CI' pour une filiale, 'ALL' pour la vue Global. Les tickets
-// n'ont pas de champ pays — c'est le tracker d'origine qui le porte.
+// Le périmètre de la page, comme partout ailleurs dans l'app : un code
+// de site, ou 'ALL'. Les tickets portent leur site par leur tracker.
 function _orCountryScope() {
   const c = typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL';
-  return c === 'CI' ? 'CI' : c === 'ALL' ? 'ALL' : 'SN';
+  return isSiteCode(c) ? c : 'ALL';
 }
 
 function _orGetFiltered() {
@@ -47,26 +42,18 @@ function _orGetFiltered() {
   const fDomain    = document.getElementById('or-filter-domain')?.value    || '';
 
   // Le sélecteur de pays de l'en-tête décide du périmètre avant tout
-  // filtre local : sur « Sénégal », la page ne parle que d'OSN. En
-  // « Global », les deux filiales sont réunies et le filtre Filiale
-  // reprend la main.
+  // filtre local : sur un site, la page ne parle que de lui. En « Global »,
+  // tous les sites sont réunis et le filtre Site reprend la main.
   const scope = _orCountryScope();
 
-  let combined = [];
-  // fType: '' = tout, 'sn' = incidents seuls, 'ci-all'/'ci-bug'/'ci-nobug' = problèmes
-  const includeSN = (fType === '' || fType === 'sn') && scope !== 'CI';
-  const includeCI = (fType === '' || fType === 'ci-all' || fType === 'ci-bug' || fType === 'ci-nobug') && scope !== 'SN';
-  if (includeSN) combined = combined.concat(_orSnData.map(t => ({ ...t, _src: 'OSN' })));
-  if (includeCI) combined = combined.concat(_orCiData.map(t => ({ ...t, _src: 'OCI' })));
+  // fType : '' = tous les sites, sinon le code d'un site.
+  const combined = _orData.filter(t => (scope === 'ALL' || t._src === scope) && (!fType || t._src === fType));
 
   return combined.filter(t => {
     if (fPriority  && t.priority !== fPriority)  return false;
     if (fStatus    && t.status   !== fStatus)     return false;
     if (fDomain    && t.domain   !== fDomain)     return false;
     if (fAffiliate && t._src     !== fAffiliate)  return false;
-    // Sous-filtre type CI : Bug / non Bug
-    if (fType === 'ci-bug'   && t._src === 'OCI' && t.type !== 'Problem Bug')     return false;
-    if (fType === 'ci-nobug' && t._src === 'OCI' && t.type !== 'Problem non Bug') return false;
     if (fWeek) {
       const d = new Date(t.open_date || t.occur_time || t.detection_time);
       if (isNaN(d)) return false;
@@ -90,10 +77,7 @@ function _orPopulateFilters() {
   // Semaines et domaines sont tirés du périmètre courant : proposer une
   // semaine absente du pays sélectionné mène à une page vide.
   const scope = _orCountryScope();
-  const all = [
-    ...(scope === 'CI' ? [] : _orSnData.map(t => ({ ...t, _src: 'OSN' }))),
-    ...(scope === 'SN' ? [] : _orCiData.map(t => ({ ...t, _src: 'OCI' })))
-  ];
+  const all = _orData.filter(t => scope === 'ALL' || t._src === scope);
 
   // Weeks
   const weeks = [...new Set(all.map(t => {
@@ -107,13 +91,11 @@ function _orPopulateFilters() {
       weeks.map(w => `<option value="${w}" ${cur===w?'selected':''}>${w}</option>`).join('');
   }
 
-  // Filiale = OSN ou OCI (filtre statique, toujours présent)
+  // Site d'origine (un par site configuré).
   const aSel = document.getElementById('or-filter-affiliate');
-  if (aSel && !aSel.querySelector('option[value="OSN"]')) {
+  if (aSel) {
     const cur = aSel.value;
-    aSel.innerHTML = `<option value="">All affiliates</option>
-      <option value="OSN" ${cur==='OSN'?'selected':''}>OSN</option>
-      <option value="OCI" ${cur==='OCI'?'selected':''}>OCI</option>`;
+    aSel.innerHTML = `<option value="">All sites</option>` + siteCodes().map(c => `<option value="${esc(c)}" ${cur===c?'selected':''}>${esc(c)}</option>`).join('');
   }
 
   // Domains
@@ -134,7 +116,7 @@ function _orPopulateFilters() {
 // synchronisés depuis cet état.
 // ══════════════════════════════════════════════════════════════
 const orUI = {
-  type    : '',   // '' | 'sn' | 'ci-all' | 'ci-bug' | 'ci-nobug'
+  type    : '',   // '' | code de site
   priority: '',
   status  : '',
   affiliate:'',
@@ -232,7 +214,7 @@ let _orLastScope = null;
 function renderOpsReview() {
   if (!orUnlocked) return;
   // Changer de pays invalide les filtres liés à la source : un « type =
-  // Problèmes » hérité de Global viderait la page en périmètre Sénégal,
+  // Problèmes » hérité de Global viderait la page sur un seul site,
   // sans puce visible pour comprendre pourquoi.
   const scope = _orCountryScope();
   if (_orLastScope !== scope) {
@@ -360,9 +342,8 @@ function _orRenderChips() {
   // Hors « Global », le périmètre ne contient qu'une source : proposer
   // les deux puces afficherait un choix dont l'une donne toujours 0.
   const scope = _orCountryScope();
-  const srcChips = scope === 'ALL'
-    ? chip('type', 'sn',     'Incidents', countBy('type', t => t._src === 'OSN'))
-      + chip('type', 'ci-all', 'Issues', countBy('type', t => t._src === 'OCI'))
+  const srcChips = scope === 'ALL' && siteCodes().length > 1
+    ? siteCodes().map(c => chip('type', c, siteName(c), countBy('type', t => t._src === c))).join('')
       + '<span class="or-chip-sep"></span>'
     : '';
 
@@ -386,9 +367,9 @@ function _orRenderResultBar(tickets) {
   // Rappeler le périmètre : sans lui, un total réduit de moitié après un
   // changement de pays se lit comme des données manquantes.
   const scope = _orCountryScope();
-  const scopeLabel = scope === 'ALL' ? 'Global (OSN + OCI)' : scope === 'CI' ? 'OCI' : 'OSN';
+  const scopeLbl = scope === 'ALL' ? `Global (${scopeCodes('ALL')})` : siteLabel(scope);
   el.innerHTML = `
-    <div><b>${tickets.length}</b> ticket${tickets.length > 1 ? 's' : ''} · <b>${domains}</b> domaine${domains > 1 ? 's' : ''} · <span style="opacity:.75">${scopeLabel}</span></div>
+    <div><b>${tickets.length}</b> ticket${tickets.length > 1 ? 's' : ''} · <b>${domains}</b> domaine${domains > 1 ? 's' : ''} · <span style="opacity:.75">${esc(scopeLbl)}</span></div>
     <div>${filtered ? `<button class="or-linkbtn" onclick="orResetFilters()">Reset filters</button>` : ''}</div>`;
 }
 
@@ -417,7 +398,7 @@ function _orRenderCharts(tickets) {
     return Object.entries(map).map(([label, count]) => ({ label, count })).sort((a,b) => b.count - a.count);
   };
 
-  const affiliateColors = { OSN: '#1A73E8', OCI: '#F9AB00' };
+  const affiliateColors = new Proxy({}, { get: (_, k) => (typeof k === 'string' ? siteColor(k) : undefined) });
 
   // Priorités dans leur ordre naturel (P1 d'abord), pas par volume : on
   // cherche d'un coup d'œil combien de P1, pas quelle priorité domine.

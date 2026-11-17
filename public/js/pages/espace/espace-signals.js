@@ -67,7 +67,7 @@ function _mesMyProgress(me) {
 }
 
 // Tracker de l'agent, et la page où saisir ses tickets.
-function _mesTracker(me) { return ((state.config?.fo_trackers || {})[me] || 'SN').toUpperCase(); }
+function _mesTracker(me) { return (personSite(me)).toUpperCase(); }
 
 // ── Shift ─────────────────────────────────────────────────────
 // Prochain créneau travaillé : celui en cours s'il y en a un, sinon le
@@ -113,7 +113,7 @@ function mesTodayItems(ctx) {
   const mine = _mesMyProgress(me);
   const semaine = mine.filter(p => p.week_start === wk);
   const tracker = _mesTracker(me);
-  const trPage = tracker === 'CI' ? 'ci' : 'sn';
+  const trPage = String(tracker || defaultSite()).toLowerCase();
 
   // 1 ── Tâches données par le manager (Équipe › Tâches) : elles vivent
   // dans My Tasks (admin_task) avec une échéance ferme. Dues ou en retard,
@@ -177,7 +177,7 @@ function mesTodayItems(ctx) {
   }
 
   // 3 ── Tickets, pendant le shift
-  const pool = tracker === 'CI' ? (state.ci || []) : (state.sn || []);
+  const pool = ticketsOf(tracker);
   const miens = t => t.fo_owner === me || t.assigned_to === me;
   if (actifs.has('tk-shift')) {
     const sh = NF._todayShift();
@@ -317,7 +317,7 @@ function mesGlance(ctx) {
   // saisis, dans les deux trackers (un renfort passe parfois de l'un à
   // l'autre). La note du mois, elle, attend le code.
   const mois = _mesToday().slice(0, 7);
-  const tickets = me ? [...(state.sn || []), ...(state.ci || [])].filter(t =>
+  const tickets = me ? allTicketsRaw().filter(t =>
     t.fo_owner === me && String(t.created_at || '').slice(0, 7) === mois).length : 0;
   return {
     month: { label: new Date().toLocaleDateString('en-GB', { month: 'long' }), tickets },

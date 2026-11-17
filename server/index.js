@@ -135,6 +135,7 @@ app.use(teamAccessRoutes);
 app.use(ideasRoutes);
 app.use(boRoutes);
 app.use(configRoutes);
+app.use(require('./routes/sites'));
 app.use(authRoutes);
 app.use(kpiConfigRoutes);
 app.use(suggestRoutes);   // avant tickets : /api/tickets/:site/suggest n'est pas …/:id

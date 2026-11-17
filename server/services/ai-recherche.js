@@ -2,8 +2,8 @@
 // RECHERCHE EN LANGAGE NATUREL DANS PEARL
 //
 // « Trouve celui qui a oublié de fermer son ticket vendredi », « combien
-// d'absences par agent en septembre », « les P1 encore ouverts à
-// Abidjan »… Pearl AI ne voit pas les données : il traduit la question
+// d'absences par agent en septembre », « les P1 encore ouverts sur le
+// site de Lyon »… Pearl AI ne voit pas les données : il traduit la question
 // en requête sur un schéma décrit (source, filtres, tri, regroupement),
 // et c'est Pearl qui l'exécute. Le résultat s'affiche tel quel, avec la
 // lecture que Pearl AI a faite de la question pour la vérifier.
@@ -22,11 +22,12 @@ const CLOS = ['Resolved', 'Closed'];
 // Chaque source : ses champs (type, valeurs connues, sens) et ses lignes.
 const SOURCES = {
   tickets: {
-    libelle: 'Tickets SN et CI',
+    libelle: 'Tickets de tous les sites',
     champs: {
       ticket: { type: 'texte', desc: 'numéro du ticket' },
       titre: { type: 'texte' },
-      pays: { type: 'liste', valeurs: ['SN', 'CI'] },
+      // Codes des sites de l'organisation, lus à chaque appel.
+      pays: { type: 'liste', get valeurs() { return require('../core/store').siteCodes(); } },
       type: { type: 'liste', valeurs: ['Incident', 'Request', 'Problem', 'Change'] },
       priorite: { type: 'liste', valeurs: ['P1', 'P2', 'P3', 'P4'] },
       statut: { type: 'liste', valeurs: ['Open', 'In Progress', 'On Hold', 'Resolved', 'Closed'], desc: 'Resolved et Closed = fermé' },

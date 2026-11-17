@@ -68,7 +68,7 @@ function _indPaint() {
   if (fil) fil.scrollTop = fil.scrollHeight;
 }
 
-const _indPerim = () => ({ SN: 'Sénégal', CI: 'Côte d\'Ivoire' }[_indPays()] || 'SN + CI');
+const _indPerim = () => scopeLabel(_indPays());
 
 function _indListeHtml() {
   const items = IND.items || [];

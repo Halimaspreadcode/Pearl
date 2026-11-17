@@ -76,9 +76,9 @@ function renderShiftPlanning() {
   const lbl = document.getElementById('shift-week-label');
   if (lbl) lbl.textContent = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
 
-  const allShifts = (state.shiftsPlan || []).filter(s => getActiveCountry() === 'ALL' || (s.tracker || 'SN') === getActiveCountry());
+  const allShifts = (state.shiftsPlan || []).filter(s => getActiveCountry() === 'ALL' || (s.tracker || defaultSite()) === getActiveCountry());
   const rc = state.rotaConfig || { sites: [] };
-  const sites = (rc.sites || []).filter(s => getActiveCountry() === 'ALL' || (s.tracker || 'SN') === getActiveCountry());
+  const sites = (rc.sites || []).filter(s => getActiveCountry() === 'ALL' || (s.tracker || defaultSite()) === getActiveCountry());
 
   // Couleurs déléguées aux variables CSS de #page-shift-planning : elles
   // basculent seules en mode sombre, ce que les hex codés en dur ne faisaient pas.

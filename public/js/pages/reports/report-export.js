@@ -219,7 +219,7 @@ async function _uploadReportFile(type, buf, filename, period) {
     await fetch(`${API}/api/report-file/${type}`
       + `?filename=${encodeURIComponent(filename)}&period=${encodeURIComponent(period)}`
       // Pays affiché : le serveur range un classeur par pays.
-      + `&country=${encodeURIComponent(typeof getActiveCountry === 'function' ? getActiveCountry() : 'SN')}`, {
+      + `&country=${encodeURIComponent(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL')}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/octet-stream' },
       body: buf,
@@ -249,7 +249,7 @@ async function _buildDailyWorkbookBuffer(dataIn) {
       .map(([key]) => key)
       .filter(key => !isSectionHidden('daily', key)),
     slaText: slaTargetText,
-    lieu: { SN: 'Dakar', CI: 'Abidjan', ALL: 'Dakar + Abidjan' }[typeof getActiveCountry === 'function' ? getActiveCountry() : 'SN'] || 'Dakar',
+    lieu: scopeLabel(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL'),
   });
 }
 

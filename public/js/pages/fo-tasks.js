@@ -82,11 +82,11 @@ function updateFOTaskAvatar() {
 
   const badge = document.getElementById('fotask-fo-tracker-badge');
   if (badge) {
-    const tr = (state.config.fo_trackers||{})[name] || 'SN';
+    const tr = personSite(name);
     badge.textContent = tr;
     badge.style.display = 'inline-block';
-    badge.style.background = tr === 'CI' ? 'var(--p2-bg)' : 'var(--ok-bg)';
-    badge.style.color = tr === 'CI' ? 'var(--p2-fg)' : 'var(--ok-fg)';
+    badge.style.background = siteBg(tr);
+    badge.style.color = siteColor(tr);
   }
 }
 
@@ -226,7 +226,7 @@ function renderFOTasks() {
   const today    = new Date().toISOString().slice(0,10);
   const trackers = cfg.fo_trackers || {};
   const allTasks = (state.foTasks || []).filter(t =>
-    getActiveCountry() === 'ALL' || (trackers[t.assigned_to] || 'SN') === getActiveCountry());
+    getActiveCountry() === 'ALL' || personInScope(t.assigned_to, getActiveCountry()));
 
   const foFilter = document.getElementById('fotask-filter-fo');
   if (foFilter) {

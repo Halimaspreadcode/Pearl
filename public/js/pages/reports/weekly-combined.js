@@ -1,8 +1,8 @@
-/* ── Weekly Performance, Dakar × Abidjan ──────────────────────
+/* ── Weekly Performance, tous les sites ───────────────────────
    Deck de revue présenté aux deux équipes (server/documents/
    weekly-combined-pptx.js). Avant de générer, on demande les
    explications : le serveur dit ce qui sort de l'ordinaire (pics
-   d'activité, absences à Dakar, incidents de plateforme) et propose ce
+   d'activité, absences, incidents de plateforme) et propose ce
    que les Observations en disent déjà.
 
    L'export est bloqué tant qu'un point requis n'est ni expliqué ni
@@ -18,13 +18,15 @@ const WkC = { analysis: null, texts: {}, skipped: new Set() };
 
 // Commentaires facultatifs : un espace par page, rempli ou laissé en
 // pointillés pour la séance.
-const WKC_OPTIONAL = [
-  ['summary',   'Key takeaways', 'Side-by-side figures'],
-  ['breakdown', 'Where the load came from', 'Breakdown by domain'],
-  ['trend',     'What the trend says', 'Eight-week trend'],
-  ['next-SN',   'Next week: Dakar', 'Focus and actions'],
-  ['next-CI',   'Next week: Abidjan', 'Focus and actions'],
-];
+// Un espace « semaine prochaine » par site de l'analyse.
+function _wkcOptional() {
+  return [
+    ['summary',   'Key takeaways', 'Side-by-side figures'],
+    ['breakdown', 'Where the load came from', 'Breakdown by domain'],
+    ['trend',     'What the trend says', 'Eight-week trend'],
+    ...((WkC.analysis && WkC.analysis.sites) || []).slice(0, 4).map(s => [`next-${s.code}`, `Next week: ${s.ville}`, 'Focus and actions']),
+  ];
+}
 
 function _wkcDraftKey() { return `wkc-draft-${WkC.analysis?.week_start?.slice(0, 10) || ''}`; }
 function _wkcLoadDraft() {
@@ -45,7 +47,7 @@ function _wkcModal() {
   el.innerHTML = `
     <div class="modal wkc-modal">
       <div class="modal-header">
-        <div class="modal-title">Weekly Performance: Dakar × Abidjan
+        <div class="modal-title">Weekly Performance: all sites
           <span id="wkc-period" class="text-muted" style="font-weight:400;font-size:12px;margin-left:8px"></span></div>
         <button class="modal-close" onclick="closeModal('wkc-modal')">&times;</button>
       </div>
@@ -83,8 +85,8 @@ async function openWeeklyCombined() {
   (WkC.analysis.to_explain || []).forEach(it => {
     WkC.texts[it.key] = draft[it.key] ?? it.suggestion ?? '';
   });
-  WKC_OPTIONAL.forEach(([k]) => { WkC.texts[k] = draft[k] ?? ''; });
-  ['activity-SN', 'activity-CI', 'attendance-SN'].forEach(k => {
+  _wkcOptional().forEach(([k]) => { WkC.texts[k] = draft[k] ?? ''; });
+  [...(WkC.analysis.sites || []).map(s => `activity-${s.code}`), 'attendance'].forEach(k => {
     if (!(k in WkC.texts)) WkC.texts[k] = draft[k] ?? '';
   });
   _wkcRender();
@@ -128,7 +130,7 @@ function _wkcRender() {
         <span>${s.kpis.opened_this_week ?? 0} opened · ${s.kpis.resolved_this_week ?? 0} resolved ·
           SLA ${s.kpis.sla_compliance == null ? 'n/a' : Math.round(s.kpis.sla_compliance) + '%'}</span>
       </div>`).join('')}
-      <div class="wkc-site"><b>Dakar attendance</b>
+      <div class="wkc-site"><b>Team attendance</b>
         <span>${att.presence_rate ?? 'n/a'}% presence · ${att.absence_days ?? 0} absence day(s)</span></div>
     </div>
 
@@ -141,9 +143,9 @@ function _wkcRender() {
       : '<div class="wkc-none">Nothing unusual this week: no peak, no absence, no platform incident.</div>'}
 
     <div class="wkc-sec-t">Commentary <span>optional, can be skipped</span></div>
-    ${WKC_OPTIONAL.map(([k, t, h]) => field(k, t, h, false)).join('')}
+    ${_wkcOptional().map(([k, t, h]) => field(k, t, h, false)).join('')}
     ${calmes.map(s => field(`activity-${s.code}`, `${s.ville}: weekly activity`, 'No peak this week', false)).join('')}
-    ${att.required ? '' : field('attendance-SN', 'Dakar attendance', 'Full attendance this week', false)}`;
+    ${att.required ? '' : field('attendance', 'Team attendance', 'Full attendance this week', false)}`;
   _wkcCountLeft();
 }
 
@@ -216,7 +218,7 @@ async function generateWeeklyCombined() {
     // Même aperçu que le Weekly Report : on relit le vrai fichier avant
     // de le télécharger, sous son propre nom.
     weeklyPptxBlob = await res.blob();
-    weeklyPptxName = `Pearl_Weekly_Performance_Dakar_Abidjan_${WkC.analysis.week_start.slice(0, 10)}.pptx`;
+    weeklyPptxName = `Pearl_Weekly_Performance_${WkC.analysis.week_start.slice(0, 10)}.pptx`;
     closeModal('wkc-modal');
     const modal = document.getElementById('pptx-preview-modal');
     const body = document.getElementById('pptx-preview-body');

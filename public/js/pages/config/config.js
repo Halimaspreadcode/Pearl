@@ -122,9 +122,9 @@ function renderConfig() {
   const foTrackers = cfg.fo_trackers || {};
   document.getElementById('config-fo-list').innerHTML =
     (cfg.fo_list||[]).map(fo => {
-      const tr = foTrackers[fo] || 'SN';
-      const trColor = tr === 'CI' ? 'var(--p2-fg)' : 'var(--ok-fg)';
-      const trBg    = tr === 'CI' ? 'var(--p2-bg)'  : 'var(--ok-bg)';
+      const tr = [].concat(foTrackers[fo] || defaultSite())[0] || '';
+      const trColor = siteColor(tr);
+      const trBg    = siteBg(tr);
       const foEsc = fo.replace(/'/g, "\\'");
       // L'ID est cliquable : c'est le seul moyen de le corriger, et un
       // agent sans ID doit rester repérable d'un coup d'œil.
@@ -266,8 +266,7 @@ async function saveSLAMode() {
   await fetch(`${API}/api/config`, { method:'PUT', headers: AdminSession.headers({'Content-Type':'application/json'}), credentials:'same-origin', body: JSON.stringify(cfg) });
   await loadConfig();
   await loadAll();
-  if (document.getElementById('page-sn')?.classList.contains('active'))  renderTracker('sn');
-  if (document.getElementById('page-ci')?.classList.contains('active'))  renderTracker('ci');
+  if (document.getElementById('page-site')?.classList.contains('active')) renderTracker(activeSiteKey());
   if (document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboard();
   updateSLAModeHint();
   const labels = { live:'Live 24/7 - horloge continue', drill:'Drill 8:30–17:30 - business hours' };
@@ -323,7 +322,7 @@ function foIdOf(fo) { return (state.config.fo_ids || {})[fo] || ''; }
 
 async function addFo() {
   const val = document.getElementById('new-fo').value.trim();
-  const tracker = document.getElementById('new-fo-tracker')?.value || 'SN';
+  const tracker = document.getElementById('new-fo-tracker')?.value || defaultSite();
   const idEl = document.getElementById('new-fo-id');
   const id = (idEl?.value || '').trim();
   if (!val) return;
@@ -397,8 +396,10 @@ async function renameFo(fo) {
 }
 
 async function toggleFoTracker(fo) {
-  const cur = (state.config.fo_trackers||{})[fo] || 'SN';
-  const next = cur === 'SN' ? 'CI' : 'SN';
+  const cur = personSite(fo);
+  // Site suivant dans la liste (clic = rotation entre les sites).
+  const codes = siteCodes();
+  const next = codes[(codes.indexOf(cur) + 1) % Math.max(1, codes.length)] || cur;
   const foTrackers = { ...(state.config.fo_trackers||{}), [fo]: next };
   const cfg = { ...state.config, fo_trackers: foTrackers };
   await fetch(`${API}/api/config`, { method:'PUT', headers: AdminSession.headers({'Content-Type':'application/json'}), credentials:'same-origin', body: JSON.stringify(cfg) });

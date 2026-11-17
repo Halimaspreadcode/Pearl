@@ -156,12 +156,13 @@ function o2oPourIa(fo) {
 
 const SORTIE_MD = 'Réponds en Markdown simple : titres courts en **gras**, listes à puces, pas de tableau. Pas d\'introduction ni de formule de politesse.';
 
-// Le pays limite les données envoyées au modèle : sans lui, une
-// question sur Dakar ramène aussi le bruit d'Abidjan. La page le
-// pré-remplit avec le pays actif de l'appli.
-const PAYS_OPTIONS = ['Global', 'Dakar (SN)', 'Abidjan (CI)'];
-const CHAMP_PAYS = { id: 'pays', label: 'Pays', type: 'select', options: PAYS_OPTIONS, pays: true };
-const codePays = v => /SN/.test(v || '') ? 'SN' : /CI/.test(v || '') ? 'CI' : 'ALL';
+// Le site limite les données envoyées au modèle : sans lui, une question
+// sur un site ramène aussi le bruit des autres. La page le pré-remplit
+// avec le site actif de l'appli. Options : « Global » puis « Ville (CODE) ».
+const siteOption = s => `${s.city || s.name} (${s.code})`;
+const paysOptions = () => ['Global', ...require('../core/store').readSites().map(siteOption)];
+const CHAMP_PAYS = { id: 'pays', label: 'Site', type: 'select', get options() { return paysOptions(); }, pays: true };
+const codePays = v => { const m = /\(([A-Z0-9]{2,8})\)\s*$/.exec(String(v || '')); return m ? require('../core/store').normScope(m[1], 'ALL') : 'ALL'; };
 
 const SKILLS = [
   {
@@ -186,8 +187,8 @@ const SKILLS = [
   },
   {
     id: 'weekly', titre: 'Commentaire du weekly', icone: 'chart', categorie: 'Rapports',
-    desc: 'Analyse la semaine Dakar et Abidjan : faits marquants, explication des pics et écarts, actions. Prêt à coller dans le deck.',
-    donnees: 'Chiffres agrégés de la semaine par site (volumes, SLA, MTTD/MTTR, encours, présence Dakar) et les observations. Aucun nom d\'agent, aucun ticket détaillé.',
+    desc: 'Analyse la semaine de chaque site : faits marquants, explication des pics et écarts, actions. Prêt à coller dans le deck.',
+    donnees: 'Chiffres agrégés de la semaine par site (volumes, SLA, MTTD/MTTR, encours, présence) et les observations. Aucun nom d\'agent, aucun ticket détaillé.',
     champs: [
       { id: 'date', label: 'Semaine (un jour de la semaine)', type: 'date' },
       { id: 'contexte', label: 'Contexte à prendre en compte (facultatif)', type: 'textarea', max: 2000,
@@ -196,9 +197,9 @@ const SKILLS = [
     ],
     max_tokens: 3000, temperature: 0.3,
     system: [
-      'Tu prépares le commentaire du weekly performance Dakar × Abidjan d\'une équipe de supervision ITSM.',
+      'Tu prépares le commentaire du weekly performance multi-sites d\'une équipe opérationnelle.',
       'Appuie-toi uniquement sur les chiffres fournis ; n\'invente aucun chiffre ni cause. Si une explication manque, dis-le et propose la question à poser.',
-      'Structure : **Synthèse** (3 phrases max), **Dakar**, **Abidjan**, **Points à expliquer** (une ligne par élément de "a_expliquer", avec une explication plausible tirée des observations ou "à confirmer"), **Actions proposées**.',
+      'Structure : **Synthèse** (3 phrases max), une section en gras par site (son nom), **Points à expliquer** (une ligne par élément de "a_expliquer", avec une explication plausible tirée des observations ou "à confirmer"), **Actions proposées**.',
       'Phrases courtes, sans tiret long.',
     ].join('\n'),
     construire: (inp) => ({
@@ -355,13 +356,13 @@ const SKILLS = [
     donnees: 'Chiffres calculés par Pearl sur la période et la précédente (flux, backlog, SLA, ruptures et leur origine, charge par agent, équipe, couverture du planning à 7 jours, qualité des données). Agents sous alias, vrais noms remis à l\'affichage. Aucun motif d\'absence, aucun ticket détaillé.',
     champs: [
       { id: 'periode', label: 'Période', type: 'select', options: ['Semaine', 'Mois'] },
-      { id: 'perimetre', label: 'Pays', type: 'select', options: PAYS_OPTIONS, pays: true },
+      { id: 'perimetre', label: 'Site', type: 'select', get options() { return paysOptions(); }, pays: true },
       { id: 'contexte', label: 'Contexte que Pearl ne connaît pas (facultatif)', type: 'textarea', max: 2000,
         placeholder: 'Ex. demande client de réduire le MTTR, 2 recrutements prévus en novembre, migration X la semaine prochaine…' },
     ],
     max_tokens: 6000, temperature: 0.2, max_chars: 30000,
     system: [
-      'Tu es l\'assistant de décision du manager d\'une équipe Front Office de supervision ITSM (Dakar et Abidjan).',
+      'Tu es l\'assistant de décision du manager d\'une équipe opérationnelle.',
       'On te donne des chiffres calculés par l\'outil. Tu aides à DÉCIDER, pas seulement à constater.',
       'Règles :',
       '- Chaque constat cite au moins un chiffre fourni. N\'invente aucun chiffre, aucune cause, aucun nom. Une cause non prouvée est une hypothèse, dis-le.',
@@ -382,7 +383,7 @@ const SKILLS = [
     secours: (f, raison) => require('./ai-decision').decisionSansIa(f, raison),
     construire: (inp) => {
       const { donneesDecision } = require('./ai-decision');
-      const perimetre = /SN/.test(inp.perimetre || '') ? 'SN' : /CI/.test(inp.perimetre || '') ? 'CI' : 'ALL';
+      const perimetre = codePays(inp.perimetre);
       const { donnees, faits, ps } = donneesDecision({ periode: inp.periode === 'Mois' ? 'mois' : 'semaine', perimetre });
       return {
         user: (inp.contexte ? `Contexte donné par le manager : ${ps.versAlias(inp.contexte)}\n` : '')
@@ -516,7 +517,7 @@ const LECTURE = {
     'Il prépare les questions à poser…',
     'Il propose un objectif SMART…',
   ],
-  weekly: () => ['Pearl AI compare Dakar et Abidjan…', 'Il cherche une explication aux écarts de la semaine…', 'Il prépare les actions proposées…'],
+  weekly: () => ['Pearl AI compare les sites…', 'Il cherche une explication aux écarts de la semaine…', 'Il prépare les actions proposées…'],
   rca: () => ['Pearl AI remonte la chaîne des « pourquoi »…', 'Il classe les causes probables…', 'Il liste les données à collecter…'],
   redaction: () => ['Pearl AI relit ton texte…', 'Il ajuste le ton…'],
   recherche: () => ['Pearl AI traduit ta question en recherche…', 'Il choisit la source et les filtres…', 'Il résout les dates de ta question…'],
@@ -593,7 +594,7 @@ async function briefTableau(equipeBrut, country = 'ALL') {
   const ps = pseudonymes(readCfg().fo_list || []);
   const equipe = signauxEquipe(equipeBrut).map(a => ({ agent: ps.alias(a.fo), signaux: a.items.map(i => `[${i.lvl}] ${ps.versAlias(i.txt)}`) }));
   const ops = signauxOps(country);
-  const site = country === 'SN' ? 'Dakar (SN)' : country === 'CI' ? 'Abidjan (CI)' : 'Dakar et Abidjan';
+  const site = require('../core/store').scopeLabel(country);
   const user = `Date : ${new Date().toISOString().slice(0, 10)}\nPérimètre : ${site}\nSignaux opérationnels :\n${JSON.stringify({ resume: ops.resume, signaux: ops.items.map(i => `[${i.lvl}] ${i.txt}${i.detail ? ' : ' + i.detail : ''}`) })}`
     + `\nSignaux d'équipe :\n${JSON.stringify(equipe)}`;
   return lancer('cockpit-brief', { user, versNom: ps.versNom });

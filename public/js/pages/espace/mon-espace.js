@@ -627,12 +627,12 @@ function _mxTodoCol(items, urgent) {
 
 function _mxTicketsCol(me) {
   const clos = t => t.status === 'Resolved' || t.status === 'Closed';
-  const list = [...(state.sn || []).map(t => ({ ...t, _tr: 'sn' })), ...(state.ci || []).map(t => ({ ...t, _tr: 'ci' }))]
+  const list = ticketsInScope('ALL').map(t => ({ ...t, _tr: t._tracker }))
     .filter(t => (t.fo_owner === me || t.assigned_to === me) && !clos(t));
   const left = t => (typeof t.time_left_ms === 'number' ? t.time_left_ms : Infinity);
   const br = t => t.sla_status === 'Breach' || left(t) < 0;
   list.sort((a, b) => (br(b) - br(a)) || String(a.priority || 'P9').localeCompare(String(b.priority || 'P9')) || left(a) - left(b));
-  const tr = _mesTracker(me).toLowerCase() === 'ci' ? 'ci' : 'sn';
+  const tr = String(_mesTracker(me) || defaultSite()).toLowerCase();
   const rows = list.slice(0, 5).map(t => {
     const prio = String(t.priority || '').toUpperCase();
     const tl = typeof formatTimeLeft === 'function' && typeof t.time_left_ms === 'number' ? formatTimeLeft(t.time_left_ms, t.status) : (t.status || '');
@@ -811,13 +811,13 @@ async function mesSignIn() {
 // ouvre la fiche ; le lien du bas ouvre le tracker filtré sur lui.
 function _mesMyTicketsHtml(me) {
   const clos = t => t.status === 'Resolved' || t.status === 'Closed';
-  const list = [...(state.sn || []).map(t => ({ ...t, _tr: 'sn' })), ...(state.ci || []).map(t => ({ ...t, _tr: 'ci' }))]
+  const list = ticketsInScope('ALL').map(t => ({ ...t, _tr: t._tracker }))
     .filter(t => (t.fo_owner === me || t.assigned_to === me) && !clos(t));
   const left = t => (typeof t.time_left_ms === 'number' ? t.time_left_ms : Infinity);
   const br = t => t.sla_status === 'Breach' || left(t) < 0;
   list.sort((a, b) => (br(b) - br(a)) || String(a.priority || 'P9').localeCompare(String(b.priority || 'P9')) || left(a) - left(b));
   const nBr = list.filter(br).length;
-  const tr = _mesTracker(me).toLowerCase() === 'ci' ? 'ci' : 'sn';
+  const tr = String(_mesTracker(me) || defaultSite()).toLowerCase();
   const rows = list.slice(0, 5).map(t => {
     const prio = String(t.priority || '').toUpperCase();
     const tl = typeof formatTimeLeft === 'function' && typeof t.time_left_ms === 'number' ? formatTimeLeft(t.time_left_ms, t.status) : '';

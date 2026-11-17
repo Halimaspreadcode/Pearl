@@ -1,4 +1,4 @@
-const { readCfg, readWeeklyProgress, readObs } = require('../core/store');
+const { readCfg, readWeeklyProgress, readObs, personSiteCodes, siteByCode, siteCodes } = require('../core/store');
 
 // ══════════════════════════════════════════════════════════════
 // DONNÉES D'ÉQUIPE POUR L'ASSISTANT IA
@@ -47,13 +47,12 @@ function scoreDe(carte) {
   try { return require('./perf').perfScoreOf(carte); } catch { return null; }
 }
 
-// Agents rattachés à un pays (fo_trackers, Sénégal par défaut), comme
-// le sélecteur Global / SN / CI du reste de l'appli.
+// Agents rattachés à un site (fo_trackers, premier site par défaut),
+// comme le sélecteur de site du reste de l'appli.
 function agentsDuPays(cfg, country = 'ALL') {
   const liste = cfg.fo_list || [];
   if (!country || country === 'ALL') return liste.slice();
-  const de = n => [].concat((cfg.fo_trackers || {})[n] || 'SN').map(x => String(x).toUpperCase());
-  return liste.filter(n => de(n).includes(country));
+  return liste.filter(n => personSiteCodes(n, cfg).includes(country));
 }
 
 // ── Bilan d'équipe ────────────────────────────────────────────
@@ -181,11 +180,11 @@ function signauxOps(country = 'ALL') {
   const near = ouverts.filter(t => t.sla_status === 'Near Breach');
   const p12 = ouverts.filter(t => ['P1', 'P2'].includes(String(t.priority).toUpperCase()));
   const ref = t => `${t.sn_tt || t.id} (${t.priority || '?'}, ${t.tracker || ''})`;
-  if (breach.length) push('urgent', 'sla-breach', `${breach.length} ticket(s) ouvert(s) en rupture de SLA`, 'sn', breach.slice(0, 6).map(ref).join(', '));
-  if (near.length) push('urgent', 'sla-near', `${near.length} ticket(s) proche(s) de la rupture de SLA`, 'sn', near.slice(0, 6).map(ref).join(', '));
-  if (p12.length) push('todo', 'p12-open', `${p12.length} ticket(s) P1/P2 ouvert(s)`, 'sn', p12.slice(0, 6).map(ref).join(', '));
+  if (breach.length) push('urgent', 'sla-breach', `${breach.length} ticket(s) ouvert(s) en rupture de SLA`, 'site', breach.slice(0, 6).map(ref).join(', '));
+  if (near.length) push('urgent', 'sla-near', `${near.length} ticket(s) proche(s) de la rupture de SLA`, 'site', near.slice(0, 6).map(ref).join(', '));
+  if (p12.length) push('todo', 'p12-open', `${p12.length} ticket(s) P1/P2 ouvert(s)`, 'site', p12.slice(0, 6).map(ref).join(', '));
   const vieux = ouverts.filter(t => t.open_date && Date.now() - Date.parse(t.open_date) > 30 * J);
-  if (vieux.length) push('todo', 'old-open', `${vieux.length} ticket(s) ouvert(s) depuis plus de 30 jours`, 'sn', vieux.slice(0, 6).map(ref).join(', '));
+  if (vieux.length) push('todo', 'old-open', `${vieux.length} ticket(s) ouvert(s) depuis plus de 30 jours`, 'site', vieux.slice(0, 6).map(ref).join(', '));
   const sansDate = tickets.filter(t => ['Resolved', 'Closed'].includes(t.status) && !t.close_date);
   if (sansDate.length) push('info', 'no-close-date', `${sansDate.length} ticket(s) fermé(s) sans Close Date (faussent le backlog)`, 'data-quality');
   let resumePannes = 0;
@@ -193,8 +192,9 @@ function signauxOps(country = 'ALL') {
     const obs = readObs().filter(o => o.status === 'Open');
     const { isOutage } = require('./weekly-combined');
     // Observations du site choisi seulement (celles sans site restent partout).
-    const duSite = o => country === 'ALL' || !o.site || String(o.site).toUpperCase().includes(country === 'SN' ? 'SN' : 'CI')
-      || (country === 'SN' && /dakar/i.test(o.site)) || (country === 'CI' && /abidjan/i.test(o.site));
+    const site = country === 'ALL' ? null : siteByCode(country, cfg);
+    const noms = site ? [site.code, site.name, site.city].filter(Boolean).map(x => x.toLowerCase()) : [];
+    const duSite = o => country === 'ALL' || !o.site || noms.some(n => String(o.site).toLowerCase().includes(n));
     const pannes = obs.filter(o => isOutage(o) && duSite(o));
     resumePannes = pannes.length;
     if (pannes.length) push('urgent', 'outage', `${pannes.length} panne(s) de plateforme en cours dans les observations`, 'observations', pannes.slice(0, 4).map(o => o.observation || o.text).join(' · ').slice(0, 300));
@@ -202,7 +202,7 @@ function signauxOps(country = 'ALL') {
   } catch {}
   try {
     const { buildWeeklyReport } = require('./reports');
-    for (const site of (country === 'ALL' ? ['SN', 'CI'] : [country])) {
+    for (const site of (country === 'ALL' ? siteCodes(cfg) : [country])) {
       const w = buildWeeklyReport(undefined, site);
       const a = w.kpis.overall_open, b = w.prev_kpis.overall_open;
       if (b != null && a > b && a - b >= 5) push('todo', 'backlog-up', `Backlog ${site} en hausse : ${b} → ${a} cette semaine`, 'rapports');

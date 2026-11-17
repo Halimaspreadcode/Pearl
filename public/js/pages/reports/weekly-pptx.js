@@ -21,14 +21,12 @@ async function buildWeeklyPptxBlob() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       date: weeklyAnchorDate,
-      // Le deck hebdomadaire est un rapport Sénégal, quel que soit le
-      // sélecteur de site de l'en-tête : il est diffusé comme tel, et le
-      // serveur impose ce périmètre de toute façon.
-      country: 'SN',
+      // Le deck porte le périmètre de l'en-tête : un site ou tous.
+      country: typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL',
       form: {
         ...collectWeeklyForm(),
         author: weeklyForm.author || rptDefaultAuthor(),
-        site: 'Dakar',
+        site: scopeLabel(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL'),
       },
     }),
   });
@@ -49,14 +47,6 @@ function weeklyPptxFilename() {
 }
 
 async function exportWeeklyPptx() {
-  // Reprise du garde-fou côté action : le bouton est désactivé hors
-  // Sénégal, mais la fonction reste appelable (raccourci, autre bouton).
-  // Générer ici produirait un deck estampillé Dakar sur un écran Abidjan.
-  const scope = typeof getActiveCountry === 'function' ? getActiveCountry() : 'SN';
-  if (scope !== 'SN') {
-    toast('The weekly report only covers the Senegal scope', 'error');
-    return;
-  }
 
   const btn   = document.getElementById('weekly-pptx-btn');
   const label = btn ? btn.textContent : '';
@@ -150,7 +140,7 @@ async function exportWeeklyExcel() {
   ws.mergeCells(2, 1, 2, 3);
   ws.mergeCells(2, 4, 2, 7);
   ws.mergeCells(2, 8, 2, 10);
-  [[wkLabel], [weeklyForm.author || rptDefaultAuthor()], ['Dakar']].forEach(([txt], i) => {
+  [[wkLabel], [weeklyForm.author || rptDefaultAuthor()], [scopeLabel(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL')]].forEach(([txt], i) => {
     const c = ws.getCell(2, [1, 4, 8][i]);
     c.value = txt;
     xlFill(c, XL_BLACK);

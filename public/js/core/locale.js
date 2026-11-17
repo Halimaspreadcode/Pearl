@@ -23,91 +23,74 @@ function applyLang(val) {
   if (active && active.dataset.page) window.renderPage(active.dataset.page);
 }
 
-// ── ACTIVE COUNTRY ───────────────────────────────────────────
-let currentCountry = localStorage.getItem('pearl-active-country') || 'SN';
+// ── PÉRIMÈTRE (SITE ACTIF) ───────────────────────────────────
+// Un code de site de l'organisation, ou 'ALL'. Le nom « country » est
+// historique : un site peut être un pays, une ville, une agence…
+let currentCountry = localStorage.getItem('pearl-active-country') || 'ALL';
 
-function getActiveCountry() { return currentCountry; }
+function getActiveCountry() {
+  // Un site retiré de la configuration ne reste pas sélectionné.
+  if (currentCountry !== 'ALL' && typeof isSiteCode === 'function' && siteList().length && !isSiteCode(currentCountry)) currentCountry = 'ALL';
+  return currentCountry;
+}
 
 function _applyCountryNav() {
-  const snLink     = document.querySelector('.nav-item[data-page="sn"]');
-  const ciLink     = document.querySelector('.nav-item[data-page="ci"]');
+  const siteLink   = document.querySelector('.nav-item[data-page="site"]');
   const globalLink = document.querySelector('.nav-item[data-page="global"]');
-  // Un seul tracker dans la barre : celui du pays choisi. Si la vue du
-  // profil ne le permet pas mais en permet un autre (ex. « non connecté »
-  // n'a que le Global), c'est celui-là qu'on montre plutôt qu'aucun.
-  let cible = currentCountry === 'ALL' ? 'global' : (currentCountry === 'CI' ? 'ci' : 'sn');
+  const scope = getActiveCountry();
+  // Un seul tracker dans la barre : celui du site choisi, ou la vue de
+  // tous les sites. Avec un seul site, la vue globale n'apporte rien.
+  const unSite = siteList().length <= 1;
+  let cible = scope === 'ALL' && !unSite ? 'global' : 'site';
   if (typeof navAllowedPages === 'function' && typeof navPageVisible === 'function') {
     const canAdmin = typeof AdminSession !== 'undefined' && AdminSession.active;
     const allowed = navAllowedPages();
-    const permis = ['sn', 'ci', 'global'].filter(t => navPageVisible(t, allowed, canAdmin));
-    if (permis.length && !permis.includes(cible)) cible = permis.includes('global') ? 'global' : permis[0];
+    const permis = ['site', 'global'].filter(t => navPageVisible(t, allowed, canAdmin));
+    if (permis.length && !permis.includes(cible)) cible = permis[0];
   }
-  if (snLink)     snLink.style.display     = cible === 'sn' ? '' : 'none';
-  if (ciLink)     ciLink.style.display     = cible === 'ci' ? '' : 'none';
+  if (siteLink)   siteLink.style.display   = cible === 'site' ? '' : 'none';
   if (globalLink) globalLink.style.display = cible === 'global' ? '' : 'none';
-  // Bascule seulement si la page affichée est le tracker qu'on vient de
-  // masquer (SN/CI/Global). Se fier à .nav-item.active renvoyait sur un
-  // tracker depuis n'importe quelle rubrique admin, puisque l'entrée
-  // active y est restée sur « Vue d'ensemble ».
+  const lbl = document.getElementById('sb-site-label');
+  if (lbl) lbl.textContent = siteList().length > 1 ? `Tickets · ${siteName(activeSiteKey())}` : 'Tickets';
   const page = _currentPageId();
-  if (['sn', 'ci', 'global'].includes(page) && page !== cible) window.renderPage(cible);
-  _applyPptxAvailability();
-}
-
-/* Le deck hebdomadaire est un rapport Sénégal : le serveur force ce
-   périmètre, quel que soit le sélecteur de site. Laisser le bouton actif
-   sur Abidjan ou Global produisait donc un fichier qui ne correspondait
-   pas à l'écran — un rapport « CI » rempli de chiffres SN.
-
-   Plutôt que de générer un document trompeur, le bouton est désactivé
-   hors Sénégal, avec la raison en infobulle. */
-function _applyPptxAvailability() {
-  const btn = document.getElementById('weekly-pptx-btn');
-  if (!btn) return;
-  const ok = currentCountry === 'SN';
-  btn.disabled = !ok;
-  btn.classList.toggle('is-unavailable', !ok);
-  btn.title = ok
-    ? ''
-    : 'Export available on the Senegal scope only: '
-      + 'the weekly report does not cover Abidjan.';
-  // Note visible sous le bouton : une infobulle ne se découvre qu'au
-  // survol, et l'absence d'explication se lit comme une panne.
-  let note = document.getElementById('weekly-pptx-note');
-  if (!ok && !note) {
-    note = document.createElement('div');
-    note.id = 'weekly-pptx-note';
-    note.className = 'pptx-scope-note';
-    note.textContent = 'Report available on the Senegal scope only.';
-    btn.parentElement?.appendChild(note);
-  } else if (ok && note) {
-    note.remove();
-  }
+  if (['site', 'global'].includes(page) && page !== cible) window.renderPage(cible);
 }
 
 function _syncCountryDot() {
-  const allBtn = document.getElementById('country-btn-all');
-  const snBtn  = document.getElementById('country-btn-sn');
-  const ciBtn  = document.getElementById('country-btn-ci');
-  [[allBtn,'ALL'], [snBtn,'SN'], [ciBtn,'CI']].forEach(([btn, val]) => {
-    if (!btn) return;
-    btn.classList.toggle('active', currentCountry === val);
+  document.querySelectorAll('#country-toggle .country-toggle-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.scope === getActiveCountry());
   });
+}
+
+// Boutons du sélecteur : « All » puis un par site. Masqué avec un seul site.
+function renderCountryToggle() {
+  const box = document.getElementById('country-toggle');
+  if (!box) return;
+  const sites = siteList();
+  box.style.display = sites.length > 1 ? '' : 'none';
+  const globe = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+  box.innerHTML = [`<button type="button" class="country-toggle-btn" data-scope="ALL" onclick="setActiveCountry('ALL')" title="All sites">${globe}<span>All</span></button>`]
+    .concat(sites.map(s => `<button type="button" class="country-toggle-btn" data-scope="${esc(s.code)}" onclick="setActiveCountry('${esc(s.code)}')" title="${esc(siteLabel(s.code))}">`
+      + `<span class="site-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${siteColor(s.code)}"></span><span>${esc(s.code)}</span></button>`))
+    .join('');
+  _syncCountryDot();
+  _applyCountryNav();
 }
 
 function _syncCountryDropdowns() {
   const foDashSel = document.getElementById('fo-dash-tracker');
   const auditSel  = document.getElementById('audit-filter-tracker');
   const obsSel    = document.getElementById('obs-filter-source');
-  if (currentCountry === 'ALL') {
+  const scope = getActiveCountry();
+  if (scope === 'ALL') {
     if (foDashSel) { foDashSel.value = 'both'; foDashSel.style.display = 'none'; }
     if (auditSel)  { auditSel.value  = '';     auditSel.style.display  = 'none'; }
     if (obsSel)    { obsSel.value    = '';     obsSel.style.display    = 'none'; }
     return;
   }
-  if (foDashSel) { foDashSel.value = currentCountry.toLowerCase(); foDashSel.style.display = 'none'; }
-  if (auditSel)  { auditSel.value  = currentCountry; auditSel.style.display = 'none'; }
-  if (obsSel)    { obsSel.value    = currentCountry; obsSel.style.display = 'none'; }
+  if (foDashSel) { foDashSel.value = scope.toLowerCase(); foDashSel.style.display = 'none'; }
+  if (auditSel)  { auditSel.value  = scope; auditSel.style.display = 'none'; }
+  if (obsSel)    { obsSel.value    = scope; obsSel.style.display = 'none'; }
 }
 
 // Page réellement affichée. La classe .active de la barre latérale ne
@@ -121,9 +104,11 @@ function _currentPageId() {
   try { return localStorage.getItem('pearl-last-page') || ''; } catch (_) { return ''; }
 }
 
-function setActiveCountry(val) {
-  currentCountry = (val === 'CI' || val === 'ALL') ? val : 'SN';
+function setActiveCountry(val, opts) {
+  const v = String(val || '').toUpperCase();
+  currentCountry = isSiteCode(v) ? v : 'ALL';
   localStorage.setItem('pearl-active-country', currentCountry);
+  if (opts && opts.silent) { _syncCountryDot(); return; }
   _applyCountryNav();
   _syncCountryDropdowns();
   _syncCountryDot();

@@ -189,7 +189,7 @@ function _o2osRenderProfil(fo) {
   const d = _o2oBreakdown(fo, sid);
   const today = _o2oToday();
 
-  const tracker = (state.config.fo_trackers || {})[fo] || 'SN';
+  const tracker = personSite(fo);
   const fid = (state.config.fo_ids || {})[fo] || '';
   const card = _perfMonthData(perfUI.month || _perfMonthKey())[fo];
   const note = typeof perfScore === 'function' ? perfScore(card).score : null;

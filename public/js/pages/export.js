@@ -23,12 +23,12 @@ function _expStatus(msg, kind) {
 // Enveloppe commune : désarme le bouton le temps de l'export et rend
 // l'échec visible. Sans cela, un export qui échoue ne dit rien et
 // l'utilisateur reclique dans le vide.
-async function runExport(btn, kind) {
+async function runExport(btn, kind, arg) {
   const label = btn ? btn.textContent : '';
   if (btn) { btn.disabled = true; btn.textContent = 'Export…'; }
   _expStatus('Génération en cours…');
   try {
-    await _runExportKind(kind);
+    await _runExportKind(kind, arg);
     _expStatus('Export terminé.', 'ok');
   } catch (e) {
     console.error('[export]', kind, e);
@@ -38,7 +38,7 @@ async function runExport(btn, kind) {
   }
 }
 
-async function _runExportKind(kind) {
+async function _runExportKind(kind, arg) {
   switch (kind) {
     // ── Rapports : chacun va chercher ses données s'il ne les a pas.
     case 'daily-xlsx':   return exportDailyExcel();
@@ -49,8 +49,7 @@ async function _runExportKind(kind) {
     case 'stats':        return exportStatsExcel();
 
     // ── Trackers, sans les filtres d'écran (voir l'en-tête de section).
-    case 'tracker-sn':   return exportTrackerFull('sn');
-    case 'tracker-ci':   return exportTrackerFull('ci');
+    case 'tracker-site': return exportTrackerFull(String(arg || '').toLowerCase());
     case 'tracker-all':  return exportTrackerFull(null);
     case 'observations': return exportObservationsExcel();
 
@@ -78,16 +77,16 @@ async function _dlWorkbook(wb, filename) {
   document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
 
-// Tracker complet : `which` vaut 'sn', 'ci', ou null pour les deux.
+// Tracker complet : `which` est le code d'un site (minuscules), ou null pour tous.
 async function exportTrackerFull(which) {
   const rows = which
-    ? (state[which] || []).map(t => ({ ...t, _tracker: which }))
+    ? ticketsOf(which).map(t => ({ ...t, _tracker: which }))
     : getGlobalTickets();
   if (!rows.length) throw new Error('Aucun ticket à exporter.');
 
   const cols = which ? getTrackerCols() : getGlobalTrackerCols();
   const wb = new ExcelJS.Workbook();
-  const ws = wb.addWorksheet(which ? `Tracker ${which.toUpperCase()}` : 'Tracker Global');
+  const ws = wb.addWorksheet(which ? `Tracker ${which.toUpperCase()}` : 'All sites');
   ws.columns = cols.map(() => ({ width: 18 }));
   xlHdr(ws, 1, cols.map((_, i) => i + 1), cols.map(([, lbl]) => lbl));
 
@@ -165,3 +164,15 @@ async function exportPlanningExcel() {
   toast('Excel export generated', 'success');
 }
 
+
+// Lignes d'export « Tickets <site> », une par site configuré.
+function renderExportSites() {
+  const box = document.getElementById('exp-sites');
+  if (!box) return;
+  box.innerHTML = siteList().map(s => `
+    <div class="exp-row">
+      <div class="exp-row-b"><div class="exp-row-t">Tickets ${esc(siteName(s.code))}</div><div class="exp-row-d">Tracker complet, sans les filtres d’écran</div></div>
+      <span class="exp-fmt">Excel</span>
+      <button type="button" class="exp-btn" aria-label="Télécharger Tickets ${esc(s.code)} (Excel)" onclick="runExport(this,'tracker-site',${escAttrArg(s.code)})">Télécharger</button>
+    </div>`).join('');
+}

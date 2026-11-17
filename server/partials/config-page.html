@@ -141,8 +141,15 @@
 
     <div class="page gm-scope" id="page-cfg-general">
       <div class="page-title">General</div>
-      <div class="page-sub">Domains, FO team, statuses and time references</div>
+      <div class="page-sub">Sites, domains, team, statuses and time references</div>
         <div class="config-grid">
+        <!-- Sites de l'organisation (js/pages/config/sites-admin.js) : un
+             tracker de tickets par site. -->
+        <div class="config-card" style="grid-column:1/-1">
+          <h3>Sites</h3>
+          <p class="text-muted" style="margin:0 0 12px;font-size:13px">Agences, plateaux, zones ou pays : chaque site a son tracker de tickets et son périmètre dans les rapports. Le code (2 à 8 lettres ou chiffres) ne se change plus une fois des tickets créés.</p>
+          <div id="sites-admin"></div>
+        </div>
         <div class="config-card">
           <h3>Active domains</h3>
           <div id="config-domains" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
@@ -158,10 +165,7 @@
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input class="form-control" id="new-fo" placeholder="Full name..." style="flex:1;min-width:180px;max-width:240px">
             <input class="form-control idt-mono" id="new-fo-id" placeholder="ID employé" style="width:150px" maxlength="12">
-            <select class="form-control" id="new-fo-tracker" style="width:72px">
-              <option value="SN">SN</option>
-              <option value="CI">CI</option>
-            </select>
+            <select class="form-control" id="new-fo-tracker" style="width:96px" data-sites="only" aria-label="Site"></select>
             <button class="btn btn-primary btn-sm" onclick="addFo()">Add</button>
           </div>
           <p style="font-size:11.5px;color:var(--mute);margin:8px 0 0;line-height:1.5">
@@ -574,12 +578,10 @@
           <!-- add-site form -->
           <div id="rota-add-site-form" style="display:none;border:1px dashed var(--line);border-radius:var(--r);padding:12px;margin-bottom:16px">
             <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-              <div><label class="form-label">Site name</label><input class="form-control" id="new-site-name" placeholder="e.g. Abidjan" style="width:160px"></div>
+              <div><label class="form-label">Site name</label><input class="form-control" id="new-site-name" placeholder="e.g. Lyon" style="width:160px"></div>
               <div>
                 <label class="form-label">Tracker</label>
-                <select class="form-control" id="new-site-tracker" style="width:90px">
-                  <option value="SN">SN</option><option value="CI">CI</option>
-                </select>
+                <select class="form-control" id="new-site-tracker" style="width:110px" data-sites="only"></select>
               </div>
               <button class="btn btn-primary btn-sm" onclick="_rotaCreateSite()">Create site</button>
               <button class="btn btn-ghost btn-sm" onclick="document.getElementById('rota-add-site-form').style.display='none'">Cancel</button>
@@ -1022,7 +1024,7 @@
       <div class="page-sub">Full history of all ticket changes</div>
       <div class="table-filters" style="margin-bottom:12px">
         <select class="filter-select" id="audit-filter-tracker" onchange="renderAudit()">
-          <option value="">Tout</option><option value="SN">SN</option><option value="CI">CI</option><option value="MAIL">Diffusion</option>
+          <option value="">Tout</option><optgroup label="Sites" data-sites-group></optgroup><option value="MAIL">Diffusion</option>
         </select>
         <select class="filter-select" id="audit-filter-action" onchange="renderAudit()">
           <option value="">All actions</option><option value="create">create</option><option value="update">update</option><option value="delete">delete</option><option value="mail-sent">mail envoyé</option><option value="mail-failed">mail en échec</option>
@@ -1296,7 +1298,7 @@
             <button type="button" class="exp-btn" aria-label="Télécharger Weekly Report (Excel)" onclick="runExport(this,'weekly-xlsx')">Télécharger</button>
           </div>
           <div class="exp-row">
-            <div class="exp-row-b"><div class="exp-row-t">Weekly Report</div><div class="exp-row-d">Deck de la semaine — périmètre Sénégal uniquement</div></div>
+            <div class="exp-row-b"><div class="exp-row-t">Weekly Report</div><div class="exp-row-d">Deck de la semaine — périmètre du site sélectionné</div></div>
             <span class="exp-fmt">PowerPoint</span>
             <button type="button" class="exp-btn" aria-label="Télécharger Weekly Report (PowerPoint)" onclick="runExport(this,'weekly-pptx')">Télécharger</button>
           </div>
@@ -1321,18 +1323,10 @@
       <section class="exp-sec">
         <h2 class="exp-sec-t">Trackers</h2>
         <div class="exp-list">
+          <!-- Une ligne par site (export.js, renderExportSites). -->
+          <div id="exp-sites"></div>
           <div class="exp-row">
-            <div class="exp-row-b"><div class="exp-row-t">Tickets SN</div><div class="exp-row-d">Tracker complet, sans les filtres d’écran</div></div>
-            <span class="exp-fmt">Excel</span>
-            <button type="button" class="exp-btn" aria-label="Télécharger Tickets SN (Excel)" onclick="runExport(this,'tracker-sn')">Télécharger</button>
-          </div>
-          <div class="exp-row">
-            <div class="exp-row-b"><div class="exp-row-t">Tickets CI</div><div class="exp-row-d">Tracker complet, sans les filtres d’écran</div></div>
-            <span class="exp-fmt">Excel</span>
-            <button type="button" class="exp-btn" aria-label="Télécharger Tickets CI (Excel)" onclick="runExport(this,'tracker-ci')">Télécharger</button>
-          </div>
-          <div class="exp-row">
-            <div class="exp-row-b"><div class="exp-row-t">Tous les trackers</div><div class="exp-row-d">SN et CI dans une même feuille</div></div>
+            <div class="exp-row-b"><div class="exp-row-t">Tous les trackers</div><div class="exp-row-d">Tous les sites dans une même feuille</div></div>
             <span class="exp-fmt">Excel</span>
             <button type="button" class="exp-btn" aria-label="Télécharger Tous les trackers (Excel)" onclick="runExport(this,'tracker-all')">Télécharger</button>
           </div>
@@ -1518,9 +1512,7 @@
               <input class="form-control" id="ml-test-to" type="email" placeholder="adresse@exemple.com"
                      onkeydown="if(event.key==='Enter')mlTest(document.getElementById('ml-test-btn'))">
               <select class="form-control" id="ml-test-report"></select>
-              <select class="form-control" id="ml-test-country" aria-label="Pays">
-                <option value="SN">Sénégal</option><option value="CI">Côte d’Ivoire</option><option value="ALL">SN + CI</option>
-              </select>
+              <select class="form-control" id="ml-test-country" aria-label="Site" data-sites="all" data-sites-all-value="ALL" data-sites-all="Tous les sites"></select>
               <button class="ml-btn ml-btn-tonal" id="ml-test-btn" onclick="mlTest(this)">Envoyer le test</button>
             </div>
             <p class="ml-hint" id="ml-test-state" role="status"></p>

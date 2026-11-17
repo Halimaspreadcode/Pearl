@@ -102,7 +102,7 @@ function _wpRenderReport(el, weekStart) {
         <div class="wp-rep-title">Team Progress</div>
         <div class="wp-rep-meta">
           Semaine du ${esc(_wpFmtDate(weekStart))} au ${esc(_wpFmtDate(weekEnd))}
-          · ${country === 'ALL' ? 'Dakar + Abidjan' : (country === 'CI' ? 'Abidjan (CI)' : 'Dakar (SN)')}
+          · ${country === 'ALL' ? scopeLabel('ALL') : siteLabel(country)}
           · ${st.done}/${st.total} delivered (${st.pct}%)
         </div>
       </div>
@@ -334,7 +334,7 @@ function _updateProgressPreview() {
   const el = document.getElementById('progress-preview');
   if (!el) return;
   const task = document.querySelector('#progress-form [name=task]')?.value.trim() || 'Votre tâche s\'affichera ici…';
-  const tracker = document.getElementById('progress-tracker-select')?.value || 'SN';
+  const tracker = document.getElementById('progress-tracker-select')?.value || defaultSite();
   const status = document.querySelector('#progress-form [name=status]:checked')?.value || 'Planned';
   const meta = WP_STATUS[status] || WP_STATUS.Planned;
   const owner = (editingProgressId
@@ -373,7 +373,8 @@ function openNewProgressItem() {
   // regarde « En cours », il ajoute très probablement un item en cours.
   _setPill('progress-status-pills', (wpFilter && wpFilter !== 'late') ? wpFilter : 'Planned');
   const trackerSel = document.getElementById('progress-tracker-select');
-  trackerSel.value = getActiveCountry() === 'CI' ? 'CI' : 'SN';
+  fillSiteSelects(trackerSel.parentElement);
+  trackerSel.value = getActiveCountry() !== 'ALL' ? getActiveCountry() : defaultSite();
   document.getElementById('progress-char-count').textContent = '0 / 220';
   _updateProgressWeekContext();
   _updateProgressPreview();
@@ -409,7 +410,7 @@ function openEditProgressItem(id) {
   ta.readOnly = locked;
   ta.classList.toggle('is-locked', locked);
   const trk = document.getElementById('progress-tracker-select');
-  trk.value = item.tracker || 'SN';
+  trk.value = item.tracker || defaultSite();
   trk.disabled = locked;
 
   _initPills('progress-status-pills');

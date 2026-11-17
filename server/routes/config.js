@@ -77,6 +77,8 @@ router.put('/api/config', requireAdmin, (req, res) => {
     delete body.ai_insights;
     // Rôles et parties prenantes : routes dédiées (/api/parties).
     delete body.parties;
+    // Sites : route dédiée (/api/sites), qui protège les tickets existants.
+    delete body.sites;
 
     // Blocs nominatifs (notes, entretiens, engagement) : ils ne sont rendus
     // par GET /api/config qu'à un admin. Un client qui a lu la config sans

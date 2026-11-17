@@ -201,7 +201,7 @@ function _aiPaint() {
         <span class="b3-mark">BB</span><b>Pearl AI</b></button>
       <span class="b3-status ${c.has_key ? 'is-on' : 'is-off'}" title="${c.has_key ? esc(c.model || '') : ''}"><i></i>${c.has_key ? 'Connecté' : 'Non connecté'}</span>
       <span class="b3-sp"></span>
-      <div class="b3-seg" role="tablist" aria-label="Périmètre">${[['ALL', 'Global'], ['SN', 'Dakar'], ['CI', 'Abidjan']].map(([v, l]) =>
+      <div class="b3-seg" role="tablist" aria-label="Périmètre">${[['ALL', 'Global'], ...siteList().map(s => [s.code, siteName(s.code)])].map(([v, l]) =>
         `<button class="${pays === v ? 'is-on' : ''}" role="tab" aria-selected="${pays === v}" onclick="aicPays('${v}')">${l}</button>`).join('')}</div>
       <button class="b3-btn${aiUI.sideOpen ? ' is-on' : ''}" onclick="aiSide(!aiUI.sideOpen)" aria-label="Historique">${_aiIco('chat')}<span>Historique</span>${convs.length ? `<em>${convs.length}</em>` : ''}${enCours ? '<i class="b3-run" title="Tâche en cours"></i>' : ''}</button>
       <button class="b3-btn${aiUI.showKb ? ' is-on' : ''}" onclick="aiKbToggle()" aria-label="Documents">${_aiIco('book')}<span>Documents</span>${nDocs ? `<em>${nDocs}</em>` : ''}</button>
@@ -1349,10 +1349,10 @@ function _aiInsHtml() {
 // champ « Pays » (marqué `pays` côté serveur), pré-rempli avec le pays
 // actif de l'appli. La réponse garde un sélecteur : changer de pays
 // relance le skill avec les mêmes réglages et remplace la réponse.
-const AI_PAYS = ['Global', 'Dakar (SN)', 'Abidjan (CI)'];
+// Mêmes libellés que le serveur (ai-skills.js) : « Global », « Ville (CODE) ».
 function _aiPaysActif() {
   const c = typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL';
-  return c === 'SN' ? AI_PAYS[1] : c === 'CI' ? AI_PAYS[2] : AI_PAYS[0];
+  return c !== 'ALL' && isSiteCode(c) ? siteLabel(c) : 'Global';
 }
 function _aiChampPays(sk) { return sk && (sk.champs || []).find(ch => ch.pays); }
 // Réglages d'une réponse de skill : gardés sur la réponse (un skill lancé
@@ -1368,8 +1368,9 @@ function _aiFiltrePays(m, i) {
   const ch = _aiChampPays(sk);
   // Un agent précis choisi : le pays ne change rien, pas de filtre.
   if (!ch || (inp.fo && sk.champs.some(c => c.id === 'fo'))) return '';
-  const cur = inp[ch.id] || AI_PAYS[0];
-  return `<div class="bb-pays" role="group" aria-label="Pays">${AI_PAYS.map(p => `<button class="${p === cur ? 'is-on' : ''}"
+  const cur = inp[ch.id] || 'Global';
+  const AI_PAYS = ['Global', ...siteList().map(s => siteLabel(s.code))];
+  return `<div class="bb-pays" role="group" aria-label="Site">${AI_PAYS.map(p => `<button class="${p === cur ? 'is-on' : ''}"
       ${p === cur || aiUI.busy ? 'disabled' : ''} onclick="aiRefiltre(${i}, '${p.replace(/'/g, "\\'")}')">${esc(p.replace(/ \(.+\)/, ''))}</button>`).join('')}</div>`;
 }
 async function aiRefiltre(i, pays) {

@@ -2,8 +2,8 @@
 // All columns matching the Excel tracker
 function getTrackerCols() { return [
   // [key, label, render_fn]
-  ['sn_tt',  t('Oceane TT#'),  t => `<span class="td-mono">${esc(t.sn_tt)||'-'}</span>`],
-  ['imoc_tt',  t('IMOC TT#'),  t => `<span class="td-mono" style="color:var(--mute)">${esc(t.imoc_tt)||'-'}</span>`],
+  ['sn_tt',  t('Ticket #'),  t => `<span class="td-mono">${esc(t.sn_tt)||'-'}</span>`],
+  ['imoc_tt',  t('External ref.'),  t => `<span class="td-mono" style="color:var(--mute)">${esc(t.imoc_tt)||'-'}</span>`],
   ['title',  t('Titre'),  t => `<span class="td-title" title="${esc(t.title)}">${esc(t.title)||'-'}</span>`],
   ['type',  t('Type'),  t => `<span class="badge badge-type-${esc((t.type||'').toLowerCase().replace(/\s+/g,'-').replace('non-bug','nonbug'))}">${esc(t.type)||'-'}</span>`],
   ['domain',  t('Domaine'),  t => esc(t.domain)||'-'],
@@ -35,22 +35,30 @@ function getTrackerCols() { return [
   ['shift',  t('Shift'),  t => `<span style="font-size:11px;color:var(--mute)">${esc(t.shift)||'-'}</span>`],
 ]; }
 
-// Per-tracker, per-column active filter values: { sn: { domain: Set(['MMC']) }, ci: {...} }
-const _colFilters = { sn: {}, ci: {}, global: {} };
+// Clé de tracker : code du site en minuscules (« lyo ») ou 'global'.
+// Le DOM n'a qu'une page de site (préfixe « site- ») et la page globale.
+// Les attributs onclick de la page portent la clé générique « site » :
+// elle désigne le site actif (activeSiteKey).
+const _tk = tk => (tk === 'site' ? activeSiteKey() : tk);
+const _dp = tk => (tk === 'global' ? 'global' : 'site');
+const _tkData = tk => (tk === 'global' ? getGlobalTickets() : ticketsOf(_tk(tk)));
+
+// Per-tracker, per-column active filter values: { lyo: { domain: Set(['MMC']) }, global: {...} }
+const _colFilters = new Proxy({}, { get: (o, k) => (typeof k === 'string' ? (o[_tk(k)] = o[_tk(k)] || {}) : undefined) });
 
 function toggleColFilterMenu(tracker, key, evt) {
   evt.stopPropagation();
-  document.querySelectorAll('.col-filter-menu').forEach(m => { if (m.id !== `colf-${tracker}-${key}`) m.remove(); });
-  const existing = document.getElementById(`colf-${tracker}-${key}`);
+  document.querySelectorAll('.col-filter-menu').forEach(m => { if (m.id !== `colf-${_dp(tracker)}-${key}`) m.remove(); });
+  const existing = document.getElementById(`colf-${_dp(tracker)}-${key}`);
   if (existing) { existing.remove(); return; }
 
-  const source = tracker === 'global' ? getGlobalTickets() : state[tracker];
+  const source = tracker === 'global' ? getGlobalTickets() : _tkData(tracker);
   const values = [...new Set(source.map(t => t[key]))].filter(v => v !== undefined && v !== null && v !== '').sort((a,b) => String(a).localeCompare(String(b)));
   const active = _colFilters[tracker][key]; // Set or undefined = all selected
 
   const menu = document.createElement('div');
   menu.className = 'col-filter-menu';
-  menu.id = `colf-${tracker}-${key}`;
+  menu.id = `colf-${_dp(tracker)}-${key}`;
   menu.style.cssText = 'position:fixed;z-index:300;background:var(--bg);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:8px;width:220px;max-height:320px;overflow-y:auto;font-size:12px';
 
   const rect = evt.target.getBoundingClientRect();
@@ -64,7 +72,7 @@ function toggleColFilterMenu(tracker, key, evt) {
       <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:10px" onclick="_colFilterAll('${tracker}','${key}',true)">Select all</button>
       <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:10px" onclick="_colFilterAll('${tracker}','${key}',false)">Clear</button>
     </div>
-    <div id="colf-list-${tracker}-${key}">
+    <div id="colf-list-${_dp(tracker)}-${key}">
       ${values.map(v => `
         <label style="display:flex;align-items:center;gap:6px;padding:3px 2px;cursor:pointer">
           <input type="checkbox" value="${esc(String(v))}" ${checked(v) ? 'checked' : ''} onchange="_colFilterToggle('${tracker}','${key}',this)">
@@ -81,13 +89,13 @@ function toggleColFilterMenu(tracker, key, evt) {
 
 function _colFilterSearch(input, tracker, key) {
   const q = input.value.toLowerCase();
-  document.querySelectorAll(`#colf-list-${tracker}-${key} label`).forEach(lbl => {
+  document.querySelectorAll(`#colf-list-${_dp(tracker)}-${key} label`).forEach(lbl => {
     lbl.style.display = lbl.textContent.toLowerCase().includes(q) ? '' : 'none';
   });
 }
 
 function _colFilterToggle(tracker, key, checkbox) {
-  const source = tracker === 'global' ? getGlobalTickets() : state[tracker];
+  const source = tracker === 'global' ? getGlobalTickets() : _tkData(tracker);
   const allValues = [...new Set(source.map(t => t[key]))].filter(v => v !== undefined && v !== null && v !== '').map(String);
   if (!_colFilters[tracker][key]) _colFilters[tracker][key] = new Set(allValues);
   const set = _colFilters[tracker][key];
@@ -97,21 +105,26 @@ function _colFilterToggle(tracker, key, checkbox) {
 }
 
 function _colFilterAll(tracker, key, select) {
-  const menu = document.getElementById(`colf-${tracker}-${key}`);
+  const menu = document.getElementById(`colf-${_dp(tracker)}-${key}`);
   if (!menu) return;
-  menu.querySelectorAll(`#colf-list-${tracker}-${key} input[type=checkbox]`).forEach(cb => cb.checked = select);
+  menu.querySelectorAll(`#colf-list-${_dp(tracker)}-${key} input[type=checkbox]`).forEach(cb => cb.checked = select);
   if (select) delete _colFilters[tracker][key];
   else _colFilters[tracker][key] = new Set();
   filterTable(tracker);
 }
 
 function renderTracker(tracker) {
+  tracker = _tk(tracker);
   currentTracker = tracker;
+  const t = document.getElementById('site-page-title');
+  if (t) t.textContent = siteList().length > 1 ? `Tickets · ${siteName(tracker)}` : 'Tickets';
+  const sub = document.getElementById('site-page-sub');
+  if (sub) { const st = siteByCode(tracker); sub.textContent = st ? [st.name, st.city, st.country].filter((v, i, a) => v && a.indexOf(v) === i).join(' · ') : 'No site configured yet: add one in Configuration.'; }
   renderTrackerViews(tracker);
   const cfg = state.config || {};
 
   // FO filter from config
-  const foFilter = document.getElementById(`${tracker}-filter-fo`);
+  const foFilter = document.getElementById(`${_dp(tracker)}-filter-fo`);
   if (foFilter) {
     const cur = foFilter.value;
     foFilter.innerHTML = '<option value="">All FOs</option>';
@@ -122,7 +135,7 @@ function renderTracker(tracker) {
   }
 
   // Domain filter from config
-  const domFilter = document.getElementById(`${tracker}-filter-domain`);
+  const domFilter = document.getElementById(`${_dp(tracker)}-filter-domain`);
   if (domFilter) {
     const cur = domFilter.value;
     domFilter.innerHTML = '<option value="">All domains</option>';
@@ -133,7 +146,7 @@ function renderTracker(tracker) {
   }
 
   // Rebuild header on every render so language changes propagate
-  const thead = document.getElementById(`${tracker}-thead-row`);
+  const thead = document.getElementById(`${_dp(tracker)}-thead-row`);
   if (thead) {
     thead.innerHTML = getTrackerCols().map(([k,lbl]) => `
       <th style="white-space:nowrap"${_colFilters[tracker][k] ? ' data-colf="1"' : ''}>
@@ -147,17 +160,17 @@ function renderTracker(tracker) {
 }
 
 function getFilteredTickets(tracker) {
-  const search    = document.getElementById(`${tracker}-search`)?.value.toLowerCase()||'';
-  const fStatus   = document.getElementById(`${tracker}-filter-status`)?.value||'';
-  const fPrio     = document.getElementById(`${tracker}-filter-priority`)?.value||'';
-  const fFO       = document.getElementById(`${tracker}-filter-fo`)?.value||'';
-  const fDom      = document.getElementById(`${tracker}-filter-domain`)?.value||'';
-  const fDateFrom = document.getElementById(`${tracker}-filter-date-from`)?.value||'';
-  const fDateTo   = document.getElementById(`${tracker}-filter-date-to`)?.value||'';
+  const search    = document.getElementById(`${_dp(tracker)}-search`)?.value.toLowerCase()||'';
+  const fStatus   = document.getElementById(`${_dp(tracker)}-filter-status`)?.value||'';
+  const fPrio     = document.getElementById(`${_dp(tracker)}-filter-priority`)?.value||'';
+  const fFO       = document.getElementById(`${_dp(tracker)}-filter-fo`)?.value||'';
+  const fDom      = document.getElementById(`${_dp(tracker)}-filter-domain`)?.value||'';
+  const fDateFrom = document.getElementById(`${_dp(tracker)}-filter-date-from`)?.value||'';
+  const fDateTo   = document.getElementById(`${_dp(tracker)}-filter-date-to`)?.value||'';
 
   const colFilters = _colFilters[tracker] || {};
 
-  return state[tracker].filter(t => {
+  return _tkData(tracker).filter(t => {
     if (!_trViewMatch(tracker, t)) return false;
     if (fStatus && t.status !== fStatus) return false;
     if (fPrio   && t.priority !== fPrio) return false;
@@ -182,16 +195,16 @@ function getFilteredTickets(tracker) {
 
 function renderTrackerRows(tracker) {
   const tickets = getFilteredTickets(tracker);
-  const tbody = document.getElementById(`${tracker}-tbody`);
+  const tbody = document.getElementById(`${_dp(tracker)}-tbody`);
   const cols  = getTrackerCols();
 
-  _updateTrackerCount(tracker, tickets.length, (state[tracker] || []).length);
+  _updateTrackerCount(tracker, tickets.length, (_tkData(tracker) || []).length);
   _bindTrackerScrollShadow();
 
   if (!tickets.length) {
     // Un "No tickets" centré ne disait pas si la table est vide ou si
     // les filtres sont trop restrictifs — et n'offrait aucune sortie.
-    const total = (state[tracker] || []).length;
+    const total = (_tkData(tracker) || []).length;
     tbody.innerHTML = `<tr><td colspan="${cols.length}">
       <div class="tk-empty">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -217,7 +230,7 @@ function renderTrackerRows(tracker) {
 // Ombre de défilement sous l'en-tête figé des trackers : sans elle, le
 // thead sticky reste un bandeau plat et on ne voit pas que ça défile.
 function _bindTrackerScrollShadow() {
-  ['sn','ci','global'].forEach(tk => {
+  ['site','global'].forEach(tk => {
     const wrap = document.querySelector(`#page-${tk} .table-wrap`);
     if (!wrap || wrap.dataset.shadowBound) return;
     wrap.dataset.shadowBound = '1';
@@ -237,7 +250,7 @@ function _bindTrackerScrollShadow() {
 // Compteur de résultats : sans lui, impossible de savoir si un filtre
 // a pris effet ni combien de lignes sont masquées.
 function _updateTrackerCount(tracker, shown, total) {
-  const el = document.getElementById(`${tracker}-result-count`);
+  const el = document.getElementById(`${_dp(tracker)}-result-count`);
   if (!el) return;
   el.textContent = shown === total
     ? `${total} ticket${total > 1 ? 's' : ''}`
@@ -249,7 +262,10 @@ function _updateTrackerCount(tracker, shown, total) {
 // Les questions qu'on se pose en ouvrant un tracker, en un clic, avec
 // leur nombre : qu'est-ce qui est actif, hors SLA, en attente, à moi ?
 // Elles se combinent avec la recherche et les filtres.
-const _trView = { sn: 'all', ci: 'all', global: 'all' };
+const _trView = new Proxy({}, {
+  get: (o, k) => (typeof k === 'string' ? o[_tk(k)] : undefined),
+  set: (o, k, v) => { o[_tk(k)] = v; return true; },
+});
 const _TR_CLOS = t => t.status === 'Resolved' || t.status === 'Closed';
 const _TR_ME = () => (typeof currentUser !== 'undefined' && currentUser && currentUser.name) || '';
 const TR_VIEWS = [
@@ -266,9 +282,9 @@ function _trViewMatch(tracker, t) {
 }
 function setTrackerView(tracker, v) { _trView[tracker] = v; filterTable(tracker); }
 function renderTrackerViews(tracker) {
-  const el = document.getElementById(`${tracker}-views`);
+  const el = document.getElementById(`${_dp(tracker)}-views`);
   if (!el) return;
-  const base = tracker === 'global' ? getGlobalTickets() : (state[tracker] || []);
+  const base = tracker === 'global' ? getGlobalTickets() : (_tkData(tracker) || []);
   const cur = _trView[tracker] || 'all';
   el.innerHTML = TR_VIEWS.filter(([k]) => k !== 'mine' || _TR_ME()).map(([k, l, f]) => {
     const n = base.filter(f).length;
@@ -286,11 +302,12 @@ function filterTable(tracker) {
 
 async function exportTrackerExcel(tracker) {
   const tickets = getFilteredTickets(tracker);
+  tracker = _tk(tracker);
   if (!tickets.length) { alert('Nothing to export.'); return; }
 
   const cols = getTrackerCols();
   const wb = new ExcelJS.Workbook();
-  const ws = wb.addWorksheet(`Tracker ${tracker.toUpperCase()}`);
+  const ws = wb.addWorksheet(`Tracker ${tracker.toUpperCase()}`.slice(0, 31));
   ws.columns = cols.map(() => ({ width: 18 }));
 
   xlHdr(ws, 1, cols.map((_,i) => i+1), cols.map(([,lbl]) => lbl));
@@ -312,10 +329,9 @@ async function exportTrackerExcel(tracker) {
   toast('Excel export generated', 'success');
 }
 
-// ── TRACKER GLOBAL (SN + CI combined, read-only) ──────────────
+// ── TRACKER GLOBAL (tous les sites, lecture seule) ───────────
 function getGlobalTickets() {
-  return state.sn.map(t => ({ ...t, _tracker: 'sn' }))
-    .concat(state.ci.map(t => ({ ...t, _tracker: 'ci' })));
+  return allTickets();
 }
 
 function getFilteredGlobalTickets() {
@@ -403,7 +419,7 @@ function renderGlobalTrackerRows() {
 
 function updateTrackerFilterBadges(tracker) {
   const isGlobal = tracker === 'global';
-  const searchId = isGlobal ? 'global-tracker-search' : `${tracker}-search`;
+  const searchId = isGlobal ? 'global-tracker-search' : `${_dp(tracker)}-search`;
   const filterIds = isGlobal
     ? [
         { id: 'global-filter-site',      label: 'Site' },
@@ -415,12 +431,12 @@ function updateTrackerFilterBadges(tracker) {
         { id: 'global-filter-date-to',   label: 'To' },
       ]
     : [
-        { id: `${tracker}-filter-status`,    label: 'Status' },
-        { id: `${tracker}-filter-priority`,  label: 'Priority' },
-        { id: `${tracker}-filter-fo`,        label: 'FO' },
-        { id: `${tracker}-filter-domain`,    label: 'Domain' },
-        { id: `${tracker}-filter-date-from`, label: 'From' },
-        { id: `${tracker}-filter-date-to`,   label: 'To' },
+        { id: `${_dp(tracker)}-filter-status`,    label: 'Status' },
+        { id: `${_dp(tracker)}-filter-priority`,  label: 'Priority' },
+        { id: `${_dp(tracker)}-filter-fo`,        label: 'FO' },
+        { id: `${_dp(tracker)}-filter-domain`,    label: 'Domain' },
+        { id: `${_dp(tracker)}-filter-date-from`, label: 'From' },
+        { id: `${_dp(tracker)}-filter-date-to`,   label: 'To' },
       ];
 
   const search = document.getElementById(searchId)?.value || '';
@@ -441,10 +457,10 @@ function updateTrackerFilterBadges(tracker) {
   const searchActive = search.trim().length > 0;
   const anyActive = chips.length > 0 || searchActive;
 
-  const resetBtn = document.getElementById(`${tracker}-reset-btn`);
+  const resetBtn = document.getElementById(`${_dp(tracker)}-reset-btn`);
   if (resetBtn) resetBtn.style.display = anyActive ? '' : 'none';
 
-  const container = document.getElementById(`${tracker}-active-chips`);
+  const container = document.getElementById(`${_dp(tracker)}-active-chips`);
   if (!container) return;
   if (!anyActive) { container.style.display = 'none'; container.innerHTML = ''; return; }
 
@@ -464,7 +480,7 @@ function updateTrackerFilterBadges(tracker) {
 
 function resetTrackerFilters(tracker) {
   const isGlobal = tracker === 'global';
-  const searchId = isGlobal ? 'global-tracker-search' : `${tracker}-search`;
+  const searchId = isGlobal ? 'global-tracker-search' : `${_dp(tracker)}-search`;
   const prefix = isGlobal ? 'global' : tracker;
   const ids = isGlobal
     ? ['global-filter-site','global-filter-status','global-filter-priority','global-filter-fo','global-filter-domain','global-filter-date-from','global-filter-date-to']
@@ -490,7 +506,7 @@ async function exportGlobalTrackerExcel() {
 
   const cols = getGlobalTrackerCols();
   const wb = new ExcelJS.Workbook();
-  const ws = wb.addWorksheet('Tracker Global');
+  const ws = wb.addWorksheet('All sites');
   ws.columns = cols.map(() => ({ width: 18 }));
 
   xlHdr(ws, 1, cols.map((_,i) => i+1), cols.map(([,lbl]) => lbl));
@@ -518,11 +534,11 @@ async function exportGlobalTrackerExcel() {
 // toujours la même (« aujourd'hui », « cette semaine »…) : un menu de
 // périodes les remplit ; « Custom » fait apparaître les deux champs.
 function _trPeriodInit(tr) {
-  const range = document.querySelector(`#${tr}-filter-bar .tfb-daterange`);
-  if (!range || document.getElementById(`${tr}-filter-period`)) return;
+  const range = document.querySelector(`#${_dp(tr)}-filter-bar .tfb-daterange`);
+  if (!range || document.getElementById(`${_dp(tr)}-filter-period`)) return;
   const sel = document.createElement('select');
   sel.className = 'filter-select tfb-period';
-  sel.id = `${tr}-filter-period`;
+  sel.id = `${_dp(tr)}-filter-period`;
   sel.setAttribute('aria-label', 'Open date');
   sel.innerHTML = [['', 'Any date'], ['today', 'Today'], ['7', 'Last 7 days'], ['30', 'Last 30 days'], ['month', 'This month'], ['custom', 'Custom…']]
     .map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
@@ -531,9 +547,9 @@ function _trPeriodInit(tr) {
   range.hidden = true;
 }
 function trSetPeriod(tr, v) {
-  const from = document.getElementById(`${tr}-filter-date-from`);
-  const to = document.getElementById(`${tr}-filter-date-to`);
-  const range = document.querySelector(`#${tr}-filter-bar .tfb-daterange`);
+  const from = document.getElementById(`${_dp(tr)}-filter-date-from`);
+  const to = document.getElementById(`${_dp(tr)}-filter-date-to`);
+  const range = document.querySelector(`#${_dp(tr)}-filter-bar .tfb-daterange`);
   if (!from || !to) return;
   const iso = d => d.toISOString().slice(0, 10);
   const now = new Date();
@@ -546,14 +562,14 @@ function trSetPeriod(tr, v) {
   filterTable(tr);
 }
 (function () {
-  const init = () => ['sn', 'ci', 'global'].forEach(_trPeriodInit);
+  const init = () => ['site', 'global'].forEach(_trPeriodInit);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
   // Reset remet aussi la période à « Any date ».
   const orig = window.resetTrackerFilters;
   if (typeof orig === 'function') window.resetTrackerFilters = function (tr) {
-    const p = document.getElementById(`${tr}-filter-period`);
+    const p = document.getElementById(`${_dp(tr)}-filter-period`);
     if (p) p.value = '';
-    const r = document.querySelector(`#${tr}-filter-bar .tfb-daterange`);
+    const r = document.querySelector(`#${_dp(tr)}-filter-bar .tfb-daterange`);
     if (r) r.hidden = true;
     return orig.apply(this, arguments);
   };

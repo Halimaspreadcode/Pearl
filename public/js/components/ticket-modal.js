@@ -35,6 +35,8 @@ function _syncRcaRequired(required) {
 }
 
 function openNewTicket(tracker) {
+  if (!tracker || tracker === 'site') tracker = activeSiteKey();
+  if (!tracker) { toast('Add a site in Configuration before creating tickets', 'error'); return; }
   currentTracker = tracker; editingId = null;
   goStep(1);
   document.getElementById('modal-title').textContent = `New ${tracker.toUpperCase()} ticket`;
@@ -55,8 +57,9 @@ function openNewTicket(tracker) {
 }
 
 function openEditTicket(tracker, id) {
+  if (tracker === 'site') tracker = activeSiteKey();
   currentTracker = tracker; editingId = id;
-  const ticket = state[tracker].find(t => t.id === id);
+  const ticket = ticketsOf(tracker).find(t => t.id === id);
   if (!ticket) return;
   if (typeof TicketSuggest !== 'undefined') TicketSuggest.stop();   // création seulement
   document.getElementById('modal-title').textContent = `Edit - ${ticket.sn_tt}`;
@@ -155,9 +158,9 @@ const saveTicket = withSaveGuard(async function() {
     });
   }
 
-  // Duplicate guard (creation only): same Océane TT# or IMOC TT# already in this tracker.
+  // Duplicate guard (creation only): same Océane TT# or External ref. already in this tracker.
   if (!editingId) {
-    const dup = (state[currentTracker] || []).find(t =>
+    const dup = ticketsOf(currentTracker).find(t =>
       (data.sn_tt && t.sn_tt && t.sn_tt.trim().toLowerCase() === data.sn_tt.trim().toLowerCase()) ||
       (data.imoc_tt && t.imoc_tt && t.imoc_tt.trim().toLowerCase() === data.imoc_tt.trim().toLowerCase())
     );
@@ -178,11 +181,11 @@ const saveTicket = withSaveGuard(async function() {
   try {
     let res;
     if (editingId) {
-      res = await fetch(`${API}/api/${currentTracker}/${editingId}`, {
+      res = await fetch(`${API}/api/tickets/${currentTracker}/${editingId}`, {
         method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
       });
     } else {
-      res = await fetch(`${API}/api/${currentTracker}`, {
+      res = await fetch(`${API}/api/tickets/${currentTracker}`, {
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
       });
     }
@@ -206,7 +209,7 @@ const deleteTicket = withSaveGuard(async function() {
   if (!requireUser('delete a ticket')) return;
   if (!editingId) return;
   if (!confirm('Delete this ticket permanently?')) return;
-  await fetch(`${API}/api/${currentTracker}/${editingId}`, { method:'DELETE' });
+  await fetch(`${API}/api/tickets/${currentTracker}/${editingId}`, { method:'DELETE' });
   toast('Ticket deleted', 'success');
   closeModal('ticket-modal');
   await loadAll();

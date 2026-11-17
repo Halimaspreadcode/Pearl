@@ -19,15 +19,15 @@ const ObjRev = {
 
 // ── Équipe affichée (SN, CI ou toutes) ────────────────────────
 // Partagée par le Suivi, les approbations et les exports d'une session :
-// on regarde un trimestre pour Dakar, pour Abidjan, ou pour les deux.
-// L'équipe d'un agent vient de fo_trackers (Sénégal par défaut).
+// on regarde un trimestre pour un site ou pour tous.
+// L'équipe d'un agent vient de fo_trackers (premier site par défaut).
 const OBJ_TEAM_KEY = 'obj-team';
 function objTeam() {
-  try { const t = localStorage.getItem(OBJ_TEAM_KEY); return ['SN', 'CI'].includes(t) ? t : 'ALL'; }
+  try { const t = localStorage.getItem(OBJ_TEAM_KEY); return isSiteCode(t) ? t : 'ALL'; }
   catch (_) { return 'ALL'; }
 }
 function objTeamOf(fo) {
-  return [].concat(((state.config || {}).fo_trackers || {})[fo] || 'SN').map(x => String(x).toUpperCase());
+  return [].concat(personSite(fo)).map(x => String(x).toUpperCase());
 }
 function objInTeam(fo) { const t = objTeam(); return t === 'ALL' || objTeamOf(fo).includes(t); }
 function objTeamFilter(map) {
@@ -40,7 +40,7 @@ function objSetTeam(t) {
 }
 function objTeamSwitch() {
   const t = objTeam();
-  return `<div class="obj-team" role="group" aria-label="Team">${[['ALL', 'All teams'], ['SN', 'SN · Dakar'], ['CI', 'CI · Abidjan']]
+  return `<div class="obj-team" role="group" aria-label="Team">${[['ALL', 'All teams'], ...siteList().map(s => [s.code, `${s.code} · ${siteName(s.code)}`])]
     .map(([k, l]) => `<button type="button" class="${t === k ? 'is-on' : ''}" aria-pressed="${t === k}" onclick="objSetTeam('${k}')">${l}</button>`).join('')}</div>`;
 }
 

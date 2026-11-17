@@ -67,7 +67,7 @@ async function buildReportFile(kind, countryIn) {
     const cols = ['sn_tt', 'imoc_tt', 'title', 'status', 'priority', 'domain',
                   'fo_owner', 'open_date', 'close_date', 'sla_status'];
     ws.columns = cols.map(() => ({ width: 18 }));
-    xlsxHeader(ws, ['TT', 'IMOC', 'Titre', 'Statut', 'Priorité', 'Domaine',
+    xlsxHeader(ws, ['TT', 'Réf. externe', 'Titre', 'Statut', 'Priorité', 'Domaine',
                     'FO', 'Ouvert', 'Clôturé', 'SLA']);
     (liste || []).forEach((t, i) => {
       ws.getRow(i + 2).values = cols.map(c => t[c] ?? '');

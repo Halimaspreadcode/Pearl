@@ -18,7 +18,7 @@ const MODULES = [
     desc: 'Tableau de bord, configuration, équipe, accès, audit, annonces.',
     pages: ['dashboard', 'config', 'equipe', 'cfg-annonces', 'audit', 'mon-espace', 'mes-today'],
     api: ['status', 'version', 'config', 'team', 'fo-access', 'user-prefs', 'presence', 'audit', 'announcements',
-      'bo', 'kpi-config', 'dashboard', 'export', 'platform', 'parties', 'fo', 'holidays'] },
+      'bo', 'kpi-config', 'dashboard', 'export', 'platform', 'parties', 'fo', 'holidays', 'sites'] },
   { id: 'tickets', label: 'Tickets & SLA', depends: ['core'],
     desc: 'Trackers par site, délais (SLA), suggestions, qualité des données, observations, passation.',
     pages: ['site', 'global', 'observations', 'fo-dashboard', 'fo-handover', 'data-quality', 'ops-review'],

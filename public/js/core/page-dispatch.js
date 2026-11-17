@@ -9,6 +9,15 @@ const ADMIN_ONLY_PAGES = ['config', 'audit', 'shift-approvals', 'data-quality', 
   'cfg-assign', 'cfg-myteam', 'cfg-objectifs', 'cfg-vues', 'equipe', 'ai', 'ai-cockpit', 'indicateurs', 'cfg-parties'];
 
 window.renderPage = function(page) {
+  // Anciennes entrées « sn », « ci » (ou tout code de site) : la page du
+  // site, avec ce site comme périmètre.
+  if (page !== 'site' && page !== 'global' && typeof isSiteCode === 'function' && isSiteCode(page)) {
+    if (typeof setActiveCountry === 'function') setActiveCountry(page.toUpperCase(), { silent: true });
+    page = 'site';
+  }
+  // Sélecteurs de site des écrans (y compris ceux injectés par la zone
+  // admin) : remplis avec les sites de l'organisation.
+  if (typeof fillSiteSelects === 'function') { try { fillSiteSelects(); fillSiteGroups(); if (typeof renderExportSites === 'function') renderExportSites(); } catch (_) {} }
   // L'Academy retire la barre latérale ; toute autre page la rend.
   if (page !== 'academy' && typeof academyFocus === 'function') academyFocus(false);
   // Les deux formations vivent désormais dans l'Academy.

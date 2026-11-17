@@ -1,6 +1,6 @@
 // Rôles et parties prenantes : création, reconnaissance des noms IMOC, rôle suivi partout.
 const { useTempDataDir } = require('./helpers/data-dir');
-useTempDataDir({ 'config.json': { fo_list: ['Lucas Garnier', 'Awa Diop'] }, 'bo_list.json': [{ name: 'Moussa Ba' }] });
+useTempDataDir({ 'config.json': { fo_list: ['Lucas Garnier', 'Awa Diop'], sites: [{ code: 'SN', name: 'Sénégal' }, { code: 'CI', name: 'Côte d\'Ivoire' }] }, 'bo_list.json': [{ name: 'Moussa Ba' }] });
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const parties = require('../server/services/parties');

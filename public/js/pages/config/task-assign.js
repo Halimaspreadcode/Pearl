@@ -26,10 +26,10 @@ function _asgFoList() {
   const trackers = state.config.fo_trackers || {};
   const country = getActiveCountry();
   return (state.config.fo_list || []).filter(fo =>
-    country === 'ALL' || (trackers[fo] || 'SN') === country);
+    country === 'ALL' || personInScope(fo, country));
 }
 
-function _asgTracker(fo) { return (state.config.fo_trackers || {})[fo] || 'SN'; }
+function _asgTracker(fo) { return personSite(fo); }
 
 // Toutes les tâches attribuées par l'admin, quel que soit leur semaine.
 function _asgAll() {

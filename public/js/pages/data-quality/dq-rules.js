@@ -56,9 +56,9 @@ const DQ_RULES = {
   'W08': { severity:'warning', category:'SLA', title:'P2 open for more than 5 days',
     description:'A P2 ticket has been active for more than 5 days without resolution. The P2 SLA requires fast resolution — beyond 5 days the breach risk is high.',
     fix:'Push the handling forward, escalate if needed, and document progress.' },
-  'W09': { severity:'warning', category:'Duplicates', title:'Duplicate IMOC TT#',
-    description:'Several tickets share the same IMOC TT number. One IMOC incident can affect several sites, but this must be justified — otherwise it is probably a data entry error.',
-    fix:'Check whether these tickets really are the same multi-site incident. Otherwise fix the wrong IMOC TT#.' },
+  'W09': { severity:'warning', category:'Duplicates', title:'Duplicate External ref.',
+    description:'Several tickets share the same external reference. One external incident can affect several sites, but this must be justified — otherwise it is probably a data entry error.',
+    fix:'Check whether these tickets really are the same multi-site incident. Otherwise fix the wrong External ref..' },
 
   'W11': { severity:'warning', category:'Lifecycle', title:'"In Progress" ticket with no recent activity',
     description:'The ticket is in "In Progress" status but has not been modified for more than 7 days. An in-progress ticket without activity can indicate an unreported blocker or an oversight.',
@@ -66,15 +66,14 @@ const DQ_RULES = {
   'E09': { severity:'error',   category:'Lifecycle', title:'"Open" ticket not picked up (+30 min)',
     description:'A ticket has been in "Open" status for more than 30 minutes. This means no FO has taken the incident yet. Every ticket must move to "In Progress" within 30 minutes of opening to guarantee fast handling and SLA compliance.',
     fix:'Assign the ticket to an FO and move the status to "In Progress" immediately.' },
-  'W12': { severity:'warning', category:'Quality', title:'SN ticket without a linked IMOC TT#',
-    description:'For escalated incidents an IMOC TT# must be linked. An SN ticket without an IMOC reference can indicate that the escalation was never documented.',
-    fix:'Enter the IMOC TT# if an escalation took place, or leave it empty only if the incident was handled locally.' },
+  'W12': { severity:'warning', category:'Quality', title:'SN ticket without a linked External ref.',
+    description:'For escalated incidents an External ref. must be linked. A ticket without an IMOC reference can indicate that the escalation was never documented.',
+    fix:'Enter the External ref. if an escalation took place, or leave it empty only if the incident was handled locally.' },
 };
 
 function _runDataQualityChecks() {
   const allTickets = [
-    ...state.sn.map(t => ({ ...t, _tracker: 'SN' })),
-    ...state.ci.map(t => ({ ...t, _tracker: 'CI' })),
+    ...ticketsInScope('ALL').map(t => ({ ...t, _tracker: t._tracker.toUpperCase() })),
   ];
   const issues = [];
   const { locale, tz } = getLangConfig();
@@ -174,9 +173,9 @@ function _runDataQualityChecks() {
         flag(t, 'W11', `Last modified: ${fmtD(t.updated_at)} (${Math.round(idleD)} days ago)`);
     }
 
-    // W12 — SN ticket without IMOC TT# (P1/P2 escalated only)
-    if (t._tracker === 'SN' && ['P1','P2'].includes(t.priority) && (!t.imoc_tt || !t.imoc_tt.trim()))
-      flag(t, 'W12', `${t.priority} SN ticket without a linked IMOC TT# — "${t.title||t.id}"`);
+    // W12 — P1/P2 ticket without an external reference (escalated tickets)
+    if (['P1','P2'].includes(t.priority) && (!t.imoc_tt || !t.imoc_tt.trim()) && ((state.config || {}).require_external_ref_p12))
+      flag(t, 'W12', `${t.priority} ticket without an external reference — "${t.title||t.id}"`);
 
     // E09 — Open ticket not picked up within 30 minutes
     if (t.status === 'Open' && t.open_date) {
@@ -200,7 +199,7 @@ function _runDataQualityChecks() {
         `TT# "${t.sn_tt}" present ${group.length}× in tracker ${t._tracker} (IDs: ${group.map(x=>x.id).join(', ')})`));
   });
 
-  // W09 — Duplicate IMOC TT#
+  // W09 — Duplicate External ref.
   const byImoc = {};
   allTickets.forEach(t => {
     if (!t.imoc_tt || !t.imoc_tt.trim()) return;

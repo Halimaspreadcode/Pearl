@@ -1,7 +1,8 @@
 // ── STATE ────────────────────────────────────────────────────
 const API = '';
-let state = { sn: [], ci: [], observations: [], config: {}, dashboard: {}, boList: [], shiftsPlan: [], foTasks: [], rotaConfig: { sites: [] }, holidays: [], shiftRequests: [], weeklyProgress: [] };
-let currentTracker = 'sn';
+let state = { sites: [], tickets: {}, observations: [], config: {}, dashboard: {}, boList: [], shiftsPlan: [], foTasks: [], rotaConfig: { sites: [] }, holidays: [], shiftRequests: [], weeklyProgress: [] };
+// Clé du tracker affiché : code du site en minuscules (« lyo »).
+let currentTracker = '';
 let editingId = null;
 let countdownInterval = null;
 // Synchronisation périodique avec le serveur, distincte du rafraîchissement
@@ -18,8 +19,8 @@ let _dernierSync = Date.now();
 const I18N = {
   fr: {
     // Column headers
-    'Oceane TT#':       'Oceane TT#',
-    'IMOC TT#':         'IMOC TT#',
+    'Ticket #':         'Ticket #',
+    'External ref.':    'External ref.',
     'Titre':            'Titre',
     'Type':             'Type',
     'Domaine':          'Domaine',
@@ -83,8 +84,8 @@ const I18N = {
     'Performance by FO': 'Performance by FO',
   },
   en: {
-    'Oceane TT#':       'Oceane TT#',
-    'IMOC TT#':         'IMOC TT#',
+    'Ticket #':         'Ticket #',
+    'External ref.':    'External ref.',
     'Titre':            'Title',
     'Type':             'Type',
     'Domaine':          'Domain',

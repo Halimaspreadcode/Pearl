@@ -118,8 +118,7 @@ function trimEmptyRows(rows, emptyRowTemplate) {
 // Tickets P1/P2 still open for more than 24h, scoped to the active country (or both if 'ALL').
 function _longOpenP1P2Tickets() {
   const country = typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL';
-  const pools = country === 'ALL' ? [...state.sn, ...state.ci]
-    : country === 'CI' ? state.ci : state.sn;
+  const pools = country === 'ALL' ? allTicketsRaw() : ticketsOf(country);
   const now = Date.now();
   return pools.filter(t =>
     ['P1','P2'].includes(t.priority) &&
@@ -131,8 +130,7 @@ function _longOpenP1P2Tickets() {
 // Open tickets whose SLA is "Near Breach" (<20% of SLA window left), scoped to the active country.
 function _nearBreachTickets() {
   const country = typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL';
-  const pools = country === 'ALL' ? [...state.sn, ...state.ci]
-    : country === 'CI' ? state.ci : state.sn;
+  const pools = country === 'ALL' ? allTicketsRaw() : ticketsOf(country);
   return pools.filter(t =>
     t.sla_status === 'Near Breach' && !['Resolved','Closed'].includes(t.status)
   );

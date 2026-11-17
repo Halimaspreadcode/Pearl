@@ -84,7 +84,7 @@ function buildDailyReport(dateQuery, country) {
 // ── WEEKLY REPORT ─────────────────────────────────────────────
 // Extrait en fonction pour que l'export PPTX parte exactement des mêmes
 // chiffres que la page — un deck qui contredit l'écran ne sert à rien.
-// Une observation porte son pays dans `source` ('SN' | 'CI'). Le registre
+// Une observation porte son site dans `source` (code du site). Le registre
 // n'était pas filtré : un rapport SN listait les observations ivoiriennes.
 // Une source absente est conservée — c'est une saisie ancienne, pas une
 // donnée d'un autre pays.

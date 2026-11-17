@@ -1096,7 +1096,7 @@ function ticketTable(slide, { x, y, w, rows, total, rowH }) {
   // Ligne d'en-tête, en petites capitales grises : même grammaire que les
   // libellés de colonnes du reste du deck.
   const head = [
-    ['Oceane TT#', colX.tt, cTT], ['Title', colX.title, cTitle],
+    ['Ticket #', colX.tt, cTT], ['Title', colX.title, cTitle],
     ['Domain', colX.dom, cDom], ['Prio', colX.pri, cPri],
     ['Severity', colX.sev, cSev],
   ];
@@ -1465,7 +1465,7 @@ function paginateFo(fo) {
   return out.length ? out : [[]];
 }
 
-// Le deck est un rapport Sénégal. Tout ce qui porte explicitement un autre
+// Le deck porte sur un site (ou tous). Tout ce qui porte explicitement un autre
 // pays est écarté ici, en plus du filtrage côté serveur : les sections
 // rédigées (highlights, risques) viennent du brouillon client, où rien
 // n'empêchait de saisir une ligne « CI ».

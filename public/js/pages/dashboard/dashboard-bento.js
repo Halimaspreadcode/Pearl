@@ -25,7 +25,7 @@ function _bxAbsenceStats() {
   // dans le dénominateur : on ne peut pas être absent d'un repos).
   const planned = (state.shiftsPlan || []).filter(s =>
     !s.is_rest &&
-    (country === 'ALL' || (s.tracker || 'SN') === country) &&
+    (country === 'ALL' || (s.tracker || defaultSite()) === country) &&
     inRange(s.date));
 
   const absences = (state.shiftRequests || []).filter(r =>
@@ -72,10 +72,10 @@ function _bxSegColor(key) {
     P1: 'var(--p1-fg)', P2: 'var(--p2-fg)', P3: 'var(--p3-fg)', P4: 'var(--p4-fg)',
     'Open': 'var(--c-blue)', 'In Progress': 'var(--c-violet)',
     'Resolved': 'var(--ok-fg)', 'Closed': 'var(--mute)',
-    // Couleurs des drapeaux : vert pour le Sénégal, orange pour la Côte d'Ivoire.
-    SN: 'var(--c-sn)', CI: 'var(--c-ci)',
   };
   if (map[key]) return map[key];
+  // Un code de site : sa couleur, dans l'ordre de la configuration.
+  if (typeof isSiteCode === 'function' && isSiteCode(key)) return siteColor(key);
 
   // Domaine connu → teinte dédiée ; domaine inattendu → teinte stable
   // tirée de la même palette par hachage du nom (jamais le gris neutre,
@@ -118,8 +118,7 @@ function renderBentoCards(kpis) {
 
   // Périmètre de tickets identique à celui des KPI (pays + période).
   let tickets = [
-    ...(country !== 'CI' ? (state.sn || []).map(t => ({ ...t, tracker: 'SN' })) : []),
-    ...(country !== 'SN' ? (state.ci || []).map(t => ({ ...t, tracker: 'CI' })) : []),
+    ...ticketsInScope(country).map(t => ({ ...t, tracker: t._tracker.toUpperCase() })),
   ];
   if (range) {
     tickets = tickets.filter(t => {
@@ -293,7 +292,7 @@ function _bxRenderRecent(tickets) {
     const prio = String(t.priority || '').toUpperCase();
     const right = (prio ? `<span class="bx-prio bx-prio-${esc(prio.toLowerCase())}">${esc(prio)}</span>` : '') +
                   (breached ? '<span class="bx-row-alert">SLA breach</span>' : '');
-    // Numéro affiché : SN TT, sinon IMOC TT, jamais l'identifiant interne.
+    // Numéro affiché : numéro du ticket, sinon référence externe, jamais l'identifiant interne.
     const num = t.sn_tt || t.imoc_tt || '—';
     return `<button class="bx-row"
         onclick="navigateToTicket('${esc((t.tracker || '').toLowerCase())}','${esc(t.id)}')"

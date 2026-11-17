@@ -1,7 +1,7 @@
 const express     = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { FILES } = require('../config/paths');
-const { readCfg, readJSON, withFileLock } = require('../core/store');
+const { readCfg, readJSON, withFileLock, normScope } = require('../core/store');
 const { reportTZ } = require('../core/time');
 const { authLimiter } = require('../http/security');
 const { requireAdmin } = require('../auth/guards');
@@ -70,8 +70,8 @@ router.put('/api/mailing', requireAdmin, (req, res) => {
       m.schedules = b.schedules.map(sc => ({
         id: sc.id || uuidv4().slice(0, 8),
         report: String(sc.report || 'daily'),
-        // Pays du rapport : Sénégal, Côte d'Ivoire ou les deux.
-        country: ['SN', 'CI', 'ALL'].includes(sc.country) ? sc.country : 'SN',
+        // Périmètre du rapport : un site ou tous.
+        country: normScope(sc.country, 'first'),
         // Une planification sans groupe n'envoie à personne et échoue en
         // silence dans le journal. Le formulaire préremplit le premier
         // groupe, mais une ligne créée avant qu'un groupe n'existe garde
@@ -137,7 +137,7 @@ router.post('/api/mailing/preview', requireAdmin, async (req, res) => {
   const sch = m.schedules.find(s => s.id === String(req.body?.schedule_id || ''));
   const report  = String(req.body?.report || (sch && sch.report) || 'daily');
   const subject = typeof req.body?.subject === 'string' ? req.body.subject : (sch && sch.subject) || '';
-  const country = String(req.body?.country || (sch && sch.country) || 'SN');
+  const country = normScope(req.body?.country || (sch && sch.country), 'first');
   if (!RAPPORT_LABELS[report]) return res.status(400).json({ error: 'Rapport inconnu' });
   try {
     const mail = await composerRapport(report, subject, country);
