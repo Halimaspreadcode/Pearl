@@ -1,0 +1,197 @@
+/* ══════════════════════════════════════════════════════════
+   Vue RAPPORT — la slide « EMOC FO Progress » à l'écran.
+   Même découpage en quatre quadrants que le PPTX pour que ce
+   qu'on lit ici soit exactement ce qui sera présenté. Chaque
+   quadrant garde sa couleur d'en-tête d'origine : c'est le
+   repère visuel que l'audience connaît déjà.
+   ══════════════════════════════════════════════════════════ */
+#page-weekly-progress .wp-report{
+  background:var(--m3-surface);
+  border:1px solid var(--m3-outline-var);
+  border-radius:var(--m3-r-lg);
+  padding:26px 30px 30px;
+}
+[data-theme="dark"] #page-weekly-progress .wp-report{background:var(--m3-surf-1);border-color:transparent}
+
+#page-weekly-progress .wp-rep-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:22px;
+}
+#page-weekly-progress .wp-rep-title{
+  font-size:23px;font-weight:600;letter-spacing:-.2px;
+  color:var(--wp-q-help);
+}
+#page-weekly-progress .wp-rep-meta{font-size:12.5px;color:var(--m3-on-surf-var)}
+
+#page-weekly-progress .wp-quads{
+  display:grid;grid-template-columns:1fr 1fr;gap:26px 34px;
+}
+#page-weekly-progress .wp-quad{display:flex;flex-direction:column;min-width:0}
+/* Le trait de couleur sous le titre est la signature de la slide. */
+#page-weekly-progress .wp-quad-h{
+  font-size:17px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+  color:var(--wp-qc);padding-bottom:5px;
+  border-bottom:3px solid var(--wp-qc);
+}
+#page-weekly-progress .wp-quad-s{
+  font-size:11.5px;font-style:italic;color:var(--m3-on-surf-var);
+  margin:5px 0 12px;
+}
+#page-weekly-progress .wp-quad-body{flex:1;min-height:150px}
+
+/* Lignes à puce (Achievements, Risques, Aide) */
+#page-weekly-progress .wp-rep-list{display:flex;flex-direction:column;gap:9px}
+#page-weekly-progress .wp-rep-li{
+  display:flex;align-items:flex-start;gap:9px;
+  font-size:13px;line-height:1.5;color:var(--m3-on-surface);
+}
+#page-weekly-progress .wp-rep-li::before{
+  content:"➤";flex-shrink:0;color:var(--wp-qc);
+  font-size:11px;line-height:1.7;
+}
+#page-weekly-progress .wp-rep-who{
+  font-weight:700;color:var(--m3-on-surface);
+}
+#page-weekly-progress .wp-rep-sub{color:var(--m3-on-surf-var)}
+
+/* Tableau du quadrant « Next steps » : mêmes colonnes que la slide. */
+#page-weekly-progress .wp-rep-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+/* L'en-tête tire son encre de la couleur du quadrant, pas du thème :
+   le fond pastel est le même en clair et en sombre, donc un texte
+   qui suivrait le thème deviendrait blanc sur pastel — illisible. */
+#page-weekly-progress .wp-rep-tbl th{
+  text-align:left;font-weight:700;font-size:11px;letter-spacing:.3px;
+  color:var(--wp-qc);padding:8px 9px;
+  background:var(--wp-qcc);white-space:nowrap;
+}
+#page-weekly-progress .wp-rep-tbl th:not(:first-child),
+#page-weekly-progress .wp-rep-tbl td:not(:first-child){text-align:center;width:1%}
+#page-weekly-progress .wp-rep-tbl td{
+  padding:8px 9px;border-bottom:1px solid var(--m3-outline-var);
+  color:var(--m3-on-surface);line-height:1.45;vertical-align:top;
+}
+#page-weekly-progress .wp-rep-tbl tr:last-child td{border-bottom:none}
+#page-weekly-progress .wp-rep-tbl tbody tr{cursor:pointer;transition:background .15s var(--m3-ease)}
+#page-weekly-progress .wp-rep-tbl tbody tr:hover{background:var(--m3-surf-2)}
+#page-weekly-progress .wp-rep-st{
+  display:inline-block;padding:2px 9px;border-radius:var(--m3-r-full);
+  font-size:10.5px;font-weight:700;white-space:nowrap;
+}
+#page-weekly-progress .wp-quad-empty{
+  font-size:12.5px;color:var(--m3-on-surf-var);font-style:italic;padding:14px 2px;
+}
+/* Bandeau d'action : la vue sert à préparer la présentation, le
+   chemin vers le PPTX doit être là, pas dans un autre écran. */
+#page-weekly-progress .wp-rep-foot{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-top:26px;padding-top:18px;
+  border-top:1px solid var(--m3-outline-var);
+}
+#page-weekly-progress .wp-rep-note{font-size:12px;color:var(--m3-on-surf-var);flex:1;min-width:180px}
+
+@media (max-width:900px){
+  #page-weekly-progress .wp-quads{grid-template-columns:1fr;gap:24px}
+  #page-weekly-progress .wp-report{padding:20px 18px 24px}
+}
+/* Impression : la vue rapport est faite pour finir sur un écran de
+   réunion ou un PDF — le reste de la page n'a rien à y faire. */
+@media print{
+  body *{visibility:hidden}
+  #page-weekly-progress .wp-report,#page-weekly-progress .wp-report *{visibility:visible}
+  #page-weekly-progress .wp-report{position:absolute;inset:0;border:none;padding:0}
+  #page-weekly-progress .wp-rep-foot{display:none}
+
+  /* À l'écran les tableaux larges défilent horizontalement ; à
+     l'impression il n'y a pas de défilement, le contenu serait
+     simplement coupé. On libère le conteneur et on laisse le tableau
+     se réduire à la largeur de la page. */
+  #page-daily-report [style*="overflow-x"],
+  #page-weekly-report [style*="overflow-x"],
+  #page-monthly-report [style*="overflow-x"]{
+    overflow:visible!important;max-width:none!important;
+  }
+  #page-daily-report table,
+  #page-weekly-report table,
+  #page-monthly-report table{
+    table-layout:fixed;width:100%!important;font-size:9pt;
+  }
+  #page-daily-report table td,#page-daily-report table th,
+  #page-weekly-report table td,#page-weekly-report table th,
+  #page-monthly-report table td,#page-monthly-report table th{
+    overflow-wrap:anywhere;word-break:break-word;white-space:normal!important;
+  }
+  /* Ne pas couper une ligne entre deux pages. */
+  #page-daily-report tr,#page-weekly-report tr,#page-monthly-report tr{
+    break-inside:avoid;page-break-inside:avoid;
+  }
+}
+
+/* ── État vide ───────────────────────────────────────────── */
+#page-weekly-progress .wp-empty{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:64px 24px;text-align:center;
+  border:1px dashed var(--m3-outline-var);border-radius:var(--m3-r-xl);
+  background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-weekly-progress .wp-empty{background:transparent}
+#page-weekly-progress .wp-empty-ico{
+  width:56px;height:56px;border-radius:50%;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--m3-surf-3);color:var(--m3-on-surf-var);
+}
+#page-weekly-progress .wp-empty-t{font-size:15px;font-weight:600;color:var(--m3-on-surface)}
+#page-weekly-progress .wp-empty-s{font-size:13px;color:var(--m3-on-surf-var);max-width:380px;line-height:1.5}
+#page-weekly-progress .wp-empty-act{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#page-weekly-progress .wp-empty-btn{
+  height:38px;padding:0 20px;border-radius:var(--m3-r-full);
+  border:1px solid var(--m3-outline);background:none;cursor:pointer;
+  font:inherit;font-size:13px;font-weight:600;color:var(--m3-on-surface);
+  transition:background .15s var(--m3-ease);
+}
+#page-weekly-progress .wp-empty-btn:hover{background:var(--m3-surf-2)}
+#page-weekly-progress .wp-empty-btn.primary{
+  border-color:transparent;background:var(--m3-primary);color:var(--m3-on-primary);
+}
+
+/* Astuce clavier : discrète, apprise une fois puis ignorée. */
+#page-weekly-progress .wp-kbd{
+  margin-top:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-size:11.5px;color:var(--m3-on-surf-var);
+}
+#page-weekly-progress .wp-kbd kbd{
+  display:inline-block;min-width:20px;padding:2px 6px;text-align:center;
+  border:1px solid var(--m3-outline-var);border-bottom-width:2px;border-radius:5px;
+  background:var(--m3-surf-1);font-family:'JetBrains Mono',monospace;font-size:10.5px;
+  color:var(--m3-on-surface);
+}
+
+/* ── Adaptatif ───────────────────────────────────────────── */
+@media (max-width:1180px){
+  #page-weekly-progress .wp-overview{grid-template-columns:repeat(2,1fr)}
+  #page-weekly-progress .wp-tile-hero{grid-column:1/-1}
+  #page-weekly-progress .wp-panels{grid-template-columns:1fr}
+}
+@media (max-width:860px){
+  #page-weekly-progress .wp-header{align-items:stretch}
+  #page-weekly-progress .wp-header-actions{width:100%}
+  #page-weekly-progress .wp-search{flex:1;min-width:0}
+  #page-weekly-progress .wp-weekbar-spacer{display:none}
+  #page-weekly-progress .wp-weekbar{gap:6px}
+  #page-weekly-progress .wp-select{flex:1;min-width:130px}
+  #page-weekly-progress .wp-board{
+    grid-template-columns:none;display:flex;overflow-x:auto;
+    scroll-snap-type:x mandatory;padding-bottom:6px;
+  }
+  #page-weekly-progress .wp-col{flex:0 0 78%;scroll-snap-align:start}
+  #page-weekly-progress .wp-tabs{width:100%;overflow-x:auto}
+}
+@media (max-width:560px){
+  #page-weekly-progress .wp-overview{grid-template-columns:1fr 1fr}
+  #page-weekly-progress .wp-title{font-size:23px}
+  #page-weekly-progress .wp-tab span{display:none}
+  #page-weekly-progress .wp-rank-row{grid-template-columns:26px 1fr 60px 40px}
+}
+@media (prefers-reduced-motion:reduce){
+  #page-weekly-progress *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+

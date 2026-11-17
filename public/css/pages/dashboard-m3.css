@@ -1,0 +1,329 @@
+/* ══════════════════════════════════════════════
+   MATERIAL 3 / PIXEL LAYER — scopé au Dashboard
+   Surfaces tonales · coins XL · containers pastel
+   · state layers · pas de bordures dures
+══════════════════════════════════════════════ */
+#page-dashboard{
+  /* Le rouge est réservé à ce qui va mal (rupture de SLA, seuils
+     dépassés). L'accent courant est un indigo, et chaque indicateur
+     a sa propre teinte (voir « Palette » dans dashboard-widgets.css). */
+  --m3-primary:        #4F6A85;
+  --m3-on-primary:     #FFFFFF;
+  --m3-primary-cont:   #E4EAF0;
+  --m3-on-primary-cont:#2F4A66;
+
+  --m3-secondary:      #5F6368;
+  --m3-secondary-cont: #EFEFEF;
+
+  --m3-error:          #C7000B;
+  --m3-error-cont:     #FDECEC;
+  --m3-on-error-cont:  #8C0009;
+
+  --m3-success:        #1E7B34;
+
+  /* surfaces neutres (gris purs, sans teinte) */
+  --m3-surface:        #FCFBF8;
+  --m3-surf-1:         #F7F5F0;
+  --m3-surf-2:         #F0ECE5;
+  --m3-surf-3:         #E8E3DA;
+  --m3-on-surface:     #26251F;
+  --m3-on-surf-var:    #6D695F;
+  --m3-outline:        #CEC8BC;
+  --m3-outline-var:    #E6E1D7;
+
+  /* formes M3 expressive */
+  /* Formes Pixel : les conteneurs sont franchement arrondis (28px),
+     c'est la signature visuelle la plus reconnaissable du langage. */
+  --m3-r-xl:  28px;
+  --m3-r-lg:  20px;
+  --m3-r-md:  16px;
+  --m3-r-sm:  12px;
+  --m3-r-full:999px;
+
+  --m3-ease: cubic-bezier(.2,0,0,1);
+
+  color:var(--m3-on-surface);
+  font-feature-settings:"ss01" on,"cv05" on;
+}
+/* la surface tonale doit couvrir toute la zone scrollable */
+.main:has(#page-dashboard.active){background:var(--canvas,#F7F5F0)}
+[data-theme="dark"] .main:has(#page-dashboard.active){background:#000000}
+
+[data-theme="dark"] #page-dashboard{
+  --m3-primary:        #8B93FF;
+  --m3-on-primary:     #12122A;
+  --m3-primary-cont:   #1C1D3A;
+  --m3-on-primary-cont:#C4C8FF;
+
+  --m3-secondary:      #9E9E9E;
+  --m3-secondary-cont: #262626;
+
+  --m3-error:          #FF5C5C;
+  --m3-error-cont:     #2A1618;
+  --m3-on-error-cont:  #FF9A9A;
+
+  --m3-success:        #5CD37E;
+
+  /* dark : pas de bordures claires, on sépare par le fond */
+  --m3-surface:        #000000;
+  --m3-surf-1:         #0E0E10;
+  --m3-surf-2:         #151517;
+  --m3-surf-3:         #1F1F22;
+  --m3-on-surface:     #E3E3E3;
+  --m3-on-surf-var:    #9AA0A6;
+  --m3-outline:        #444746;
+  --m3-outline-var:    #2D2E30;
+}
+
+/* ── En-tête : Google Sans-like display ── */
+#page-dashboard .page-header{margin-bottom:20px}
+#page-dashboard .page-title{
+  font-size:24px;font-weight:500;line-height:1.25;
+  letter-spacing:-.01em;color:var(--m3-on-surface);
+}
+#page-dashboard .page-sub{
+  font-size:14px;font-weight:400;color:var(--m3-on-surf-var);
+  letter-spacing:.01em;margin-top:4px;
+}
+
+/* ── Chips M3 (barre d'outils) ── */
+#page-dashboard #dash-period-bar > div:first-child{
+  background:transparent!important;border:none!important;
+  border-radius:var(--m3-r-full)!important;padding:0!important;gap:8px!important;
+}
+#page-dashboard .hm-tab{
+  border:1px solid var(--m3-outline-var)!important;
+  background:transparent!important;
+  color:var(--m3-on-surf-var)!important;
+  border-radius:var(--m3-r-sm)!important;
+  padding:6px 16px!important;height:32px;
+  font-size:13px!important;font-weight:500!important;letter-spacing:.01em;
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+#page-dashboard .hm-tab:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)!important}
+#page-dashboard .hm-tab.active{
+  background:var(--m3-secondary-cont)!important;
+  color:var(--m3-on-primary-cont)!important;
+  border-color:transparent!important;
+}
+#page-dashboard .filter-select{
+  border-radius:var(--m3-r-sm)!important;
+  border:1px solid var(--m3-outline)!important;
+  background:transparent!important;color:var(--m3-on-surface)!important;
+  height:34px!important;font-size:13px!important;
+}
+#page-dashboard #dash-period-label{font-size:12px;color:var(--m3-on-surf-var)}
+
+/* le chip "Vue combinée" */
+#page-dashboard .page > div:first-of-type > div:first-child,
+#page-dashboard [style*="border-radius:20px"]:not(.d-card-action){
+  border-radius:var(--m3-r-full)!important;
+}
+
+/* ── Cartes : surface tonale, coins XL, zéro ombre au repos ── */
+#page-dashboard .dash-grid{gap:12px}
+#page-dashboard .d-card-head{margin-bottom:16px}
+/* Filled card M3 : fond tonal, aucune bordure. Une carte cerclée
+   d'un trait gris est un pattern Bootstrap, pas Material. */
+#page-dashboard .d-card{
+  background:var(--m3-surf-2);
+  border:none;
+  border-radius:var(--m3-r-xl);
+  padding:24px;
+  box-shadow:none;
+  transition:background .25s var(--m3-ease);
+}
+#page-dashboard .d-card:hover{background:var(--m3-surf-3)}
+/* dark : la bordure claire faisait un liseré blanc — on sépare
+   par la valeur du fond, pas par un trait */
+[data-theme="dark"] #page-dashboard .d-card{
+  background:var(--m3-surf-1);border-color:transparent;
+}
+[data-theme="dark"] #page-dashboard .d-card:hover{
+  background:var(--m3-surf-2);border-color:transparent;
+}
+
+/* Toutes les cartes sont neutres. La couleur est réservée aux
+   états qui portent une information (breach, hors-SLA). */
+
+/* ── Icône : pastille M3 pleine ── */
+#page-dashboard .d-card-icon{
+  width:32px;height:32px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2);
+}
+#page-dashboard .d-card-icon svg{stroke:var(--m3-on-surf-var)}
+/* .d-card-icon force display:flex, ce qui neutralisait l'attribut
+   hidden : la pastille restait visible comme un rond vide. */
+#page-dashboard [hidden]{display:none!important}
+
+/* ── Typo M3 ── */
+#page-dashboard .d-card-label{
+  font-size:13px;font-weight:400;letter-spacing:.006em;
+  color:var(--m3-on-surf-var);margin-bottom:6px;
+}
+#page-dashboard .d-card-value{
+  font-size:32px;font-weight:500;letter-spacing:-.02em;line-height:1.1;
+  color:var(--m3-on-surface);
+}
+#page-dashboard .d-card-value.red{color:var(--m3-error)}
+#page-dashboard .d-card-trend{font-size:12px;letter-spacing:.03em;color:var(--m3-on-surf-var);margin-top:6px}
+#page-dashboard .d-card-trend .neu{color:inherit}
+#page-dashboard .d-card-trend .up{color:var(--m3-success)}
+#page-dashboard .d-card-trend .down{color:var(--m3-error)}
+#page-dashboard .d-card-head > span[style]{
+  font-size:16px!important;font-weight:500!important;
+  color:var(--m3-on-surface)!important;letter-spacing:0!important;
+}
+
+/* ── Bouton texte M3 ── */
+#page-dashboard .d-card-action{
+  font-size:13px;font-weight:500;letter-spacing:.006em;
+  color:var(--m3-primary);border:none;
+  border-radius:var(--m3-r-full);padding:6px 12px;
+  transition:background .2s var(--m3-ease);
+}
+#page-dashboard .d-card-action:hover{
+  background:color-mix(in srgb,var(--m3-primary) 10%,transparent);
+  color:var(--m3-primary);
+}
+
+/* ── Sparklines : barres à sommet arrondi, base à plat ──
+   Un rayon plein (999px) transformait les valeurs basses (3-4px)
+   en pastilles rondes : le rayon dépassait la demi-hauteur. */
+#page-dashboard .d-chart-bars{gap:4px;height:36px;align-items:flex-end}
+#page-dashboard .d-chart-bars span{
+  border-radius:2px 2px 0 0;min-height:2px;
+  background:color-mix(in srgb,var(--m3-on-surface) 12%,transparent);
+  transition:background .2s var(--m3-ease);
+}
+#page-dashboard .d-chart-bars span.active{background:var(--m3-primary);opacity:1}
+#page-dashboard .d-chart-bars span:hover{background:var(--m3-primary);opacity:.7}
+
+/* ── Donut ── */
+#page-dashboard #dc-sla-ring{opacity:1!important;stroke-width:6}
+#page-dashboard .d-donut-wrap circle:first-child{stroke:color-mix(in srgb,var(--m3-on-surface) 14%,transparent);stroke-width:6}
+#page-dashboard .d-donut-legend-item{font-size:12px;color:var(--m3-on-surface)}
+
+/* ── Barres de stats (Priority / Status) ── */
+#page-dashboard .d-stat-key{font-size:13px;color:var(--m3-on-surf-var);width:74px}
+#page-dashboard .d-stat-bar-wrap{
+  height:12px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 10%,transparent);
+}
+#page-dashboard .d-stat-bar{border-radius:var(--m3-r-full)}
+#page-dashboard .d-stat-val{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:var(--m3-on-surface)}
+
+/* ── Domain rows : state layer M3 ── */
+#page-dashboard .dom-bar-row{border-radius:var(--m3-r-full);padding:6px 10px}
+#page-dashboard .dom-bar-row:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+#page-dashboard .dom-bar-row.active{background:var(--m3-secondary-cont)}
+#page-dashboard .dom-bar-label{font-size:12px;font-weight:500;color:var(--m3-on-surf-var)}
+#page-dashboard .dom-bar-track{
+  height:12px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 10%,transparent);
+}
+#page-dashboard .dom-bar-seg,#page-dashboard .dom-bar-seg-part{border-radius:var(--m3-r-full)}
+#page-dashboard .dom-bar-count{font-size:12px;font-weight:500;color:var(--m3-on-surface)}
+#page-dashboard .dom-bar-pct{font-size:11px;color:var(--m3-on-surf-var)}
+#page-dashboard .dom-detail-col{border-left:1px solid var(--m3-outline-var)}
+#page-dashboard .dom-detail-title{font-size:16px;font-weight:500;color:var(--m3-on-surface)}
+#page-dashboard .dom-detail-section{
+  font-size:11px;font-weight:500;letter-spacing:.09em;color:var(--m3-on-surf-var);
+}
+#page-dashboard .dom-detail-label{font-size:12px;color:var(--m3-on-surf-var)}
+#page-dashboard .dom-detail-val{font-size:12px;font-weight:500;color:var(--m3-on-surface)}
+#page-dashboard .dom-detail-hint{border-top:1px solid var(--m3-outline-var);color:var(--m3-on-surf-var)}
+
+/* ── Heatmap : cellules M3 ── */
+#page-dashboard .d-heatmap-cell{
+  border-radius:var(--m3-r-sm);width:24px;height:24px;
+  transition:transform .2s var(--m3-ease);
+}
+#page-dashboard .d-heatmap-cell[data-v="0"]{background:color-mix(in srgb,var(--m3-on-surface) 7%,transparent);opacity:1}
+#page-dashboard .d-heatmap-cell[data-v="1"]{background:color-mix(in srgb,var(--m3-primary) 22%,transparent)}
+#page-dashboard .d-heatmap-cell[data-v="2"]{background:color-mix(in srgb,var(--m3-primary) 48%,transparent)}
+#page-dashboard .d-heatmap-cell[data-v="3"]{background:color-mix(in srgb,var(--m3-primary) 74%,transparent)}
+#page-dashboard .d-heatmap-cell[data-v="4"]{background:var(--m3-primary);opacity:1}
+#page-dashboard .d-heatmap-label{font-size:11px;color:var(--m3-on-surf-var)}
+#page-dashboard .d-heatmap-col-label{font-size:10px;color:var(--m3-on-surf-var)}
+
+/* Les bandeaux d'alerte ne doivent pas manger tout le premier écran :
+   au-delà de 5 lignes on scrolle dans le bandeau. */
+#page-dashboard #breach-list,
+#page-dashboard #near-breach-list{
+  max-height:168px;overflow-y:auto;
+}
+#page-dashboard .breach-item{font-size:12.5px;padding:6px 0}
+#page-dashboard .breach-tt{color:inherit;opacity:.85}
+#page-dashboard .breach-time{color:inherit;opacity:.7}
+
+/* ── Bandeau KPI : une seule bande au lieu de 6 cartes ──────
+   Grille auto-fit : 6 colonnes en grand écran, puis 3, puis 2. */
+#page-dashboard .d-kpibar{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(172px,1fr));
+  gap:8px;
+  background:transparent;border:none;
+  margin-bottom:12px;
+}
+[data-theme="dark"] #page-dashboard .d-kpibar{
+  background:transparent;border-color:transparent;
+}
+#page-dashboard .d-kpi{
+  display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+  padding:18px 20px 16px;
+  background:var(--m3-kpi-surf);
+  border:none;border-radius:var(--m3-r-lg);
+  text-align:left;width:100%;
+  font-family:'Inter',sans-serif;
+  transition:background .2s var(--m3-ease);
+}
+#page-dashboard button.d-kpi{cursor:pointer}
+#page-dashboard button.d-kpi:hover{background:var(--m3-kpi-surf-hov)}
+#page-dashboard .d-kpi-label{
+  font-size:12px;font-weight:400;color:var(--m3-on-surf-var);
+  letter-spacing:.01em;
+}
+#page-dashboard .d-kpi-value{
+  font-size:28px;font-weight:500;line-height:1.15;letter-spacing:-.02em;
+  color:var(--m3-on-surface);display:block;
+}
+#page-dashboard .d-kpi-sub{
+  font-size:11.5px;color:var(--m3-on-surf-var);display:block;
+}
+#page-dashboard .d-kpi-spark{
+  display:flex;align-items:flex-end;gap:3px;
+  height:20px;width:100%;margin-top:8px;padding:0;
+}
+#page-dashboard .d-kpi-sla-row{display:flex;align-items:center;gap:12px;margin-top:2px}
+#page-dashboard .d-kpi-ring{flex-shrink:0}
+
+/* rupture SLA : accent porté par le texte, pas par le fond —
+   la carte garde la surface tonale des autres KPI */
+#page-dashboard .d-kpi.has-breach .d-kpi-label,
+#page-dashboard .d-kpi.has-breach .d-kpi-sub{color:var(--m3-error)}
+
+/* ── Heatmap : colonne total + pied ── */
+#page-dashboard .hm-total{
+  width:34px;flex-shrink:0;text-align:right;
+  font-size:12px;font-weight:500;color:var(--m3-on-surface);
+  padding-left:8px;
+}
+#page-dashboard .hm-total-label{
+  width:34px;flex-shrink:0;text-align:right;padding-left:8px;
+  font-size:10px;color:var(--m3-on-surf-var);
+}
+#page-dashboard .hm-foot{
+  font-size:11.5px;color:var(--m3-on-surf-var);
+  margin-top:10px;padding-top:8px;
+  border-top:1px solid var(--m3-outline-var);
+}
+#page-dashboard .hm-label{width:64px;font-size:12px;color:var(--m3-on-surf-var)}
+#page-dashboard .hm-col-labels{padding-left:72px}
+#page-dashboard .hm-cell{border-radius:var(--m3-r-sm);height:26px}
+#page-dashboard .hm-cell[data-v="0"]{background:var(--m3-surf-3);opacity:1}
+#page-dashboard .hm-cell[data-v="1"]{background:color-mix(in srgb,var(--m3-primary) 22%,transparent)}
+#page-dashboard .hm-cell[data-v="2"]{background:color-mix(in srgb,var(--m3-primary) 45%,transparent)}
+#page-dashboard .hm-cell[data-v="3"]{background:color-mix(in srgb,var(--m3-primary) 70%,transparent)}
+#page-dashboard .hm-cell[data-v="4"]{background:var(--m3-primary)}
+

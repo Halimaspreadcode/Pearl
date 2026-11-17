@@ -1,0 +1,229 @@
+/* ══════════════════════════════════════════════════════════
+   RAPPELS FO — cloche + panneau
+   Réservé au rôle FO : ce sont des rappels sur SON travail, pas
+   une supervision d'équipe.
+
+   Parti pris chromatique : la plateforme est déjà saturée de
+   rouge (breach, marque, alertes SLA). Un rappel qui reprend ce
+   rouge se noie dans le bruit et fait paniquer pour une tâche
+   non cochée. Donc :
+     · bleu   = information, action de routine (le défaut) ;
+     · ambre  = c'est le moment d'agir (shift en cours, échéance) ;
+     · rouge  = uniquement le vrai retard, jamais autre chose.
+   Le rouge redevient rare, donc il redevient lisible.
+   ══════════════════════════════════════════════════════════ */
+.nf-wrap{position:relative;display:flex;align-items:center}
+
+.nf-bell{position:relative}
+/* La pastille ne compte que ce qui demande une action. Elle ne
+   pulse que s'il y a un retard : une animation permanente devient
+   un papier peint qu'on n'aperçoit plus. */
+.nf-badge{
+  position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;
+  padding:0 4px;border-radius:999px;
+  background:var(--nf-info,#1A73E8);color:#fff;
+  font-size:9.5px;font-weight:700;line-height:16px;text-align:center;
+  border:1.5px solid var(--tb-bg,#fff);
+  font-variant-numeric:tabular-nums;pointer-events:none;
+}
+.nf-badge.due{background:var(--nf-warn,#B06000)}
+.nf-badge.late{background:var(--nf-late,#C7000B);animation:nfPing 2.4s ease-in-out infinite}
+@keyframes nfPing{0%,100%{transform:scale(1)}12%{transform:scale(1.18)}24%{transform:scale(1)}}
+
+.nf-panel{
+  --nf-surf:#FFFFFF;--nf-surf1:#F8F9FA;--nf-surf2:#F1F3F4;--nf-surf3:#E8EAED;
+  --nf-ink:#1F1F1F;--nf-ink-var:#5F6368;--nf-line:#E3E3E3;
+  --nf-info:#1A73E8;--nf-info-c:#E8F0FE;
+  --nf-warn:#B06000;--nf-warn-c:#FEF7E0;
+  --nf-late:#C7000B;--nf-late-c:#FCE8E6;
+  --nf-ok:#1E7B34;  --nf-ok-c:#E6F4EA;
+  --nf-ease:cubic-bezier(.2,0,0,1);
+
+  position:absolute;top:calc(100% + 12px);right:0;z-index:220;
+  width:min(400px,calc(100vw - 28px));
+  max-height:min(560px,calc(100vh - 110px));
+  display:flex;flex-direction:column;
+  background:var(--nf-surf);color:var(--nf-ink);
+  border:1px solid var(--nf-line);border-radius:20px;
+  box-shadow:0 2px 6px rgba(0,0,0,.10),0 12px 40px rgba(0,0,0,.16);
+  overflow:hidden;
+  transform-origin:top right;
+  animation:nfIn .2s var(--nf-ease);
+}
+@keyframes nfIn{from{opacity:0;transform:scale(.96) translateY(-6px)}}
+[data-theme="dark"] .nf-panel{
+  --nf-surf:#151517;--nf-surf1:#1F1F22;--nf-surf2:#2D2E30;--nf-surf3:#3C3D3F;
+  --nf-ink:#E3E3E3;--nf-ink-var:#9AA0A6;--nf-line:#3C3D3F;
+  --nf-info:#8AB4F8;--nf-info-c:#101F35;
+  --nf-warn:#FDD663;--nf-warn-c:#2E2510;
+  --nf-late:#F28B82;--nf-late-c:#2C1614;
+  --nf-ok:#81C995;  --nf-ok-c:#0F2417;
+  box-shadow:0 2px 6px rgba(0,0,0,.4),0 12px 40px rgba(0,0,0,.5);
+}
+
+/* `display:flex` sur .nf-panel l'emporte sur l'attribut [hidden] :
+   sans cette règle, le panneau reste dans le flux une fois fermé et
+   son en-tête se voit comme un trait en travers de la page. */
+.nf-panel[hidden]{display:none!important}
+
+.nf-head{
+  display:flex;align-items:center;gap:10px;
+  padding:16px 18px 13px;border-bottom:1px solid var(--nf-line);
+}
+.nf-head-t{font-size:14.5px;font-weight:600;flex:1;min-width:0}
+.nf-head-s{font-size:11.5px;color:var(--nf-ink-var);margin-top:2px}
+.nf-clear{
+  border:none;background:none;cursor:pointer;font:inherit;flex-shrink:0;
+  font-size:11.5px;font-weight:600;color:var(--nf-info);
+  padding:5px 9px;border-radius:999px;
+  transition:background .15s var(--nf-ease);
+}
+.nf-clear:hover{background:var(--nf-info-c)}
+
+.nf-list{overflow-y:auto;padding:7px;overscroll-behavior:contain}
+
+/* Une carte = un rappel = une action. Le liseré gauche porte la
+   couleur d'urgence : discret quand tout va bien, franc en retard. */
+.nf-item{
+  position:relative;display:flex;align-items:flex-start;gap:12px;
+  width:100%;text-align:left;padding:13px 14px 13px 15px;
+  border:none;border-radius:14px;background:none;cursor:pointer;font:inherit;
+  transition:background .15s var(--nf-ease);
+  margin-bottom:10px;
+  marrgin-top:10px;
+  padding-right:5px;
+}
+.nf-item::before{
+  content:"";position:absolute;left:5px;top:15px;bottom:15px;width:3px;
+  border-radius:3px;background:var(--nf-c,var(--nf-info));opacity:.85;
+}
+.nf-item:hover{background:var(--nf-surf1)}
+.nf-item + .nf-item{box-shadow:inset 0 1px 0 var(--nf-line)}
+
+.nf-ico{
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--nf-cc,var(--nf-info-c));color:var(--nf-c,var(--nf-info));
+}
+/* Les enfants sont des <span> (un <button> ne peut pas contenir de
+   <div>) : il faut donc forcer le passage en bloc, sinon titre et
+   description se collent sur une même ligne. */
+.nf-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.nf-t{display:block;font-size:13px;font-weight:600;line-height:1.4;color:var(--nf-ink)}
+.nf-d{display:block;font-size:12px;color:var(--nf-ink-var);line-height:1.5;margin-top:2px}
+.nf-meta{
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:7px;
+  font-size:10.5px;color:var(--nf-ink-var);
+}
+.nf-tag{
+  padding:2px 8px;border-radius:999px;font-weight:700;letter-spacing:.2px;
+  background:var(--nf-cc,var(--nf-info-c));color:var(--nf-c,var(--nf-info));
+}
+.nf-cta{
+  flex-shrink:0;align-self:center;display:flex;align-items:center;
+  color:var(--nf-ink-var);opacity:0;transition:opacity .15s var(--nf-ease),transform .15s var(--nf-ease);
+}
+.nf-item:hover .nf-cta{opacity:1;transform:translateX(2px)}
+@media (hover:none){.nf-cta{opacity:.6}}
+
+/* Rien à faire : on félicite sobrement plutôt que d'afficher un
+   vide anxiogène. */
+.nf-zero{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:44px 26px;text-align:center;
+}
+.nf-zero-ico{
+  width:52px;height:52px;border-radius:50%;margin-bottom:7px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--nf-ok-c);color:var(--nf-ok);
+}
+.nf-zero-t{font-size:14px;font-weight:600}
+.nf-zero-d{font-size:12.5px;color:var(--nf-ink-var);line-height:1.5;max-width:250px}
+
+.nf-foot{
+  padding:10px 16px;border-top:1px solid var(--nf-line);
+  font-size:11px;color:var(--nf-ink-var);text-align:center;
+}
+
+/* ── Annonces de l'administration ──────────────────────────────
+   Distinctes des rappels : elles ne sont pas cliquables et ne
+   renvoient pas vers une page, elles se lisent sur place. */
+.nf-annonces{padding:8px 12px 4px;display:flex;flex-direction:column;gap:10px}
+/* Carte Material : surface neutre et sans contour. La couleur de niveau
+   ne sert plus de cadre — elle tient dans la seule puce, ce qui laisse
+   le texte sur un fond franc et calme l'ensemble. */
+.nf-annonce{
+  background:var(--nf-surf1);border:none;border-radius:16px;
+  padding:16px 18px;
+}
+/* Une annonce lue recule d'un cran de surface plutôt que de perdre son
+   fond : le bloc garde sa forme, sans baisse d'opacité qui ferait
+   tomber le texte sous le seuil de contraste AA. */
+.nf-annonce.is-read{background:transparent;box-shadow:inset 0 0 0 1px var(--nf-line)}
+.nf-annonce.is-read .nf-annonce-t{font-weight:500}
+.nf-annonce-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+/* La puce porte la couleur de niveau en tonal (fond teinté, encre
+   colorée) : le contraste tient dans les deux thèmes sans dépendre
+   d'un blanc fixe, qui devenait illisible sur le jaune du mode sombre.
+   L'encre est assombrie vers l'encre de base — la teinte pure sur son
+   propre fond à 16 % ne dépassait pas 3,6:1 en thème clair. */
+.nf-annonce-tag{
+  font-size:11px;font-weight:500;letter-spacing:.01em;
+  color:color-mix(in srgb,var(--nf-c) 72%,var(--nf-ink));
+  background:color-mix(in srgb,var(--nf-c) 16%,transparent);
+  border-radius:8px;padding:3px 10px;flex:none;
+}
+/* En thème sombre les teintes sont déjà claires : les mélanger à l'encre
+   (claire elle aussi) ne les assombrit pas, la couleur pure suffit. */
+[data-theme="dark"] .nf-annonce-tag{color:var(--nf-c)}
+.nf-annonce-t{
+  font-size:14px;font-weight:500;color:var(--nf-ink);flex:1;min-width:0;
+  line-height:1.4;letter-spacing:.01em;
+}
+/* L'espacement sous le corps appartient au pied (`margin-top`) : le
+   cumuler ici écarterait le trait de séparation du texte. */
+.nf-annonce-b{
+  font-size:13px;line-height:1.6;color:var(--nf-ink-var);
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.nf-annonce-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:12px;color:var(--nf-ink-var);flex-wrap:wrap;
+  margin-top:16px;padding-top:0;border-top:none;
+}
+/* Bouton texte Material : pas de contour au repos, la surface
+   n'apparaît qu'au survol. Même assombrissement que la puce — la
+   teinte pure passait sous 4,5:1 sur la carte en thème clair. */
+.nf-annonce-btn{
+  border:none;background:none;cursor:pointer;
+  color:color-mix(in srgb,var(--nf-c) 72%,var(--nf-ink));
+  font:inherit;font-size:13px;font-weight:500;padding:8px 14px;border-radius:20px;
+  transition:background .15s var(--nf-ease);
+}
+[data-theme="dark"] .nf-annonce-btn{color:var(--nf-c)}
+.nf-annonce-btn:hover{background:color-mix(in srgb,var(--nf-c) 12%,transparent)}
+.nf-annonce-ok{font-weight:500;color:var(--nf-ink-var)}
+
+/* Bandeau de shift : n'apparaît que pendant le créneau du FO.
+   C'est le seul moment où « saisir vos tickets » a du sens. */
+.nf-shift{
+  display:flex;align-items:center;gap:11px;
+  margin:7px 7px 0;padding:12px 14px;border-radius:14px;
+  background:var(--nf-warn-c);color:var(--nf-warn);
+}
+.nf-shift svg{flex-shrink:0}
+.nf-shift-t{font-size:12.5px;font-weight:700}
+.nf-shift-d{font-size:11.5px;opacity:.9;margin-top:1px;line-height:1.4}
+
+@media (max-width:560px){
+  .nf-panel{
+    position:fixed;top:auto;bottom:0;right:0;left:0;width:100vw;
+    max-height:76vh;border-radius:24px 24px 0 0;
+    transform-origin:bottom center;
+  }
+  @keyframes nfIn{from{opacity:0;transform:translateY(14px)}}
+}
+@media (prefers-reduced-motion:reduce){
+  .nf-panel,.nf-badge.late{animation:none!important}
+}
+

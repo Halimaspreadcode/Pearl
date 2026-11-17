@@ -1,0 +1,107 @@
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root {
+  /* Couleur principale de l'interface. Le nom --red est historique (la
+     charte était rouge) : il désigne l'accent, devenu un bleu ardoise
+     pâle. Le rouge ne sert plus qu'aux alertes : --danger. */
+  --red:    #4F6A85;
+  --red-d:  #3E5670;
+  --red-l:  rgba(79,106,133,.12);
+  --red-xl: rgba(79,106,133,.06);
+  --accent: #4F6A85;
+  --danger:   #A9493B;
+  --danger-l: rgba(169,73,59,.10);
+
+  --p1-bg:#FFEBEE;--p1-fg:#C62828;
+  --p2-bg:#FFF3E0;--p2-fg:#E65100;
+  --p3-bg:#FFFDE7;--p3-fg:#7B6A00;
+  --p4-bg:#EDE7F6;--p4-fg:#4527A0;
+  --ok-bg:#E8F5E9;--ok-fg:#2E7D32;
+
+  --r-xl:16px;--r-lg:12px;--r:8px;--r-sm:6px;--r-xs:4px;
+}
+
+/* ── LIGHT ── */
+[data-theme="light"] {
+  /* sidebar: blanc/gris très clair */
+  --sb-bg:      #FAF8F4;
+  --sb-border:  #E8E3DA;
+  --sb-head:    #9A958A;
+  --sb-text:    #47443D;
+  --sb-mute:    #A39E93;
+  --sb-hover:   #F0ECE5;
+  --sb-active-bg: #E4EAF0;
+  --sb-active-fg: #2F4A66;
+  --sb-badge:   #EFEBE4;
+
+  /* topbar */
+  --tb-bg:   #FAF8F4;
+  --tb-line: #E8E3DA;
+
+  /* content */
+  --bg:       #F4F1EB;
+  --bg2:      #EAE5DC;
+  --white:    #FCFBF8;
+  --dark:     #26251F;
+  --mid:      #47443D;
+  --gray:     #6D695F;
+  --mute:     #9A958A;
+  --line:     #E6E1D7;
+  --input-bg: #FEFDFA;
+
+  --sh-xs: 0 1px 2px rgba(0,0,0,.06);
+  --sh-sm: 0 1px 4px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.04);
+  --sh-md: 0 4px 20px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+  --sh-lg: 0 16px 48px rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.06);
+
+  /* report banners: always dark surface, regardless of theme */
+  --rpt-bar-bg: #2E3440;
+  --rpt-bar-fg: #FFFFFF;
+}
+
+/* ── DARK ── */
+[data-theme="dark"] {
+  --sb-bg:      #0A0A0A;
+  --sb-border:  rgba(255,255,255,.06);
+  --sb-head:    rgba(255,255,255,.28);
+  --sb-text:    #ABABAB;
+  --sb-mute:    rgba(255,255,255,.28);
+  --sb-hover:   rgba(255,255,255,.05);
+  --sb-active-bg: #22303E;
+  --sb-active-fg: #CFDCEA;
+  --sb-badge:   rgba(255,255,255,.07);
+
+  --tb-bg:   #000000;
+  --tb-line: rgba(255,255,255,.06);
+
+  --bg:       #000000;
+  --bg2:      #111111;
+  --white:    #0E0E10;
+  --dark:     #E8E8E8;
+  --mid:      #AAAAAA;
+  --gray:     #777777;
+  --mute:     #555555;
+  --line:     #222222;
+  --input-bg: #1A1A1A;
+
+  --sh-xs: 0 1px 2px rgba(0,0,0,.3);
+  --sh-sm: 0 1px 4px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.2);
+  --sh-md: 0 4px 20px rgba(0,0,0,.4),0 1px 4px rgba(0,0,0,.2);
+  --sh-lg: 0 16px 48px rgba(0,0,0,.6),0 4px 12px rgba(0,0,0,.3);
+
+  --p1-bg:#3B1219;--p1-fg:#F47174;
+  --p2-bg:#2E1D09;--p2-fg:#F0974E;
+  --p3-bg:#2B2700;--p3-fg:#E0C96A;
+  --p4-bg:#1A1040;--p4-fg:#A490F5;
+  --ok-bg:#0D2213;--ok-fg:#57D97A;
+}
+
+/* ── SHADOW ALIASES (backward compat) ── */
+[data-theme="light"]{--shadow:var(--sh-sm);--shadow-md:var(--sh-md);--shadow-lg:var(--sh-lg)}
+[data-theme="dark"] {--shadow:var(--sh-sm);--shadow-md:var(--sh-md);--shadow-lg:var(--sh-lg)}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-size:13.5px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--dark);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+

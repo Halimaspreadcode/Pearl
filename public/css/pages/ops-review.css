@@ -1,0 +1,407 @@
+/* ── 9. FO TASKS ───────────────────────────────────────── */
+/* La page est un kanban (classes .kanban-* générées en JS). */
+#page-fo-tasks .kanban-card{
+  background:var(--m3-surf-1);
+  border:1px solid var(--m3-outline-var);
+  border-radius:var(--m3-r-md);box-shadow:none;
+}
+[data-theme="dark"] #page-fo-tasks .kanban-card{border-color:transparent;background:var(--m3-surf-2)}
+#page-fo-tasks .kanban-col-head{
+  font-size:13px;font-weight:500;color:var(--m3-on-surface);
+}
+#page-fo-tasks .kanban-count{
+  background:var(--m3-surf-3);border-radius:var(--m3-r-full);
+  font-size:11px;color:var(--m3-on-surf-var);padding:1px 8px;
+}
+#page-fo-tasks .kanban-card-meta{font-size:11.5px;color:var(--m3-on-surf-var)}
+#page-fo-tasks .kanban-empty{color:var(--m3-on-surf-var);font-size:12.5px}
+
+/* ── 10. QUIZ ──────────────────────────────────────────── */
+/* Les styles vivent dans le bloc Material 3 dédié (préfixe .qz-). */
+#page-quiz .form-control,#page-quiz .table-wrap{border-radius:var(--m3-r-lg)}
+
+/* ── 11-14. RAPPORTS : daily · weekly · monthly · progress ─ */
+#page-daily-report .rpt-bar,
+#page-weekly-report .rpt-bar,
+#page-monthly-report .rpt-bar{border-radius:var(--m3-r-lg)}
+#page-daily-report .rpt-side-panel-title,
+#page-weekly-report .rpt-side-panel-title,
+#page-monthly-report .rpt-side-panel-title{
+  font-size:13px;font-weight:500;color:var(--m3-on-surface);
+}
+#page-daily-report .table-wrap,
+#page-weekly-report .table-wrap,
+#page-monthly-report .table-wrap,
+#page-weekly-progress .table-wrap{border-radius:var(--m3-r-lg)}
+
+/* ── 15. AUDIT ─────────────────────────────────────────── */
+#page-audit .table-wrap{border-radius:var(--m3-r-lg)}
+#page-audit .filter-select{height:36px}
+
+/* ── 16. OPS REVIEW ────────────────────────────────────── */
+/* Rendu en JS avec styles inline : seuls les conteneurs
+   génériques et les champs sont stylables ici. */
+#page-ops-review .table-wrap{
+  border-radius:var(--m3-r-xl);border:none;background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-ops-review .table-wrap{background:var(--m3-surf-2)}
+#page-ops-review .form-control{border-radius:var(--m3-r-sm)}
+#page-ops-review .rpt-side-panel-title{
+  font-size:14px;font-weight:500;color:var(--m3-on-surface);
+}
+#page-ops-review table{border-radius:var(--m3-r-xl);overflow:hidden}
+#page-ops-review .page-title{margin-bottom:6px}
+
+/* Panneaux (graphiques, SLA) — étaient des boîtes à coins 10px
+   cerclées de gris. Surfaces pleines, coins XL, plus d'air. */
+.or-panel{
+  background:var(--m3-surf-1);border:none;
+  border-radius:var(--m3-r-xl);padding:22px 24px;
+  box-shadow:none;
+}
+[data-theme="dark"] .or-panel{background:var(--m3-surf-2)}
+.or-panel-flush{padding:0;overflow:hidden}
+.or-panel h3,.or-panel h4{
+  font-size:15px;font-weight:500;color:var(--m3-on-surface);
+  margin-bottom:16px;letter-spacing:0;
+}
+
+/* Tuiles KPI (classes posées côté JS) */
+.or-kpi{
+  background:var(--m3-surf-1);border:none;
+  border-radius:var(--m3-r-lg);padding:18px 20px;
+}
+[data-theme="dark"] .or-kpi{background:var(--m3-surf-2)}
+.or-kpi-lbl{
+  font-size:12px;font-weight:400;letter-spacing:.01em;
+  color:var(--m3-on-surf-var);margin-bottom:6px;text-transform:none;
+}
+.or-kpi-val{font-size:26px;font-weight:500;letter-spacing:-.02em}
+
+
+/* Barres horizontales des graphiques Ops */
+.orb-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.orb-label{
+  width:88px;flex-shrink:0;font-size:12.5px;font-weight:400;
+  color:var(--m3-on-surf-var);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.orb-track{
+  flex:1;height:12px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 10%,transparent);
+  overflow:hidden;
+}
+.orb-fill{
+  height:100%;border-radius:var(--m3-r-full);
+  transition:width .4s cubic-bezier(.2,0,0,1);
+}
+.orb-count{
+  width:28px;flex-shrink:0;text-align:right;
+  font-size:12.5px;font-weight:500;color:var(--m3-on-surface);
+}
+.orb-empty{font-size:12.5px;color:var(--m3-on-surf-var);padding:10px 0}
+
+/* Cartes SLA par filiale */
+.or-sla-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:16px}
+.or-sla-card{padding:18px 20px}
+.or-sla-aff{font-size:14px;font-weight:500;color:var(--m3-on-surface);margin-bottom:12px}
+.or-sla-stats{display:flex;gap:20px}
+.or-sla-lbl{
+  font-size:11.5px;font-weight:400;letter-spacing:.01em;
+  text-transform:none;color:var(--m3-on-surf-var);margin-bottom:2px;
+}
+.or-sla-val{font-size:20px;font-weight:500;color:var(--m3-on-surface);letter-spacing:-.01em}
+
+/* ── Refonte Ops Review — mêmes principes que Data Quality ──────
+   Les six listes déroulantes ne montraient jamais ce qu'un filtre
+   allait donner, et le tableau était intégralement stylé en inline
+   (donc insensible au thème). */
+#page-ops-review,
+#page-ops-review *{
+  --or-err:#D93025;   --or-err-on:#C5221F;   --or-err-bg:#FCE8E6;
+  /* #B06000 ne donnait que 4.34:1 sur son fond ambré — sous le seuil AA. */
+  --or-warn:#F9AB00;  --or-warn-on:#8F4E00;  --or-warn-bg:#FEF7E0;
+  --or-info:#1A73E8;  --or-info-on:#1967D2;  --or-info-bg:#E8F0FE;
+  --or-ok:#1E8E3E;    --or-ok-on:#137333;    --or-ok-bg:#E6F4EA;
+
+  /* Contours : les jetons globaux (#E3E3E3 / #C4C7C5) plafonnaient à
+     1.3–1.7:1 contre les surfaces de la page. Les puces de filtre et les
+     listes déroulantes étant transparentes, leur bordure EST le composant :
+     en dessous de 3:1 le contrôle disparaît. */
+  --m3-outline-var:#7C8085;
+  --m3-sep:#E3E3E3;
+  --m3-outline:#7C8085;
+}
+[data-theme="dark"] #page-ops-review,
+[data-theme="dark"] #page-ops-review *{
+  --or-err:#F28B82;   --or-err-on:#F28B82;   --or-err-bg:#2A1618;
+  --or-warn:#FDD663;  --or-warn-on:#FDD663;  --or-warn-bg:#2A2416;
+  --or-info:#8AB4F8;  --or-info-on:#8AB4F8;  --or-info-bg:#172033;
+  --or-ok:#81C995;    --or-ok-on:#81C995;    --or-ok-bg:#0F2A17;
+
+  --m3-outline-var:#797C80;
+  --m3-sep:#2D2E30;
+  --m3-outline:#797C80;
+}
+
+.or-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;margin-bottom:20px;
+}
+.or-head .page-sub{margin-bottom:0}
+.or-head-actions{display:flex;gap:4px;align-items:center}
+.or-icon-btn{
+  width:40px;height:40px;flex-shrink:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:none;background:transparent;cursor:pointer;
+  border-radius:var(--m3-r-full);color:var(--m3-on-surf-var);
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease);
+}
+.or-icon-btn svg{width:20px;height:20px}
+.or-icon-btn:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surface);
+}
+
+/* Héro : SLA en anneau + chiffres clés cliquables */
+.or-hero{
+  display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;
+  background:var(--m3-surf-1);border-radius:var(--m3-r-xl);
+  padding:24px 28px;margin-bottom:16px;
+}
+[data-theme="dark"] .or-hero{background:var(--m3-surf-2)}
+.or-gauge{position:relative;width:132px;height:132px;flex-shrink:0}
+.or-gauge svg{width:132px;height:132px;transform:rotate(-90deg)}
+.or-gauge-track{stroke:var(--m3-surf-3);fill:none;stroke-width:11}
+.or-gauge-fill{
+  fill:none;stroke-width:11;stroke-linecap:round;
+  transition:stroke-dashoffset .9s var(--m3-ease);
+}
+.or-gauge.ok   .or-gauge-fill{stroke:var(--or-ok)}
+.or-gauge.warn .or-gauge-fill{stroke:var(--or-warn)}
+.or-gauge.err  .or-gauge-fill{stroke:var(--or-err)}
+.or-gauge-mid{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;
+}
+.or-gauge-n{font-size:32px;font-weight:500;line-height:1;color:var(--m3-on-surface)}
+.or-gauge-n small{font-size:15px;font-weight:400;color:var(--m3-on-surf-var)}
+.or-gauge-l{
+  font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+.or-hero-body{min-width:0}
+.or-hero-verdict{font-size:19px;font-weight:500;line-height:1.3;color:var(--m3-on-surface);margin-bottom:4px}
+.or-hero-sub{font-size:13.5px;color:var(--m3-on-surf-var);line-height:1.5;margin-bottom:16px}
+.or-hero-sub b{color:var(--m3-on-surface);font-weight:500}
+.or-stats{display:flex;flex-wrap:wrap;gap:8px}
+.or-stat{
+  display:inline-flex;align-items:baseline;gap:7px;
+  padding:7px 14px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2);border:1px solid transparent;
+  font-size:12.5px;color:var(--m3-on-surf-var);cursor:pointer;
+  font-family:inherit;
+  transition:background .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+[data-theme="dark"] .or-stat{background:var(--m3-surf-3)}
+.or-stat:hover{border-color:var(--m3-outline)}
+.or-stat[aria-pressed="true"]{background:var(--m3-secondary-cont);color:var(--m3-on-primary-cont)}
+.or-stat-n{font-size:15px;font-weight:500;color:var(--m3-on-surface)}
+.or-stat.err  .or-stat-n{color:var(--or-err-on)}
+.or-stat.warn .or-stat-n{color:var(--or-warn-on)}
+.or-stat.info .or-stat-n{color:var(--or-info-on)}
+.or-stat.ok   .or-stat-n{color:var(--or-ok-on)}
+.or-stat.static{cursor:default}
+.or-stat.static:hover{border-color:transparent}
+
+@media(max-width:820px){
+  .or-hero{grid-template-columns:1fr;justify-items:center;text-align:center;gap:18px}
+  .or-stats{justify-content:center}
+}
+
+/* Barre d'outils */
+.or-toolbar{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.or-search{
+  position:relative;display:flex;align-items:center;
+  height:38px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2);padding:0 6px 0 14px;
+  transition:background .2s var(--m3-ease),box-shadow .2s var(--m3-ease);
+}
+.or-search:focus-within{
+  background:var(--m3-surface);
+  box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 1px var(--m3-primary);
+}
+.or-search > svg{width:16px;height:16px;color:var(--m3-on-surf-var);flex-shrink:0}
+.or-search input{
+  flex:1;min-width:0;width:100%;height:100%;
+  border:none!important;outline:none;background:transparent!important;
+  border-radius:0!important;box-shadow:none!important;
+  padding:0 9px;font-size:13px;font-family:inherit;color:var(--m3-on-surface);
+}
+.or-search input::placeholder{color:var(--m3-on-surf-var)}
+.or-search-clear{
+  width:26px;height:26px;flex-shrink:0;border:none;background:transparent;
+  cursor:pointer;border-radius:var(--m3-r-full);color:var(--m3-on-surf-var);
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.or-search-clear svg{width:15px;height:15px}
+.or-search-clear:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+
+.or-chiprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.or-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  height:32px;padding:0 14px;border-radius:var(--m3-r-sm);
+  border:1px solid var(--m3-outline-var);background:transparent;
+  font-size:13px;font-weight:500;font-family:inherit;letter-spacing:.01em;
+  color:var(--m3-on-surf-var);cursor:pointer;white-space:nowrap;
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+.or-chip:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+.or-chip svg{width:15px;height:15px;flex-shrink:0}
+.or-chip .or-chip-n{
+  font-size:11px;font-weight:500;padding:1px 6px;
+  border-radius:var(--m3-r-full);background:var(--m3-surf-3);
+  color:var(--m3-on-surf-var);
+}
+.or-chip.active{
+  background:var(--m3-secondary-cont);color:var(--m3-on-primary-cont);
+  border-color:transparent;
+}
+.or-chip.active .or-chip-n{background:color-mix(in srgb,var(--m3-on-primary-cont) 14%,transparent);color:inherit}
+.or-chip-sep{width:1px;height:20px;background:var(--m3-sep);margin:0 2px}
+
+.or-selectrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* Pastille de filtre. Hauteur portée à 36 px : à 32 px avec une police
+   de 13 px, les jambages des lettres touchaient le bord — d'où les
+   libellés qui semblaient rognés. `line-height` explicite pour que le
+   texte se centre quel que soit le rendu natif du select. */
+.or-select{
+  height:36px;line-height:34px;padding:0 32px 0 14px;
+  border-radius:var(--m3-r-full,999px);
+  border:1px solid var(--m3-outline-var);background:transparent;
+  font-size:13px;font-weight:500;font-family:inherit;
+  color:var(--m3-on-surface);cursor:pointer;
+  text-overflow:ellipsis;
+  appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235F6368' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;background-size:14px;
+}
+[data-theme="dark"] .or-select{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239AA0A6' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+.or-select:hover{background-color:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+.or-select:focus{outline:none;border-color:var(--m3-primary)}
+
+/* Ligne de résumé sous les filtres. Remontée à 13 px : à 12,5 px en gris
+   secondaire elle passait sous le seuil de lisibilité en thème sombre,
+   alors qu'elle porte le décompte qu'on vient chercher. */
+.or-resultbar{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;margin:2px 0 14px;min-height:24px;
+  font-size:13px;color:var(--m3-on-surf-var);
+}
+.or-resultbar b{color:var(--m3-on-surface);font-weight:500}
+.or-linkbtn{
+  border:none;background:transparent;cursor:pointer;font-family:inherit;
+  font-size:12.5px;font-weight:500;color:var(--m3-primary);
+  padding:6px 12px;border-radius:var(--m3-r-full);
+  transition:background .15s var(--m3-ease);
+}
+.or-linkbtn:hover{background:color-mix(in srgb,var(--m3-primary) 10%,transparent)}
+
+.or-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px}
+.or-panel-title{font-size:14.5px;font-weight:500;color:var(--m3-on-surface);margin-bottom:16px}
+.or-table-head{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;padding:18px 22px 14px;
+}
+.or-table-head .or-panel-title{margin-bottom:0}
+
+/* Tableau : sortait du thème, tout était inline */
+.or-tablewrap{overflow-x:auto}
+.or-table{width:100%;border-collapse:collapse}
+.or-table th{
+  padding:10px 14px;text-align:left;white-space:nowrap;
+  font-size:11px;font-weight:500;letter-spacing:.03em;text-transform:none;
+  color:var(--m3-on-surf-var);background:var(--m3-surf-2);border-bottom:none;
+}
+[data-theme="dark"] .or-table th{background:var(--m3-surf-3)}
+.or-table td{
+  padding:11px 14px;font-size:12.5px;white-space:nowrap;
+  color:var(--m3-on-surface);
+}
+/* Séparateurs décoratifs : exemptés du seuil 3:1 (WCAG 1.4.11), sinon une
+   ligne pleine largeur à chaque rangée transforme le tableau en grille. */
+.or-table tbody tr{border-bottom:1px solid var(--m3-sep)}
+.or-table tbody tr:last-child{border-bottom:none}
+.or-table tbody tr:hover{background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent)}
+.or-td-id{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--m3-primary);font-weight:500}
+.or-td-title{white-space:normal;max-width:280px;font-weight:500}
+.or-td-dim{color:var(--m3-on-surf-var);font-size:12px}
+.or-pill{
+  display:inline-block;font-size:11px;font-weight:500;
+  padding:2px 9px;border-radius:var(--m3-r-full);white-space:nowrap;
+}
+/* « Near Breach » débordait de sa cellule : le SLA n'est pas binaire. */
+.or-pill-sla-warn{background:var(--or-warn-bg);color:var(--or-warn-on)}
+.or-pill-src{background:var(--m3-surf-3);color:var(--m3-on-surf-var)}
+.or-pill-sla-ok{background:var(--or-ok-bg);color:var(--or-ok-on)}
+.or-pill-sla-ko{background:var(--or-err-bg);color:var(--or-err-on)}
+.or-rca-yes{color:var(--or-ok-on);font-weight:500;font-size:12px}
+.or-mark{background:color-mix(in srgb,var(--or-warn) 40%,transparent);border-radius:3px;padding:0 1px}
+.or-more{
+  width:100%;border:none;background:transparent;cursor:pointer;
+  font-family:inherit;font-size:12.5px;font-weight:500;
+  color:var(--m3-primary);padding:12px;
+  border-top:1px solid var(--m3-sep);
+  transition:background .15s var(--m3-ease);
+}
+.or-more:hover{background:color-mix(in srgb,var(--m3-primary) 8%,transparent)}
+
+.or-empty{text-align:center;padding:64px 20px;color:var(--m3-on-surf-var)}
+.or-empty svg{width:44px;height:44px;display:block;margin:0 auto 14px;opacity:.6}
+.or-empty-title{font-size:16px;font-weight:500;color:var(--m3-on-surface)}
+.or-empty-sub{font-size:13px;color:var(--m3-on-surf-var);margin-top:6px}
+
+/* ── Alignement sur les autres rapports ─────────────────────────
+   objectives-admin.css emploie le même préfixe `.or-` (Objectifs) et se
+   charge avant cette feuille : sa règle `.or-search { flex: 1 1 260px }`
+   s'appliquait ici, dans une barre en colonne — d'où un champ de recherche
+   de 260 px de haut. Tout ce qui suit est donc limité à la page. */
+#page-ops-review .or-toolbar{gap:10px;margin-bottom:12px}
+#page-ops-review .or-toolbar-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#page-ops-review .or-search{
+  flex:1 1 280px;min-width:0;max-width:520px;height:40px;gap:0;
+  border:1px solid transparent;background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-ops-review .or-search{background:var(--m3-surf-2)}
+#page-ops-review .or-search:focus-within{
+  background:var(--m3-surface);border-color:var(--m3-primary);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--m3-primary) 16%,transparent);
+}
+#page-ops-review .or-selectrow{margin-left:auto}
+#page-ops-review .or-panel-title{font-size:16px;font-weight:600;margin-bottom:14px}
+#page-ops-review .or-hero-verdict{font-size:20px;font-weight:600}
+#page-ops-review .or-sla-row[hidden],
+#page-ops-review .or-panel[hidden]{display:none}
+@media(max-width:640px){
+  #page-ops-review .or-search{max-width:none;flex-basis:100%}
+  #page-ops-review .or-selectrow{margin-left:0}
+  #page-ops-review .or-hero{padding:20px}
+}
+
+/* Note de portée sur les écrans verrouillés */
+.m3-lock-note{
+  font-size:12px;color:var(--m3-on-surf-var);
+  background:var(--m3-surf-3);border-radius:var(--m3-r-md);
+  padding:10px 12px;margin-bottom:14px;line-height:1.5;
+}
+
+/* ── 17. LOG ANALYZER ──────────────────────────────────── */
+#page-log-analyzer .table-wrap{border-radius:var(--m3-r-lg)}
+#page-log-analyzer .filter-select{height:36px}
+#page-log-analyzer pre,#page-log-analyzer code{
+  background:var(--m3-surf-2);border-radius:var(--m3-r-sm);
+  color:var(--m3-on-surface);
+}
+

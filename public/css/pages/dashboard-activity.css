@@ -1,0 +1,368 @@
+/* ══════════════════════════════════════════════
+   ACTIVITÉ RÉCENTE — refonte Material 3
+   Une seule grammaire pour toute la carte :
+     · teinte primaire = ce qui entre (ouverts),
+     · neutre dense    = ce qui sort (clôturés),
+     · plein = valeur, piste = contexte.
+   Les hachures ont sauté : à cette échelle elles moirent et se
+   lisaient comme du bruit plutôt que comme une quantité.
+══════════════════════════════════════════════ */
+#page-dashboard #bx-forecast{
+  --act-in:   var(--m3-primary);
+  --act-out:  var(--c-green);
+  --act-track:color-mix(in srgb,var(--m3-on-surface) 9%,transparent);
+}
+
+/* ── Timeline : rail continu, dégradé vers le jour courant ── */
+#page-dashboard .bx-tl{margin-top:18px}
+#page-dashboard .bx-tl-item{
+  grid-template-columns:14px minmax(0,1fr) minmax(96px,.72fr);
+  gap:8px 16px;align-items:start;
+  padding:10px 12px 12px;margin:0 -12px;
+  border-radius:var(--m3-r-lg);
+  transition:background .18s var(--m3-ease);
+}
+#page-dashboard .bx-tl-item:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 4%,transparent);
+}
+#page-dashboard .bx-tl-body{min-width:0}
+/* Le rail : pâle dans le passé, dense à l'approche du présent. */
+#page-dashboard .bx-tl-item:not(:last-child)::before{
+  top:26px;bottom:-2px;left:18px;width:2px;border-radius:1px;
+  background:linear-gradient(180deg,
+    color-mix(in srgb,var(--m3-on-surface) 9%,transparent),
+    color-mix(in srgb,var(--m3-on-surface) 18%,transparent));
+}
+#page-dashboard .bx-tl-dot{
+  width:14px;height:14px;margin-top:3px;
+  border:2px solid color-mix(in srgb,var(--m3-on-surface) 22%,transparent);
+  background:var(--m3-surface);
+  transition:background .25s var(--m3-ease),border-color .25s var(--m3-ease),
+             box-shadow .25s var(--m3-ease);
+}
+/* Le jour courant : seul point coloré de la colonne, donc repérable
+   sans avoir à lire les dates. */
+#page-dashboard .bx-tl-item.on .bx-tl-dot{
+  background:var(--act-in);border-color:var(--act-in);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--act-in) 18%,transparent);
+  animation:bxTlPulse 2.6s var(--m3-ease) infinite;
+}
+@keyframes bxTlPulse{
+  0%,100%{box-shadow:0 0 0 4px color-mix(in srgb,var(--act-in) 18%,transparent)}
+  50%    {box-shadow:0 0 0 7px color-mix(in srgb,var(--act-in) 7%,transparent)}
+}
+@media (prefers-reduced-motion:reduce){
+  #page-dashboard .bx-tl-item.on .bx-tl-dot{animation:none}
+}
+#page-dashboard .bx-tl-k{
+  font-size:13.5px;font-weight:500;letter-spacing:-.005em;
+}
+#page-dashboard .bx-tl-item.on .bx-tl-k{font-weight:600}
+/* Badge : dit pourquoi cette ligne est mise en avant. */
+#page-dashboard .bx-tl-now{
+  display:inline-block;margin-left:8px;padding:1px 8px;
+  font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  border-radius:var(--m3-r-full);vertical-align:1px;
+  color:var(--act-in);
+  background:color-mix(in srgb,var(--act-in) 12%,transparent);
+}
+/* Chiffres en puces plutôt qu'en phrase : scannable en diagonale,
+   et la pastille rappelle la couleur du segment correspondant. */
+#page-dashboard .bx-tl-v{
+  display:flex;flex-wrap:wrap;align-items:center;gap:5px 14px;
+  font-size:11.5px;margin-top:6px;
+}
+#page-dashboard .bx-tl-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--m3-on-surf-var);font-variant-numeric:tabular-nums;
+}
+#page-dashboard .bx-tl-chip::before{
+  content:'';width:7px;height:7px;border-radius:var(--m3-r-full);flex-shrink:0;
+}
+#page-dashboard .bx-tl-chip.in::before {background:var(--act-in)}
+#page-dashboard .bx-tl-chip.out::before{background:var(--act-out)}
+#page-dashboard .bx-tl-chip b{
+  font-weight:600;color:var(--m3-on-surface);font-size:12.5px;
+}
+/* Barre de volume : deux segments arrondis sur une piste commune. */
+#page-dashboard .bx-tl-bar{
+  display:flex;gap:4px;align-items:center;height:10px;margin-top:9px;
+  border-radius:var(--m3-r-full);background:var(--act-track);overflow:hidden;
+}
+#page-dashboard .bx-tl-seg{
+  height:100%;border-radius:var(--m3-r-full);min-width:4px;
+  transition:width .55s var(--m3-ease),filter .18s var(--m3-ease);
+}
+#page-dashboard .bx-tl-seg.open{background:var(--act-in)}
+#page-dashboard .bx-tl-seg.done{background:var(--act-out)}
+#page-dashboard .bx-tl-item:hover .bx-tl-seg{filter:brightness(1.08)}
+#page-dashboard .bx-tl-bar-empty{
+  height:3px;width:24px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 14%,transparent);
+}
+/* Une seule légende en pied de timeline, au lieu d'un rappel/ligne. */
+#page-dashboard .bx-tl-key{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  margin-top:14px;padding-top:14px;
+  border-top:1px solid color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  font-size:11px;color:var(--m3-on-surf-var);
+}
+#page-dashboard .bx-tl-key span{display:inline-flex;align-items:center;gap:7px}
+#page-dashboard .bx-tl-key i{width:10px;height:10px;border-radius:3px;display:block}
+
+/* ── Tuiles : cartes tonales, élévation au survol ────────── */
+#page-dashboard .bx-tile-a,
+#page-dashboard .bx-tile-b{
+  background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent);
+}
+#page-dashboard .bx-tile{
+  padding:20px 22px;border-radius:var(--m3-r-xl);
+  border:1px solid color-mix(in srgb,var(--m3-on-surface) 6%,transparent);
+  transition:background .2s var(--m3-ease),border-color .2s var(--m3-ease),
+             transform .2s var(--m3-ease),box-shadow .2s var(--m3-ease);
+}
+#page-dashboard .bx-tile:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  border-color:color-mix(in srgb,var(--m3-on-surface) 12%,transparent);
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px -8px color-mix(in srgb,var(--m3-on-surface) 30%,transparent);
+}
+#page-dashboard .bx-tile-lbl{
+  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+#page-dashboard .bx-tile-val{
+  font-size:38px;margin-top:12px;letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;
+}
+/* Le nombre garde sa taille, l'unité recule d'un cran. */
+#page-dashboard .bx-tile-val .unit{
+  font-size:.5em;font-weight:500;color:var(--m3-on-surf-var);margin-left:2px;
+}
+#page-dashboard .bx-tile-out{
+  top:16px;right:16px;padding:7px;border-radius:var(--m3-r-full);
+  opacity:0;transform:translateX(-2px);
+  transition:opacity .18s var(--m3-ease),transform .18s var(--m3-ease),
+             background .15s var(--m3-ease),color .15s var(--m3-ease);
+}
+/* La flèche n'apparaît qu'à l'approche : moins de bruit au repos,
+   mais elle reste atteignable au clavier. */
+#page-dashboard .bx-tile:hover .bx-tile-out,
+#page-dashboard .bx-tile-out:focus-visible{opacity:1;transform:none}
+#page-dashboard .bx-tile-out:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 12%,transparent);
+  color:var(--m3-on-surface);
+}
+
+/* ── Carte « Taux d'absence » ─────────────────────────────
+   Seule occupante de la colonne : elle s'étire sur toute la
+   hauteur de la timeline voisine, d'où le flex vertical. */
+#page-dashboard .bx-tile-abs{
+  position:relative;flex:1;display:flex;flex-direction:column;
+  background:color-mix(in srgb,var(--act-in) 8%,transparent);
+  border-color:color-mix(in srgb,var(--act-in) 18%,transparent);
+}
+#page-dashboard .bx-tile-abs:hover{
+  background:color-mix(in srgb,var(--act-in) 12%,transparent);
+  border-color:color-mix(in srgb,var(--act-in) 26%,transparent);
+}
+#page-dashboard .bx-abs-main{
+  display:flex;align-items:center;gap:18px;margin-top:14px;
+}
+#page-dashboard .bx-abs-main .bx-tile-val{margin-top:0;line-height:1}
+#page-dashboard .bx-abs-ring{flex-shrink:0}
+#page-dashboard .bx-abs-ring circle:last-child{
+  transition:stroke-dashoffset .7s var(--m3-ease),stroke .3s var(--m3-ease);
+}
+#page-dashboard .bx-abs-sub{
+  font-size:12px;color:var(--m3-on-surf-var);margin-top:6px;
+  font-variant-numeric:tabular-nums;
+}
+/* Répartition par agent : liste courte, plaquée sous le chiffre.
+   margin-top:auto la pousse en bas quand la carte est haute. */
+#page-dashboard .bx-abs-list{
+  display:flex;flex-direction:column;gap:8px;
+  margin:20px 0 0;padding-top:16px;
+  border-top:1px solid color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+}
+#page-dashboard .bx-abs-list:empty{display:none}
+#page-dashboard .bx-abs-row{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(40px,.8fr) 26px;
+  align-items:center;gap:10px;font-size:12.5px;
+}
+#page-dashboard .bx-abs-k{
+  display:flex;align-items:center;gap:8px;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--m3-on-surface);
+}
+#page-dashboard .bx-abs-av{
+  width:22px;height:22px;border-radius:var(--m3-r-full);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:700;letter-spacing:.02em;color:#fff;
+}
+#page-dashboard .bx-abs-bar{
+  height:6px;border-radius:var(--m3-r-full);
+  background:var(--act-track);overflow:hidden;
+}
+#page-dashboard .bx-abs-bar i{
+  display:block;height:100%;border-radius:var(--m3-r-full);
+  background:var(--act-in);transition:width .5s var(--m3-ease);
+}
+#page-dashboard .bx-abs-v{
+  text-align:right;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--m3-on-surf-var);
+}
+#page-dashboard .bx-abs-foot{
+  font-size:11.5px;color:var(--m3-on-surf-var);
+  margin-top:auto;padding-top:14px;
+}
+/* État vide : la carte doit dire « pas de source », pas afficher
+   un 0 % qui se lirait comme un résultat mesuré. */
+#page-dashboard .bx-tile-abs.is-empty .bx-tile-val{color:var(--m3-on-surf-var)}
+
+/* Pastille de tête : surface tonale primaire, cohérente avec le
+   point « aujourd'hui » de la timeline. */
+#page-dashboard #bx-forecast .bx-ico-accent{
+  background:color-mix(in srgb,var(--act-in) 12%,transparent);
+  color:var(--act-in);
+}
+
+/* ── Volume : colonne de répartition ──
+   Hérite la couleur de la carte (.bx-dark), d'où les currentColor :
+   le panneau doit rester lisible sur fond noir comme sur fond clair. */
+#page-dashboard .bx-break{
+  flex:1;min-width:0;align-self:stretch;
+  display:flex;flex-direction:column;gap:9px;
+  padding-left:24px;
+  border-left:1px solid color-mix(in srgb,currentColor 14%,transparent);
+}
+#page-dashboard .bx-break-h{
+  font-size:11px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;opacity:.55;margin-bottom:2px;
+}
+#page-dashboard .bx-break-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(48px,.9fr) 30px 34px;
+  align-items:center;gap:10px;font-size:12.5px;
+}
+#page-dashboard .bx-break-k{
+  display:flex;align-items:center;gap:7px;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.85;
+}
+/* Pastille de rappel : relie la ligne au segment correspondant dans
+   les barres empilées, y compris quand la barre est trop courte
+   pour que sa couleur soit lisible. */
+#page-dashboard .bx-break-dot{
+  width:8px;height:8px;border-radius:var(--m3-r-full);flex-shrink:0;
+}
+#page-dashboard .bx-break-t{
+  font-weight:inherit;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+#page-dashboard .bx-break-bar{
+  height:6px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,currentColor 12%,transparent);
+  overflow:hidden;
+}
+#page-dashboard .bx-break-bar i{
+  display:block;height:100%;border-radius:var(--m3-r-full);
+  transition:width .5s var(--m3-ease);
+}
+#page-dashboard .bx-break-v{
+  text-align:right;font-weight:600;font-variant-numeric:tabular-nums;
+}
+#page-dashboard .bx-break-p{
+  text-align:right;font-size:11.5px;opacity:.5;
+  font-variant-numeric:tabular-nums;
+}
+#page-dashboard .bx-break-more{
+  font-size:11.5px;opacity:.45;margin-top:2px;
+}
+@media(max-width:900px){
+  /* la répartition passe sous les barres au lieu de les écraser */
+  #page-dashboard .bx-break{
+    padding-left:0;padding-top:18px;border-left:none;
+    border-top:1px solid color-mix(in srgb,currentColor 14%,transparent);
+  }
+}
+
+/* Les hachures qui recouvraient jauge SLA et segments de timeline ont
+   été retirées : la couleur porte désormais la distinction
+   entrées / sorties, le motif n'avait plus rien à dire. */
+
+@media(max-width:900px){
+  /* la barre de volume passe sous le texte plutôt que de l'écraser */
+  #page-dashboard .bx-tl-item{grid-template-columns:14px minmax(0,1fr)}
+  #page-dashboard .bx-tl-bar{grid-column:2;margin-top:2px}
+}
+
+#page-dashboard .bx-empty{
+  font-size:12px;color:var(--m3-on-surf-var);padding:14px 0;
+}
+
+@media (max-width:1100px){
+  #page-dashboard .bx-split{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  #page-dashboard .bx{padding:22px 20px}
+  #page-dashboard .bx-figure{font-size:36px}
+}
+
+#page-dashboard #hm-hover-panel{
+  background:var(--m3-surf-2)!important;border:none!important;
+  border-radius:var(--m3-r-lg)!important;
+}
+#page-dashboard .hm-hover-name{font-size:13px;font-weight:500;color:var(--m3-on-surface)}
+#page-dashboard .hm-hover-date{font-size:11px;color:var(--m3-on-surf-var);margin-bottom:8px}
+#page-dashboard .hm-hover-val{font-size:26px;font-weight:500;line-height:1;color:var(--m3-on-surface)}
+#page-dashboard .hm-hover-val[data-hot]{color:var(--m3-primary)}
+#page-dashboard .hm-hover-unit{font-size:11px;color:var(--m3-on-surf-var);margin-top:2px}
+
+/* ── Insights : constats actionnables en tête de dashboard ── */
+#page-dashboard .d-insights{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;
+}
+#page-dashboard .d-insight{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 16px;border-radius:var(--m3-r-full);
+  font-size:13px;color:var(--m3-on-surface);
+  background:var(--m3-surf-2);
+}
+#page-dashboard .d-insight svg{width:15px;height:15px;flex-shrink:0;opacity:.8}
+#page-dashboard .d-insight b{font-weight:600}
+#page-dashboard .d-insight.crit{background:var(--m3-error-cont);color:var(--m3-on-error-cont)}
+#page-dashboard .d-insight.warn{background:#FEF7E0;color:#7A5900}
+[data-theme="dark"] #page-dashboard .d-insight.warn{background:#2A2416;color:#F0C24B}
+#page-dashboard .d-insight-act{
+  border:none;background:transparent;cursor:pointer;
+  font-family:inherit;font-size:12px;font-weight:600;color:inherit;
+  text-decoration:underline;padding:0 0 0 4px;
+}
+
+/* ── Empty state ── */
+#page-dashboard .d-empty{
+  color:var(--m3-on-surf-var);font-size:12.5px;padding:8px 0;
+}
+
+/* ── Alertes : error container M3 ── */
+#page-dashboard .breach-alert{
+  background:var(--m3-error-cont);border:none;
+  border-radius:var(--m3-r-xl);padding:18px 22px;
+}
+#page-dashboard .breach-alert-title{
+  font-size:14px;font-weight:500;letter-spacing:.006em;
+  color:var(--m3-on-error-cont);
+}
+#page-dashboard .breach-alert-count{
+  background:var(--m3-error);color:var(--m3-surface);
+  border-radius:var(--m3-r-full);font-weight:500;
+}
+/* ambre = avertissement réel, pas une couleur décorative */
+#page-dashboard .near-breach-alert{
+  background:#FEF7E0;border:none;
+  border-radius:var(--m3-r-xl);padding:18px 22px;
+}
+#page-dashboard .near-breach-alert .breach-alert-title{color:#7A5900}
+[data-theme="dark"] #page-dashboard .near-breach-alert{background:#2A2416}
+[data-theme="dark"] #page-dashboard .near-breach-alert .breach-alert-title{color:#F0C24B}
+

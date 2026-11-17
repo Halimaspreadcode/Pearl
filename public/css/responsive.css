@@ -1,0 +1,80 @@
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media(max-width:768px){
+  /* minmax(0,…) et non 1fr : une piste 1fr ne descend pas sous la largeur
+     minimale de son contenu, et la barre du haut (≈ 890 px sans retour à la
+     ligne) élargissait toute la colonne — sur un téléphone, les pages
+     débordaient à droite sans pouvoir défiler. */
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:56px 1fr}
+  .sidebar{
+    display:flex;position:fixed;left:0;top:0;bottom:0;z-index:300;
+    transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);
+    width:240px;
+  }
+  .sidebar.sb-open{transform:translateX(0)}
+  .topbar{grid-column:1/-1}
+  .hamburger-btn{display:flex !important}
+  .topbar-sub{font-size:11px}
+  .main{padding:12px;grid-column:1/-1}
+  .form-grid{grid-template-columns:1fr}
+  .stats-grid,.bento-grid{grid-template-columns:1fr}
+  .dash-grid{grid-template-columns:minmax(0,1fr)}
+  /* Deux tuiles par ligne, qui peuvent rétrécir : sans minmax(0,…), les
+     mini-graphiques imposaient 480 px et le bandeau sortait de l'écran. */
+  #page-dashboard .d-kpibar{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #page-dashboard .d-kpi{min-width:0;padding:14px 14px 12px}
+  #page-dashboard .d-kpi-spark{overflow:hidden}
+  .d-card-wide{grid-column:span 1}
+  .modal{max-width:100% !important;border-radius:0 !important;max-height:100vh !important}
+  .modal-overlay{padding:0 !important;align-items:flex-end}
+  .table-header{flex-direction:column;align-items:stretch}
+  .table-filters{flex-direction:column}
+  .search-input{width:100%}
+  .user-pill span#user-name-top{display:none}
+  #lang-select{display:none}
+  #tz-select{display:none}
+}
+
+/* ── Barre du haut sur téléphone ────────────────────────────────
+   Au complet elle fait ~900 px. Sous 640 px on garde l'essentiel, en
+   icônes : menu, recherche, ruptures (le nombre seul), pays (drapeaux),
+   rappels, profil. L'horloge et le thème, secondaires, disparaissent. Si
+   une session admin ajoute son cadenas, la barre défile au lieu de couper. */
+@media(max-width:640px){
+  .topbar{gap:4px!important;padding:0 8px!important;overflow-x:auto;scrollbar-width:none}
+  .topbar::-webkit-scrollbar{display:none}
+  .topbar-sub,#theme-btn{display:none!important}
+  #global-search-trigger{flex:0 0 36px!important;width:36px!important;max-width:36px!important;
+    margin:0!important;padding:0!important;justify-content:center!important}
+  #global-search-trigger span{display:none}
+  .topbar-right{gap:4px;flex-shrink:0;margin-left:auto}
+  .topbar .topbar-btn,.hamburger-btn{width:36px;height:36px;flex-shrink:0}
+  .topbar-breach{padding:5px 10px;flex-shrink:0}
+  .topbar-breach .bcl-word{display:none}
+  #country-toggle{height:36px;flex-shrink:0}
+  .country-toggle-btn{padding:0 8px!important}
+  .country-toggle-btn span{display:none}
+  .user-pill{padding:0!important;gap:0;flex-shrink:0;border:none!important}
+
+  /* Sélecteur de période du Dashboard : les boutons passent à la ligne. */
+  #dash-period-bar{flex-wrap:wrap;margin-left:0!important;max-width:100%}
+  #dash-period-bar > div:first-child{flex-wrap:wrap}
+  /* Shift Planning : en colonne, align-items:flex-start laissait le
+     planning prendre sa largeur naturelle (~870 px) ; il défile dans son
+     cadre au lieu d'élargir la page. */
+  .sp-layout{align-items:stretch!important}
+  .sp-main{width:100%;overflow-x:auto}
+}
+@media(max-width:768px){
+  /* Analyseur plein cadre : ses marges négatives (-28 px) valent pour le
+     padding de bureau ; sur téléphone la zone de contenu n'en a que 12. */
+  #page-log-analyzer{margin:-12px!important}
+}
+@media(min-width:769px) and (max-width:1024px){
+  .dash-grid{grid-template-columns:1fr 1fr}
+  .d-card-wide{grid-column:span 2}
+  .app{grid-template-columns:200px minmax(0,1fr)}
+}
+
+

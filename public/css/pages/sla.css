@@ -1,0 +1,257 @@
+/* ══════════════════════════════════════════════════════════════
+   SLA — refonte Material 3 (Google)
+   La page ne fait que deux choses : régler des durées, et choisir
+   l'horloge qui les décompte. Elle est donc bâtie comme une liste
+   de réglages Google (une ligne = un type de ticket) plutôt qu'en
+   grille de petites boîtes : la valeur et son unité s'alignent sur
+   une même colonne, ce qui rend les écarts lisibles d'un coup d'œil.
+   Les jetons --m3-* sont redéclarés localement pour que le thème
+   sombre bascule sans JS, comme sur Weekly Progress.
+   ══════════════════════════════════════════════════════════════ */
+#page-cfg-sla,#page-cfg-goals,#page-cfg-perf{
+  --m3-primary:        #4F6A85;
+  --m3-primary-cont:   #E4EAF0;
+  --m3-on-primary-cont:#2F4A66;
+  --m3-surface:        #FCFBF8;
+  --m3-surf-1:         #F7F5F0;
+  --m3-surf-2:         #F0ECE5;
+  --m3-surf-3:         #E8E3DA;
+  --m3-on-surface:     #26251F;
+  --m3-on-surf-var:    #6D695F;
+  --m3-outline:        #CEC8BC;
+  --m3-outline-var:    #E6E1D7;
+  --m3-ease: cubic-bezier(.2,0,0,1);
+  /* Biz = comptage en heures ouvrées. Repris de l'ambre déjà utilisé
+     par les badges BIZ des trackers pour rester reconnaissable. */
+  --gsla-biz:  #B06000;
+  --gsla-biz-c:#FEF7E0;
+  color:var(--m3-on-surface);
+}
+[data-theme="dark"] #page-cfg-sla,
+[data-theme="dark"] #page-cfg-goals,
+[data-theme="dark"] #page-cfg-perf{
+  --m3-primary:        #FF5C5C;
+  --m3-primary-cont:   #2A1618;
+  --m3-on-primary-cont:#FF9A9A;
+  --m3-surface:        #000000;
+  --m3-surf-1:         #0E0E10;
+  --m3-surf-2:         #151517;
+  --m3-surf-3:         #1F1F22;
+  --m3-on-surface:     #E3E3E3;
+  --m3-on-surf-var:    #9AA0A6;
+  --m3-outline:        #8E918F;
+  --m3-outline-var:    #333537;
+  --gsla-biz:  #FDD663;
+  --gsla-biz-c:#2E2510;
+}
+
+/* ── En-tête ── */
+.gsla .gsla-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;margin-bottom:20px;
+}
+.gsla .page-sub{margin-bottom:0}
+.gsla .gsla-fab{
+  display:inline-flex;align-items:center;gap:9px;flex-shrink:0;
+  height:40px;padding:0 22px;border:none;cursor:pointer;font:inherit;
+  font-size:13.5px;font-weight:600;border-radius:var(--m3-r-full,999px);
+  background:var(--m3-primary);color:#fff;
+  box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15);
+  transition:box-shadow .2s var(--m3-ease),filter .2s var(--m3-ease);
+}
+.gsla .gsla-fab:hover{
+  box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15);
+  filter:brightness(1.06);
+}
+.gsla .gsla-fab:active{box-shadow:none}
+[data-theme="dark"] .gsla .gsla-fab{color:#1A1A1A}
+
+/* ── Cartes ── */
+.gsla .gsla-card{
+  background:var(--m3-surface);border:1px solid var(--m3-outline-var);
+  border-radius:var(--m3-r-md,16px);padding:22px 24px;margin-bottom:16px;
+  max-width:860px;
+}
+/* Performance FO n'est pas un formulaire de réglages mais un écran de
+   revue : matrice, mesures et suivi 1:1 se lisent côte à côte. La borne
+   de 860 px, juste pour SLA et Objectifs, y laissait la moitié de
+   l'écran vide. On l'ouvre, avec une limite haute pour que les lignes
+   de texte restent lisibles sur un très grand moniteur. */
+#page-cfg-perf .gsla-card{max-width:1360px}
+/* Les six critères tiennent sur deux colonnes dès qu'il y a la place :
+   le barème se lit alors d'un seul regard au lieu de défiler. Le texte
+   d'aide de la carte, lui, reste borné — une ligne de 1300 px ne se lit
+   pas. */
+#page-cfg-perf .gsla-card-d{max-width:82ch}
+@media (min-width:1100px){
+  /* Deux colonnes pour le barème seul. Restreint à .gsla-list — appliqué
+     plus largement, il attrapait aussi la zone de commentaire, dont les
+     champs en width:100% débordaient alors de leur colonne. */
+  #page-cfg-perf .gsla-list{
+    display:grid;grid-template-columns:1fr 1fr;gap:0 22px;align-items:start;
+  }
+  #page-cfg-perf .gsla-list > *{min-width:0}
+}
+[data-theme="dark"] .gsla .gsla-card{
+  background:var(--m3-surf-1);border-color:transparent;
+}
+.gsla .gsla-card-head{margin-bottom:18px}
+.gsla .gsla-card-t{
+  font-size:16px;font-weight:500;letter-spacing:0;text-transform:none;
+  color:var(--m3-on-surface);border:none;padding:0;margin:0 0 6px;
+}
+.gsla .gsla-card-d{
+  font-size:13px;line-height:1.55;color:var(--m3-on-surf-var);margin:0;max-width:66ch;
+}
+.gsla .gsla-card-d strong{font-weight:500;color:var(--m3-on-surface)}
+
+/* ── Liste des délais ── */
+/* Respiration entre le texte d'introduction et la première ligne :
+   le paragraphe explique, la liste se règle — deux registres qu'on
+   sépare franchement. */
+.gsla .gsla-list{display:flex;flex-direction:column;margin-top:34px}
+
+/* Une ligne = un type de ticket. Séparateurs plutôt que cartes :
+   la liste reste dense et le regard descend sans obstacle. */
+.gsla .gsla-row{
+  display:flex;align-items:center;gap:16px;
+  
+  padding:12px 16px;margin:0 0 10px 0;border-radius:var(--m3-r-sm,12px);
+  border:1px solid var(--m3-outline-var);
+  transition:background .15s var(--m3-ease);
+}
+/* Héritage du temps où les lignes étaient séparées par des filets : la
+   première n'avait pas à porter de trait au-dessus. Les lignes sont
+   désormais encadrées, et sur deux colonnes seule la case en haut à
+   gauche était rognée. On laisse la règle aux seules lignes de groupe,
+   qui s'appuient encore sur le filet du groupe. */
+.gsla .gsla-group > .gsla-row:first-of-type{border-top:none}
+.gsla .gsla-row:hover{background:var(--m3-surf-1)}
+[data-theme="dark"] .gsla .gsla-row:hover{background:var(--m3-surf-2)}
+
+.gsla .gsla-name{
+  flex:1;min-width:0;font-size:14px;color:var(--m3-on-surface);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.gsla .gsla-row.is-leg .gsla-name{
+  font-size:13px;color:var(--m3-on-surf-var);padding-left:14px;position:relative;
+}
+/* Puce de rattachement : indique que la ligne appartient au groupe
+   au-dessus, sans recourir à un décalage muet. */
+.gsla .gsla-row.is-leg .gsla-name::before{
+  content:"";position:absolute;left:0;top:50%;
+  width:6px;height:6px;margin-top:-3px;border-radius:50%;
+  background:var(--m3-outline);
+}
+
+/* Champ heures : souligné Material, la valeur reste le seul élément
+   à fort contraste de la ligne. */
+.gsla .gsla-num{
+  display:inline-flex;align-items:baseline;gap:5px;flex-shrink:0; padding-left:10px;
+}
+.gsla .gsla-num input{
+  /* La valeur est alignée à droite : il lui faut un retrait, sinon
+     elle vient buter contre le bord arrondi du champ. */
+  width:74px;padding:6px 12px 6px 8px;font:inherit;font-size:15px;font-weight:500;
+  text-align:right;color:var(--m3-on-surface);background:transparent;
+  border:none;border-bottom:1px solid var(--m3-outline);border-radius:0;
+  outline:none;transition:border-color .15s var(--m3-ease),box-shadow .15s var(--m3-ease);
+  -moz-appearance:textfield;
+}
+.gsla .gsla-num input::-webkit-outer-spin-button,
+.gsla .gsla-num input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.gsla .gsla-num input:hover{border-bottom-color:var(--m3-on-surface)}
+.gsla .gsla-num input:focus{
+  border-bottom-color:var(--m3-primary);box-shadow:0 1px 0 0 var(--m3-primary);
+}
+.gsla .gsla-unit{
+  font-size:13px;color:var(--m3-on-surf-var);width:12px;
+}
+/* Équivalent en jours : le contrat se pense en heures, l'exploitation
+   en jours. On affiche les deux plutôt que de faire convertir. */
+.gsla .gsla-eq{
+  flex-shrink:0;width:64px;font-size:12px;color:var(--m3-on-surf-var);
+  font-variant-numeric:tabular-nums;
+}
+
+/* Bascule Cal / Biz : segmented button Material 3 */
+.gsla .gsla-seg{
+  display:inline-flex;flex-shrink:0;border-radius:var(--m3-r-full,999px);
+  border:1px solid var(--m3-outline);overflow:hidden;
+}
+.gsla .gsla-seg-btn{
+  height:32px;padding:0 14px;border:none;background:transparent;cursor:pointer;
+  font:inherit;font-size:12px;font-weight:500;letter-spacing:.02em;
+  color:var(--m3-on-surf-var);
+  transition:background .15s var(--m3-ease),color .15s var(--m3-ease);
+}
+.gsla .gsla-seg-btn + .gsla-seg-btn{border-left:1px solid var(--m3-outline)}
+.gsla .gsla-seg-btn:hover{background:var(--m3-surf-2)}
+.gsla .gsla-seg-btn[aria-pressed="true"]{
+  background:var(--m3-primary-cont);color:var(--m3-on-primary-cont);
+}
+.gsla .gsla-seg-btn[aria-pressed="true"][data-mode="business"]{
+  background:var(--gsla-biz-c);color:var(--gsla-biz);
+}
+
+/* Groupe à deux jambes (Workaround / Final Resolution) */
+.gsla .gsla-group{
+  border-top:1px solid var(--m3-outline-var);
+  padding:6px 0 2px;
+}
+.gsla .gsla-list > .gsla-group:first-child{border-top:none}
+.gsla .gsla-group-t{
+  font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);padding:10px 0 2px;
+}
+
+/* ── Mode de travail ── */
+.gsla .gsla-modes{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;
+}
+.gsla .gsla-mode{
+  display:flex;align-items:flex-start;gap:12px;cursor:pointer;
+  padding:16px 18px;border:1px solid var(--m3-outline-var);
+  border-radius:var(--m3-r-sm,12px);background:var(--m3-surface);
+  transition:background .15s var(--m3-ease),border-color .15s var(--m3-ease);
+}
+[data-theme="dark"] .gsla .gsla-mode{background:var(--m3-surf-2);border-color:transparent}
+.gsla .gsla-mode:hover{background:var(--m3-surf-1)}
+[data-theme="dark"] .gsla .gsla-mode:hover{background:var(--m3-surf-3)}
+.gsla .gsla-mode input{position:absolute;opacity:0;pointer-events:none}
+.gsla .gsla-mode:has(input:checked){
+  background:var(--m3-primary-cont);border-color:var(--m3-primary);
+}
+.gsla .gsla-mode:has(input:focus-visible){
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--m3-primary) 24%,transparent);
+}
+.gsla .gsla-mode-body{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.gsla .gsla-mode-t{font-size:14px;font-weight:500;color:var(--m3-on-surface)}
+.gsla .gsla-mode-d{font-size:12.5px;line-height:1.45;color:var(--m3-on-surf-var)}
+.gsla .gsla-mode:has(input:checked) .gsla-mode-t,
+.gsla .gsla-mode:has(input:checked) .gsla-mode-d{color:var(--m3-on-primary-cont)}
+/* Coche : dessinée en CSS pour éviter une icône de plus à charger */
+.gsla .gsla-mode-tick{
+  flex-shrink:0;width:20px;height:20px;margin-top:1px;border-radius:50%;
+  border:2px solid var(--m3-outline);position:relative;
+  transition:border-color .15s var(--m3-ease),background .15s var(--m3-ease);
+}
+.gsla .gsla-mode:has(input:checked) .gsla-mode-tick{
+  border-color:var(--m3-primary);background:var(--m3-primary);
+}
+.gsla .gsla-mode:has(input:checked) .gsla-mode-tick::after{
+  content:"";position:absolute;left:5px;top:2px;
+  width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+}
+[data-theme="dark"] .gsla .gsla-mode:has(input:checked) .gsla-mode-tick::after{border-color:#1A1A1A}
+
+.gsla .gsla-hint{
+  display:flex;align-items:flex-start;gap:9px;margin-top:16px;
+  padding:12px 14px;border-radius:var(--m3-r-sm,12px);
+  background:var(--m3-surf-1);color:var(--m3-on-surf-var);
+  font-size:12.5px;line-height:1.5;
+}
+[data-theme="dark"] .gsla .gsla-hint{background:var(--m3-surf-2)}
+.gsla .gsla-hint svg{flex-shrink:0;margin-top:1px;opacity:.75}
+

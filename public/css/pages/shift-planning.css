@@ -1,0 +1,333 @@
+/* ══════════════════════════════════════════════════════════
+   SHIFT PLANNING — refonte Material 3
+   Palette d'événements calquée sur Google Agenda. Les teintes
+   sont déclarées en variables pour que le mode sombre bascule
+   sans toucher au JS (l'ancien code codait les couleurs en dur
+   et devenait illisible sur fond sombre).
+   ══════════════════════════════════════════════════════════ */
+#page-shift-planning{
+  --sp-morning:      #1A73E8;  --sp-morning-cont:   #E8F0FE;
+  --sp-afternoon:    #1E8E3E;  --sp-afternoon-cont: #E6F4EA;
+  --sp-night:        #3F51B5;  --sp-night-cont:     #E8EAF6;
+  --sp-rest:         #5F6368;  --sp-rest-cont:      #F1F3F4;
+}
+[data-theme="dark"] #page-shift-planning{
+  --sp-morning:      #8AB4F8;  --sp-morning-cont:   #1B2A44;
+  --sp-afternoon:    #81C995;  --sp-afternoon-cont: #17301F;
+  --sp-night:        #9FA8DA;  --sp-night-cont:     #1E2140;
+  --sp-rest:         #9AA0A6;  --sp-rest-cont:      #2A2B2E;
+}
+
+/* ── En-tête de page ── */
+.sp-topbar{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;margin-bottom:6px;
+}
+.sp-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* Navigation de mois : icon-buttons ronds + libellé stable */
+.sp-nav{display:flex;align-items:center;gap:2px}
+.sp-nav-btn{
+  width:36px;height:36px;flex-shrink:0;border:none;background:transparent;
+  border-radius:var(--m3-r-full);cursor:pointer;color:var(--m3-on-surf-var);
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease);
+}
+.sp-nav-btn:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);color:var(--m3-on-surface)}
+.sp-nav-btn:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+.sp-nav-btn svg{width:20px;height:20px}
+.sp-month{
+  font-size:15px;font-weight:500;color:var(--m3-on-surface);
+  min-width:150px;text-align:center;letter-spacing:.006em;
+}
+
+/* Chips M3 : toggles et actions secondaires */
+.sp-chip{
+  display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;
+  border:1px solid var(--m3-outline);border-radius:8px;
+  background:transparent;color:var(--m3-on-surf-var);
+  font-family:inherit;font-size:13px;font-weight:500;letter-spacing:.006em;
+  cursor:pointer;white-space:nowrap;
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+.sp-chip:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);color:var(--m3-on-surface)}
+.sp-chip:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+.sp-chip svg{width:16px;height:16px;flex-shrink:0}
+/* état sélectionné : conteneur secondaire + coche, convention M3 */
+.sp-chip.sel{
+  background:var(--m3-secondary-cont);border-color:transparent;
+  color:var(--m3-on-surface);padding-left:10px;
+}
+.sp-chip .sp-chip-check{width:18px;height:18px}
+
+/* Bouton rempli : l'action principale de la page */
+.sp-fab{
+  display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 20px 0 16px;
+  border:none;border-radius:var(--m3-r-full);
+  background:var(--m3-primary);color:var(--m3-on-primary);
+  font-family:inherit;font-size:14px;font-weight:500;letter-spacing:.006em;
+  cursor:pointer;white-space:nowrap;
+  box-shadow:0 1px 2px rgba(0,0,0,.18),0 1px 3px 1px rgba(0,0,0,.10);
+  transition:box-shadow .2s var(--m3-ease),filter .2s var(--m3-ease);
+}
+.sp-fab:hover{box-shadow:0 1px 2px rgba(0,0,0,.18),0 2px 6px 2px rgba(0,0,0,.14);filter:brightness(1.06)}
+.sp-fab:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+.sp-fab svg{width:18px;height:18px}
+
+/* ── Onglets de site ── */
+.sp-tabs{
+  display:flex;gap:0;margin-bottom:18px;
+  border-bottom:1px solid var(--m3-outline-var);
+}
+.sp-tab{
+  position:relative;border:none;background:transparent;cursor:pointer;
+  padding:12px 20px;font-family:inherit;font-size:14px;font-weight:500;
+  letter-spacing:.006em;color:var(--m3-on-surf-var);
+  transition:color .2s var(--m3-ease),background .2s var(--m3-ease);
+  border-radius:8px 8px 0 0;
+}
+.sp-tab:hover{background:color-mix(in srgb,var(--m3-on-surface) 6%,transparent);color:var(--m3-on-surface)}
+.sp-tab:focus-visible{outline:2px solid var(--m3-primary);outline-offset:-3px}
+.sp-tab.active{color:var(--m3-primary)}
+.sp-tab.active::after{
+  content:'';position:absolute;left:0;right:0;bottom:-1px;height:3px;
+  background:var(--m3-primary);border-radius:3px 3px 0 0;
+}
+
+/* ── Sélecteur de semaine ── */
+.sp-weeks{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.sp-week{
+  display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;
+  border:1px solid var(--m3-outline);border-radius:8px;background:transparent;
+  font-family:inherit;font-size:13px;font-weight:500;color:var(--m3-on-surf-var);
+  cursor:pointer;white-space:nowrap;
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+.sp-week:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);color:var(--m3-on-surface)}
+.sp-week:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+.sp-week .sp-week-range{font-weight:400;opacity:.75}
+.sp-week.active{
+  background:var(--m3-secondary-cont);border-color:transparent;color:var(--m3-on-surface);
+}
+/* semaine courante non sélectionnée : point d'accent, pas de bordure criarde */
+.sp-week.now::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--m3-primary);flex-shrink:0;
+}
+
+/* ── Grille ── */
+.sp-grid-wrap{
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-md);
+  overflow:hidden;background:var(--m3-surface);
+}
+.sp-scroll{overflow-x:auto}
+.sp-grid{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.sp-grid th,.sp-grid td{border:none}
+
+/* En-têtes de jour */
+.sp-grid thead th{
+  padding:10px 6px;text-align:center;font-weight:500;
+  background:var(--m3-surf-1);
+  border-bottom:1px solid var(--m3-outline-var);
+  min-width:104px;
+}
+.sp-grid thead th.sp-corner{
+  text-align:left;padding:10px 16px;min-width:104px;
+  position:sticky;left:0;z-index:3;background:var(--m3-surf-1);
+  font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+  border-right:1px solid var(--m3-outline-var);
+}
+.sp-dow{
+  font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+/* Pastille du numéro de jour — ronde et pleine pour aujourd'hui, à la Google Agenda */
+.sp-daynum{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;margin-top:4px;border-radius:50%;
+  font-size:16px;font-weight:400;color:var(--m3-on-surface);
+  transition:background .2s var(--m3-ease);
+}
+.sp-grid thead th.is-today .sp-dow{color:var(--m3-primary);font-weight:600}
+.sp-grid thead th.is-today .sp-daynum{
+  background:var(--m3-primary);color:var(--m3-on-primary);font-weight:500;
+}
+.sp-grid thead th.is-we{background:var(--m3-surf-2)}
+.sp-grid thead th.is-we .sp-daynum{color:var(--m3-on-surf-var)}
+.sp-grid thead th.is-out .sp-daynum,
+.sp-grid thead th.is-out .sp-dow{opacity:.38}
+
+/* Colonne de gauche : le shift */
+.sp-shift-cell{
+  position:sticky;left:0;z-index:2;padding:0;vertical-align:middle;
+  background:var(--m3-surface);
+  border-right:1px solid var(--m3-outline-var);
+}
+.sp-shift-inner{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+}
+.sp-shift-dot{
+  width:10px;height:10px;border-radius:50%;background:var(--sp-c);flex-shrink:0;
+}
+.sp-shift-name{font-size:13px;font-weight:500;color:var(--m3-on-surface);line-height:1.3}
+.sp-shift-hrs{
+  font-size:11px;color:var(--m3-on-surf-var);margin-top:1px;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Cellules de jour */
+.sp-grid tbody td{
+  padding:5px;vertical-align:top;
+  border-bottom:1px solid var(--m3-outline-var);
+  border-right:1px solid var(--m3-outline-var);
+}
+.sp-grid tbody tr:last-child td{border-bottom:none}
+.sp-grid tbody td.is-we{background:var(--m3-surf-1)}
+.sp-grid tbody td.is-out{background:var(--m3-surf-2);opacity:.5}
+/* séparation entre blocs de shift : trait net, pas de pointillé */
+.sp-grid tbody tr.sp-shift-end td{border-bottom:1px solid var(--m3-outline)}
+
+/* Chip d'affectation — l'« événement » de la grille */
+.sp-ev{
+  display:flex;align-items:center;gap:7px;width:100%;
+  padding:6px 10px;margin-bottom:4px;border:none;
+  border-radius:8px;background:var(--sp-cc);
+  font-family:inherit;text-align:left;cursor:pointer;
+  transition:filter .2s var(--m3-ease),box-shadow .2s var(--m3-ease);
+}
+.sp-ev:last-child{margin-bottom:0}
+.sp-ev:hover{filter:brightness(.96);box-shadow:0 1px 3px rgba(0,0,0,.16)}
+.sp-ev:focus-visible{outline:2px solid var(--m3-primary);outline-offset:1px}
+[data-theme="dark"] .sp-ev:hover{filter:brightness(1.22)}
+.sp-ev-dot{width:6px;height:6px;border-radius:50%;background:var(--sp-c);flex-shrink:0}
+.sp-ev-name{
+  font-size:12px;font-weight:500;color:var(--m3-on-surface);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+}
+.sp-ev-last{font-weight:400;color:var(--m3-on-surf-var)}
+
+/* Ligne des jours fériés */
+.sp-hol-label{
+  position:sticky;left:0;z-index:2;padding:6px 14px;
+  background:var(--m3-surf-1);color:var(--m3-on-surf-var);
+  font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  border-right:1px solid var(--m3-outline-var);
+}
+.sp-grid tbody tr.sp-hol td{
+  background:var(--m3-surf-1);
+  border-bottom:1px solid var(--m3-outline-var);
+  padding:6px 5px;
+}
+.sp-hol-pill{
+  display:inline-block;max-width:100%;padding:2px 8px;border-radius:var(--m3-r-full);
+  background:var(--m3-primary-cont);color:var(--m3-on-primary-cont);
+  font-size:11px;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* ── Panneau latéral ── */
+.sp-layout{display:flex;gap:20px;align-items:flex-start}
+.sp-main{flex:1;min-width:0}
+.sp-side{flex-shrink:0;width:224px}
+.sp-card{
+  background:var(--m3-surf-1);border-radius:var(--m3-r-md);
+  padding:16px;position:sticky;top:16px;
+}
+.sp-card-title{
+  font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);margin-bottom:12px;
+}
+.sp-site-name{
+  font-size:13px;font-weight:500;color:var(--m3-on-surface);margin-bottom:8px;
+}
+.sp-team{margin-bottom:14px}
+.sp-team-name{
+  font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);margin-bottom:6px;
+}
+.sp-member{display:flex;align-items:center;gap:8px;padding:3px 0}
+.sp-avatar{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--m3-surf-3);color:var(--m3-on-surf-var);
+  font-size:10px;font-weight:500;letter-spacing:.02em;
+}
+.sp-member-name{
+  font-size:12.5px;color:var(--m3-on-surface);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sp-legend{margin-top:4px;padding-top:14px;border-top:1px solid var(--m3-outline-var)}
+/* Sans panneau d'équipes au-dessus, le filet de séparation n'a rien à séparer. */
+.sp-card-title + .sp-legend{margin-top:0;padding-top:0;border-top:none}
+.sp-legend-row{display:flex;align-items:center;gap:10px;padding:4px 0}
+.sp-legend-sw{
+  width:14px;height:14px;border-radius:4px;flex-shrink:0;
+  background:var(--sp-cc);box-shadow:inset 0 0 0 1.5px var(--sp-c);
+}
+.sp-legend-txt{font-size:12.5px;color:var(--m3-on-surf-var)}
+
+/* État vide */
+.sp-empty{
+  text-align:center;padding:56px 20px;color:var(--m3-on-surf-var);font-size:14px;
+}
+.sp-empty svg{width:40px;height:40px;opacity:.4;margin-bottom:12px}
+
+@media(max-width:1100px){
+  .sp-layout{flex-direction:column}
+  .sp-side{width:100%}
+  .sp-card{position:static}
+}
+
+
+/* ══ Refonte : alignée sur le reste de l'application ══
+   Bloc en verre, tableau blanc (noir en sombre), date du jour en noir,
+   barre d'outils sobre, légende sur la ligne des semaines, ses propres
+   créneaux en noir pour se repérer d'un coup d'œil. */
+.main:has(#page-shift-planning.active){background:transparent!important}
+#page-shift-planning{
+  --m3-surface:#FFFFFF;--m3-surf-1:#FFFFFF;--m3-surf-2:#F6F7F8;--m3-surf-3:#ECEEF0;
+  --m3-outline-var:rgba(20,24,32,.07);--sp-ink:#111214}
+[data-theme="dark"] #page-shift-planning{
+  --m3-surface:#0A0A0C;--m3-surf-1:#0A0A0C;--m3-surf-2:#111216;--m3-surf-3:#1A1B20;
+  --m3-outline-var:rgba(255,255,255,.08);--sp-ink:#F4F4F5}
+#page-shift-planning .sp-shell{margin-top:18px;padding:18px!important}
+#page-shift-planning .sp-chip{background:transparent!important;border:none!important;box-shadow:none!important;border-radius:999px!important;height:38px;padding:0 12px!important;color:var(--m3-on-surface)!important}
+#page-shift-planning .sp-chip:hover{background:rgba(38,37,31,.06)!important}
+[data-theme="dark"] #page-shift-planning .sp-chip:hover{background:rgba(255,255,255,.07)!important}
+#page-shift-planning .sp-chip[aria-pressed="true"]{background:rgba(38,37,31,.08)!important}
+#page-shift-planning .sp-fab{background:var(--sp-ink)!important;color:var(--m3-surface)!important;box-shadow:none!important;border-radius:999px!important}
+#page-shift-planning .sp-month{font-size:16px;font-weight:600;min-width:140px;text-align:center}
+
+/* Semaines : rail de pilules, l'active en noir ; légende à droite */
+#page-shift-planning .sp-weekbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+#page-shift-planning .sp-weeks{display:inline-flex!important;gap:3px!important;padding:4px;border-radius:999px;background:rgba(38,37,31,.06);margin:0!important;flex-wrap:wrap}
+[data-theme="dark"] #page-shift-planning .sp-weeks{background:rgba(255,255,255,.07)}
+#page-shift-planning .sp-week{border:none!important;background:transparent!important;border-radius:999px!important;height:34px;padding:0 14px!important;box-shadow:none!important;font-weight:600}
+#page-shift-planning .sp-week.active{background:var(--sp-ink)!important;color:var(--m3-surface)!important}
+#page-shift-planning .sp-week.active .sp-week-range{color:inherit!important;opacity:.7}
+#page-shift-planning .sp-week.now:not(.active){box-shadow:inset 0 0 0 1.5px var(--m3-primary)!important}
+#page-shift-planning .sp-legend-inline{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--m3-on-surf-var)}
+#page-shift-planning .sp-legend-inline span{display:inline-flex;align-items:center;gap:6px}
+#page-shift-planning .sp-legend-inline i{width:9px;height:9px;border-radius:50%;background:var(--sp-c)}
+#page-shift-planning .sp-layout.is-full{display:block!important}
+
+/* Tableau */
+#page-shift-planning .sp-grid-wrap{border:none!important;border-radius:22px!important;
+  box-shadow:0 1px 2px rgba(20,24,32,.04),0 12px 32px -20px rgba(20,24,32,.25)}
+[data-theme="dark"] #page-shift-planning .sp-grid-wrap{box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+#page-shift-planning .sp-grid thead th{padding:14px 6px!important}
+#page-shift-planning .sp-grid thead th.is-today .sp-daynum{background:var(--sp-ink)!important;color:var(--m3-surface)!important;font-weight:600}
+#page-shift-planning .sp-grid thead th.is-today .sp-dow{color:var(--m3-on-surface)!important}
+#page-shift-planning .sp-grid td{border-bottom:1px solid var(--m3-outline-var)}
+#page-shift-planning .sp-grid td.is-we{background:var(--m3-surf-2)}
+#page-shift-planning .sp-grid td.is-today{background:color-mix(in srgb,var(--m3-primary) 5%,transparent)}
+#page-shift-planning .sp-ev{border-radius:10px!important;padding:7px 10px!important}
+#page-shift-planning .sp-ev.is-me{background:var(--sp-ink)!important}
+#page-shift-planning .sp-ev.is-me .sp-ev-name,#page-shift-planning .sp-ev.is-me .sp-ev-last{color:var(--m3-surface)!important}
+#page-shift-planning .sp-card{background:#FFFFFF!important;border:none!important;border-radius:22px!important}
+[data-theme="dark"] #page-shift-planning .sp-card{background:#0A0A0C!important}
+/* Sans bande de couleur à gauche : le point de couleur suffit. */
+#page-shift-planning .sp-shift-cell{border-left:none!important}
+#page-shift-planning .sp-legend-sw{border-left:none!important;width:9px!important;height:9px!important;border-radius:50%!important;background:var(--sp-c)!important}
+#page-shift-planning .sp-shift-inner{border-left:none!important;padding-left:16px!important}

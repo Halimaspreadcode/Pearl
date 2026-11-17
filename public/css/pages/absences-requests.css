@@ -1,0 +1,500 @@
+/* ══════════════════════════════════════════════
+   SUIVI DES ABSENCES
+   Chaque type d'absence porte une teinte propre, déclarée une seule
+   fois ici : calendrier, légende, barre de composition et pastilles
+   de la liste lisent toutes la même variable, donc une couleur ne
+   peut pas diverger d'une vue à l'autre.
+══════════════════════════════════════════════ */
+#page-absences{
+  --abs-conges: #1a73e8;   /* congés payés  */
+  --abs-rtt:    #12b5cb;   /* RTT           */
+  --abs-sick:   #d93025;   /* maladie / AT  */
+  --abs-family: #9334e6;   /* maternité / paternité */
+  --abs-train:  #e8710a;   /* formation     */
+  --abs-onsite: #00897b;   /* on-site (delivery) */
+  --abs-unpaid: #5f6368;   /* sans solde    */
+  --abs-abs:    #b31412;   /* injustifiée   */
+  --abs-other:  #7cb342;   /* autre         */
+}
+/* ══════════════════════════════════════════════
+   MES DEMANDES (soumission FO)
+   Reprend la grammaire visuelle d'Absences : même en-tête, mêmes
+   tuiles. La page est en lecture/écriture pour le FO, mais ne porte
+   aucune action de décision — celles-ci vivent en Admin.
+   ══════════════════════════════════════════════ */
+#page-my-requests .mr-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:20px;
+}
+#page-my-requests .mr-sub{font-size:13px;color:var(--m3-on-surf-var);margin-top:4px}
+#page-my-requests .mr-head-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#page-my-requests .mr-head-actions .filter-select{width:auto;min-width:160px}
+#page-my-requests .mr-kpis{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:14px;margin-bottom:18px;
+}
+#page-my-requests .mr-kpi{
+  background:var(--m3-surface);border-radius:var(--m3-r-xl);
+  border:1px solid color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  padding:16px 18px;display:flex;flex-direction:column;gap:6px;
+}
+#page-my-requests .mr-kpi-lbl{
+  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+#page-my-requests .mr-kpi-val{
+  font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1;
+  color:var(--m3-on-surface);font-variant-numeric:tabular-nums;
+}
+#page-my-requests .mr-card{
+  background:var(--m3-surface);border-radius:var(--m3-r-xl);
+  border:1px solid color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  padding:14px 16px;margin-bottom:10px;
+  display:flex;align-items:flex-start;gap:14px;
+}
+#page-my-requests .mr-card-main{flex:1;min-width:0}
+#page-my-requests .mr-l1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+#page-my-requests .mr-who{font-size:14px;font-weight:600;letter-spacing:-.01em}
+#page-my-requests .mr-l2{font-size:12.5px;color:var(--m3-on-surf-var);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+#page-my-requests .mr-note{
+  font-size:12.5px;margin-top:6px;padding:8px 10px;border-radius:10px;
+  background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent);
+}
+#page-my-requests .mr-meta{font-size:11.5px;color:var(--m3-on-surf-var);margin-top:6px}
+#page-my-requests .mr-chip{
+  font-size:11px;font-weight:600;padding:3px 9px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surf-var);white-space:nowrap;
+}
+#page-my-requests .mr-chip.is-pending{
+  background:color-mix(in srgb,#e8710a 16%,transparent);color:#e8710a;
+}
+#page-my-requests .mr-chip.is-approved{
+  background:color-mix(in srgb,#1e8e3e 16%,transparent);color:#1e8e3e;
+}
+#page-my-requests .mr-chip.is-rejected{
+  background:color-mix(in srgb,var(--m3-error) 16%,transparent);color:var(--m3-error);
+}
+#page-my-requests .mr-verdict{
+  font-size:12px;margin-top:8px;padding-top:8px;
+  border-top:1px solid color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surf-var);
+}
+#page-my-requests .mr-empty{
+  text-align:center;padding:48px 20px;color:var(--m3-on-surf-var);
+  background:var(--m3-surface);border-radius:var(--m3-r-xl);
+  border:1px dashed color-mix(in srgb,var(--m3-on-surface) 16%,transparent);
+}
+#page-my-requests .mr-empty-t{font-size:15px;font-weight:600;color:var(--m3-on-surface);margin-bottom:4px}
+
+/* ── New-request form ──
+   Les groupes ne vivent pas dans une .form-grid ici : sans rythme
+   vertical explicite, les sections se touchent (label collé au champ
+   précédent) et le formulaire se lit comme un seul bloc. */
+#my-request-modal .modal-body > .form-group{margin-bottom:20px}
+#my-request-modal .modal-body > .form-group:last-child{margin-bottom:0}
+#my-request-modal .form-group > .form-label{margin-bottom:3px}
+#my-request-modal .mrq-id{
+  display:flex;align-items:center;gap:12px;margin-bottom:16px;
+  padding:11px 13px;border-radius:12px;
+  background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent);
+}
+#my-request-modal .mrq-id-av{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--red);color:#fff;font-size:13px;font-weight:600;
+}
+#my-request-modal .mrq-id-txt{flex:1;min-width:0}
+#my-request-modal .mrq-id-name{font-size:14px;font-weight:600;letter-spacing:-.01em}
+#my-request-modal .mrq-id-sub{font-size:11.5px;color:var(--mute);margin-top:1px}
+#my-request-modal .mrq-id-change{
+  background:none;border:none;cursor:pointer;padding:5px 9px;border-radius:8px;
+  font-size:12px;font-weight:600;color:var(--red);
+}
+#my-request-modal .mrq-id-change:hover{background:color-mix(in srgb,var(--red) 12%,transparent)}
+
+#my-request-modal .mrq-types{display:flex;gap:6px;flex-wrap:wrap}
+#my-request-modal .mrq-type{
+  flex:1 1 auto;min-width:74px;cursor:pointer;
+  padding:9px 10px;border-radius:10px;font-size:12.5px;font-weight:600;
+  background:color-mix(in srgb,var(--m3-on-surface) 6%,transparent);
+  border:1.5px solid transparent;color:var(--m3-on-surf-var);
+  transition:background .15s,border-color .15s,color .15s;
+}
+#my-request-modal .mrq-type:hover{background:color-mix(in srgb,var(--m3-on-surface) 11%,transparent)}
+#my-request-modal .mrq-type.is-on{
+  border-color:var(--red);color:var(--red);
+  background:color-mix(in srgb,var(--red) 12%,transparent);
+}
+
+#my-request-modal .mrq-quick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+#my-request-modal .mrq-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+#my-request-modal .mrq-chip{
+  cursor:pointer;padding:6px 10px;border-radius:var(--m3-r-full);
+  font-size:11.5px;font-weight:500;line-height:1.3;
+  background:color-mix(in srgb,var(--m3-on-surface) 7%,transparent);
+  border:1px solid transparent;color:var(--m3-on-surf-var);
+  display:inline-flex;align-items:center;gap:5px;
+}
+#my-request-modal .mrq-chip:hover{background:color-mix(in srgb,var(--m3-on-surface) 13%,transparent)}
+#my-request-modal .mrq-chip small{opacity:.65;font-size:10.5px}
+#my-request-modal .mrq-chip.is-on{
+  border-color:var(--red);color:var(--red);
+  background:color-mix(in srgb,var(--red) 12%,transparent);
+}
+
+#my-request-modal .mrq-ctx{
+  border-radius:10px;padding:10px 12px;margin-bottom:14px;
+  font-size:12px;line-height:1.5;color:var(--mute);
+  background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent);
+}
+#my-request-modal .mrq-ctx.is-warn{
+  color:#e8710a;background:color-mix(in srgb,#e8710a 11%,transparent);
+}
+
+#page-absences .abs-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:20px;
+}
+#page-absences .abs-sub{font-size:13px;color:var(--m3-on-surf-var);margin-top:4px}
+#page-absences .abs-head-actions{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+#page-absences .abs-head-actions .filter-select{width:auto;min-width:104px}
+
+/* ── KPI ── */
+#page-absences .abs-kpis{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:14px;margin-bottom:18px;
+}
+#page-absences .abs-kpi{
+  background:var(--m3-surface);border-radius:var(--m3-r-xl);
+  border:1px solid color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  padding:18px 20px;display:flex;flex-direction:column;gap:6px;
+  transition:transform .2s var(--m3-ease),box-shadow .2s var(--m3-ease);
+}
+#page-absences .abs-kpi:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px -8px color-mix(in srgb,var(--m3-on-surface) 30%,transparent);
+}
+#page-absences .abs-kpi-lbl{
+  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+#page-absences .abs-kpi-val{
+  font-size:32px;font-weight:600;letter-spacing:-.03em;line-height:1;
+  color:var(--m3-on-surface);font-variant-numeric:tabular-nums;
+}
+#page-absences .abs-kpi-val .unit{
+  font-size:.5em;font-weight:500;color:var(--m3-on-surf-var);margin-left:2px;
+}
+#page-absences .abs-kpi-note{font-size:11.5px;color:var(--m3-on-surf-var)}
+#page-absences .abs-kpi.warn .abs-kpi-val{color:var(--m3-error)}
+
+/* Barre de composition : la répartition par type sur une seule ligne,
+   plus lisible qu'un camembert à dix parts. */
+#page-absences .abs-mix{
+  display:flex;height:10px;border-radius:var(--m3-r-full);overflow:hidden;
+  background:color-mix(in srgb,var(--m3-on-surface) 9%,transparent);
+  margin-top:2px;
+}
+#page-absences .abs-mix i{height:100%;min-width:2px;transition:width .5s var(--m3-ease)}
+
+/* ── Bandeau de conflits ── */
+/* Demandes FO en lecture seule : volontairement plus sobre que les
+   cartes d'Approbations, pour qu'on ne cherche pas à décider ici. */
+#page-absences .abs-foreq-list{display:flex;flex-direction:column;gap:2px;margin-top:4px}
+#page-absences .abs-foreq{
+  display:flex;align-items:flex-start;gap:12px;padding:10px 2px;
+  border-bottom:1px solid color-mix(in srgb,var(--m3-on-surface) 7%,transparent);
+}
+#page-absences .abs-foreq:last-child{border-bottom:none}
+#page-absences .abs-foreq-main{min-width:0;flex:1}
+#page-absences .abs-foreq-l1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#page-absences .abs-foreq-l2{
+  font-size:12px;color:var(--m3-on-surf-var);margin-top:3px;
+  overflow:hidden;text-overflow:ellipsis;
+}
+#page-absences .abs-foreq-chip{
+  font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surf-var);white-space:nowrap;
+}
+#page-absences .abs-foreq-chip.is-pending{background:color-mix(in srgb,#e8710a 16%,transparent);color:#e8710a}
+#page-absences .abs-foreq-chip.is-approved{background:color-mix(in srgb,#1e8e3e 16%,transparent);color:#1e8e3e}
+#page-absences .abs-foreq-chip.is-rejected{background:color-mix(in srgb,var(--m3-error) 16%,transparent);color:var(--m3-error)}
+#page-absences .abs-foreq-more{
+  font-size:12px;color:var(--m3-on-surf-var);padding:8px 2px 2px;
+}
+
+#page-absences .abs-conflict{
+  border-radius:var(--m3-r-xl);padding:16px 20px;margin-bottom:18px;
+  background:color-mix(in srgb,var(--m3-error) 10%,var(--m3-surface));
+  border:1px solid color-mix(in srgb,var(--m3-error) 30%,transparent);
+}
+#page-absences .abs-conflict-h{
+  display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;
+  color:var(--m3-error);margin-bottom:4px;
+}
+#page-absences .abs-conflict-sub{font-size:12.5px;color:var(--m3-on-surf-var)}
+#page-absences .abs-conflict-list{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;
+}
+#page-absences .abs-conflict-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:var(--m3-r-full);
+  background:var(--m3-surface);border:1px solid color-mix(in srgb,var(--m3-error) 25%,transparent);
+  font-size:12px;color:var(--m3-on-surface);cursor:pointer;
+  transition:background .15s var(--m3-ease);
+}
+#page-absences .abs-conflict-chip:hover{background:color-mix(in srgb,var(--m3-error) 8%,transparent)}
+#page-absences .abs-conflict-chip b{font-weight:600}
+#page-absences .abs-conflict-chip small{color:var(--m3-on-surf-var)}
+
+/* ── Cartes ── */
+#page-absences .abs-grid{
+  display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+  gap:18px;margin-bottom:18px;align-items:start;
+}
+#page-absences .abs-card{
+  background:var(--m3-surface);border-radius:var(--m3-r-xl);
+  border:1px solid color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  padding:20px 22px;margin-bottom:18px;
+}
+#page-absences .abs-grid .abs-card{margin-bottom:0}
+#page-absences .abs-card-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:14px;flex-wrap:wrap;margin-bottom:16px;
+}
+#page-absences .abs-card-title{font-size:15px;font-weight:600;letter-spacing:-.01em}
+#page-absences .abs-card-sub{font-size:12px;color:var(--m3-on-surf-var);margin-top:3px}
+
+/* « Demandes des agents » : repliable, fermé par défaut. La décision se
+   prend dans Admin › Approbations, la liste n'est ici qu'un rappel. */
+#page-absences .abs-foreq-summary{
+  cursor:pointer;margin-bottom:0;list-style:none;align-items:center;
+}
+#page-absences .abs-foreq-summary::-webkit-details-marker{display:none}
+#page-absences .abs-foreq-chev{
+  color:var(--m3-on-surf-var);display:flex;align-items:center;
+  transition:transform .15s;
+}
+#page-absences .abs-foreq-card[open] .abs-foreq-chev{transform:rotate(180deg)}
+#page-absences .abs-foreq-body{margin-top:16px}
+#page-absences .abs-filters{display:flex;gap:8px;flex-wrap:wrap}
+#page-absences .abs-filters .filter-select{width:auto;min-width:130px}
+
+/* ── Calendrier ── */
+#page-absences .abs-cal-nav{display:flex;gap:8px}
+#page-absences .abs-cal-nav button{
+  width:32px;height:32px;border-radius:var(--m3-r-full);
+  border:1px solid var(--m3-outline);background:transparent;
+  color:var(--m3-on-surface);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .18s var(--m3-ease);
+}
+#page-absences .abs-cal-nav button:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+#page-absences .abs-cal{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;
+}
+#page-absences .abs-cal-dow{
+  font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);text-align:center;padding-bottom:6px;
+}
+/* Hauteur fixe plutôt qu'aspect-ratio:1 — sur une colonne large, des
+   cellules carrées faisaient un calendrier de 700px de haut pour trois
+   pastilles. 62px suffit au numéro plus deux rangées de points. */
+#page-absences .abs-cell{
+  min-height:62px;border-radius:var(--m3-r-sm);padding:5px 6px;
+  display:flex;flex-direction:column;gap:3px;
+  background:color-mix(in srgb,var(--m3-on-surface) 3%,transparent);
+  font-size:11.5px;position:relative;overflow:hidden;
+  transition:background .15s var(--m3-ease),transform .15s var(--m3-ease);
+}
+#page-absences .abs-cell.pad{background:transparent;min-height:0}
+/* Le week-end doit se distinguer d'un jour ouvré au premier coup d'œil :
+   à 6% contre 3% l'écart était invisible. */
+#page-absences .abs-cell.we{
+  background:color-mix(in srgb,var(--m3-on-surface) 11%,transparent);
+}
+#page-absences .abs-cell.we .abs-cell-n{opacity:.55}
+#page-absences .abs-cell.hol{
+  background:color-mix(in srgb,var(--m3-tertiary,var(--m3-primary)) 10%,transparent);
+}
+#page-absences .abs-cell.has{cursor:pointer}
+#page-absences .abs-cell.has:hover{transform:scale(1.04);z-index:2}
+#page-absences .abs-cell-n{
+  font-weight:500;color:var(--m3-on-surf-var);font-variant-numeric:tabular-nums;
+}
+#page-absences .abs-cell.today .abs-cell-n{
+  color:var(--m3-primary);font-weight:700;
+}
+#page-absences .abs-cell.today{
+  box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--m3-primary) 55%,transparent);
+}
+/* Points colorés : un par absence du jour, teinte = type. */
+#page-absences .abs-dots{display:flex;flex-wrap:wrap;gap:3px;margin-top:auto}
+#page-absences .abs-dot{
+  width:7px;height:7px;border-radius:var(--m3-r-full);flex-shrink:0;
+}
+#page-absences .abs-cell-more{font-size:9.5px;color:var(--m3-on-surf-var);line-height:1}
+#page-absences .abs-legend{
+  display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:16px;padding-top:14px;
+  border-top:1px solid color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  font-size:11.5px;color:var(--m3-on-surf-var);
+}
+#page-absences .abs-legend span{display:inline-flex;align-items:center;gap:7px}
+#page-absences .abs-legend i{width:9px;height:9px;border-radius:var(--m3-r-full);display:block}
+
+/* ── Soldes ── */
+#page-absences .abs-balances{display:flex;flex-direction:column;gap:14px;max-height:420px;overflow-y:auto}
+#page-absences .abs-bal{display:flex;flex-direction:column;gap:6px}
+#page-absences .abs-bal-top{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-size:12.5px;
+}
+#page-absences .abs-bal-name{
+  font-weight:500;color:var(--m3-on-surface);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+#page-absences .abs-bal-v{
+  flex-shrink:0;color:var(--m3-on-surf-var);font-variant-numeric:tabular-nums;
+}
+#page-absences .abs-bal-v b{color:var(--m3-on-surface);font-weight:600}
+#page-absences .abs-bal-bar{
+  height:8px;border-radius:var(--m3-r-full);overflow:hidden;display:flex;
+  background:color-mix(in srgb,var(--m3-on-surface) 9%,transparent);
+}
+#page-absences .abs-bal-bar i{height:100%;transition:width .5s var(--m3-ease)}
+#page-absences .abs-bal-bar i.taken{background:var(--abs-conges)}
+/* Le prévisionnel (demandé, non validé) est hachuré : il pèse sur le
+   solde sans être encore acquis. */
+#page-absences .abs-bal-bar i.pending{
+  background:repeating-linear-gradient(-45deg,
+    var(--abs-conges) 0 2px, color-mix(in srgb,var(--abs-conges) 30%,transparent) 2px 6px);
+}
+#page-absences .abs-bal.over .abs-bal-v b{color:var(--m3-error)}
+
+/* ── Tableau ── */
+#page-absences .abs-tbl{width:100%;border-collapse:collapse;font-size:13px}
+#page-absences .abs-tbl th{
+  text-align:left;font-size:11px;font-weight:600;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--m3-on-surf-var);
+  padding:0 12px 10px;white-space:nowrap;
+}
+#page-absences .abs-tbl td{
+  padding:11px 12px;
+  border-top:1px solid color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  vertical-align:middle;
+}
+#page-absences .abs-tbl tr{transition:background .15s var(--m3-ease)}
+#page-absences .abs-tbl tbody tr:hover{background:color-mix(in srgb,var(--m3-on-surface) 4%,transparent);cursor:pointer}
+#page-absences .abs-type{
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+}
+#page-absences .abs-type i{width:8px;height:8px;border-radius:var(--m3-r-full);flex-shrink:0}
+#page-absences .abs-pill{
+  display:inline-block;padding:3px 10px;border-radius:var(--m3-r-full);
+  font-size:11px;font-weight:600;white-space:nowrap;
+}
+#page-absences .abs-pill.st-Demandée{
+  background:color-mix(in srgb,#e8710a 15%,transparent);color:#b45c05;
+}
+#page-absences .abs-pill.st-Validée{
+  background:color-mix(in srgb,#188038 15%,transparent);color:#146c30;
+}
+#page-absences .abs-pill.st-Refusée,
+#page-absences .abs-pill.st-Annulée{
+  background:color-mix(in srgb,var(--m3-on-surface) 10%,transparent);
+  color:var(--m3-on-surf-var);
+}
+[data-theme="dark"] #page-absences .abs-pill.st-Demandée{color:#f7ad5e}
+[data-theme="dark"] #page-absences .abs-pill.st-Validée{color:#7bd396}
+#page-absences .abs-days{font-variant-numeric:tabular-nums;font-weight:600}
+
+/* Préavis : vert = annoncé, ambre = tardif, rouge = pas prévenu.
+   Volontairement plus discret que le statut — le statut décide, le
+   préavis qualifie. Un préavis non renseigné reste neutre : c'est à
+   qualifier, pas une faute. */
+#page-absences .abs-notice{
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  font-size:11.5px;color:var(--m3-on-surf-var);
+}
+#page-absences .abs-notice::before{
+  content:'';width:7px;height:7px;border-radius:var(--m3-r-full);flex-shrink:0;
+  background:currentColor;
+}
+#page-absences .abs-notice.ok      {color:#188038}
+#page-absences .abs-notice.late    {color:#e8710a}
+#page-absences .abs-notice.ko      {color:var(--m3-error);font-weight:600}
+#page-absences .abs-notice.unknown {color:var(--m3-on-surf-var);opacity:.5}
+[data-theme="dark"] #page-absences .abs-notice.ok  {color:#7bd396}
+[data-theme="dark"] #page-absences .abs-notice.late{color:#f7ad5e}
+/* Pastille « non prévenu » dans les soldes : signale l'agent à revoir
+   sans le noyer dans une colonne de plus. */
+#page-absences .abs-bal-flag{
+  display:inline-flex;align-items:center;gap:4px;margin-left:8px;
+  padding:1px 7px;border-radius:var(--m3-r-full);
+  font-size:10px;font-weight:600;
+  color:var(--m3-error);
+  background:color-mix(in srgb,var(--m3-error) 12%,transparent);
+}
+#page-absences .abs-conflict-flag{
+  display:inline-flex;align-items:center;gap:4px;margin-left:8px;
+  font-size:10.5px;font-weight:600;color:var(--m3-error);
+}
+#page-absences .abs-empty{
+  text-align:center;padding:34px 16px;color:var(--m3-on-surf-var);font-size:13px;
+}
+
+/* Aperçu du décompte dans la modale */
+#page-absences-preview,
+.abs-preview{
+  border-radius:var(--m3-r-lg);padding:12px 14px;font-size:12.5px;
+  background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent);
+  color:var(--m3-on-surf-var);line-height:1.5;
+}
+.abs-preview b{color:var(--m3-on-surface);font-weight:600}
+.abs-preview .warn{color:var(--m3-error);font-weight:600}
+
+@media (max-width:1100px){
+  #page-absences .abs-grid{grid-template-columns:1fr}
+  #page-absences .abs-balances{max-height:none}
+}
+@media (max-width:640px){
+  #page-absences .abs-card{padding:18px 16px}
+  #page-absences .abs-cell{padding:4px}
+  #page-absences .abs-filters .filter-select{width:100%}
+}
+
+/* PAGE EXPORT : styles dans css/pages/rapports.css (onglet Exports). */
+
+/* ── CONTRÔLE ADMIN SUR « MY PERFORMANCE » ─────────────────────
+   Bandeau volontairement distinct du reste de la page : on regarde la
+   fiche de quelqu'un d'autre, cela doit se voir en permanence et ne
+   jamais se confondre avec sa propre note. */
+.myperf-admin-bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-bottom:14px;padding:9px 12px;border-radius:8px;
+  background:var(--ok-bg);border:1px solid var(--line);
+}
+.myperf-admin-l{
+  display:flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:600;color:var(--ok-fg);
+}
+.myperf-admin-bar .filter-select{min-width:190px}
+@media (max-width:640px){
+  .myperf-admin-bar .filter-select{width:100%}
+}
+
+/* ── ACTIONS GROUPÉES SUR LES ABSENCES ─────────────────────────
+   Barre d'action contextuelle : n'apparaît qu'avec une sélection. */
+#page-absences .abs-batch-bar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-bottom:10px;padding:8px 12px;border-radius:8px;
+  background:var(--ok-bg);border:1px solid var(--line);
+}
+#page-absences .abs-batch-n{font-size:12.5px;font-weight:600;margin-right:auto}
+#page-absences .abs-sel-col{width:34px;text-align:center}
+#page-absences .abs-sel-col input{cursor:pointer}
+

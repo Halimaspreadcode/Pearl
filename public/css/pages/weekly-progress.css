@@ -1,0 +1,679 @@
+/* ══════════════════════════════════════════════════════════
+   WEEKLY PROGRESS — refonte Material 3
+   La page répond à une seule question : « où en est-on cette
+   semaine, et qu'est-ce qui traîne ? ». La hiérarchie visuelle
+   suit ce parcours : semaine → chiffres cliquables → insight
+   → détail. Les jetons sont redéclarés localement (comme sur
+   le dashboard et les approbations) pour que le mode sombre
+   bascule sans JS.
+   ══════════════════════════════════════════════════════════ */
+#page-weekly-progress{
+  --m3-primary:        #4F6A85;
+  --m3-on-primary:     #FFFFFF;
+  --m3-primary-cont:   #E4EAF0;
+  --m3-on-primary-cont:#2F4A66;
+
+  --m3-surface:        #FCFBF8;
+  --m3-surf-1:         #F7F5F0;
+  --m3-surf-2:         #F0ECE5;
+  --m3-surf-3:         #E8E3DA;
+  --m3-on-surface:     #26251F;
+  --m3-on-surf-var:    #6D695F;
+  --m3-outline:        #CEC8BC;
+  --m3-outline-var:    #E6E1D7;
+
+  /* Sémantique de statut. Une seule échelle, réutilisée par les
+     tuiles, les cartes, le kanban et les graphes : la couleur veut
+     dire la même chose partout sur la page. */
+  --wp-plan:  #5F6368;  --wp-plan-cont:  #F1F3F4;
+  --wp-prog:  #B06000;  --wp-prog-cont:  #FEF7E0;
+  --wp-done:  #1E7B34;  --wp-done-cont:  #E6F4EA;
+  --wp-late:  #C7000B;  --wp-late-cont:  #FCE8E6;
+  --wp-info:  #1A73E8;  --wp-info-cont:  #E8F0FE;
+
+  /* Quadrants de la vue Rapport. Séparés des jetons de statut : ce
+     sont les couleurs de la slide, elles doivent rester reconnaissables
+     mais s'assombrir comme le reste en thème sombre. */
+  --wp-q-ok:   #1E8E3E;  --wp-q-ok-c:   #E6F4EA;
+  --wp-q-next: #1A73E8;  --wp-q-next-c: #E8F0FE;
+  --wp-q-risk: #C7000B;  --wp-q-risk-c: #FCE8E6;
+  --wp-q-help: #E8710A;  --wp-q-help-c: #FEF0E3;
+
+  --m3-r-xl:  28px;
+  --m3-r-lg:  20px;
+  --m3-r-md:  16px;
+  --m3-r-sm:  12px;
+  --m3-r-full:999px;
+  --m3-ease: cubic-bezier(.2,0,0,1);
+
+  color:var(--m3-on-surface);
+  font-feature-settings:"ss01" on,"cv05" on;
+}
+.main:has(#page-weekly-progress.active){background:#FFFFFF}
+[data-theme="dark"] .main:has(#page-weekly-progress.active){background:#000000}
+
+[data-theme="dark"] #page-weekly-progress{
+  --m3-primary:        #93AFCB;
+  --m3-on-primary:     #1A1A1A;
+  --m3-primary-cont:   #1C2734;
+  --m3-on-primary-cont:#BFD2E6;
+
+  --m3-surface:        #000000;
+  --m3-surf-1:         #0E0E10;
+  --m3-surf-2:         #151517;
+  --m3-surf-3:         #1F1F22;
+  --m3-on-surface:     #E3E3E3;
+  --m3-on-surf-var:    #9AA0A6;
+  --m3-outline:        #8E918F;
+  --m3-outline-var:    #333537;
+
+  --wp-plan:  #C4C7C5;  --wp-plan-cont:  #2A2B2C;
+  --wp-prog:  #FDD663;  --wp-prog-cont:  #2E2510;
+  --wp-done:  #81C995;  --wp-done-cont:  #0F2417;
+  --wp-late:  #F28B82;  --wp-late-cont:  #2C1614;
+  --wp-info:  #8AB4F8;  --wp-info-cont:  #101F35;
+
+  --wp-q-ok:   #81C995;  --wp-q-ok-c:   #0F2417;
+  --wp-q-next: #8AB4F8;  --wp-q-next-c: #101F35;
+  --wp-q-risk: #F28B82;  --wp-q-risk-c: #2C1614;
+  --wp-q-help: #FCAD70;  --wp-q-help-c: #2E1D0B;
+}
+
+/* ── En-tête ─────────────────────────────────────────────── */
+#page-weekly-progress .wp-header{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;margin-bottom:18px;
+}
+#page-weekly-progress .wp-title{
+  font-size:28px;font-weight:400;letter-spacing:-.4px;
+  color:var(--m3-on-surface);line-height:1.15;
+}
+#page-weekly-progress .wp-sub{
+  font-size:13px;color:var(--m3-on-surf-var);margin-top:3px;
+}
+#page-weekly-progress .wp-header-actions{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+
+/* Champ de recherche pilule, façon Google */
+#page-weekly-progress .wp-search{
+  display:flex;align-items:center;gap:9px;
+  height:44px;padding:0 8px 0 15px;min-width:250px;
+  background:var(--m3-surf-2);border-radius:var(--m3-r-full);
+  color:var(--m3-on-surf-var);
+  transition:background .18s var(--m3-ease),box-shadow .18s var(--m3-ease);
+}
+#page-weekly-progress .wp-search:focus-within{
+  background:var(--m3-surface);
+  box-shadow:0 1px 3px rgba(0,0,0,.14),0 4px 12px rgba(0,0,0,.08),
+             inset 0 0 0 1px var(--m3-outline-var);
+}
+#page-weekly-progress .wp-search svg{flex-shrink:0;opacity:.8}
+#page-weekly-progress .wp-search input{
+  border:none;background:none;outline:none;flex:1;min-width:0;
+  font:inherit;font-size:13.5px;color:var(--m3-on-surface);
+}
+#page-weekly-progress .wp-search input::placeholder{color:var(--m3-on-surf-var);opacity:.85}
+#page-weekly-progress .wp-search input::-webkit-search-cancel-button{display:none}
+#page-weekly-progress .wp-search-clear{
+  display:none;align-items:center;justify-content:center;
+  width:28px;height:28px;border:none;border-radius:50%;
+  background:none;color:var(--m3-on-surf-var);cursor:pointer;flex-shrink:0;
+  transition:background .15s var(--m3-ease);
+}
+#page-weekly-progress .wp-search-clear:hover{background:var(--m3-surf-3)}
+#page-weekly-progress .wp-search.has-value .wp-search-clear{display:flex}
+
+/* Action primaire : bouton étendu M3 */
+#page-weekly-progress .wp-fab{
+  display:inline-flex;align-items:center;gap:9px;
+  height:44px;padding:0 22px 0 18px;border:none;
+  border-radius:var(--m3-r-full);cursor:pointer;
+  background:var(--m3-primary);color:var(--m3-on-primary);
+  font:inherit;font-size:13.5px;font-weight:600;letter-spacing:.1px;
+  box-shadow:0 1px 3px rgba(0,0,0,.2),0 1px 2px rgba(0,0,0,.12);
+  transition:box-shadow .2s var(--m3-ease),filter .2s var(--m3-ease),transform .12s var(--m3-ease);
+}
+#page-weekly-progress .wp-fab:hover{
+  box-shadow:0 2px 6px rgba(0,0,0,.24),0 6px 16px rgba(0,0,0,.14);filter:brightness(1.06);
+}
+#page-weekly-progress .wp-fab:active{transform:scale(.97)}
+
+/* ── Barre de semaine ────────────────────────────────────── */
+#page-weekly-progress .wp-weekbar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-bottom:18px;
+}
+#page-weekly-progress .wp-weeknav{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;flex-shrink:0;
+  border:none;border-radius:50%;background:none;cursor:pointer;
+  color:var(--m3-on-surf-var);
+  transition:background .15s var(--m3-ease),color .15s var(--m3-ease);
+}
+#page-weekly-progress .wp-weeknav:hover{background:var(--m3-surf-2);color:var(--m3-on-surface)}
+#page-weekly-progress .wp-weeknav:active{background:var(--m3-surf-3)}
+
+#page-weekly-progress .wp-weekpick{
+  display:inline-flex;align-items:center;gap:10px;
+  height:40px;padding:0 16px;
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-full);
+  background:var(--m3-surface);cursor:pointer;
+  font:inherit;font-size:13.5px;font-weight:500;color:var(--m3-on-surface);
+  transition:background .15s var(--m3-ease),border-color .15s var(--m3-ease);
+}
+#page-weekly-progress .wp-weekpick:hover{background:var(--m3-surf-1);border-color:var(--m3-outline)}
+#page-weekly-progress .wp-weekpick svg{opacity:.7;flex-shrink:0}
+#page-weekly-progress .wp-weekpick-main{white-space:nowrap}
+#page-weekly-progress .wp-weekpick-tag{
+  font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  padding:2px 9px;border-radius:var(--m3-r-full);
+  background:var(--wp-info-cont);color:var(--wp-info);
+}
+#page-weekly-progress .wp-weekpick-tag:empty{display:none}
+#page-weekly-progress .wp-weekpick-tag.is-past{background:var(--m3-surf-2);color:var(--m3-on-surf-var)}
+#page-weekly-progress .wp-weekpick-tag.is-future{background:var(--wp-prog-cont);color:var(--wp-prog)}
+/* L'input date reste dans le flux pour que showPicker() s'ancre au
+   bon endroit, mais il est visuellement réduit à néant. */
+#page-weekly-progress .wp-datehidden{
+  width:0;height:0;padding:0;margin:0;border:0;opacity:0;pointer-events:none;
+}
+#page-weekly-progress .wp-today{
+  height:36px;padding:0 16px;border-radius:var(--m3-r-full);
+  border:1px solid var(--m3-outline-var);background:none;cursor:pointer;
+  font:inherit;font-size:12.5px;font-weight:600;color:var(--m3-on-surf-var);
+  transition:background .15s var(--m3-ease),color .15s var(--m3-ease),opacity .15s;
+}
+#page-weekly-progress .wp-today:hover{background:var(--m3-surf-2);color:var(--m3-on-surface)}
+/* Désactivé quand on y est déjà : un bouton qui ne fait rien doit
+   le dire avant d'être cliqué. */
+#page-weekly-progress .wp-today[disabled]{opacity:.4;pointer-events:none}
+#page-weekly-progress .wp-weekbar-spacer{flex:1;min-width:0}
+
+#page-weekly-progress .wp-select{
+  height:40px;padding:0 34px 0 14px;
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-full);
+  background:var(--m3-surface);cursor:pointer;appearance:none;
+  font:inherit;font-size:12.5px;font-weight:500;color:var(--m3-on-surface);
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235F6368'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:18px;
+  transition:background-color .15s var(--m3-ease),border-color .15s var(--m3-ease);
+}
+#page-weekly-progress .wp-select:hover{background-color:var(--m3-surf-1);border-color:var(--m3-outline)}
+[data-theme="dark"] #page-weekly-progress .wp-select{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239AA0A6'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+}
+
+/* ── Tuiles d'ensemble (= filtres) ───────────────────────── */
+#page-weekly-progress .wp-overview{
+  display:grid;grid-template-columns:minmax(210px,.9fr) repeat(4,1fr);
+  gap:12px;margin-bottom:16px;
+}
+#page-weekly-progress .wp-tile{
+  position:relative;display:flex;flex-direction:column;gap:2px;
+  padding:16px 18px;text-align:left;
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-lg);
+  background:var(--m3-surface);cursor:pointer;font:inherit;
+  transition:background .18s var(--m3-ease),border-color .18s var(--m3-ease),
+             box-shadow .18s var(--m3-ease),transform .12s var(--m3-ease);
+}
+#page-weekly-progress .wp-tile:hover{
+  background:var(--m3-surf-1);border-color:var(--m3-outline);
+  box-shadow:0 1px 3px rgba(0,0,0,.1),0 4px 12px rgba(0,0,0,.06);
+}
+#page-weekly-progress .wp-tile:active{transform:scale(.985)}
+#page-weekly-progress .wp-tile-k{
+  font-size:11px;font-weight:700;letter-spacing:.55px;text-transform:uppercase;
+  color:var(--m3-on-surf-var);display:flex;align-items:center;gap:6px;
+}
+#page-weekly-progress .wp-tile-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#page-weekly-progress .wp-tile-v{
+  font-size:30px;font-weight:400;line-height:1.1;color:var(--m3-on-surface);
+  font-variant-numeric:tabular-nums;
+}
+#page-weekly-progress .wp-tile-hint{font-size:11.5px;color:var(--m3-on-surf-var)}
+/* Tuile active = filtre appliqué. Le fond tonal suit la sémantique
+   du statut filtré, pas une couleur de sélection générique. */
+#page-weekly-progress .wp-tile.on{
+  border-color:transparent;
+  box-shadow:inset 0 0 0 2px var(--wp-c,var(--m3-primary));
+  background:var(--wp-cc,var(--m3-primary-cont));
+}
+#page-weekly-progress .wp-tile.on .wp-tile-k,
+#page-weekly-progress .wp-tile.on .wp-tile-v,
+#page-weekly-progress .wp-tile.on .wp-tile-hint{color:var(--wp-c,var(--m3-primary))}
+#page-weekly-progress .wp-tile.is-zero{opacity:.55}
+#page-weekly-progress .wp-tile.is-zero:hover{opacity:1}
+
+/* Tuile de tête : anneau de complétion. Le pourcentage est la
+   seule mesure qui compte pour un manager qui passe 5 secondes. */
+#page-weekly-progress .wp-tile-hero{
+  flex-direction:row;align-items:center;gap:16px;cursor:default;
+  background:var(--m3-surf-1);
+}
+#page-weekly-progress .wp-tile-hero:hover{transform:none;box-shadow:none;background:var(--m3-surf-1)}
+#page-weekly-progress .wp-ring{position:relative;width:66px;height:66px;flex-shrink:0}
+#page-weekly-progress .wp-ring svg{transform:rotate(-90deg);display:block}
+#page-weekly-progress .wp-ring circle{fill:none;stroke-linecap:round}
+#page-weekly-progress .wp-ring .wp-ring-bg{stroke:var(--m3-surf-3)}
+#page-weekly-progress .wp-ring .wp-ring-fg{
+  stroke:var(--wp-done);
+  transition:stroke-dashoffset .7s var(--m3-ease),stroke .3s var(--m3-ease);
+}
+#page-weekly-progress .wp-ring-label{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:600;color:var(--m3-on-surface);
+  font-variant-numeric:tabular-nums;
+}
+#page-weekly-progress .wp-hero-txt{min-width:0}
+#page-weekly-progress .wp-hero-k{
+  font-size:11px;font-weight:700;letter-spacing:.55px;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+#page-weekly-progress .wp-hero-v{font-size:15px;font-weight:600;color:var(--m3-on-surface);margin-top:2px}
+#page-weekly-progress .wp-hero-d{font-size:11.5px;color:var(--m3-on-surf-var);margin-top:2px}
+#page-weekly-progress .wp-delta{font-weight:700}
+#page-weekly-progress .wp-delta.up{color:var(--wp-done)}
+#page-weekly-progress .wp-delta.down{color:var(--wp-late)}
+
+/* ── Bandeau d'insight ───────────────────────────────────── */
+#page-weekly-progress .wp-insight{
+  display:flex;align-items:center;gap:13px;
+  padding:13px 18px;margin-bottom:16px;
+  border-radius:var(--m3-r-lg);
+  background:var(--wp-ic,var(--wp-info-cont));
+  color:var(--wp-if,var(--wp-info));
+  font-size:13px;line-height:1.45;
+}
+#page-weekly-progress .wp-insight svg{flex-shrink:0}
+#page-weekly-progress .wp-insight b{font-weight:700}
+#page-weekly-progress .wp-insight-act{
+  margin-left:auto;flex-shrink:0;
+  height:32px;padding:0 15px;border-radius:var(--m3-r-full);
+  border:1px solid currentColor;background:none;color:inherit;cursor:pointer;
+  font:inherit;font-size:12px;font-weight:600;
+  transition:background .15s var(--m3-ease);
+}
+#page-weekly-progress .wp-insight-act:hover{background:rgba(127,127,127,.16)}
+
+/* ── Barre de vues ───────────────────────────────────────── */
+#page-weekly-progress .wp-viewbar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px;
+}
+#page-weekly-progress .wp-tabs{
+  display:inline-flex;gap:3px;padding:3px;
+  background:var(--m3-surf-2);border-radius:var(--m3-r-full);
+}
+#page-weekly-progress .wp-tab{
+  display:inline-flex;align-items:center;gap:7px;
+  height:36px;padding:0 17px;border:none;border-radius:var(--m3-r-full);
+  background:none;cursor:pointer;font:inherit;
+  font-size:12.5px;font-weight:600;color:var(--m3-on-surf-var);
+  transition:background .18s var(--m3-ease),color .18s var(--m3-ease),box-shadow .18s var(--m3-ease);
+}
+#page-weekly-progress .wp-tab svg{opacity:.85;flex-shrink:0}
+#page-weekly-progress .wp-tab:hover{color:var(--m3-on-surface)}
+#page-weekly-progress .wp-tab.active{
+  background:var(--m3-surface);color:var(--m3-on-surface);
+  box-shadow:0 1px 2px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.06);
+}
+[data-theme="dark"] #page-weekly-progress .wp-tab.active{background:var(--m3-surf-3)}
+
+/* Puces de filtre actif : un filtre invisible est un bug perçu. */
+#page-weekly-progress .wp-activefilters{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#page-weekly-progress .wp-fchip{
+  display:inline-flex;align-items:center;gap:7px;
+  height:30px;padding:0 8px 0 13px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2);color:var(--m3-on-surface);
+  font-size:12px;font-weight:500;
+}
+#page-weekly-progress .wp-fchip button{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border:none;border-radius:50%;
+  background:none;color:var(--m3-on-surf-var);cursor:pointer;
+  transition:background .15s var(--m3-ease);
+}
+#page-weekly-progress .wp-fchip button:hover{background:var(--m3-surf-3);color:var(--m3-on-surface)}
+#page-weekly-progress .wp-fclear{
+  border:none;background:none;cursor:pointer;font:inherit;
+  font-size:12px;font-weight:600;color:var(--m3-primary);
+  padding:0 6px;text-decoration:underline;text-underline-offset:2px;
+}
+
+/* ── Carte d'item (partagée liste + tableau) ─────────────── */
+#page-weekly-progress .wp-card{
+  position:relative;display:flex;align-items:flex-start;gap:12px;
+  padding:13px 14px;
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-md);
+  background:var(--m3-surface);cursor:pointer;
+  transition:background .16s var(--m3-ease),border-color .16s var(--m3-ease),
+             box-shadow .16s var(--m3-ease),transform .12s var(--m3-ease),opacity .2s;
+}
+#page-weekly-progress .wp-card:hover{
+  border-color:var(--m3-outline);
+  box-shadow:0 1px 3px rgba(0,0,0,.12),0 4px 14px rgba(0,0,0,.07);
+  transform:translateY(-1px);
+}
+[data-theme="dark"] #page-weekly-progress .wp-card{background:var(--m3-surf-1);border-color:transparent}
+[data-theme="dark"] #page-weekly-progress .wp-card:hover{background:var(--m3-surf-2)}
+/* Le retard ne colore pas la carte : dans la vue Analyse, TOUTES les
+   cartes sont en retard — un contour rouge partout ne distingue plus
+   rien. La pastille « Late · wk of … » de la carte le dit ; pas de
+   liseré latéral en plus. */
+#page-weekly-progress .wp-card.is-saving{opacity:.5;pointer-events:none}
+
+/* Case à cocher = action la plus fréquente (« c'est fait »).
+   Au repos elle est neutre et discrète : c'est une case, pas un
+   voyant d'alerte. Seul « fait » se colore, parce que c'est le seul
+   état qui mérite d'être vu de loin. Le statut, lui, est déjà écrit
+   en toutes lettres dans la puce à côté. */
+#page-weekly-progress .wp-check{
+  flex-shrink:0;width:20px;height:20px;margin-top:2px;
+  border:1.5px solid var(--m3-outline);border-radius:50%;
+  background:none;cursor:pointer;padding:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:transparent;
+  transition:background .18s var(--m3-ease),border-color .18s var(--m3-ease),color .18s var(--m3-ease);
+}
+#page-weekly-progress .wp-check:hover{
+  border-color:var(--wp-done);color:color-mix(in srgb,var(--wp-done) 45%,transparent);
+}
+/* « En cours » : un arc partiel sur le contour, sans remplissage.
+   On lit « commencé, pas fini » sans qu'un disque jaune n'attire
+   l'œil avant le texte de la tâche. */
+#page-weekly-progress .wp-check.s-prog{
+  border-color:var(--m3-outline-var);
+  background:conic-gradient(var(--wp-prog) 0 50%,transparent 50% 100%);
+  -webkit-mask:radial-gradient(circle,transparent 0 6px,#000 6.5px);
+          mask:radial-gradient(circle,transparent 0 6px,#000 6.5px);
+}
+#page-weekly-progress .wp-check.s-done{
+  border-color:var(--wp-done);background:var(--wp-done);color:#fff;
+}
+#page-weekly-progress .wp-card-main{flex:1;min-width:0}
+#page-weekly-progress .wp-card-txt{
+  font-size:13.5px;line-height:1.5;color:var(--m3-on-surface);
+  overflow-wrap:anywhere;
+}
+#page-weekly-progress .wp-card.s-done .wp-card-txt{
+  color:var(--m3-on-surf-var);text-decoration:line-through;
+  text-decoration-color:var(--m3-outline);
+}
+#page-weekly-progress .wp-card-meta{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;
+  font-size:11.5px;color:var(--m3-on-surf-var);
+}
+#page-weekly-progress .wp-av{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  font-size:9.5px;font-weight:700;letter-spacing:.2px;color:#fff;
+}
+#page-weekly-progress .wp-meta-owner{display:inline-flex;align-items:center;gap:6px;font-weight:500}
+#page-weekly-progress .wp-sep{opacity:.45}
+#page-weekly-progress .wp-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2px 9px;border-radius:var(--m3-r-full);
+  font-size:10.5px;font-weight:700;letter-spacing:.3px;
+  background:var(--m3-surf-2);color:var(--m3-on-surf-var);
+}
+#page-weekly-progress .wp-pill.s-plan{background:var(--wp-plan-cont);color:var(--wp-plan)}
+#page-weekly-progress .wp-pill.s-prog{background:var(--wp-prog-cont);color:var(--wp-prog)}
+#page-weekly-progress .wp-pill.s-done{background:var(--wp-done-cont);color:var(--wp-done)}
+#page-weekly-progress .wp-pill.s-late{background:var(--wp-late-cont);color:var(--wp-late)}
+#page-weekly-progress .wp-pill.s-site{background:var(--wp-info-cont);color:var(--wp-info)}
+
+/* Actions agreed in review: a reserved purple that competes with no
+   status colour (green/orange/red/blue are already taken). These tasks are
+   commitments made in front of the manager and count towards the score —
+   they must not be mistaken for an ordinary weekly task. */
+#page-weekly-progress .wp-pill.s-o2o{background:rgba(147,52,230,.12);color:#7627BB}
+[data-theme="dark"] #page-weekly-progress .wp-pill.s-o2o{
+  background:rgba(209,153,255,.16);color:#D1A3FF;
+}
+/* No coloured left rule on review cards: the "Review" pill and the lock
+   already identify them, and a bar down the left of every such card made
+   the board read as an alert list. */
+
+/* ── Tâche attribuée par l'admin ────────────────────────────
+   Elle n'est pas de la même nature que ce que le FO se note lui-même :
+   c'est une consigne reçue. La carte prend donc une surface propre et
+   porte, en toutes lettres, qui l'a donnée. Aucun liseré vertical : la
+   pastille « Assigned » et le cadenas suffisent, et la teinte de fond
+   se voit même quand les cartes sont serrées en vue Tableau. */
+#page-weekly-progress .wp-card.is-adm{
+  background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-weekly-progress .wp-card.is-adm{background:var(--m3-surf-2)}
+#page-weekly-progress .wp-card.is-adm:hover{background:var(--m3-surf-2)}
+[data-theme="dark"] #page-weekly-progress .wp-card.is-adm:hover{background:var(--m3-surf-3)}
+
+/* Pastille d'origine : le bleu d'information, distinct du violet des
+   actions d'entretien et des couleurs de statut déjà prises. */
+#page-weekly-progress .wp-pill.s-adm{
+  background:rgba(26,115,232,.12);color:#1657B8;
+}
+[data-theme="dark"] #page-weekly-progress .wp-pill.s-adm{
+  background:rgba(138,180,248,.18);color:#A8C7FA;
+}
+
+/* Priorité posée par l'admin. Seul « High » se colore vraiment : si les
+   trois niveaux criaient, aucun ne dirait plus rien. */
+#page-weekly-progress .wp-pill.s-prio-high{
+  background:color-mix(in srgb,var(--wp-late) 14%,transparent);color:var(--wp-late);
+}
+#page-weekly-progress .wp-pill.s-prio-medium{
+  background:color-mix(in srgb,var(--wp-prog) 16%,transparent);color:var(--wp-prog);
+}
+#page-weekly-progress .wp-pill.s-prio-low{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surf-var);
+}
+
+/* Consigne jointe : le texte de la tâche dit quoi, la consigne dit
+   comment. Elle vit sous l'intitulé, en retrait, pour ne pas devenir un
+   second titre. */
+#page-weekly-progress .wp-card-note{
+  font-size:12px;line-height:1.55;color:var(--m3-on-surf-var);
+  margin-top:5px;padding-left:10px;
+  border-left:2px solid var(--m3-outline-var);
+}
+/* Signature : qui a donné la tâche, et le fait que l'intitulé est figé.
+   Écrit plutôt que laissé à deviner d'un cadenas isolé. */
+#page-weekly-progress .wp-card-from{
+  display:flex;align-items:center;gap:6px;margin-top:7px;
+  font-size:11px;color:var(--m3-on-surf-var);
+}
+#page-weekly-progress .wp-card-from svg{opacity:.65;flex:none}
+#page-weekly-progress .wp-due-late{color:var(--wp-late);font-weight:500}
+
+/* Cadenas en lieu et place des actions de ligne. Il occupe la même
+   gouttière que les trois boutons qu'il remplace : les cartes gardent
+   leur alignement, verrouillées ou non. */
+#page-weekly-progress .wp-lockmark{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  color:var(--m3-on-surf-var);opacity:.55;cursor:help;
+}
+#page-weekly-progress .wp-card.is-locked{cursor:pointer}
+#page-weekly-progress .wp-card.is-locked .wp-card-acts{opacity:1}
+
+/* Bandeau du panneau d'édition : d'où vient la tâche, et ce qui reste
+   modifiable. Il ouvre le formulaire — la première chose lue avant de
+   buter sur un champ qui ne répond pas. */
+.wp-locknote{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:14px 16px;margin-bottom:18px;border-radius:12px;
+  background:#E8F0FE;color:#1657B8;
+}
+[data-theme="dark"] .wp-locknote{background:rgba(138,180,248,.14);color:#A8C7FA}
+.wp-locknote svg{flex:none;margin-top:1px}
+.wp-locknote-t{font-size:13px;line-height:1.5}
+.wp-locknote-t b{font-weight:600}
+.wp-locknote-d{font-size:11.5px;line-height:1.55;opacity:.82;margin-top:3px}
+.wp-locknote-i{
+  font-size:12px;line-height:1.55;margin-top:8px;padding:8px 10px;
+  border-radius:8px;background:rgba(255,255,255,.55);
+}
+[data-theme="dark"] .wp-locknote-i{background:rgba(0,0,0,.24)}
+/* Champ figé : le fond dit « lecture seule » sans passer par disabled,
+   qui aurait sorti le texte du flux de sélection et empêché de le
+   copier. */
+#progress-form .form-control.is-locked{
+  background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surf-var);
+  cursor:default;
+}
+#progress-form .form-control.is-locked:focus{box-shadow:none;border-color:var(--m3-outline-var)}
+
+/* Actions au survol : présentes sans encombrer au repos. */
+#page-weekly-progress .wp-card-acts{
+  display:flex;gap:2px;flex-shrink:0;align-self:flex-start;
+  opacity:0;transition:opacity .16s var(--m3-ease);
+}
+#page-weekly-progress .wp-card:hover .wp-card-acts,
+#page-weekly-progress .wp-card:focus-within .wp-card-acts{opacity:1}
+@media (hover:none){#page-weekly-progress .wp-card-acts{opacity:1}}
+#page-weekly-progress .wp-iact{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border:none;border-radius:50%;
+  background:none;color:var(--m3-on-surf-var);cursor:pointer;
+  transition:background .15s var(--m3-ease),color .15s var(--m3-ease);
+}
+#page-weekly-progress .wp-iact:hover{background:var(--m3-surf-2);color:var(--m3-on-surface)}
+#page-weekly-progress .wp-iact.danger:hover{background:var(--wp-late-cont);color:var(--wp-late)}
+
+/* ── Vue Liste : groupée par FO ──────────────────────────── */
+#page-weekly-progress .wp-list{display:flex;flex-direction:column;gap:22px}
+#page-weekly-progress .wp-group-head{
+  display:flex;align-items:center;gap:11px;margin-bottom:10px;
+}
+#page-weekly-progress .wp-group-title{font-size:13.5px;font-weight:600;color:var(--m3-on-surface)}
+#page-weekly-progress .wp-group-count{
+  font-size:11px;font-weight:700;padding:2px 9px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2);color:var(--m3-on-surf-var);
+}
+/* Mini-barre de complétion par FO : compare les FO entre eux sans
+   avoir à compter les cartes. */
+#page-weekly-progress .wp-group-bar{
+  flex:1;max-width:180px;height:6px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-3);overflow:hidden;
+}
+#page-weekly-progress .wp-group-bar i{
+  display:block;height:100%;border-radius:var(--m3-r-full);
+  background:var(--wp-done);transition:width .6s var(--m3-ease);
+}
+#page-weekly-progress .wp-group-pct{
+  font-size:11.5px;font-weight:600;color:var(--m3-on-surf-var);
+  font-variant-numeric:tabular-nums;min-width:32px;text-align:right;
+}
+#page-weekly-progress .wp-group-items{display:flex;flex-direction:column;gap:8px}
+
+/* ── Vue Tableau (kanban) ────────────────────────────────── */
+#page-weekly-progress .wp-board{
+  display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));
+  gap:14px;align-items:start;
+}
+#page-weekly-progress .wp-col{
+  display:flex;flex-direction:column;
+  border-radius:var(--m3-r-lg);background:var(--m3-surf-1);
+  padding:12px;min-height:140px;
+  border:2px dashed transparent;
+  transition:background .18s var(--m3-ease),border-color .18s var(--m3-ease);
+}
+/* Cible de dépôt : le retour visuel doit être sans ambiguïté,
+   sinon le glisser-déposer donne l'impression d'être cassé. */
+#page-weekly-progress .wp-col.drop{
+  background:var(--wp-cc,var(--m3-surf-2));border-color:var(--wp-c,var(--m3-primary));
+}
+#page-weekly-progress .wp-col-head{
+  display:flex;align-items:center;gap:9px;padding:2px 4px 12px;
+}
+#page-weekly-progress .wp-col-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+#page-weekly-progress .wp-col-title{
+  flex:1;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+#page-weekly-progress .wp-col-count{
+  font-size:11px;font-weight:700;padding:2px 9px;border-radius:var(--m3-r-full);
+  background:var(--m3-surface);color:var(--m3-on-surf-var);
+  border:1px solid var(--m3-outline-var);
+}
+[data-theme="dark"] #page-weekly-progress .wp-col-count{background:var(--m3-surf-3);border-color:transparent}
+#page-weekly-progress .wp-col-items{display:flex;flex-direction:column;gap:8px}
+#page-weekly-progress .wp-card.dragging{opacity:.4;transform:rotate(1.5deg) scale(.98)}
+#page-weekly-progress .wp-card[draggable="true"]{cursor:grab}
+#page-weekly-progress .wp-card[draggable="true"]:active{cursor:grabbing}
+#page-weekly-progress .wp-col-empty{
+  padding:20px 10px;text-align:center;
+  font-size:12px;color:var(--m3-on-surf-var);
+  border:1px dashed var(--m3-outline-var);border-radius:var(--m3-r-md);
+}
+
+/* ── Vue Tendance ────────────────────────────────────────── */
+#page-weekly-progress .wp-panel{
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-lg);
+  background:var(--m3-surface);padding:20px 22px;
+}
+[data-theme="dark"] #page-weekly-progress .wp-panel{background:var(--m3-surf-1);border-color:transparent}
+#page-weekly-progress .wp-panel-head{margin-bottom:18px}
+#page-weekly-progress .wp-panel-t{font-size:15px;font-weight:600;color:var(--m3-on-surface)}
+#page-weekly-progress .wp-panel-s{font-size:12.5px;color:var(--m3-on-surf-var);margin-top:3px}
+#page-weekly-progress .wp-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+#page-weekly-progress .wp-trend{
+  display:flex;align-items:flex-end;gap:14px;
+  height:190px;padding-top:8px;
+}
+#page-weekly-progress .wp-tcol{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;
+  height:100%;justify-content:flex-end;cursor:pointer;
+}
+#page-weekly-progress .wp-tstack{
+  width:100%;max-width:56px;display:flex;flex-direction:column-reverse;
+  border-radius:var(--m3-r-sm);overflow:hidden;
+  background:var(--m3-surf-2);
+  transition:transform .18s var(--m3-ease),box-shadow .18s var(--m3-ease);
+}
+#page-weekly-progress .wp-tcol:hover .wp-tstack{transform:translateY(-3px);box-shadow:0 4px 14px rgba(0,0,0,.12)}
+#page-weekly-progress .wp-tcol.now .wp-tstack{box-shadow:0 0 0 2px var(--m3-primary)}
+#page-weekly-progress .wp-tseg{transition:height .6s var(--m3-ease)}
+#page-weekly-progress .wp-tlabel{
+  font-size:11px;color:var(--m3-on-surf-var);text-align:center;line-height:1.3;
+}
+#page-weekly-progress .wp-tcol.now .wp-tlabel{color:var(--m3-on-surface);font-weight:700}
+#page-weekly-progress .wp-tpct{
+  font-size:12.5px;font-weight:700;color:var(--m3-on-surface);
+  font-variant-numeric:tabular-nums;
+}
+#page-weekly-progress .wp-legend{
+  display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;
+  padding-top:14px;border-top:1px solid var(--m3-outline-var);
+}
+#page-weekly-progress .wp-legend span{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:12px;color:var(--m3-on-surf-var);
+}
+#page-weekly-progress .wp-legend i{width:10px;height:10px;border-radius:3px;display:block}
+
+/* ── Vue Analyse ─────────────────────────────────────────── */
+#page-weekly-progress .wp-rank{display:flex;flex-direction:column;gap:11px}
+#page-weekly-progress .wp-rank-row{
+  display:grid;grid-template-columns:26px 1fr 130px 46px;
+  align-items:center;gap:11px;cursor:pointer;padding:3px 4px;
+  border-radius:var(--m3-r-sm);
+  transition:background .15s var(--m3-ease);
+}
+#page-weekly-progress .wp-rank-row:hover{background:var(--m3-surf-2)}
+#page-weekly-progress .wp-rank-name{
+  font-size:13px;color:var(--m3-on-surface);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#page-weekly-progress .wp-rank-bar{
+  height:8px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-3);overflow:hidden;display:flex;
+}
+#page-weekly-progress .wp-rank-bar i{display:block;height:100%;transition:width .6s var(--m3-ease)}
+#page-weekly-progress .wp-rank-n{
+  font-size:12px;font-weight:600;color:var(--m3-on-surf-var);
+  text-align:right;font-variant-numeric:tabular-nums;
+}
+

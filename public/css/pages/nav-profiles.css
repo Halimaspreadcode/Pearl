@@ -1,0 +1,250 @@
+/* ══════════════════════════════════════════════════════════════
+   VUES PAR PROFIL (Admin › Vues par profil)
+   ══════════════════════════════════════════════════════════════ */
+#page-cfg-vues .gsla-card{max-width:1100px}
+.nvp-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px}
+.nvp-tab{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;
+  border-radius:var(--m3-r-full,999px);border:1px solid var(--m3-outline-var,#E3E3E3);
+  background:transparent;font:inherit;font-size:13px;color:var(--m3-on-surf-var,var(--mute));
+}
+.nvp-tab:hover{background:var(--m3-surf-1)}
+.nvp-tab.is-on{
+  background:var(--m3-primary-cont);border-color:var(--m3-primary);
+  color:var(--m3-on-primary-cont);font-weight:600;
+}
+.nvp-tab span{
+  font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;
+  background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surf-var,var(--mute));
+}
+.nvp-tab.is-on span{background:var(--m3-primary);color:#fff}
+
+.nvp-state{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:11px 14px;margin-bottom:18px;border-radius:12px;
+  background:var(--m3-surf-1);font-size:12.5px;color:var(--m3-on-surf-var,var(--mute));
+}
+.nvp-badge{
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;
+  background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surf-var,var(--mute));
+}
+.nvp-badge.is-on{background:var(--m3-primary-cont);color:var(--m3-on-primary-cont)}
+.nvp-mini{
+  margin-left:auto;padding:5px 12px;cursor:pointer;border-radius:999px;
+  border:1px solid var(--m3-outline-var,#E3E3E3);background:transparent;
+  font:inherit;font-size:11.5px;font-weight:600;color:var(--m3-primary);
+}
+.nvp-mini:hover{background:var(--m3-primary-cont)}
+
+/* Chaque groupe est une carte à part, bornée en largeur : en grille
+   `auto-fit` les cinq groupes s'étalaient sur toute la largeur, et les
+   deux derniers — Reporting et Outils — finissaient hors champ à droite
+   ou sous la ligne de flottaison. On les a cherchés deux fois en croyant
+   qu'ils manquaient. */
+.nvp-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,240px));
+  gap:18px 22px;justify-content:start;
+}
+.nvp-grp{min-width:0}
+.nvp-grp-h{
+  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  padding-bottom:7px;margin-bottom:5px;border-bottom:1px solid var(--m3-outline-var,#E3E3E3);
+}
+.nvp-grp-t{
+  font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--m3-on-surf-var,var(--mute));
+}
+.nvp-grp-a{display:flex;gap:4px}
+.nvp-grp-a button{
+  border:none;background:transparent;cursor:pointer;font:inherit;
+  font-size:10.5px;color:var(--m3-primary);padding:2px 4px;border-radius:4px;
+}
+.nvp-grp-a button:hover{background:var(--m3-primary-cont)}
+.nvp-row{
+  display:flex;align-items:center;gap:9px;padding:6px 6px;border-radius:7px;
+  cursor:pointer;font-size:13px;color:var(--m3-on-surface,var(--dark));
+}
+.nvp-row:hover{background:var(--m3-surf-1)}
+.nvp-row input{cursor:pointer;flex-shrink:0}
+.nvp-row.is-fixed{cursor:default;opacity:.75}
+.nvp-row.is-fixed:hover{background:transparent}
+.nvp-row-l{flex:1;min-width:0}
+.nvp-fixed{
+  font-size:10px;color:var(--m3-on-surf-var,var(--mute));
+  background:var(--m3-surf-2,#F1F3F4);padding:1px 7px;border-radius:999px;
+}
+
+/* ── My Performance : rappel de dépassement ──
+   Posé avant le score. Un objectif dépassé n'a pas à se chercher au bas
+   de la page, dans le repli de sa propre carte. Fond teinté plutôt que
+   filet latéral : c'est un bloc unique, il n'a pas besoin d'être rangé
+   dans une famille de cartes. */
+.myperf-late{
+  display:flex;gap:13px;align-items:flex-start;
+  padding:15px 17px;margin-bottom:14px;border-radius:14px;
+  background:var(--red-l,#FCE8E6);border:1px solid rgba(199,0,11,.22);
+}
+[data-theme="dark"] .myperf-late{background:#2A1113;border-color:rgba(255,120,120,.24)}
+.myperf-late.is-warn{background:#FEF7E0;border-color:rgba(230,81,0,.22)}
+[data-theme="dark"] .myperf-late.is-warn{background:#2A1F08;border-color:rgba(251,188,4,.24)}
+.myperf-late-ico{color:var(--red);flex-shrink:0;margin-top:1px}
+.myperf-late.is-warn .myperf-late-ico{color:#E65100}
+.myperf-late-body{min-width:0;flex:1}
+.myperf-late-t{font-size:14.5px;font-weight:700;color:var(--dark);margin-bottom:5px}
+[data-theme="dark"] .myperf-late-t{color:#fff}
+.myperf-late-l{margin:0 0 7px;padding-left:18px;font-size:12.5px;line-height:1.7;color:var(--dark)}
+[data-theme="dark"] .myperf-late-l{color:#EDEDED}
+.myperf-late-d{font-size:12px;line-height:1.55;color:var(--dark);opacity:.8}
+[data-theme="dark"] .myperf-late-d{color:#EDEDED}
+
+/* Échéance dépassée sur la carte d'objectif de l'agent */
+.mo-due.is-late{
+  background:var(--red-l,#FCE8E6)!important;color:var(--red)!important;font-weight:600;
+}
+[data-theme="dark"] .mo-due.is-late{background:#2A1113!important;color:#FF8A80!important}
+.mo-step-d.is-late{color:var(--red);font-weight:600;cursor:help}
+
+/* Reprise du plan trimestriel, depuis le profil O2O */
+.o2os-obj-cta{
+  display:inline-block;margin-left:2px;padding:4px 11px;cursor:pointer;
+  border-radius:999px;border:1px solid var(--m3-primary);background:transparent;
+  font:inherit;font-size:11.5px;font-weight:600;color:var(--m3-primary);
+}
+.o2os-obj-cta:hover{background:var(--m3-primary-cont)}
+
+/* Provenance de la liste d'objectifs du profil O2O. Les deux modèles
+   coexistent le temps de la bascule : sans cette ligne, rien ne disait
+   si l'on regardait le plan de départ ou ce que l'agent suit vraiment. */
+.o2os-obj-src{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin:-4px 0 12px;font-size:11.5px;color:var(--mute);
+}
+.o2os-obj-src small{font-size:11.5px}
+.o2os-obj-steps{display:block;font-size:10.5px;color:var(--mute);margin-top:2px}
+.o2os-obj-flag{
+  display:block;font-size:10.5px;color:#E65100;margin-top:3px;cursor:help;
+}
+/* ── My Performance : commentaires du manager ──
+   La note arrivait sans les mots. Les commentaires sont posés juste
+   après le détail chiffré, parce qu'ils l'expliquent. */
+.myperf-cmts{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+.myperf-cmt{
+  padding:11px 13px;border-radius:11px;background:var(--bg2,#F8F9FA);
+  border:1px solid var(--line);
+}
+[data-theme="dark"] .myperf-cmt{background:var(--m3-surf-2);border-color:transparent}
+.myperf-cmt-h{display:flex;align-items:baseline;gap:9px;margin-bottom:5px}
+.myperf-cmt-c{
+  font-size:10.5px;font-weight:700;letter-spacing:.3px;padding:2px 8px;
+  border-radius:999px;background:var(--m3-primary-cont);color:var(--m3-on-primary-cont);
+}
+.myperf-cmt-c.is-gen{background:var(--m3-surf-2,#F1F3F4);color:var(--gray)}
+[data-theme="dark"] .myperf-cmt-c.is-gen{background:var(--m3-surf-3)}
+.myperf-cmt-d{font-size:10.5px;color:var(--mute);margin-left:auto}
+.myperf-cmt-t{font-size:12.5px;line-height:1.6;color:var(--dark)}
+[data-theme="dark"] .myperf-cmt-t{color:#EDEDED}
+
+/* ── My Performance : actions convenues ── */
+.myperf-act-warn{color:var(--red);font-weight:600}
+.myperf-acts{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column}
+.myperf-act{
+  display:flex;align-items:baseline;gap:10px;padding:9px 2px;
+  border-top:1px solid var(--line);font-size:12.5px;
+}
+.myperf-act:first-child{border-top:none}
+[data-theme="dark"] .myperf-act{border-top-color:rgba(255,255,255,.07)}
+.myperf-act-m{flex:none;width:14px;text-align:center;color:var(--mute);font-size:12px}
+.myperf-act.is-done .myperf-act-m{color:var(--ok-fg)}
+.myperf-act.is-late .myperf-act-m{color:var(--red)}
+.myperf-act-t{flex:1;min-width:0;line-height:1.5;color:var(--dark)}
+[data-theme="dark"] .myperf-act-t{color:#EDEDED}
+.myperf-act.is-done .myperf-act-t{color:var(--gray);text-decoration:line-through}
+.myperf-act-d{
+  flex:none;text-align:right;font-size:10.5px;color:var(--mute);
+  font-variant-numeric:tabular-nums;
+}
+.myperf-act.is-late .myperf-act-d{color:var(--red);font-weight:600}
+.myperf-act-d em{display:block;font-style:normal;font-size:10px;opacity:.75}
+
+/* ── Vues par profil : pages réservées ── */
+.nvp-tab-res{margin-left:8px}
+.nvp-res{border-radius:8px}
+.nvp-res.is-on{background:var(--m3-surf-1);padding-bottom:8px;margin:2px 0}
+[data-theme="dark"] .nvp-res.is-on{background:var(--m3-surf-2)}
+.nvp-res-n{
+  font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;
+  background:var(--m3-primary);color:#fff;
+}
+.nvp-res-warn{font-size:10.5px;color:#E65100;font-weight:600}
+.nvp-res-body{padding:0 10px 4px 32px}
+.nvp-res-ids{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.nvp-res-id{
+  display:inline-flex;align-items:center;gap:5px;padding:2px 4px 2px 9px;
+  border-radius:999px;background:var(--m3-primary-cont);color:var(--m3-on-primary-cont);
+  font-size:11.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+.nvp-res-id button{
+  border:none;background:transparent;cursor:pointer;font:inherit;font-size:13px;
+  line-height:1;color:inherit;opacity:.6;padding:0 3px;
+}
+.nvp-res-id button:hover{opacity:1}
+.nvp-res-none{font-size:11.5px;color:var(--mute);font-style:italic}
+.nvp-res-add{display:flex;gap:6px;align-items:center}
+.nvp-res-add .form-control{flex:1;min-width:0;font-size:12px;height:30px}
+.nvp-res-add .nvp-mini{margin-left:0;flex-shrink:0}
+
+/* Un titre de groupe visible même quand il ne porte qu'une entrée
+   (Outils → Analyseur) : sans fond ni filet il se confondait avec la
+   liste au-dessus. */
+.nvp-grp{
+  break-inside:avoid;padding:12px 14px;border-radius:10px;
+  background:var(--m3-surf-1);align-self:start;
+}
+[data-theme="dark"] .nvp-grp{background:var(--m3-surf-2)}
+.nvp-grp-h{border-bottom-color:var(--m3-outline-var,#E3E3E3)}
+.nvp-grp-t em{
+  font-style:normal;font-size:10px;font-weight:600;margin-left:7px;
+  padding:1px 6px;border-radius:999px;letter-spacing:0;
+  background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surf-var,var(--mute));
+}
+[data-theme="dark"] .nvp-grp-t em{background:var(--m3-surf-3)}
+/* Nom d'usage d'une page dont le libellé diffère du nom interne. */
+.nvp-alias{
+  display:block;font-style:normal;font-size:10.5px;
+  color:var(--m3-on-surf-var,var(--mute));opacity:.8;
+}
+
+/* Sessions d'objectifs passées : chaque ligne porte son bouton
+   d'export, le bilan se relit longtemps après la clôture. */
+#page-cfg-perf .or-sess-past-t{font-size:12px;font-weight:600;color:var(--mute);margin-bottom:6px}
+#page-cfg-perf .or-sess-past-i{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:5px 0;font-size:13px;
+}
+#page-cfg-perf .or-sess-past-d{color:var(--mute);font-size:11.5px}
+/* Historique des sessions d'objectifs. La session ouverte est mise en
+   avant par un liseré : c'est celle qui porte le trimestre en cours. */
+#page-cfg-perf .os-list{display:flex;flex-direction:column;gap:2px;margin-top:12px}
+#page-cfg-perf .os-row{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 12px;border-radius:8px;background:var(--m3-surf-2,transparent);
+  border-bottom:1px solid var(--line);
+}
+#page-cfg-perf .os-row:last-child{border-bottom:none}
+#page-cfg-perf .os-row.is-open{background:color-mix(in srgb,var(--ok-fg) 7%,transparent);border-radius:12px}
+#page-cfg-perf .os-name{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+#page-cfg-perf .os-meta{font-size:11.5px;color:var(--mute);margin-top:2px}
+#page-cfg-perf .os-state{
+  font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:9px;
+  background:color-mix(in srgb,var(--mute) 18%,transparent);color:var(--mute);
+}
+#page-cfg-perf .os-state.os-open{background:var(--ok-bg);color:var(--ok-fg)}
+@media (max-width:640px){
+  #page-cfg-perf .os-row{flex-direction:column;align-items:stretch}
+}
+#page-cfg-perf .os-actions{display:flex;gap:6px;flex-shrink:0}
+
+.nvp-grp-n{margin:2px 0 8px;font-size:11.5px;line-height:1.45;color:var(--m3-on-surf-var,#6B6E76)}
+/* Compteur de l'onglet actif : lisible sur la pilule noire (blanche en sombre). */
+.nvp-tab.is-on span{background:rgba(255,255,255,.18)!important;color:inherit!important}
+[data-theme="dark"] .nvp-tab.is-on span{background:rgba(0,0,0,.12)!important}

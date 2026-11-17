@@ -1,0 +1,483 @@
+/* ── Mes objectifs ────────────────────────────────────────────
+   L'agent saisit, l'admin approuve. Toute la charge de la mise en forme
+   porte sur une distinction : ce qui est en vigueur et ce qui attend
+   une approbation ne doivent jamais se confondre. D'où un seul motif,
+   `.mo-pend`, réutilisé pour l'intitulé, les KPIs et les jalons. */
+/* Surfaces locales. En sombre, `--white` et `--bg2` valent tous deux
+   #111 : la carte, ses lignes et le formulaire se confondaient avec le
+   fond de page, d'où un bloc entièrement plat où seuls des filets
+   marquaient les limites. On pose donc trois niveaux explicites —
+   carte, corps déplié, ligne — qui tiennent dans les deux thèmes. */
+/* Les jetons sont posés sur les blocs eux-mêmes, pas seulement sur
+   `.mo-wrap` : les trimestres passés rendent leurs cartes dans une autre
+   section, où elles auraient perdu toute surface. */
+.mo-wrap,.mo-card,.mo-form,.mo-empty{
+  --mo-s1:var(--white);                       /* carte */
+  --mo-s2:#FAFBFC;                            /* corps déplié */
+  --mo-s3:#F2F4F7;                            /* lignes KPI / jalons */
+  --mo-edge:var(--line);
+  /* Teinte de repère, volontairement sans couleur : le rouge de la marque
+     est réservé aux alertes, et une bande colorée en tête de carte
+     décorait sans rien dire. Ce qui distingue la carte ouverte, c'est sa
+     surface et son ombre — le gris appuyé suffit pour le reste. */
+  --mo-tint:#3D444D;
+}
+[data-theme="dark"] .mo-wrap,
+[data-theme="dark"] .mo-card,
+[data-theme="dark"] .mo-form,
+[data-theme="dark"] .mo-empty{
+  --mo-s1:#151515;
+  --mo-s2:#0E0E0E;
+  --mo-s3:#1D1D1D;
+  --mo-edge:#262626;
+  --mo-tint:#B4B4B4;
+}
+.mo-wrap{margin-top:var(--mp-gap)}
+.mo-sess{
+  display:inline-flex;align-items:center;gap:7px;flex:none;
+  font-size:11px;font-weight:600;color:var(--ok-fg);
+  background:var(--ok-bg);border-radius:999px;padding:5px 12px;
+}
+.mo-sess-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.mo-sess-d{font-weight:500;opacity:.75;font-variant-numeric:tabular-nums}
+
+.mo-empty{
+  font-size:12px;color:var(--gray);line-height:1.6;
+  padding:18px 20px;border:1px dashed var(--mo-edge);border-radius:var(--r-lg,12px);
+  background:var(--mo-s2);
+}
+.mo-empty b{display:block;color:var(--dark);font-size:12.5px;margin-bottom:3px}
+
+.mo-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.mo-add{margin-top:14px}
+
+/* Carte d'objectif. Le repli par défaut tient la liste parcourable :
+   trois objectifs dépliés feraient une page à faire défiler. */
+.mo-card{
+  border:1px solid var(--mo-edge);border-radius:var(--r-xl,16px);
+  background:var(--mo-s1);overflow:hidden;
+  transition:border-color .18s ease,box-shadow .18s ease;
+}
+.mo-card:hover{box-shadow:var(--sh-xs)}
+/* Ouverte, la carte se signale par son relief : bordure un peu plus
+   marquée et ombre portée. Pas de bande colorée en tête — elle
+   décorait la carte sans rien apprendre de plus. */
+.mo-card.is-open{
+  border-color:color-mix(in srgb,var(--mo-tint) 30%,var(--mo-edge));
+  box-shadow:var(--sh-sm);
+}
+.mo-head{
+  display:flex;align-items:center;gap:14px;
+  padding:15px 16px;cursor:pointer;
+  transition:background .15s ease;
+}
+.mo-head:hover{background:color-mix(in srgb,var(--dark) 3%,transparent)}
+[data-theme="dark"] .mo-head:hover{background:rgba(255,255,255,.03)}
+.mo-head-main{min-width:0;flex:1}
+.mo-title{font-size:14px;font-weight:600;color:var(--dark);line-height:1.4;overflow-wrap:anywhere;letter-spacing:-.01em}
+/* Les repères secondaires se séparent par un point médian : quatre
+   fragments espacés se lisaient comme quatre étiquettes de même poids
+   que l'état, alors qu'ils ne font que le préciser. */
+.mo-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:7px}
+.mo-due,.mo-cnt{font-size:11px;color:var(--mute);font-variant-numeric:tabular-nums}
+.mo-meta .mo-due + .mo-cnt::before,
+.mo-meta .mo-cnt + .mo-cnt::before{content:'·';margin-right:8px;color:var(--mute);opacity:.6}
+
+/* Anneau de progression : la valeur et sa lecture visuelle au même
+   endroit, à hauteur de l'intitulé. Un chiffre isolé dans le coin
+   opposé obligeait l'œil à faire l'aller-retour. */
+.mo-ring{position:relative;width:40px;height:40px;flex:none}
+.mo-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.mo-ring circle{fill:none;stroke:var(--mo-s3);stroke-width:3.5}
+[data-theme="dark"] .mo-ring circle{stroke:#262626}
+.mo-ring .mo-ring-v{
+  stroke:var(--mo-tint);stroke-linecap:round;
+  transition:stroke-dashoffset .6s cubic-bezier(.2,0,0,1);
+}
+.mo-ring.is-full .mo-ring-v{stroke:var(--ok-fg)}
+.mo-ring span{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--dark);font-variant-numeric:tabular-nums;
+}
+/* À 0 %, l'anneau vide ne dit rien de plus que le chiffre : on estompe
+   le zéro pour qu'il ne pèse pas autant qu'une progression réelle. */
+.mo-ring.is-zero span{color:var(--mute)}
+
+/* Chevron : dit que la carte s'ouvre, et où elle en est. */
+.mo-caret{
+  flex:none;color:var(--mute);
+  transition:transform .2s cubic-bezier(.2,0,0,1);
+}
+.mo-card.is-open .mo-caret{transform:rotate(90deg);color:var(--mo-tint)}
+
+/* Pastille d'état. Une couleur par sens, jamais deux sens par couleur.
+   En capitales serrées, « APPROVED » sonnait comme un tampon
+   administratif ; en casse normale il annonce simplement une bonne
+   nouvelle. Une pastille pleine et ronde suffit à la distinguer. */
+.mo-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;
+  padding:3px 10px;border-radius:999px;background:var(--mo-s3);color:var(--gray);
+  flex:none;
+}
+.mo-chip::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:currentColor;flex:none;opacity:.85;
+}
+.mo-chip.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.mo-chip.wait{background:var(--p3-bg);color:var(--p3-fg)}
+.mo-chip.ko{background:var(--p1-bg);color:var(--p1-fg)}
+.mo-chip.draft{background:var(--mo-s3);color:var(--gray)}
+.mo-chip.off{background:var(--mo-s3);color:var(--mute)}
+.mo-chip.mgr{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+
+/* Ce que l'agent a ajouté lui-même sur un objectif posé par le manager :
+   dit en toutes lettres que ce n'est pas encore acquis. Une pastille
+   « en attente » seule laissait croire à un simple délai d'affichage. */
+.mo-mine{
+  flex-basis:100%;font-size:11px;color:var(--p3-fg);line-height:1.5;margin-top:5px;
+}
+.mo-step.is-mine,.mo-kpi.is-mine{background:color-mix(in srgb,var(--p3-fg) 8%,transparent)}
+
+
+/* En attente d'approbation : l'ancienne valeur barrée, la nouvelle en
+   gras. Lu d'un coup d'œil, sans avoir à ouvrir un historique. */
+.mo-pend{
+  display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  margin:0 16px 12px;padding:10px 13px;border-radius:var(--r-lg,12px);
+  background:var(--p3-bg);
+}
+.mo-pend-tag{
+  font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;
+  color:var(--p3-fg);flex:none;opacity:.9;
+}
+.mo-pend-txt{font-size:12px;color:var(--p3-fg);line-height:1.55;min-width:0}
+.mo-pend-txt s{opacity:.6}
+
+.mo-why{font-size:11px;color:var(--p1-fg);line-height:1.5;margin-top:5px}
+.mo-why.is-block{
+  margin:0 16px 12px;padding:10px 12px;
+  border-radius:var(--r,8px);background:var(--p1-bg);font-size:11.5px;
+}
+
+/* Le détail se distingue de l'en-tête par sa surface, pas seulement par
+   un trait : la carte dépliée doit se lire comme deux zones, l'identité
+   puis le travail. */
+.mo-body{
+  padding:4px 16px 16px;border-top:1px solid var(--mo-edge);
+  background:var(--mo-s2);
+}
+/* « Why » : un filet en marge plutôt qu'un sur-titre en capitales. La
+   phrase est courte, elle n'a pas besoin d'une étiquette aussi haute
+   qu'elle. */
+.mo-why-txt{
+  font-size:12px;color:var(--gray);line-height:1.6;margin:16px 0 4px;
+  padding-left:12px;border-left:2px solid var(--mo-s3);
+}
+/* Casse normale : « WHY » en micro-capitales criait une étiquette de
+   base de données au-dessus d'une phrase écrite à la main. */
+.mo-why-txt span{
+  display:block;font-size:11px;font-weight:600;
+  color:var(--mute);margin-bottom:4px;letter-spacing:0;
+}
+
+.mo-sub{margin-top:20px}
+/* L'intitulé et son bouton restent groupés à gauche : rejetés aux deux
+   bords, ils laissaient une bande vide au milieu de chaque section. */
+.mo-sub-h{
+  display:flex;align-items:center;gap:10px;
+  font-size:12px;font-weight:600;letter-spacing:0;
+  color:var(--gray);margin-bottom:10px;
+}
+/* La glose du titre de section rappelle ce qu'est un KPI ou un jalon
+   sans peser autant que le titre lui-même. */
+.mo-sub-h i{font-style:normal;font-weight:400;color:var(--mute)}
+.mo-sub-h .mo-mini{margin-top:0;padding:3px 11px;font-size:11px}
+/* Section vide : une invitation, pas un constat de manque. */
+.mo-none{
+  font-size:12px;color:var(--gray);line-height:1.6;
+  padding:13px 15px;border-radius:var(--r-lg,12px);
+  border:1px dashed var(--mo-edge);background:var(--mo-s1);
+}
+
+/* Un KPI se lit « quoi → combien » : le nom et sa cible côte à côte, la
+   source en appui dessous. La ligne ne s'étire plus sur toute la
+   largeur — au-delà d'une soixantaine de caractères, il ne reste qu'une
+   bande vide entre le nom et le bord de la carte. */
+.mo-kpis{display:flex;flex-direction:column;gap:6px}
+.mo-kpi{
+  position:relative;max-width:720px;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  gap:2px 10px;align-items:center;
+  padding:10px 13px;border-radius:var(--r,8px);
+  background:var(--mo-s1);border:1px solid var(--mo-edge);
+}
+.mo-kpi-main{display:flex;align-items:center;gap:9px;flex-wrap:wrap;min-width:0}
+.mo-kpi-n{font-size:12.5px;font-weight:600;color:var(--dark);min-width:0;overflow-wrap:anywhere}
+/* La cible est le chiffre qui décide : sans couleur pour la porter, on
+   la détache par le contraste — texte appuyé sur une pastille pleine. */
+.mo-kpi-t{
+  font-size:11.5px;font-weight:700;color:var(--dark);white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+  background:var(--mo-s3);border-radius:999px;padding:3px 10px;
+}
+.mo-kpi-s{grid-column:1;font-size:10.5px;color:var(--mute);margin-top:2px}
+.mo-kpi .mo-pend{grid-column:1/-1;margin:6px 0 0}
+.mo-kpi .mo-why{grid-column:1/-1}
+.mo-kpi .mo-mine{grid-column:1/-1}
+
+.mo-steps{display:flex;flex-direction:column;gap:2px;max-width:720px}
+.mo-step{
+  position:relative;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:9px 13px;border-radius:var(--r,8px);
+  transition:background .15s ease;
+}
+.mo-step:hover{background:var(--mo-s3)}
+.mo-step-l{display:flex;align-items:center;gap:11px;flex:1;min-width:0;cursor:pointer;font-size:12.5px;color:var(--dark)}
+/* Case à cocher dessinée : celle du navigateur arrivait en blanc plein
+   sur fond noir, si contrastée qu'elle happait le regard avant le jalon
+   qu'elle coche. */
+.mo-step-l input{
+  appearance:none;-webkit-appearance:none;flex:none;
+  width:16px;height:16px;margin:0;border-radius:5px;cursor:pointer;
+  border:1.5px solid color-mix(in srgb,var(--mute) 70%,transparent);
+  background:transparent;position:relative;
+  transition:background .15s ease,border-color .15s ease;
+}
+.mo-step-l input:hover:not(:disabled){border-color:var(--mo-tint)}
+.mo-step-l input:checked{background:var(--mo-tint);border-color:var(--mo-tint)}
+.mo-step-l input:checked::after{
+  content:'';position:absolute;left:4.5px;top:1.5px;
+  width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;
+  transform:rotate(42deg);
+}
+.mo-step-l input:disabled{opacity:.45;cursor:default}
+.mo-step-l input:focus-visible{outline:2px solid var(--mo-tint);outline-offset:2px}
+.mo-step-l span{min-width:0;overflow-wrap:anywhere}
+.mo-step-l .is-done{text-decoration:line-through;color:var(--mute)}
+.mo-step-d{font-size:10.5px;color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.mo-step .mo-pend{flex-basis:100%;margin:6px 0 0}
+
+/* En attente d'approbation : un simple fond teinté. La pastille
+   « Awaiting » sur la ligne dit déjà de quoi il s'agit — ni cadre, ni
+   filet de couleur à gauche, qui ajoutaient un signal de plus pour la
+   même information. */
+.mo-kpi.is-wait,.mo-step.is-wait{
+  background:color-mix(in srgb,var(--p3-fg) 9%,transparent);
+  border-color:color-mix(in srgb,var(--p3-fg) 22%,transparent);
+}
+
+/* Pied de carte : les actions se détachent du contenu par un filet,
+   sinon le bouton « Edit » flottait sous les jalons comme s'il les
+   concernait. */
+.mo-acts{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  margin-top:18px;padding-top:14px;border-top:1px solid var(--mo-edge);
+}
+.mo-del{color:var(--red);margin-left:auto}
+
+/* Contrôle SMART replié : une ligne cliquable, pas un triangle nu du
+   navigateur. */
+.mo-det{margin-top:16px}
+.mo-det summary{
+  display:flex;align-items:center;gap:8px;list-style:none;
+  font-size:11px;font-weight:600;color:var(--gray);cursor:pointer;
+  padding:7px 11px;border-radius:999px;width:fit-content;
+  border:1px solid var(--mo-edge);background:var(--mo-s1);
+  transition:color .15s ease,border-color .15s ease;
+}
+.mo-det summary::-webkit-details-marker{display:none}
+.mo-det summary::before{
+  content:'';width:0;height:0;flex:none;
+  border:4px solid transparent;border-left-color:currentColor;
+  transition:transform .2s ease;
+}
+.mo-det[open] summary::before{transform:rotate(90deg) translateX(-1px)}
+.mo-det summary:hover{color:var(--dark);border-color:color-mix(in srgb,var(--mo-tint) 35%,var(--mo-edge))}
+
+/* ── Formulaire de saisie ─────────────────────────────────── */
+/* Le formulaire prend la place de la carte : il doit se lire comme une
+   surface de travail, pas comme une autre carte de la liste. D'où une
+   en-tête tenue par un filet et un corps posé sur la surface haute. */
+.mo-form{
+  margin-top:14px;border-radius:var(--r-xl,16px);
+  border:1px solid color-mix(in srgb,var(--mo-tint) 26%,var(--mo-edge));
+  background:var(--mo-s1);
+  box-shadow:var(--sh-sm);overflow:hidden;
+}
+.mo-form-h{
+  padding:16px 22px 15px;border-bottom:1px solid var(--mo-edge);
+  background:var(--mo-s2);
+}
+.mo-form-b{padding:4px 22px 22px}
+.mo-form-t{font-size:14px;font-weight:700;color:var(--dark);letter-spacing:-.01em}
+/* Rappel de l'intitulé en vigueur pendant l'édition : le formulaire ayant
+   pris la place de la carte, c'est la seule trace de ce qu'on modifie. */
+.mo-form-cur{
+  font-size:12.5px;color:var(--dark);line-height:1.5;margin-top:10px;
+  padding:9px 12px;border-radius:var(--r,8px);background:var(--mo-s3);
+  overflow-wrap:anywhere;
+}
+.mo-form-cur span{
+  display:block;font-size:11px;font-weight:600;text-transform:none;
+  letter-spacing:0;color:var(--mute);margin-bottom:4px;
+}
+/* La note explique une règle du dispositif : elle se donne comme telle,
+   avec un filet en marge, et non comme une alerte. */
+.mo-form-note{
+  font-size:11.5px;color:var(--gray);line-height:1.55;margin:10px 0 0;
+  padding-left:11px;border-left:2px solid color-mix(in srgb,var(--p3-fg) 45%,transparent);
+}
+.mo-form-b > .mo-form-note{margin:16px 0 0}
+/* Libellés en casse normale : les micro-capitales espacées donnaient un
+   formulaire d'administration des années 2000, et se lisent mal. */
+.mo-lbl{
+  display:block;font-size:13px;font-weight:600;
+  color:var(--dark);margin:20px 0 5px;letter-spacing:0;
+}
+/* Accompagnement du champ. « KPI » et « jalon » sont du vocabulaire de
+   gestion : personne ne le devine, et un libellé seul laissait chacun
+   remplir au jugé. La définition se donne donc avant la saisie, pas dans
+   un point d'interrogation à survoler. Elle prime le placeholder, qui
+   disparaît dès la première frappe. */
+.mo-hint{
+  font-size:11.5px;color:var(--gray);line-height:1.55;
+  margin:0 0 8px;max-width:64ch;
+}
+.mo-hint b{font-weight:600;color:var(--dark)}
+.mo-form .form-control{
+  border-radius:var(--r,8px);font-size:13px;
+  background:var(--input-bg);border:1px solid var(--mo-edge);
+  transition:border-color .15s ease,box-shadow .15s ease;
+}
+.mo-form .form-control::placeholder{color:var(--mute)}
+.mo-form .form-control:hover{border-color:color-mix(in srgb,var(--mo-tint) 30%,var(--mo-edge))}
+.mo-form .form-control:focus{
+  border-color:var(--mo-tint);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--mo-tint) 16%,transparent);
+}
+.mo-date{max-width:200px}
+.mo-krows,.mo-srows{display:flex;flex-direction:column;gap:6px}
+.mo-krow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr) auto;gap:6px;align-items:center}
+.mo-srow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center}
+.mo-x{
+  width:28px;height:28px;flex:none;border:none;border-radius:var(--r,8px);
+  background:transparent;color:var(--mute);font-size:17px;line-height:1;cursor:pointer;
+  transition:background .15s ease,color .15s ease;
+}
+.mo-x:hover{background:var(--p1-bg);color:var(--red)}
+.mo-mini{
+  display:inline-flex;align-items:center;gap:5px;
+  border:1px dashed var(--mo-edge);background:transparent;color:var(--gray);
+  font:inherit;font-size:11px;font-weight:600;cursor:pointer;
+  padding:6px 12px;border-radius:999px;margin-top:8px;
+  transition:border-color .15s ease,color .15s ease,background .15s ease;
+}
+.mo-mini:hover{
+  border-color:color-mix(in srgb,var(--mo-tint) 45%,transparent);
+  color:var(--mo-tint);background:color-mix(in srgb,var(--mo-tint) 7%,transparent);
+}
+/* Pied de formulaire : « Annuler » à gauche, les deux enregistrements à
+   droite, l'envoi seul en plein. Trois boutons alignés de même poids ne
+   disaient pas lequel termine la saisie. */
+.mo-form-foot{
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  margin:22px -22px -22px;padding:15px 22px;
+  border-top:1px solid var(--mo-edge);background:var(--mo-s2);
+}
+.mo-form-foot > :first-child{margin-right:auto}
+
+/* Formulaire d'ajout d'un KPI / jalon, ouvert dans la carte. Il hérite
+   du même traitement que les champs du formulaire principal, sinon les
+   entrées arrivaient nues au milieu du corps déplié. */
+.mo-addform{
+  margin-top:9px;padding:13px;border-radius:var(--r,8px);
+  border:1px solid color-mix(in srgb,var(--mo-tint) 26%,var(--mo-edge));
+  background:var(--mo-s1);max-width:720px;
+}
+.mo-addgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.mo-addgrid.two{grid-template-columns:minmax(0,1fr) auto}
+.mo-addform .form-control{
+  border-radius:var(--r,8px);font-size:12.5px;
+  background:var(--input-bg);border:1px solid var(--mo-edge);
+}
+.mo-addform .form-control:focus{
+  border-color:var(--mo-tint);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--mo-tint) 16%,transparent);
+}
+.mo-addfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:11px}
+
+/* ── Contrôle SMART ───────────────────────────────────────── */
+/* Indicatif, jamais bloquant : il informe la saisie et l'arbitrage.
+   Le cadre change de teinte, mais aucun bouton ne se désactive. */
+.mo-smart{
+  margin-top:14px;padding:14px 16px;border-radius:var(--r-lg,12px);
+  border:1px solid var(--mo-edge,var(--line));background:var(--mo-s1,var(--white));
+  max-width:720px;
+}
+.mo-smart.ok{border-color:color-mix(in srgb,var(--ok-fg) 40%,var(--mo-edge,var(--line)))}
+.mo-smart.warn{border-color:color-mix(in srgb,var(--p2-fg) 40%,var(--mo-edge,var(--line)))}
+.mo-smart.ko{border-color:color-mix(in srgb,var(--red) 38%,var(--mo-edge,var(--line)))}
+.mo-smart-h{display:flex;align-items:center;gap:14px}
+.mo-smart-txt{min-width:0}
+.mo-smart-t{font-size:13px;font-weight:600;color:var(--dark);line-height:1.35}
+.mo-smart-d{font-size:11px;color:var(--mute);line-height:1.5;margin-top:3px;max-width:48ch}
+
+/* Anneau de score, même langage que la progression des objectifs. */
+.mo-smart-ring{position:relative;width:48px;height:48px;flex:none}
+.mo-smart-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.mo-smart-ring circle{fill:none;stroke:var(--mo-s3,var(--bg2));stroke-width:4}
+.mo-smart-arc{stroke-linecap:round;transition:stroke-dashoffset .5s cubic-bezier(.2,0,0,1)}
+.mo-smart.ok   .mo-smart-arc{stroke:var(--ok-fg)}
+.mo-smart.warn .mo-smart-arc{stroke:var(--p2-fg)}
+.mo-smart.ko   .mo-smart-arc{stroke:var(--red)}
+.mo-smart-ring span{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--dark);font-variant-numeric:tabular-nums;
+}
+
+/* Les cinq axes en pastilles : le nom coloré suffit à dire lequel
+   pèche, sans cinq jauges à lire une par une. */
+.mo-axes{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.mo-ax{
+  font-size:11px;font-weight:500;padding:4px 11px;border-radius:999px;
+  background:var(--mo-s3,var(--bg2));color:var(--gray);cursor:default;
+}
+.mo-ax.is-ok{background:var(--ok-bg);color:var(--ok-fg)}
+.mo-ax.is-mid{background:var(--p2-bg);color:var(--p2-fg)}
+.mo-ax.is-low{background:var(--p1-bg);color:var(--p1-fg)}
+
+.mo-fix{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+.mo-fix li{
+  font-size:11.5px;color:var(--gray);line-height:1.5;
+  padding-left:16px;position:relative;
+}
+.mo-fix li::before{
+  content:'';position:absolute;left:4px;top:7px;
+  width:4px;height:4px;border-radius:50%;background:var(--mute);
+}
+
+@media (max-width:720px){
+  .mo-axes{grid-template-columns:repeat(2,1fr)}
+  .mo-krow,.mo-srow{grid-template-columns:1fr auto}
+  /* L'anneau reste à côté du titre : c'est l'en-tête compact qui rend la
+     liste parcourable au pouce. */
+  .mo-head{gap:11px;padding:13px 13px}
+  .mo-kpi{grid-template-columns:minmax(0,1fr) auto}
+  .mo-kpi-s{grid-column:1/-1}
+  .mo-addgrid,.mo-addgrid.two{grid-template-columns:1fr}
+  .mo-form-h{padding:14px 16px 13px}
+  .mo-form-b{padding:2px 16px 16px}
+  .mo-form-foot{margin:20px -16px -16px;padding:14px 16px}
+  .mo-body{padding:4px 13px 13px}
+  .mo-pend,.mo-why.is-block{margin-left:13px;margin-right:13px}
+}
+
+
+/* Date de réalisation d'un jalon coché après son échéance. */
+.mo-tick{flex-basis:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin:8px 0 2px;padding:10px 12px;border-radius:10px;background:var(--m3-surf-2);font-size:12.5px}
+.mo-tick span{flex-basis:100%;color:var(--m3-on-surf-var)}
+.mo-tick input{width:auto;height:34px}
+.mo-step-when{font-size:11px;color:var(--m3-on-surf-var);margin-left:6px}

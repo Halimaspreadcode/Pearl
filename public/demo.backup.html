@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EMOC Tracker, Product Playbook</title>
+<!--
+  Standalone playbook. No API call, no live data, no password.
+
+  Structure follows one thread: an alarm arrives, and we follow it all the
+  way to the monthly review it eventually feeds. Each chapter answers one
+  question and is written as prose, not as a card wall.
+
+  Screenshots live in public/demo/ and are wired through data-shot.
+  Password protected screens are drawn as diagrams instead, since a
+  capture would publish named appraisal data.
+-->
+<style>
+  :root{
+    --bg:#FBFBFC;
+    --panel:#FFFFFF;
+    --ink:#101319;
+    --ink2:#565E6B;
+    --ink3:#8B93A1;
+    --line:#E6E9EE;
+    --line2:#F1F3F6;
+    --brand:#2F5BEA;
+    --brand-soft:#EEF2FE;
+    --ok:#0F7A43;
+    --warn:#B45309;
+    --shadow-s:0 1px 2px rgba(16,24,40,.04);
+    --shadow-m:0 6px 22px rgba(16,24,40,.07);
+    --shadow-l:0 24px 60px rgba(16,24,40,.10);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    line-height:1.7;-webkit-font-smoothing:antialiased;font-size:16px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 28px}
+  .wide{max-width:1060px;margin:0 auto;padding:0 28px}
+
+  .rise{opacity:0;transform:translateY(16px);
+    transition:opacity .75s cubic-bezier(.2,.7,.3,1),transform .75s cubic-bezier(.2,.7,.3,1)}
+  .rise.in{opacity:1;transform:none}
+  .rise.d1{transition-delay:.08s} .rise.d2{transition-delay:.16s}
+  @media (prefers-reduced-motion:reduce){
+    .rise{opacity:1;transform:none;transition:none} html{scroll-behavior:auto}
+  }
+
+  /* Header */
+  header{
+    padding:120px 0 88px;text-align:center;position:relative;
+    background:radial-gradient(760px 300px at 50% -120px,var(--brand-soft),transparent 72%);
+  }
+  .eyebrow{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink3);margin-bottom:26px;
+  }
+  h1{font-size:54px;line-height:1.06;margin:0 0 22px;letter-spacing:-.035em;font-weight:680}
+  .sub{font-size:19px;color:var(--ink2);max-width:600px;margin:0 auto;line-height:1.62}
+
+  /* Progress bar of the reading */
+  .prog{position:fixed;top:0;left:0;height:2px;background:var(--brand);width:0;z-index:99;
+    transition:width .1s linear}
+
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(251,251,252,.88);backdrop-filter:saturate(180%) blur(16px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .inner{max-width:1060px;margin:0 auto;padding:11px 28px;
+    display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  nav .inner::-webkit-scrollbar{display:none}
+  nav a{
+    padding:6px 13px;border-radius:999px;font-size:12.5px;font-weight:500;
+    color:var(--ink3);text-decoration:none;white-space:nowrap;transition:color .2s,background .2s;
+  }
+  nav a:hover{color:var(--ink)}
+  nav a.on{background:var(--ink);color:#fff}
+
+  /* scroll-margin keeps a chapter title clear of the sticky nav when the
+     page jumps to an anchor. Without it the heading lands underneath. */
+  section{padding:92px 0;scroll-margin-top:64px}
+  section + section{border-top:1px solid var(--line)}
+
+  .step-tag{
+    display:flex;align-items:center;gap:12px;margin-bottom:20px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);
+  }
+  .step-tag b{
+    color:var(--brand);font-weight:700;
+  }
+  .step-tag hr{flex:1;border:0;border-top:1px solid var(--line);margin:0}
+
+  h2{font-size:34px;margin:0 0 20px;letter-spacing:-.028em;line-height:1.22;font-weight:670}
+  p{margin:0 0 20px;color:var(--ink2);font-size:16px}
+  p.first{font-size:18px;color:var(--ink);line-height:1.62}
+  strong{color:var(--ink);font-weight:600}
+  .quiet{color:var(--ink3);font-size:14.5px}
+
+  /* Pull quote, used sparingly to carry the thread */
+  .pull{
+    margin:34px 0;padding:0 0 0 22px;border-left:2px solid var(--brand);
+    font-size:19px;line-height:1.55;color:var(--ink);letter-spacing:-.012em;
+  }
+
+  /* Four layouts, alternated so no two consecutive chapters look alike.
+     All of them stack to a single column below 900px, text first, since
+     the text carries the meaning and the screen only illustrates it. */
+
+  /* A. Prose left, screen right (and .flip for the mirror image). */
+  .split{
+    max-width:1160px;margin:0 auto;padding:0 28px;
+    display:grid;grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr);
+    gap:56px;align-items:center;
+  }
+  .split.flip{grid-template-columns:minmax(0,1.15fr) minmax(0,0.85fr)}
+  .split.flip .split-text{order:2}
+  .split.flip .split-media{order:1}
+  .split-text h2{margin-top:0}
+  .split-text p:last-child{margin-bottom:0}
+  .split-media figure{margin:0}
+
+  /* B. Bleed: the screen runs wider than the column, for the one capture
+     that deserves to dominate its chapter. */
+  .bleed{max-width:1280px;margin:0 auto;padding:0 28px}
+  .bleed figure{margin:0}
+
+  /* C. Sticky pair: the text stays in place while the screen scrolls past
+     it. Used once, on the chapter with the most to explain. */
+  .sticky-pair{
+    max-width:1160px;margin:0 auto;padding:0 28px;
+    display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.2fr);gap:56px;
+    align-items:start;
+  }
+  .sticky-pair .col-text{position:sticky;top:104px}
+  .sticky-pair .col-media figure:first-child{margin-top:0}
+
+  /* D. Inset: a narrow screen centred inside the reading column, for the
+     screens that are themselves narrow. */
+  .inset{max-width:820px;margin:0 auto;padding:0 28px}
+  .inset figure{margin:44px 0}
+
+  @media (max-width:900px){
+    .split,.split.flip,.sticky-pair{grid-template-columns:1fr;gap:34px}
+    .split.flip .split-text{order:1} .split.flip .split-media{order:2}
+    .sticky-pair .col-text{position:static}
+  }
+
+  /* Figure */
+  figure{margin:44px 0}
+  .frame{
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    background:var(--panel);box-shadow:var(--shadow-l);
+  }
+  .bar{display:flex;align-items:center;gap:7px;padding:11px 15px;
+    background:var(--line2);border-bottom:1px solid var(--line)}
+  .bar i{width:9px;height:9px;border-radius:50%;background:#D9DEE6;display:block}
+  .bar-u{margin-left:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:11px;color:var(--ink3)}
+  .frame img{display:block;width:100%;height:auto}
+  .miss{padding:64px 24px;text-align:center;color:var(--ink3);font-size:13px}
+
+  /* Markers pinned on a screenshot. Positions are percentages of the image
+     box, so they follow the capture at any width. The marker is hidden
+     until the image actually loads, otherwise it would float over the
+     placeholder. */
+  .shotwrap{position:relative}
+  .pin{
+    position:absolute;width:26px;height:26px;border-radius:50%;
+    background:var(--brand);color:#fff;border:2.5px solid #fff;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:12px;font-weight:700;line-height:1;
+    display:none;align-items:center;justify-content:center;
+    box-shadow:0 2px 10px rgba(16,24,40,.28);
+    transform:translate(-50%,-50%);z-index:2;
+  }
+  .shotwrap.ready .pin{display:flex;animation:pop .45s cubic-bezier(.2,1.3,.4,1) backwards}
+  .pin:nth-of-type(2){animation-delay:.1s}
+  .pin:nth-of-type(3){animation-delay:.2s}
+  .pin:nth-of-type(4){animation-delay:.3s}
+  @keyframes pop{from{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+                 to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  @media (prefers-reduced-motion:reduce){
+    .shotwrap.ready .pin{animation:none}
+  }
+
+  /* Legend below the capture, numbered to match the markers. */
+  .keys{margin:18px 0 0;padding:0;list-style:none}
+  .keys li{
+    display:flex;gap:12px;align-items:flex-start;padding:9px 0;
+    border-top:1px solid var(--line2);font-size:14px;color:var(--ink2);
+  }
+  .keys li:first-child{border-top:0}
+  .keys .k{
+    flex:none;width:21px;height:21px;border-radius:50%;background:var(--brand-soft);
+    color:var(--brand);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    margin-top:2px;
+  }
+  .keys b{color:var(--ink);font-weight:600}
+  figcaption{font-size:13.5px;color:var(--ink3);margin-top:16px;line-height:1.6}
+  figcaption b{color:var(--ink2);font-weight:600}
+
+  /* Diagram panel */
+  .diagram{
+    border:1px solid var(--line);border-radius:14px;background:var(--panel);
+    box-shadow:var(--shadow-m);padding:30px 32px;
+  }
+  .diagram svg{display:block;width:100%;height:auto}
+  .diagram-h{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink3);margin-bottom:22px;
+  }
+
+  /* Simple facts row, replaces card walls */
+  .facts{margin:34px 0;border-top:1px solid var(--line)}
+  .fact{display:flex;gap:26px;padding:20px 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .fact dt{flex:none;width:168px;font-size:14.5px;font-weight:600;color:var(--ink)}
+  .fact dd{margin:0;font-size:14.5px;color:var(--ink2)}
+  @media (max-width:640px){
+    .fact{flex-direction:column;gap:4px}
+    .fact dt{width:auto}
+  }
+
+  .tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;
+     background:var(--panel);margin:34px 0}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:13px 18px;border-bottom:1px solid var(--line2)}
+  tr:last-child td{border-bottom:0}
+  th{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
+     color:var(--ink3);font-weight:600;background:var(--line2)}
+  td b{font-weight:600}
+  .yes{color:var(--brand);font-weight:600}
+  .no{color:var(--ink3)}
+
+  footer{padding:80px 0 100px;text-align:center;color:var(--ink3);font-size:13.5px}
+  footer b{color:var(--ink2)}
+
+  @media (max-width:680px){
+    h1{font-size:36px} h2{font-size:26px} header{padding:76px 0 56px}
+    section{padding:64px 0} p.first{font-size:17px}
+  }
+</style>
+</head>
+<body>
+
+<div class="prog" id="prog"></div>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow rise">EMOC Tracker, version 2.7</div>
+    <h1 class="rise d1">One alarm,<br>followed to the end</h1>
+    <p class="sub rise d2">
+      This playbook follows a single incident through the product, from the
+      moment it reaches the floor to the monthly review it eventually feeds.
+      Ten chapters, in the order the work actually happens.
+    </p>
+  </div>
+</header>
+
+<nav>
+  <div class="inner">
+    <a href="#floor">The floor</a>
+    <a href="#ticket">The ticket</a>
+    <a href="#shift">The shift</a>
+    <a href="#absence">When someone is away</a>
+    <a href="#skills">Getting better</a>
+    <a href="#rating">The monthly rating</a>
+    <a href="#review">The review</a>
+    <a href="#report">Telling the story</a>
+    <a href="#settings">Behind the scenes</a>
+    <a href="#trust">Who sees what</a>
+  </div>
+</nav>
+
+<!-- 01 -->
+<section id="floor">
+  <div class="wrap">
+    <div class="step-tag rise"><b>01</b> The floor <hr></div>
+    <h2 class="rise">It starts with a screen someone is watching</h2>
+    <p class="first rise d1">
+      A supervision centre runs on attention. Somebody is looking at alarms
+      right now, and the first question they need answered is never
+      complicated: is anything slipping.
+    </p>
+    <p class="rise d1">
+      The dashboard answers that in one screen. Volumes, how much of the
+      backlog is still inside its deadline, who is carrying the load, and what
+      has already breached. Nothing here needs a click to be understood, which
+      matters when it is read twenty times a day.
+    </p>
+    <p class="rise d1">
+      One control shapes everything else: the <strong>Global, SN and CI
+      switch</strong>. A country lead selects their perimeter and the entire
+      product narrows to it, sidebar included. A regional lead stays on Global
+      and reads both. Same product, two jobs.
+    </p>
+  </div>
+
+  <div class="bleed">
+    <figure class="rise">
+      <div class="frame shotwrap" data-shot="01-dashboard.png">
+        <div class="bar"><i></i><i></i><i></i><span class="bar-u">dashboard</span></div>
+        <span class="pin" style="left:80.5%;top:9.5%">1</span>
+        <span class="pin" style="left:18%;top:23%">2</span>
+        <span class="pin" style="left:23%;top:35%">3</span>
+        <span class="pin" style="left:68%;top:23%">4</span>
+        <div class="miss">Screenshot pending</div>
+      </div>
+      <ul class="keys">
+        <li><span class="k">1</span><div><b>Perimeter switch.</b> Global merges
+          both countries. Picking SN or CI narrows every figure below, and the
+          sidebar hides the trackers that no longer apply.</div></li>
+        <li><span class="k">2</span><div><b>Who is on the floor.</b> A live
+          presence signal held in memory, never stored. It empties on restart
+          and rebuilds itself within a minute.</div></li>
+        <li><span class="k">3</span><div><b>The KPI row.</b> Every figure carries
+          a sparkline underneath, so a number is never read without its
+          trend.</div></li>
+        <li><span class="k">4</span><div><b>Period filter.</b> All time, month,
+          week or a custom range. The whole page recomputes, including the
+          charts further down.</div></li>
+      </ul>
+    </figure>
+  </div>
+</section>
+
+<!-- 02 -->
+<section id="ticket">
+  <div class="wrap">
+    <div class="step-tag rise"><b>02</b> The ticket <hr></div>
+    <h2 class="rise">Something is wrong, and the clock starts</h2>
+  </div>
+
+  <div class="sticky-pair rise" style="margin-top:34px">
+    <div class="col-text">
+      <p class="first">
+        An alarm becomes a ticket. From that second a deadline runs, and the
+        whole point of the tracker is that nobody has to remember it.
+      </p>
+      <p>
+        The clock starts at the <strong>occurrence time, not the moment someone
+        typed it in</strong>. That single decision is what keeps the
+        measurement honest: an incident found late is still an incident that
+        started early, and a tracker that pretended otherwise would flatter
+        the team.
+      </p>
+      <p>
+        Critical anomalies carry two deadlines rather than one. Restoring
+        service and fixing the root cause are different promises, so they are
+        timed separately. A workaround that holds does not close the
+        underlying problem, and the product refuses to conflate them.
+      </p>
+    </div>
+    <div class="col-media">
+    <figure>
+      <div class="frame shotwrap" data-shot="02-tracker-sn.png">
+        <div class="bar"><i></i><i></i><i></i><span class="bar-u">tracker, senegal</span></div>
+        <span class="pin" style="left:24%;top:27.5%">1</span>
+        <span class="pin" style="left:24.5%;top:34.5%">2</span>
+        <span class="pin" style="left:93%;top:21.5%">3</span>
+        <div class="miss">Screenshot pending</div>
+      </div>
+      <ul class="keys">
+        <li><span class="k">1</span><div><b>Filters that combine.</b> Status,
+          priority, owner, domain and a date range, all at once. The ticket
+          count on the right always reflects the active set.</div></li>
+        <li><span class="k">2</span><div><b>Two reference numbers.</b> Oceane and
+          IMOC identifiers are both carried, because the two systems coexist in
+          the operation. Dropping one would just move the reconciliation work
+          somewhere else.</div></li>
+        <li><span class="k">3</span><div><b>New ticket.</b> Opens the two step
+          side panel: identification first, technical qualification second,
+          with the missing required fields shown on the tab itself.</div></li>
+      </ul>
+    </figure>
+    </div>
+  </div>
+
+  <div class="split rise" style="margin-top:88px">
+    <div class="split-text">
+      <p class="pull" style="margin-top:0">
+        Not everything worth remembering is a ticket.
+      </p>
+      <p>
+        A recurring smell on a link, a customer who called twice, a workaround
+        that should not become permanent. None of these justify opening an
+        incident, and all of them matter to whoever takes the next shift.
+      </p>
+      <p>
+        Observations exist for exactly that. Free of the ticket lifecycle, so
+        nobody has to invent a fake incident just to write something down.
+      </p>
+    </div>
+    <div class="split-media">
+      <figure>
+        <div class="frame" data-shot="17-observations.png">
+          <div class="bar"><i></i><i></i><i></i><span class="bar-u">observations</span></div>
+          <div class="miss">Screenshot pending</div>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 03 -->
+<section id="shift">
+  <div class="wrap">
+    <div class="step-tag rise"><b>03</b> The shift <hr></div>
+    <h2 class="rise">Someone has to be there at three in the morning</h2>
+    <p class="first rise d1">
+      Behind every ticket is a rota that put a person in a chair. Planning is
+      where the operation is really decided, and where most of the friction
+      lives.
+    </p>
+    <p class="rise d1">
+      The month is pre built from the configured sites and slots, then adjusted
+      by hand, because reality always differs. What matters is what happens
+      next: an agent asks for a change, and that request stops being a message
+      in a group chat. It enters a queue, gets a decision, and leaves a trace.
+    </p>
+    <p class="rise d1">
+      The planner also reads the absence calendar. If somebody is booked on a
+      shift while declared away, the conflict surfaces on its own. Only future
+      conflicts are shown, since a shift that already happened cannot be fixed
+      and listing it only buries the ones that still can.
+    </p>
+  </div>
+
+  <div class="bleed">
+    <figure class="rise">
+      <div class="frame" data-shot="04-shift-planning.png">
+        <div class="bar"><i></i><i></i><i></i><span class="bar-u">shift planning</span></div>
+        <div class="miss">Screenshot pending</div>
+      </div>
+      <figcaption>
+        <b>Agents in rows, days in columns.</b> The overlay marks conflicts
+        with declared absences so the plan and the reality stay in agreement,
+        month after month.
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="split flip rise" style="margin-top:64px">
+    <div class="split-text">
+      <p class="pull" style="margin-top:0">
+        A request stops being a message in a group chat.
+      </p>
+      <p>
+        The agent submits from their own screen, the decision is taken in
+        administration, and the person asking always sees where their request
+        stands. That visibility is what removes the follow up messages, not the
+        approval workflow itself.
+      </p>
+    </div>
+    <div class="split-media">
+      <figure>
+        <div class="frame" data-shot="19-my-requests.png">
+          <div class="bar"><i></i><i></i><i></i><span class="bar-u">my requests</span></div>
+          <div class="miss">Screenshot pending</div>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 04 -->
+<section id="absence">
+  <div class="wrap">
+    <div class="step-tag rise"><b>04</b> When someone is away <hr></div>
+    <h2 class="rise">Not all absences mean the same thing</h2>
+    <p class="first rise d1">
+      A holiday, a fever and a training day all remove someone from the floor,
+      but treating them alike would be both unfair and wrong.
+    </p>
+    <p class="rise d1">
+      Eleven leave types are defined, each with three properties: does it
+      consume the annual balance, is it paid, can it be planned. Only paid
+      leave and RTT eat into the balance. <strong>Sick leave never
+      does</strong>, which is the behaviour anyone would expect and yet
+      surprisingly easy to get wrong.
+    </p>
+    <p class="rise d1">
+      Days are counted in working days with the country holidays removed, and
+      pending requests are already reserved. A balance that looks available but
+      is about to be consumed would be worse than no balance at all.
+    </p>
+  </div>
+
+  <div class="inset">
+    <figure class="rise">
+      <div class="diagram">
+        <div class="diagram-h">Worked example, one agent over a year</div>
+        <svg viewBox="0 0 900 262" role="img" aria-label="Leave balance calculation">
+          <text x="0" y="16" font-size="12.5" font-weight="600" fill="#8B93A1">ANNUAL ENTITLEMENT</text>
+          <rect x="0" y="28" width="900" height="30" rx="7" fill="#F1F3F6"/>
+          <text x="882" y="48" font-size="13" font-weight="600" fill="#565E6B" text-anchor="end">30 days</text>
+
+          <rect x="0" y="80" width="300" height="30" rx="7" fill="#2F5BEA"/>
+          <text x="16" y="100" font-size="12.5" font-weight="600" fill="#fff">Paid leave, approved</text>
+          <text x="314" y="100" font-size="12.5" fill="#565E6B">10 days, deducted</text>
+
+          <rect x="0" y="124" width="150" height="30" rx="7" fill="#A8BCF6"/>
+          <text x="16" y="144" font-size="12.5" font-weight="600" fill="#101319">Pending</text>
+          <text x="164" y="144" font-size="12.5" fill="#565E6B">5 days, reserved in advance</text>
+
+          <rect x="0" y="168" width="150" height="30" rx="7" fill="#F1F3F6" stroke="#E6E9EE"/>
+          <text x="16" y="188" font-size="12.5" font-weight="600" fill="#8B93A1">Sick leave</text>
+          <text x="164" y="188" font-size="12.5" fill="#8B93A1">5 days, does not touch the balance</text>
+
+          <line x1="0" y1="216" x2="900" y2="216" stroke="#E6E9EE"/>
+          <text x="0" y="244" font-size="14" font-weight="700" fill="#0F7A43">Remaining, 15 days</text>
+          <text x="882" y="244" font-size="12.5" fill="#8B93A1" text-anchor="end">30 minus 10 taken minus 5 pending</text>
+        </svg>
+      </div>
+      <figcaption>
+        This screen sits behind its own password, separate from administration,
+        because it holds medical reasons and personal balances.
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="wrap">
+    <div class="tw rise">
+      <table>
+        <thead><tr><th>Leave type</th><th>Deducts</th><th>Paid</th><th>Plannable</th></tr></thead>
+        <tbody>
+          <tr><td><b>Paid leave</b></td><td class="yes">Yes</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td><b>RTT</b></td><td class="yes">Yes</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td><b>Sick leave</b></td><td class="no">No</td><td>Yes</td><td>No</td></tr>
+          <tr><td><b>Work accident</b></td><td class="no">No</td><td>Yes</td><td>No</td></tr>
+          <tr><td><b>Maternity, paternity</b></td><td class="no">No</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td><b>Training</b></td><td class="no">No</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td><b>On site delivery</b></td><td class="no">No</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td><b>Unpaid leave</b></td><td class="no">No</td><td>No</td><td>Yes</td></tr>
+          <tr><td><b>Unjustified absence</b></td><td class="no">No</td><td>No</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="quiet rise">
+      An unjustified absence costs 25 points on the attendance criterion, enough
+      on its own to drop below the 85 percent team threshold. The rule is
+      written down rather than left to judgement, so it is the same rule for
+      everyone.
+    </p>
+  </div>
+</section>
+
+<!-- 05 -->
+<section id="skills">
+  <div class="wrap">
+    <div class="step-tag rise"><b>05</b> Getting better <hr></div>
+    <h2 class="rise">Learning that actually counts for something</h2>
+    <p class="first rise d1">
+      Training tends to be the first thing announced and the first thing
+      dropped. It survives here because it feeds the rating, and because the
+      way it is scored rewards the behaviour you actually want.
+    </p>
+    <p class="rise d1">
+      The naive approach is to take the best quiz score and stop there. That
+      rewards one good afternoon and ignores everything else. So the score
+      combines four things: how well courses are passed, <strong>how many
+      different courses</strong> are covered, how consistent the effort is over
+      time, and the level reached.
+    </p>
+    <p class="rise d1">
+      The practical effect is simple. Retaking the same quiz ten times changes
+      nothing. Passing ten different courses with a steady rhythm takes you to
+      the top of the scale. Effort keeps paying all the way to 100.
+    </p>
+  </div>
+
+  <div class="inset">
+    <figure class="rise">
+      <div class="diagram">
+        <div class="diagram-h">How the skills score is built</div>
+        <svg viewBox="0 0 900 218" role="img" aria-label="Skills score composition">
+          <rect x="0" y="0" width="405" height="38" rx="8" fill="#2F5BEA"/>
+          <text x="18" y="24" font-size="13" font-weight="600" fill="#fff">Mastery, best score per course</text>
+          <text x="387" y="24" font-size="13" font-weight="700" fill="#fff" text-anchor="end">45</text>
+
+          <rect x="415" y="0" width="225" height="38" rx="8" fill="#6C8DF2"/>
+          <text x="433" y="24" font-size="13" font-weight="600" fill="#fff">Coverage</text>
+          <text x="622" y="24" font-size="13" font-weight="700" fill="#fff" text-anchor="end">25</text>
+
+          <rect x="650" y="0" width="160" height="38" rx="8" fill="#A8BCF6"/>
+          <text x="666" y="24" font-size="12.5" font-weight="600" fill="#101319">Consistency</text>
+          <text x="794" y="24" font-size="13" font-weight="700" fill="#101319" text-anchor="end">20</text>
+
+          <rect x="820" y="0" width="80" height="38" rx="8" fill="#D2DDFB"/>
+          <text x="836" y="24" font-size="12.5" font-weight="600" fill="#101319">Level</text>
+          <text x="884" y="36" font-size="11" font-weight="700" fill="#101319" text-anchor="end">10</text>
+
+          <text x="0" y="78" font-size="12.5" font-weight="600" fill="#8B93A1">WHAT THAT PRODUCES</text>
+          <line x1="0" y1="90" x2="900" y2="90" stroke="#E6E9EE"/>
+
+          <text x="0" y="120" font-size="13.5" fill="#565E6B">One course, passed once</text>
+          <rect x="470" y="105" width="64" height="22" rx="6" fill="#F1F3F6"/>
+          <text x="502" y="120" font-size="12.5" font-weight="700" fill="#565E6B" text-anchor="middle">50</text>
+          <text x="554" y="120" font-size="13" fill="#8B93A1">the same course retaken ten times, still 50</text>
+
+          <text x="0" y="158" font-size="13.5" fill="#565E6B">Five courses, steady rhythm</text>
+          <rect x="470" y="143" width="64" height="22" rx="6" fill="#EEF2FE"/>
+          <text x="502" y="158" font-size="12.5" font-weight="700" fill="#2F5BEA" text-anchor="middle">73</text>
+
+          <text x="0" y="196" font-size="13.5" fill="#565E6B">Full path, every course, level reached</text>
+          <rect x="470" y="181" width="64" height="22" rx="6" fill="#0F7A43"/>
+          <text x="502" y="196" font-size="12.5" font-weight="700" fill="#fff" text-anchor="middle">100</text>
+        </svg>
+      </div>
+      <figcaption>
+        An external certification is worth 100 on its own, since it is attested
+        by a third party and nothing internal replaces that.
+      </figcaption>
+    </figure>
+
+  </div>
+
+  <div class="split rise" style="margin-top:64px">
+    <div class="split-text">
+      <p class="pull" style="margin-top:0">
+        The streak is the number of consecutive days with activity.
+      </p>
+      <p>
+        It is the one figure that separates a steady learner from a single good
+        afternoon, and it is the reason consistency carries a fifth of the
+        score rather than nothing at all.
+      </p>
+      <p>
+        Experience, level and streak are recomputed on the server at every
+        attempt, so none of it can be adjusted from the browser.
+      </p>
+    </div>
+    <div class="split-media">
+      <figure>
+        <div class="frame" data-shot="06-quiz.png">
+          <div class="bar"><i></i><i></i><i></i><span class="bar-u">quiz</span></div>
+          <div class="miss">Screenshot pending</div>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 06 -->
+<section id="rating">
+  <div class="wrap">
+    <div class="step-tag rise"><b>06</b> The monthly rating <hr></div>
+    <h2 class="rise">Six criteria, and where each number comes from</h2>
+    <p class="first rise d1">
+      Everything so far converges here. Tickets, absences and training are not
+      separate records, they are the evidence behind a monthly conversation.
+    </p>
+    <p class="rise d1">
+      Four of the six criteria are computed from data the product already
+      holds. The manager can change any of them, and the manual entry always
+      wins, because a month has context that no measurement captures. What the
+      product guarantees is that <strong>the starting point is never
+      invented</strong>.
+    </p>
+    <p class="rise d1">
+      A score is the weighted mean of the criteria that were actually filled
+      in, renormalised. Grading four criteria out of six does not
+      mechanically cap the result at 55, which would have punished the manager
+      rather than described the agent.
+    </p>
+  </div>
+
+  <div class="wrap">
+    <dl class="facts rise">
+      <div class="fact"><dt>SLA, 20</dt><dd>Measured. Share of tickets held inside their deadline.</dd></div>
+      <div class="fact"><dt>Process, 15</dt><dd>Entered. Escalation and notification discipline.</dd></div>
+      <div class="fact"><dt>Handover, 10</dt><dd>Entered. Quality of the shift to shift transmission.</dd></div>
+      <div class="fact"><dt>Attendance, 15</dt><dd>Measured. Unjustified absences and missing notice.</dd></div>
+      <div class="fact"><dt>Skills, 10</dt><dd>Measured. The training path described above.</dd></div>
+      <div class="fact"><dt>Individual goals, 30</dt><dd>Measured. Progress, due dates met, and agreed actions picked up.</dd></div>
+    </dl>
+  </div>
+
+  <div class="bleed">
+    <figure class="rise">
+      <div class="diagram">
+        <div class="diagram-h">Trust matrix, how the team is positioned</div>
+        <svg viewBox="0 0 900 336" role="img" aria-label="Trust matrix quadrants">
+          <rect x="52" y="10" width="392" height="146" rx="12" fill="#FBFBFC" stroke="#E6E9EE"/>
+          <text x="74" y="44" font-size="15" font-weight="700" fill="#101319">Grow</text>
+          <text x="74" y="70" font-size="13" fill="#565E6B">Trusted, results still building</text>
+          <text x="74" y="94" font-size="13" fill="#8B93A1">Coaching, pairing, short horizon goals</text>
+
+          <rect x="456" y="10" width="392" height="146" rx="12" fill="#EDF7F1" stroke="#C6E5D4"/>
+          <text x="478" y="44" font-size="15" font-weight="700" fill="#0F7A43">Top performer</text>
+          <text x="478" y="70" font-size="13" fill="#0F7A43">Trusted, delivering</text>
+          <text x="478" y="94" font-size="13" fill="#565E6B">Autonomy, referent roles, career steps</text>
+
+          <rect x="52" y="172" width="392" height="146" rx="12" fill="#FDF5EA" stroke="#F0DCBC"/>
+          <text x="74" y="206" font-size="15" font-weight="700" fill="#B45309">Watch</text>
+          <text x="74" y="232" font-size="13" fill="#B45309">Neither yet</text>
+          <text x="74" y="256" font-size="13" fill="#565E6B">Explicit expectations, close follow up</text>
+
+          <rect x="456" y="172" width="392" height="146" rx="12" fill="#FBFBFC" stroke="#E6E9EE"/>
+          <text x="478" y="206" font-size="15" font-weight="700" fill="#101319">Go</text>
+          <text x="478" y="232" font-size="13" fill="#565E6B">Results without engagement</text>
+          <text x="478" y="256" font-size="13" fill="#8B93A1">Understand the disengagement first</text>
+
+          <text x="24" y="176" font-size="11" font-weight="600" fill="#8B93A1" transform="rotate(-90 24 176)">ENGAGEMENT</text>
+          <text x="412" y="334" font-size="11" font-weight="600" fill="#8B93A1">PERFORMANCE</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>On the wording.</b> Earlier versions used names like brilliant
+        mercenary and dead weight. They came from no reference document and
+        could not be repeated to the person concerned, so they were replaced by
+        four that can be said out loud in a review.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 07 -->
+<section id="review">
+  <div class="wrap">
+    <div class="step-tag rise"><b>07</b> The review <hr></div>
+    <h2 class="rise">Sitting down with one person</h2>
+    <p class="first rise d1">
+      A one to one that starts with opening five screens has already lost ten
+      minutes and most of its attention. The agent profile exists to remove
+      that.
+    </p>
+    <p class="rise d1">
+      One page gathers what the product knows: a radar over the six criteria,
+      the goals with their milestones and due dates, the actions agreed last
+      time, and the full interview history. The radar matters because
+      <strong>a dent in a shape is spotted before the labels are read</strong>,
+      which a column of six numbers never achieves.
+    </p>
+    <p class="rise d1">
+      Strengths and watch points are derived from the measurements with
+      explicit thresholds. Nothing is asserted without data. A criterion that
+      was never filled in appears in neither column, rather than being quietly
+      counted as a weakness.
+    </p>
+  </div>
+
+  <div class="wide">
+    <figure class="rise">
+      <div class="diagram">
+        <div class="diagram-h">Agent profile, and what the product infers from it</div>
+        <svg viewBox="0 0 900 336" role="img" aria-label="Agent competency radar">
+          <g transform="translate(196,168)">
+            <polygon points="0,-128 110.9,-64 110.9,64 0,128 -110.9,64 -110.9,-64" fill="none" stroke="#E6E9EE"/>
+            <polygon points="0,-96 83.1,-48 83.1,48 0,96 -83.1,48 -83.1,-48" fill="none" stroke="#F1F3F6"/>
+            <polygon points="0,-64 55.4,-32 55.4,32 0,64 -55.4,32 -55.4,-32" fill="none" stroke="#F1F3F6"/>
+            <polygon points="0,-32 27.7,-16 27.7,16 0,32 -27.7,16 -27.7,-16" fill="none" stroke="#F1F3F6"/>
+            <line x1="0" y1="0" x2="0" y2="-128" stroke="#E6E9EE"/>
+            <line x1="0" y1="0" x2="110.9" y2="-64" stroke="#E6E9EE"/>
+            <line x1="0" y1="0" x2="110.9" y2="64" stroke="#E6E9EE"/>
+            <line x1="0" y1="0" x2="0" y2="128" stroke="#E6E9EE"/>
+            <line x1="0" y1="0" x2="-110.9" y2="64" stroke="#E6E9EE"/>
+            <line x1="0" y1="0" x2="-110.9" y2="-64" stroke="#E6E9EE"/>
+            <polygon points="0,-117.8 88.7,-51.2 66.5,38.4 0,83.2 -49.9,28.8 -77.6,-44.8"
+                     fill="rgba(47,91,234,.16)" stroke="#2F5BEA" stroke-width="2.4" stroke-linejoin="round"/>
+            <circle cx="0" cy="-117.8" r="3.6" fill="#2F5BEA"/>
+            <circle cx="88.7" cy="-51.2" r="3.6" fill="#2F5BEA"/>
+            <circle cx="66.5" cy="38.4" r="3.6" fill="#2F5BEA"/>
+            <circle cx="0" cy="83.2" r="3.6" fill="#2F5BEA"/>
+            <circle cx="-49.9" cy="28.8" r="3.6" fill="#2F5BEA"/>
+            <circle cx="-77.6" cy="-44.8" r="3.6" fill="#2F5BEA"/>
+            <text x="0" y="-144" font-size="12" font-weight="600" fill="#101319" text-anchor="middle">SLA 92</text>
+            <text x="126" y="-72" font-size="12" font-weight="600" fill="#101319">Process 80</text>
+            <text x="126" y="80" font-size="12" font-weight="600" fill="#101319">Handover 60</text>
+            <text x="0" y="154" font-size="12" font-weight="600" fill="#101319" text-anchor="middle">Attendance 65</text>
+            <text x="-126" y="80" font-size="12" font-weight="600" fill="#101319" text-anchor="end">Skills 45</text>
+            <text x="-126" y="-72" font-size="12" font-weight="600" fill="#101319" text-anchor="end">Goals 70</text>
+          </g>
+          <text x="452" y="52" font-size="13" font-weight="700" fill="#0F7A43">STRENGTHS</text>
+          <text x="452" y="82" font-size="13.5" fill="#565E6B">SLA held at 92 percent, reliable on deadlines</text>
+          <text x="452" y="108" font-size="13.5" fill="#565E6B">Goals well advanced, 70 percent</text>
+          <text x="452" y="134" font-size="13.5" fill="#565E6B">Every due date met this quarter</text>
+
+          <text x="452" y="190" font-size="13" font-weight="700" fill="#B45309">WATCH POINTS</text>
+          <text x="452" y="220" font-size="13.5" fill="#565E6B">Training barely started, two courses of ten</text>
+          <text x="452" y="246" font-size="13.5" fill="#565E6B">Attendance at 65, one unjustified absence</text>
+          <text x="452" y="272" font-size="13.5" fill="#565E6B">Handover notes thin on recent rotations</text>
+        </svg>
+      </div>
+      <figcaption>
+        The team view lists who has had no recent interview, whose goals are
+        overdue and which agreed actions are still waiting. That is the working
+        queue for a manager, not a report to be filed.
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="wrap">
+    <p class="pull rise">
+      Actions agreed in an interview are extracted line by line and carried to
+      the next one. An action that was never picked up shows as still open,
+      which is usually the most useful thing on the page.
+    </p>
+  </div>
+</section>
+
+<!-- 08 -->
+<section id="report">
+  <div class="wrap">
+    <div class="step-tag rise"><b>08</b> Telling the story <hr></div>
+    <h2 class="rise">Somebody upstairs asks how the month went</h2>
+    <p class="first rise d1">
+      The same records that ran the floor produce the reporting, which is the
+      only way the numbers in a steering committee ever match the numbers on
+      the operations screen.
+    </p>
+    <p class="rise d1">
+      Daily, weekly and monthly reports are generated from live data, and the
+      weekly deck exports to PowerPoint server side with the team layout. That
+      export is deliberately <strong>disabled outside the Senegal
+      perimeter</strong>, because the template is a Senegal report and letting
+      it run on CI would produce a document that contradicts its own title.
+    </p>
+    <p class="rise d1">
+      Two companion screens keep the data trustworthy. Data Quality flags
+      tickets with missing fields, impossible dates or contradictory statuses.
+      The Audit Trail records who changed what, when, and what the previous
+      value was.
+    </p>
+  </div>
+
+  <div class="split flip rise" style="margin-top:24px">
+    <div class="split-text">
+      <p class="pull" style="margin-top:0">
+        The numbers in a steering committee match the numbers on the floor.
+      </p>
+      <p>
+        Not because someone reconciled two spreadsheets, but because there is
+        only one set of records. Ops Review sits alongside the weekly report
+        for the deeper cut, breaking a period down by domain, priority and
+        affiliate.
+      </p>
+    </div>
+    <div class="split-media">
+      <figure>
+        <div class="frame" data-shot="12-reports.png">
+          <div class="bar"><i></i><i></i><i></i><span class="bar-u">weekly report</span></div>
+          <div class="miss">Screenshot pending</div>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 09 -->
+<section id="settings">
+  <div class="wrap">
+    <div class="step-tag rise"><b>09</b> Behind the scenes <hr></div>
+    <h2 class="rise">Everything above is configurable</h2>
+    <p class="first rise d1">
+      None of the rules described here are hard coded. Deadlines, domains,
+      statuses, team composition, rotation sites, quiz bank, interview template
+      and rating targets all live in configuration.
+    </p>
+    <p class="rise d1">
+      Eleven settings areas sit behind a single unlock that lasts eight hours,
+      reachable from one overview with a search field. The search matches both
+      the title and the description, so looking for the word password finds
+      Access and security without knowing it was called that.
+    </p>
+    <p class="rise d1">
+      Two areas deserve a mention. <strong>Live sessions</strong> shows who is
+      connected and on which page, and allows a session to be closed remotely.
+      <strong>Access and security</strong> is where personal codes are issued
+      for the appraisal view described next.
+    </p>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="trust">
+  <div class="wrap">
+    <div class="step-tag rise"><b>10</b> Who sees what <hr></div>
+    <h2 class="rise">Appraisal data stays where it belongs</h2>
+    <p class="first rise d1">
+      A rating is a personal record. An interview note is a personal record.
+      The product treats them that way, and the enforcement lives on the
+      server rather than in the interface.
+    </p>
+    <p class="rise d1">
+      That distinction is the whole point. Hiding a screen is not protection if
+      the data has already travelled to the browser, where anyone can read it
+      from the console. <strong>The route refuses, not the interface.</strong>
+    </p>
+    <p class="rise d1">
+      An agent reads their own level with a Huawei ID and a personal code
+      issued by their manager. The code is stored hashed and shown once, at
+      creation. The endpoint takes no agent identifier at all, so there is no
+      request shape that returns a colleague's score, even with a valid
+      session.
+    </p>
+  </div>
+
+  <div class="inset">
+    <figure class="rise">
+      <div class="frame shotwrap" data-shot="16-ma-performance.png">
+        <div class="bar"><i></i><i></i><i></i><span class="bar-u">my performance</span></div>
+        <span class="pin" style="left:31.5%;top:40%">1</span>
+        <span class="pin" style="left:31.5%;top:45%">2</span>
+        <div class="miss">Screenshot pending</div>
+      </div>
+      <ul class="keys">
+        <li><span class="k">1</span><div><b>Huawei ID.</b> Identifies the agent,
+          but on its own it proves nothing. Colleagues know each other's IDs,
+          so it is a name, not a secret.</div></li>
+        <li><span class="k">2</span><div><b>Personal code.</b> Issued by the
+          manager, stored hashed, displayed once at creation. Regenerating it
+          cuts any session opened with the previous one.</div></li>
+      </ul>
+      <figcaption>
+        <b>What the agent gets once inside.</b> A qualitative level, a trend
+        against last month and the score itself. No comparison with colleagues,
+        no criterion breakdown. The detail belongs in the conversation with the
+        manager, not on a screen read alone.
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="wrap">
+    <div class="tw rise">
+      <table>
+        <thead><tr><th>Realm</th><th>Secret</th><th>Session</th><th>Reaches</th></tr></thead>
+        <tbody>
+          <tr><td><b>Team</b></td><td>Declared identity</td><td>Browser</td><td>Trackers, planning, quizzes, reports</td></tr>
+          <tr><td><b>Administration</b></td><td>Config password</td><td>8 hours</td><td>Settings, ratings, ops review</td></tr>
+          <tr><td><b>HR records</b></td><td>Separate password</td><td>Own registry</td><td>Absence reasons and balances</td></tr>
+          <tr><td><b>Own appraisal</b></td><td>Personal code, hashed</td><td>30 minutes</td><td>One agent's own level, nothing more</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="quiet rise">
+      Every administrative action, a decision, a forced sign out, a code
+      issued, leaves a timestamped trace. Three separate secrets mean an
+      administrator token does not open HR records, and the reverse holds too.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>EMOC Tracker 2.7</b>, designed by Halima GUEYE</p>
+    <p class="quiet" style="margin-top:4px">Playbook page, no live data is displayed here</p>
+  </div>
+</footer>
+
+<script>
+// Screenshots. A frame declares the file it expects. If it loads, it
+// replaces the placeholder; otherwise the placeholder stays. Adding a
+// capture never requires editing this page.
+document.querySelectorAll('.frame[data-shot]').forEach(function (frame) {
+  var name = frame.getAttribute('data-shot');
+  var img = new Image();
+  img.onload = function () {
+    var miss = frame.querySelector('.miss');
+    if (miss) miss.remove();
+    img.alt = name;
+    // Insert before the markers so they stay painted on top of the image.
+    var firstPin = frame.querySelector('.pin');
+    if (firstPin) frame.insertBefore(img, firstPin); else frame.appendChild(img);
+    // Markers stay hidden until the capture is actually there, otherwise
+    // they would float over an empty placeholder.
+    frame.classList.add('ready');
+  };
+  img.src = 'demo/' + name;
+});
+
+// Reveal on scroll, once per element.
+var io = new IntersectionObserver(function (entries) {
+  entries.forEach(function (e) {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+}, { rootMargin: '0px 0px -50px 0px', threshold: 0.05 });
+document.querySelectorAll('.rise').forEach(function (el) { io.observe(el); });
+
+// Anything already above the fold is revealed at once. This covers two
+// cases the observer alone would leave blank: landing on a deep anchor,
+// and a jump that skips past elements without ever crossing them.
+function revealPassed() {
+  var limit = scrollY + innerHeight;
+  document.querySelectorAll('.rise:not(.in)').forEach(function (el) {
+    if (el.getBoundingClientRect().top + scrollY < limit) {
+      el.classList.add('in');
+      io.unobserve(el);
+    }
+  });
+}
+requestAnimationFrame(revealPassed);
+addEventListener('load', revealPassed);
+
+// Reading progress, and the chapter currently in view. Both are driven by
+// scroll position rather than by observer callbacks: an observer lights up
+// whichever section crosses the band, which lit two chapters at once during
+// a fast scroll.
+var links = Array.prototype.slice.call(document.querySelectorAll('nav a'));
+var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+var prog = document.getElementById('prog');
+var ticking = false;
+
+function update() {
+  ticking = false;
+  // A fast jump can outrun the observer, leaving a passed element blank.
+  revealPassed();
+  var h = document.documentElement;
+  var max = h.scrollHeight - h.clientHeight;
+  prog.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+
+  // The chapter whose top has passed the upper third of the viewport.
+  var mark = h.scrollTop + h.clientHeight * 0.33;
+  var current = null;
+  sections.forEach(function (s) { if (s.offsetTop <= mark) current = s; });
+  links.forEach(function (a) {
+    a.classList.toggle('on', !!current && a.getAttribute('href') === '#' + current.id);
+  });
+}
+
+addEventListener('scroll', function () {
+  if (!ticking) { ticking = true; requestAnimationFrame(update); }
+}, { passive: true });
+addEventListener('resize', update);
+update();
+</script>
+
+</body>
+</html>

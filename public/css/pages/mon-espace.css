@@ -1,0 +1,799 @@
+/* ══════════════════════════════════════════════════════════════
+   MY SPACE (page « mon-espace »)
+
+   Même vocabulaire que les pages Équipe et Rapports : surfaces à trait
+   fin, rayons de 14–16 px, onglets soulignés, pastilles arrondies.
+   L'urgence d'une ligne se lit par l'icône teintée, jamais par un
+   liseré latéral.
+
+   Pensé pour un agent pressé, souvent sur téléphone : lignes entières
+   cliquables d'au moins 64 px, un seul bouton par ligne, rien qui
+   déborde à 375 px.
+
+   Les écrans montés dans #mes-mount gardent leur propre feuille ; on
+   n'y retire que ce que l'en-tête commun rend redondant, et on les
+   tasse un peu sur téléphone.
+   ══════════════════════════════════════════════════════════════ */
+#page-mon-espace{
+  --mes-surf:var(--m3-surface,#fff);
+  --mes-surf-2:var(--m3-surf-1,#F8F9FA);
+  --mes-line:var(--m3-outline-var,#E3E3E3);
+  --mes-ink:var(--m3-on-surface,#1F1F1F);
+  --mes-mute:var(--m3-on-surf-var,#5F6368);
+  --mes-pri:var(--m3-primary,#C7000B);
+  --mes-on-pri:#fff;
+  --mes-pri-cont:var(--m3-primary-cont,#FDECEC);
+  --mes-on-pri-cont:var(--m3-on-primary-cont,#8C0009);
+  --mes-ok:#1E8E3E;--mes-ok-bg:#E6F4EA;
+  --mes-bad:#C5221F;--mes-bad-bg:#FCE8E6;
+  --mes-warn:#B06000;--mes-warn-bg:#FEF7E0;
+  --mes-info:#1A73E8;--mes-info-bg:#E8F0FE;
+  --mes-shadow:0 1px 2px rgba(60,64,67,.3),0 2px 6px 2px rgba(60,64,67,.15);
+  color:var(--mes-ink);
+  padding-bottom:40px;
+}
+[data-theme="dark"] #page-mon-espace{
+  --mes-surf:var(--m3-surf-1,#0E0E10);
+  --mes-surf-2:var(--m3-surf-2,#151517);
+  --mes-line:rgba(255,255,255,.1);
+  --mes-on-pri:#1A1A1A;
+  --mes-ok:#81C995;--mes-ok-bg:rgba(129,201,149,.12);
+  --mes-bad:#F28B82;--mes-bad-bg:rgba(242,139,130,.14);
+  --mes-warn:#FDD663;--mes-warn-bg:rgba(253,214,99,.12);
+  --mes-info:#8AB4F8;--mes-info-bg:rgba(138,180,248,.12);
+  --mes-shadow:0 2px 10px rgba(0,0,0,.55);
+}
+#page-mon-espace h1.page-title{margin:0}
+
+/* Menu replié en icônes (réglage par défaut) : la pastille de l'entrée
+   doit rester visible. La règle générique du rail réduit à zéro tout
+   <span> enfant direct d'une entrée (le conteneur du cadenas) ; celle-ci
+   rend sa taille à la pastille de My Space. */
+.app.sb-rail .nav-item[data-page="mon-espace"] > .nav-item-badge{
+  top:5px;right:5px;width:8px;min-width:8px;height:8px;border-radius:50%;
+  background:var(--m3-primary,#C7000B);box-shadow:0 0 0 2px var(--m3-surface,#fff);
+}
+#page-mon-espace button{font:inherit}
+#page-mon-espace button:focus-visible{outline:2px solid var(--mes-pri);outline-offset:2px}
+
+/* ── En-tête : titre, état du jour, identité ── */
+#page-mon-espace .mes-head{margin-bottom:14px;min-width:0}
+#page-mon-espace .mes-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+#page-mon-espace .mes-head .page-sub{margin:4px 0 0;line-height:1.5}
+#page-mon-espace .mes-head .page-sub b{color:var(--mes-ink);font-weight:600}
+#page-mon-espace .mes-link{
+  border:none;background:transparent;color:var(--mes-pri);cursor:pointer;
+  font-size:13px;font-weight:600;padding:6px 10px;border-radius:999px;white-space:nowrap;
+}
+#page-mon-espace .mes-link:hover{background:var(--mes-pri-cont)}
+#page-mon-espace .mes-notyou{margin-left:2px;padding:4px 8px;font-size:12.5px;font-weight:500;color:var(--mes-mute)}
+#page-mon-espace .mes-notyou:hover{color:var(--mes-pri)}
+#page-mon-espace .mes-inline{padding:0 2px;font-size:inherit;border-radius:4px;text-decoration:underline;text-underline-offset:2px}
+#page-mon-espace .mes-inline:hover{background:none}
+#page-mon-espace .mes-lock{
+  display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border-radius:999px;
+  border:1px solid var(--mes-line);background:var(--mes-surf);color:var(--mes-ink);
+  font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;
+}
+#page-mon-espace .mes-lock:hover{border-color:var(--mes-mute)}
+#page-mon-espace .mes-warn{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 16px;padding:10px 14px;
+  border-radius:12px;background:var(--mes-warn-bg);color:var(--mes-warn);font-size:13px;
+}
+#page-mon-espace .mes-warn b{color:var(--mes-ink)}
+
+/* ── Onglets ── */
+#page-mon-espace .mes-tabs{
+  display:flex;gap:2px;margin-bottom:18px;border-bottom:1px solid var(--mes-line);
+}
+#page-mon-espace .mes-tab{
+  position:relative;display:inline-flex;align-items:center;gap:8px;flex-shrink:0;
+  min-height:48px;padding:10px 16px;border:none;background:none;cursor:pointer;white-space:nowrap;
+  font-size:14px;color:var(--mes-mute);border-radius:12px 12px 0 0;
+}
+#page-mon-espace .mes-tab-i{width:18px;height:18px;flex-shrink:0}
+#page-mon-espace .mes-tab:hover{background:var(--mes-surf-2);color:var(--mes-ink)}
+#page-mon-espace .mes-tab.is-on{color:var(--mes-pri);font-weight:600}
+#page-mon-espace .mes-tab.is-on::after{
+  content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:3px;
+  border-radius:3px 3px 0 0;background:var(--mes-pri);
+}
+#page-mon-espace .mes-tab:focus-visible{outline:2px solid var(--mes-pri);outline-offset:-2px}
+#page-mon-espace .mes-badge{
+  min-width:20px;height:20px;padding:0 6px;border-radius:999px;display:inline-grid;place-items:center;
+  font-size:11.5px;font-weight:600;background:var(--mes-pri);color:var(--mes-on-pri);
+}
+#page-mon-espace .mes-tab-lock{display:inline-flex;color:var(--mes-mute);opacity:.8}
+#page-mon-espace .mes-tab-sl{display:none}
+
+/* ── Sections de l'accueil ── */
+#page-mon-espace .mes-sec{max-width:1100px;margin-bottom:24px}
+#page-mon-espace .mes-h2{
+  display:flex;align-items:center;gap:8px;margin:0 0 10px;padding:0;border:none;
+  font-size:15px;font-weight:600;color:var(--mes-ink);
+}
+
+/* Une ligne = un geste. Toute la ligne est le bouton : la cible est
+   grande, et l'intitulé de l'action à droite dit ce qui va se passer. */
+#page-mon-espace .mes-list{display:flex;flex-direction:column;gap:8px}
+#page-mon-espace .mes-row{
+  display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:14px;
+  width:100%;min-height:68px;padding:12px 14px 12px 12px;text-align:left;cursor:pointer;
+  border:1px solid var(--mes-line);border-radius:16px;background:var(--mes-surf);color:var(--mes-ink);
+  transition:box-shadow .15s,border-color .15s;
+}
+#page-mon-espace .mes-row:hover{box-shadow:var(--mes-shadow)}
+[data-theme="dark"] #page-mon-espace .mes-row:hover{border-color:var(--m3-outline,#8E918F)}
+#page-mon-espace .mes-row-i{
+  width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  background:var(--mes-info-bg);color:var(--mes-info);
+}
+#page-mon-espace .mes-row.is-due .mes-row-i{background:var(--mes-warn-bg);color:var(--mes-warn)}
+#page-mon-espace .mes-row.is-late .mes-row-i{background:var(--mes-bad-bg);color:var(--mes-bad)}
+#page-mon-espace .mes-row-b{display:flex;flex-direction:column;gap:3px;min-width:0}
+#page-mon-espace .mes-row-t{font-size:15px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+#page-mon-espace .mes-row-d{font-size:13px;color:var(--mes-mute);line-height:1.4;overflow-wrap:anywhere}
+#page-mon-espace .mes-row-cta{
+  display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px 0 16px;border-radius:999px;
+  background:var(--mes-pri-cont);color:var(--mes-on-pri-cont);font-size:13.5px;font-weight:600;white-space:nowrap;
+}
+/* Le retard porte le bouton plein : c'est la première chose à faire. */
+#page-mon-espace .mes-row.is-late .mes-row-cta,
+#page-mon-espace .mes-row:hover .mes-row-cta{background:var(--mes-pri);color:var(--mes-on-pri)}
+
+/* Rien à faire : un vrai résultat, dit comme tel. */
+#page-mon-espace .mes-clear{
+  display:flex;align-items:center;gap:16px;max-width:1100px;margin-bottom:24px;padding:20px 22px;
+  border-radius:16px;background:var(--mes-ok-bg);color:var(--mes-ink);
+}
+#page-mon-espace .mes-clear-ico{
+  width:56px;height:56px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;
+  background:var(--mes-surf);color:var(--mes-ok);
+}
+#page-mon-espace .mes-clear-t{font-size:18px;font-weight:600;color:var(--mes-ok)}
+#page-mon-espace .mes-clear-d{font-size:13.5px;color:var(--mes-mute);margin-top:3px;line-height:1.5}
+#page-mon-espace .mes-clear-d .mes-inline{color:var(--mes-ink)}
+
+/* ── Repères ── */
+#page-mon-espace .mes-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+#page-mon-espace .mes-tile{
+  display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;min-height:112px;
+  padding:14px 16px;text-align:left;cursor:pointer;
+  border:1px solid var(--mes-line);border-radius:16px;background:var(--mes-surf);color:var(--mes-ink);
+  transition:box-shadow .15s,border-color .15s;
+}
+#page-mon-espace .mes-tile:hover{box-shadow:var(--mes-shadow)}
+[data-theme="dark"] #page-mon-espace .mes-tile:hover{border-color:var(--m3-outline,#8E918F)}
+#page-mon-espace .mes-tile-h{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--mes-mute)}
+#page-mon-espace .mes-tile-v{font-size:19px;font-weight:600;line-height:1.25;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#page-mon-espace .mes-tile-v small{font-size:13px;font-weight:500;color:var(--mes-mute)}
+#page-mon-espace .mes-tile-m{font-size:12.5px;color:var(--mes-mute);line-height:1.35;margin-top:auto;overflow-wrap:anywhere}
+#page-mon-espace .mes-tile-lock{display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--mes-mute)}
+#page-mon-espace .mes-bar{display:block;width:100%;height:6px;border-radius:999px;background:var(--mes-surf-2);overflow:hidden}
+[data-theme="dark"] #page-mon-espace .mes-bar{background:rgba(255,255,255,.08)}
+#page-mon-espace .mes-bar i{display:block;height:100%;border-radius:inherit;background:var(--mes-ok)}
+
+/* ── États vides ── */
+#page-mon-espace .mes-empty{
+  max-width:520px;margin:24px auto;padding:28px 24px;text-align:center;
+  border:1px solid var(--mes-line);border-radius:16px;background:var(--mes-surf);
+}
+#page-mon-espace .mes-empty-ico{
+  width:56px;height:56px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;
+  background:var(--mes-info-bg);color:var(--mes-info);
+}
+#page-mon-espace .mes-empty-t{font-size:17px;font-weight:600}
+#page-mon-espace .mes-empty-d{font-size:13.5px;color:var(--mes-mute);margin:6px 0 16px;line-height:1.45}
+#page-mon-espace .mes-btn{
+  display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 22px;border-radius:999px;
+  border:none;background:var(--mes-pri-cont);color:var(--mes-on-pri-cont);font-size:14px;font-weight:600;cursor:pointer;
+}
+#page-mon-espace .mes-btn.is-pri{background:var(--mes-pri);color:var(--mes-on-pri)}
+#page-mon-espace .mes-note{
+  max-width:1100px;padding:18px 20px;border-radius:16px;font-size:13.5px;line-height:1.5;
+  color:var(--mes-mute);background:var(--mes-surf-2);
+}
+
+/* ── Écrans montés ──
+   Leur titre cède la place à celui de My Space ; leur sélecteur
+   d'agent à l'identité affichée en haut. */
+#mes-mount > .page > .page-title,
+#mes-mount > .page > .page-sub,
+#mes-mount > #page-my-requests .mr-head .page-title,
+#mes-mount > #page-my-requests .mr-sub,
+#mes-mount > #page-weekly-progress .wp-header-id,
+#mes-mount > #page-quiz .qz-header-id{display:none}
+#mes-mount > #page-my-requests[data-mes-me] #mr-who{display:none}
+#mes-mount > #page-my-requests .mr-head{justify-content:flex-end}
+/* My Performance : le nom est déjà en haut ; reste la période et la sortie. */
+#mes-mount > #page-my-perf .myperf-av,
+#mes-mount > #page-my-perf .myperf-who,
+#mes-mount > #page-my-perf .myperf-idbar > .btn{display:none}
+#mes-mount > #page-my-perf .myperf-gate{padding-top:8px}
+/* Reste une ligne : la période à gauche, l'état de la notation à droite. */
+#mes-mount > #page-my-perf .myperf-idbar{flex-wrap:nowrap;padding:12px 16px}
+#mes-mount > #page-my-perf .myperf-idtxt{flex:1 1 auto}
+#mes-mount > #page-my-perf .myperf-idbar-sp{display:none}
+#mes-mount > #page-my-perf .myperf-period{font-size:13px;margin:0}
+/* Accès par code : l'ID vient du profil, il ne reste que le code. */
+#mes-mount > #page-my-perf[data-mes-id] #myperf-id,
+#mes-mount > #page-my-perf[data-mes-id] .myperf-lock-d{display:none}
+#mes-mount > #page-my-perf[data-mes-id] .myperf-lock-t{margin-bottom:6px}
+#page-mon-espace .mes-gate-who{font-size:13px;color:var(--mes-mute);line-height:1.5;margin-bottom:8px}
+#page-mon-espace .mes-gate-id{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px 4px;margin-top:8px;
+  font-size:12.5px;color:var(--mes-ink);font-weight:500;
+}
+#page-mon-espace .mes-gate-who .mes-link{padding:4px 8px;font-size:12.5px}
+#mes-mount > #page-my-perf #myperf-code,
+#mes-mount > #page-my-perf #myperf-submit{min-height:44px;font-size:15px}
+
+@media (max-width:900px){
+  #page-mon-espace .mes-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Téléphone : onglets en barre d'icônes (tous visibles, sans défilement),
+   actions sous le texte, cible pleine largeur. */
+@media (max-width:640px){
+  /* L'en-tête se tasse : sur un téléphone, ce qui est à faire doit
+     apparaître sans défiler. */
+  #page-mon-espace .mes-head{margin-bottom:10px}
+  #page-mon-espace .mes-head .page-sub{font-size:13.5px}
+  /* Le cadenas seul : son libellé est dans aria-label et l'infobulle. */
+  #page-mon-espace .mes-lock{width:40px;height:40px;padding:0;justify-content:center}
+  #page-mon-espace .mes-lock-l{display:none}
+  #page-mon-espace .mes-tabs{display:grid;grid-template-columns:repeat(var(--mes-n,5),minmax(0,1fr));gap:0;margin-bottom:14px}
+  #page-mon-espace .mes-tab{
+    flex-direction:column;gap:3px;padding:8px 2px 9px;min-height:58px;font-size:11.5px;
+    border-radius:12px 12px 0 0;justify-content:center;
+  }
+  #page-mon-espace .mes-tab-l{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  /* Libellé court quand le long ne tient pas (Performance → Perf). */
+  #page-mon-espace .mes-tab-sl{display:block}
+  #page-mon-espace .mes-tab-l.has-sl{display:none}
+  #page-mon-espace .mes-tab-i{width:20px;height:20px}
+  #page-mon-espace .mes-tab .mes-badge,
+  #page-mon-espace .mes-tab .mes-tab-lock{position:absolute;top:4px;left:calc(50% + 6px)}
+  #page-mon-espace .mes-tab .mes-badge{min-width:18px;height:18px;font-size:10.5px;padding:0 5px}
+  #page-mon-espace .mes-tab.is-on::after{left:18%;right:18%}
+  #page-mon-espace .mes-row{
+    grid-template-columns:40px minmax(0,1fr);grid-template-areas:"i b" "i c";
+    gap:8px 12px;padding:12px 12px 12px 10px;align-items:start;
+  }
+  #page-mon-espace .mes-row-i{grid-area:i;width:40px;height:40px}
+  #page-mon-espace .mes-row-b{grid-area:b}
+  #page-mon-espace .mes-row-cta{grid-area:c;justify-self:start;height:40px;padding:0 16px 0 18px;font-size:14px}
+  #page-mon-espace .mes-row-d{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #page-mon-espace .mes-clear{padding:16px;gap:14px}
+  #page-mon-espace .mes-clear-ico{width:48px;height:48px}
+  #page-mon-espace .mes-tiles{gap:8px}
+  #page-mon-espace .mes-tile{min-height:104px;padding:12px 14px}
+  #page-mon-espace .mes-tile-v{font-size:17px}
+
+  /* My Tasks : la semaine sur une ligne (‹ semaine ›), les filtres
+     dessous ; « This week » n'apparaît que loin de la semaine en cours. */
+  #mes-mount > #page-weekly-progress .wp-weekbar{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:6px 4px}
+  #mes-mount > #page-weekly-progress .wp-weekpick{grid-column:2;grid-row:1;justify-content:center;min-width:0;padding:0 10px}
+  #mes-mount > #page-weekly-progress .wp-weekpick-main{overflow:hidden;text-overflow:ellipsis}
+  #mes-mount > #page-weekly-progress .wp-weeknav:first-child{grid-column:1;grid-row:1}
+  #mes-mount > #page-weekly-progress .wp-weekpick ~ .wp-weeknav{grid-column:3;grid-row:1}
+  #mes-mount > #page-weekly-progress .wp-datehidden{position:absolute}
+  #mes-mount > #page-weekly-progress .wp-today{grid-column:1/-1;height:40px}
+  #mes-mount > #page-weekly-progress .wp-today[disabled]{display:none}
+  #mes-mount > #page-weekly-progress .wp-select{grid-column:1/-1;width:100%}
+  #mes-mount > #page-weekly-progress #wp-sort{display:none}
+  #mes-mount > #page-weekly-progress .wp-weekpick svg{display:none}
+  #mes-mount > #page-weekly-progress .wp-weekpick-tag{white-space:nowrap;font-size:10px;padding:2px 7px}
+  /* Les quatre compteurs en deux lignes compactes (libellé, nombre),
+     sous l'anneau : la liste des tâches arrive plus vite à l'écran. */
+  #mes-mount > #page-weekly-progress .wp-overview{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #mes-mount > #page-weekly-progress .wp-tile{flex-direction:row;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;min-width:0}
+  #mes-mount > #page-weekly-progress .wp-tile-hero{padding:12px 14px;justify-content:flex-start}
+  #mes-mount > #page-weekly-progress .wp-tile-k{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  #mes-mount > #page-weekly-progress .wp-tile-v{font-size:22px}
+  #mes-mount > #page-weekly-progress .wp-tile:not(.wp-tile-hero) .wp-tile-hint{display:none}
+
+  /* Quiz : série, XP et cours sur une ligne, le niveau dessous. */
+  #mes-mount > #page-quiz .g-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:20px}
+  #mes-mount > #page-quiz .g-stat{min-width:0;padding:10px;gap:8px;flex-direction:column;align-items:flex-start}
+  #mes-mount > #page-quiz .g-stat.g-stat-wide{grid-column:1/-1;flex-direction:row;align-items:center;min-width:0}
+  #mes-mount > #page-quiz .g-stat-ico{width:30px;height:30px}
+
+  /* My Requests : les trois compteurs sur une ligne. */
+  #mes-mount > #page-my-requests .mr-kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  #mes-mount > #page-my-requests .mr-kpi{padding:12px}
+  #mes-mount > #page-my-requests .mr-head-actions{width:100%}
+  #mes-mount > #page-my-requests .mr-head-actions .btn{flex:1;min-height:44px;font-size:15px;justify-content:center;text-align:center}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REFONTE ÉPURÉE (30/09)
+   Moins de traits, plus d'air : une colonne centrée, des surfaces
+   pleines sans bordure, un seul bloc « à faire » découpé par de fins
+   séparateurs, des onglets en pastille. En sombre, la page est en noir
+   pur (#000) et les surfaces montent d'un cran (#0E0E10) — le relief
+   vient de la surface, pas d'un contour.
+   ══════════════════════════════════════════════════════════════ */
+#page-mon-espace{
+  --mes-card:#FFFFFF;
+  --mes-card-2:#F4F5F7;
+  --mes-hair:rgba(0,0,0,.06);
+  /* Pleine largeur, alignée à gauche comme les autres pages : centrée,
+     la page laissait de grands vides sur les écrans larges. */
+  max-width:none;margin:0;padding-top:6px;
+}
+[data-theme="dark"] #page-mon-espace{
+  --mes-card:#0E0E10;
+  --mes-card-2:#151517;
+  --mes-hair:rgba(255,255,255,.06);
+}
+/* Fond de page légèrement grisé en clair, pour que les cartes blanches
+   se détachent sans contour ; noir pur en sombre. */
+.main:has(#page-mon-espace.active){background:#F7F8FA}
+[data-theme="dark"] .main:has(#page-mon-espace.active){background:#000}
+
+/* ── En-tête ── */
+#page-mon-espace .mes-head{margin-bottom:22px}
+#page-mon-espace .mes-eyebrow{
+  font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--mes-mute);margin-bottom:6px;
+}
+#page-mon-espace .mes-hello{font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+#page-mon-espace .mes-sub{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+#page-mon-espace .mes-state{
+  display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:999px;
+  font-size:13px;font-weight:600;
+}
+#page-mon-espace .mes-state i{width:7px;height:7px;border-radius:50%;background:currentColor}
+#page-mon-espace .mes-state.is-todo{background:var(--mes-bad-bg);color:var(--mes-bad)}
+#page-mon-espace .mes-state.is-ok{background:var(--mes-ok-bg);color:var(--mes-ok)}
+#page-mon-espace .mes-lock{border:none;background:var(--mes-card);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+[data-theme="dark"] #page-mon-espace .mes-lock{box-shadow:none}
+
+/* ── Onglets en pastille ── */
+#page-mon-espace .mes-tabs{
+  display:inline-flex;gap:2px;padding:4px;margin-bottom:26px;border:none;
+  border-radius:999px;background:var(--mes-card-2);max-width:100%;overflow-x:auto;scrollbar-width:none;
+}
+#page-mon-espace .mes-tabs::-webkit-scrollbar{display:none}
+#page-mon-espace .mes-tab{
+  min-height:38px;padding:0 16px;border-radius:999px;font-size:13.5px;font-weight:500;gap:7px;
+}
+#page-mon-espace .mes-tab:hover{background:transparent;color:var(--mes-ink)}
+#page-mon-espace .mes-tab.is-on{background:var(--mes-card);color:var(--mes-ink);font-weight:600;
+  box-shadow:0 1px 3px rgba(0,0,0,.08)}
+[data-theme="dark"] #page-mon-espace .mes-tab.is-on{background:#1F1F22;box-shadow:none}
+#page-mon-espace .mes-tab.is-on::after{display:none}
+#page-mon-espace .mes-tab-i{width:16px;height:16px}
+#page-mon-espace .mes-tab.is-on .mes-tab-i{color:var(--mes-pri)}
+#page-mon-espace .mes-badge{min-width:18px;height:18px;font-size:11px;padding:0 5px}
+
+/* ── Titres de section ── */
+#page-mon-espace .mes-sec{max-width:none;margin-bottom:30px}
+#page-mon-espace .mes-h2{
+  font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--mes-mute);margin:0 0 10px 4px;
+}
+
+/* ── « À faire » : un seul bloc, des séparateurs fins ── */
+#page-mon-espace .mes-list{
+  gap:0;border-radius:20px;background:var(--mes-card);overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+}
+[data-theme="dark"] #page-mon-espace .mes-list{box-shadow:none}
+#page-mon-espace .mes-row{
+  border:none;border-radius:0;background:transparent;min-height:72px;
+  padding:14px 18px 14px 16px;grid-template-columns:40px minmax(0,1fr) auto;gap:14px;
+  transition:background .15s;
+}
+#page-mon-espace .mes-row + .mes-row{box-shadow:inset 0 1px 0 var(--mes-hair)}
+#page-mon-espace .mes-row:hover{box-shadow:none;background:var(--mes-card-2)}
+#page-mon-espace .mes-row + .mes-row:hover{box-shadow:inset 0 1px 0 var(--mes-hair)}
+[data-theme="dark"] #page-mon-espace .mes-row:hover{border-color:transparent}
+#page-mon-espace .mes-row-i{width:40px;height:40px}
+#page-mon-espace .mes-row-t{font-size:14.5px}
+#page-mon-espace .mes-row-d{font-size:13px}
+/* Action discrète (texte + flèche) ; seul le retard garde le bouton plein. */
+#page-mon-espace .mes-row-cta{
+  height:36px;padding:0 12px 0 14px;background:transparent;color:var(--mes-pri);font-size:13.5px;
+}
+#page-mon-espace .mes-row:hover .mes-row-cta{background:var(--mes-pri-cont);color:var(--mes-on-pri-cont)}
+#page-mon-espace .mes-row.is-late .mes-row-cta{background:var(--mes-pri);color:var(--mes-on-pri)}
+
+#page-mon-espace .mes-clear{border-radius:20px;padding:22px 24px}
+
+/* ── Repères : tuiles pleines, grands chiffres ── */
+#page-mon-espace .mes-tiles{gap:12px}
+#page-mon-espace .mes-tile{
+  border:none;border-radius:20px;background:var(--mes-card);min-height:124px;padding:16px 18px;gap:8px;
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);transition:transform .15s,box-shadow .15s;
+}
+#page-mon-espace .mes-tile:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.07)}
+[data-theme="dark"] #page-mon-espace .mes-tile{box-shadow:none}
+[data-theme="dark"] #page-mon-espace .mes-tile:hover{border-color:transparent;background:#151517;box-shadow:none}
+#page-mon-espace .mes-tile-h{font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+#page-mon-espace .mes-tile-v{font-size:24px;font-weight:600;letter-spacing:-.01em}
+#page-mon-espace .mes-tile-v small{font-size:14px}
+
+#page-mon-espace .mes-empty{border:none;border-radius:20px;background:var(--mes-card)}
+#page-mon-espace .mes-note{border-radius:20px;background:var(--mes-card)}
+
+@media (max-width:640px){
+  #page-mon-espace .mes-head{margin-bottom:16px}
+  #page-mon-espace .mes-hello{font-size:24px}
+  /* Téléphone : la pastille d'onglets occupe toute la largeur, icônes et
+     libellés courts dessous. */
+  #page-mon-espace .mes-tabs{display:grid;width:100%;border-radius:18px;margin-bottom:18px}
+  #page-mon-espace .mes-tab{border-radius:14px;min-height:54px;padding:6px 2px}
+  #page-mon-espace .mes-row{grid-template-columns:36px minmax(0,1fr);padding:14px 14px 14px 12px}
+  #page-mon-espace .mes-row-i{width:36px;height:36px}
+  #page-mon-espace .mes-row-cta{padding:0 14px;height:38px;background:var(--mes-pri-cont);color:var(--mes-on-pri-cont)}
+  #page-mon-espace .mes-tile{min-height:108px;padding:14px}
+  #page-mon-espace .mes-tile-v{font-size:19px}
+}
+
+/* ── Grand écran ──────────────────────────────────────────────
+   Au-delà de 1280 px, la colonne s'élargit et l'accueil passe sur deux
+   colonnes : « À faire » à gauche (ce qu'on vient chercher), les repères
+   à droite en tuiles empilées. Les onglets montés (Tasks, Performance…)
+   profitent aussi de la largeur. */
+@media (min-width:1280px){
+  #page-mon-espace .mes-today{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(320px,1fr);gap:28px;align-items:start}
+  #page-mon-espace .mes-today-main > .mes-sec:last-child,
+  #page-mon-espace .mes-today-side > .mes-sec{margin-bottom:0}
+  #page-mon-espace .mes-today-side .mes-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #page-mon-espace .mes-today-side{position:sticky;top:16px}
+}
+@media (min-width:1680px){
+  #page-mon-espace .mes-hello{font-size:34px}
+  #page-mon-espace .mes-row{min-height:78px;padding:16px 22px 16px 18px}
+  #page-mon-espace .mes-row-t{font-size:15.5px}
+  #page-mon-espace .mes-tile{min-height:140px;padding:18px 20px}
+  #page-mon-espace .mes-tile-v{font-size:27px}
+}
+
+/* Note affichée aux profils non FO : pleine largeur, comme le reste. */
+#page-mon-espace .mes-note{max-width:none}
+
+/* ══════════════════════════════════════════════════════════
+   MY SPACE — refonte alignée sur le dashboard
+   · un bloc en verre (.dash-panel) porte les onglets et le contenu ;
+   · des cartes blanches (noires en sombre) au même modèle que le
+     dashboard : pastille d'icône, titre 19 px, sous-titre discret ;
+   · une carte « My open tickets », le plus consulté par un agent ;
+   · des repères « chiffre d'abord ».
+   ══════════════════════════════════════════════════════════ */
+.main:has(#page-mon-espace.active){background:transparent!important}
+#page-mon-espace{--mes-pri:var(--m3-primary)}
+#page-mon-espace .mes-shell{margin-top:4px}
+#page-mon-espace .mes-tabs{margin-bottom:20px;background:rgba(38,37,31,.06)}
+[data-theme="dark"] #page-mon-espace .mes-tabs{background:rgba(255,255,255,.07)}
+
+/* Cartes */
+#page-mon-espace .mes-card{background:#FFFFFF;border:1px solid rgba(20,24,32,.07);border-radius:24px;
+  padding:22px 22px 18px;margin-bottom:16px;position:relative;
+  background:radial-gradient(90% 70% at 100% 0%,color-mix(in srgb,var(--m3-primary) 6%,transparent),transparent 60%),#FFFFFF}
+[data-theme="dark"] #page-mon-espace .mes-card{border-color:rgba(255,255,255,.09);
+  background:radial-gradient(90% 70% at 100% 0%,color-mix(in srgb,var(--m3-primary) 11%,transparent),transparent 60%),#000}
+#page-mon-espace .mes-card:last-child{margin-bottom:0}
+#page-mon-espace .mes-card-h{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+#page-mon-espace .mes-card-ico{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:#1F2023;color:#fff}
+[data-theme="dark"] #page-mon-espace .mes-card-ico{background:#1A1B1F}
+#page-mon-espace .mes-card-t{font-size:19px;font-weight:600;letter-spacing:-.02em;margin:0;line-height:1.2;color:var(--m3-on-surface)}
+#page-mon-espace .mes-card-s{font-size:12.5px;color:var(--m3-on-surf-var);margin-top:3px}
+#page-mon-espace .mes-card-s b{font-weight:600}
+#page-mon-espace .mes-bad-t{color:var(--m3-error)}
+#page-mon-espace .mes-card-more{margin-left:auto;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;
+  border:none;background:rgba(38,37,31,.06);color:var(--m3-on-surface);font-size:12.5px;font-weight:500;cursor:pointer}
+[data-theme="dark"] #page-mon-espace .mes-card-more{background:rgba(255,255,255,.08)}
+#page-mon-espace .mes-card-more:hover{background:rgba(38,37,31,.11)}
+
+/* « À faire » : les lignes vivent dans la carte, sans second cadre. */
+#page-mon-espace .mes-card .mes-list{background:transparent!important;box-shadow:none!important;border-radius:16px;gap:6px!important;overflow:visible}
+#page-mon-espace .mes-card .mes-row{border-radius:16px!important;background:rgba(38,37,31,.035)!important;border:none!important;box-shadow:none!important;padding:12px 14px!important}
+[data-theme="dark"] #page-mon-espace .mes-card .mes-row{background:rgba(255,255,255,.05)!important}
+#page-mon-espace .mes-card .mes-row:hover{background:rgba(38,37,31,.07)!important}
+[data-theme="dark"] #page-mon-espace .mes-card .mes-row:hover{background:rgba(255,255,255,.09)!important}
+#page-mon-espace .mes-card .mes-row + .mes-row{border-top:none!important}
+/* Un seul style d'action : pilule neutre, pleine au survol ou en retard. */
+#page-mon-espace .mes-row-cta{border-radius:999px!important;padding:7px 12px!important;background:rgba(38,37,31,.07)!important;color:var(--m3-on-surface)!important;font-size:12.5px!important;font-weight:600!important}
+[data-theme="dark"] #page-mon-espace .mes-row-cta{background:rgba(255,255,255,.09)!important}
+#page-mon-espace .mes-row:hover .mes-row-cta,
+#page-mon-espace .mes-row.is-late .mes-row-cta{background:var(--m3-primary)!important;color:#fff!important}
+#page-mon-espace .mes-card .mes-clear{background:transparent!important;box-shadow:none!important;border:none!important;padding:4px 0 12px!important}
+
+/* Mes tickets */
+#page-mon-espace .mes-tks{display:flex;flex-direction:column;gap:6px}
+#page-mon-espace .mes-tk{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  padding:11px 14px;border:none;border-radius:16px;background:rgba(38,37,31,.035);color:var(--m3-on-surface)}
+[data-theme="dark"] #page-mon-espace .mes-tk{background:rgba(255,255,255,.05)}
+#page-mon-espace .mes-tk:hover{background:rgba(38,37,31,.07)}
+[data-theme="dark"] #page-mon-espace .mes-tk:hover{background:rgba(255,255,255,.09)}
+#page-mon-espace .mes-tk-p{font:700 11px/1 'Inter',sans-serif;padding:5px 7px;border-radius:7px;background:rgba(38,37,31,.08);flex-shrink:0;min-width:28px;text-align:center}
+[data-theme="dark"] #page-mon-espace .mes-tk-p{background:rgba(255,255,255,.10)}
+#page-mon-espace .mes-tk-p1{background:var(--m3-error)!important;color:#fff}
+#page-mon-espace .mes-tk-b{display:flex;flex-direction:column;min-width:0;flex:1}
+#page-mon-espace .mes-tk-n{font:600 12.5px/1.3 'JetBrains Mono',monospace;color:var(--m3-primary)}
+#page-mon-espace .mes-tk-t{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#page-mon-espace .mes-tk-r{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;font-size:12px;color:var(--m3-on-surf-var)}
+#page-mon-espace .mes-tk-tl{font:500 11.5px 'JetBrains Mono',monospace}
+#page-mon-espace .mes-tk.is-br .mes-tk-tl,#page-mon-espace .mes-tk-br{color:var(--m3-error);font-weight:600}
+#page-mon-espace .mes-tk-empty{display:flex;align-items:center;gap:10px;padding:6px 2px 4px;font-size:13.5px;color:var(--m3-on-surf-var)}
+
+/* Repères : modèle des indicateurs du dashboard */
+#page-mon-espace .mes-glance .mes-h2{margin:2px 0 10px 4px}
+#page-mon-espace .mes-tile{border-radius:22px!important;padding:18px 18px 16px!important;min-height:148px;gap:6px!important;
+  border:1px solid rgba(20,24,32,.07)!important;box-shadow:none!important;
+  background:radial-gradient(140% 90% at 100% 0%,color-mix(in srgb,var(--m3-primary) 9%,transparent),transparent 55%),#FFFFFF!important}
+[data-theme="dark"] #page-mon-espace .mes-tile{border-color:rgba(255,255,255,.09)!important;
+  background:radial-gradient(140% 90% at 100% 0%,color-mix(in srgb,var(--m3-primary) 16%,transparent),transparent 55%),#000!important}
+#page-mon-espace .mes-tile:hover{box-shadow:0 12px 30px -14px rgba(20,24,32,.28)!important}
+#page-mon-espace .mes-tile-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px}
+#page-mon-espace .mes-tile-h{font-size:12.5px!important;font-weight:500;color:var(--m3-on-surf-var)!important;text-transform:none;letter-spacing:0}
+#page-mon-espace .mes-tile-ico{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:color-mix(in srgb,var(--m3-primary) 12%,transparent);color:var(--m3-primary)}
+#page-mon-espace .mes-tile-v{font-size:34px!important;font-weight:600!important;letter-spacing:-.04em;line-height:1.05!important;color:var(--m3-on-surface)}
+#page-mon-espace .mes-tile-v small{font-size:16px!important;letter-spacing:0;color:var(--m3-on-surf-var)}
+#page-mon-espace .mes-tile-vs{font-size:20px;letter-spacing:-.02em;line-height:1.2}
+#page-mon-espace .mes-tile-m{font-size:12px!important;color:var(--m3-on-surf-var)!important}
+#page-mon-espace .mes-tile-k{color:var(--m3-primary);font-weight:500}
+#page-mon-espace .mes-tile-lock{color:var(--m3-on-surf-var)}
+#page-mon-espace .mes-tile.is-locked .mes-tile-ico{background:rgba(38,37,31,.06);color:var(--m3-on-surf-var)}
+#page-mon-espace .mes-bar{height:6px;background:rgba(38,37,31,.08)}
+[data-theme="dark"] #page-mon-espace .mes-bar{background:rgba(255,255,255,.10)}
+#page-mon-espace .mes-bar i{background:var(--m3-primary)!important}
+
+@media(min-width:1100px){
+  #page-mon-espace .mes-today{grid-template-columns:minmax(0,1.6fr) minmax(340px,1fr)!important;gap:20px!important}
+}
+@media(max-width:640px){
+  #page-mon-espace .mes-card{padding:18px 14px 14px;border-radius:20px}
+  #page-mon-espace .mes-card-t{font-size:17px}
+  #page-mon-espace .mes-tile{min-height:0}
+  #page-mon-espace .mes-tile-v{font-size:28px!important}
+  #page-mon-espace .mes-tk-r{display:none}
+}
+/* Le titre « At a glance » est lu par les lecteurs d'écran mais ne
+   décale plus la colonne : les tuiles s'alignent sur le haut des cartes. */
+#page-mon-espace .mes-glance .mes-h2{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ── Écrans montés dans My Space : mêmes surfaces que les cartes ──
+   Tasks, Requests, Performance et Quiz gardent leur mise en page, mais
+   leurs fonds beiges passent au blanc (noir en sombre) et aux gris
+   neutres, comme le reste du bloc. */
+:root:not([data-theme="dark"]) #page-mon-espace .mes-shell #page-weekly-progress{
+  --m3-surface:#FFFFFF;--m3-surf-1:#FFFFFF;--m3-surf-2:#F2F3F5;--m3-surf-3:#E8EAED;
+  --m3-outline:#D5D8DD;--m3-outline-var:#E7E9EC;
+}
+:root:not([data-theme="dark"]) #page-mon-espace .mes-shell{--white:#FFFFFF;--bg:#F2F3F5;--bg2:#F2F3F5;--line:#E7E9EC}
+#page-mon-espace .mes-shell .myperf-card,
+#page-mon-espace .mes-shell .mr-kpi,
+#page-mon-espace .mes-shell .wp-panel{border-radius:22px}
+[data-theme="dark"] #page-mon-espace .mes-shell .myperf-card{background:#000;border-color:rgba(255,255,255,.09)}
+#page-mon-espace .mes-shell .myperf-lock-ico{background:color-mix(in srgb,var(--m3-primary) 12%,transparent)!important;color:var(--m3-primary)!important}
+:root:not([data-theme="dark"]) #page-mon-espace .mes-shell #page-my-requests{--m3-surface:#FFFFFF;--m3-surf-1:#FFFFFF;--m3-surf-2:#F2F3F5;--m3-outline-var:#E7E9EC}
+#page-mon-espace .mes-shell #page-my-requests .mr-kpi{background:#FFFFFF;border-color:rgba(20,24,32,.07)}
+#page-mon-espace .mes-shell #page-my-requests .mr-empty{background:#FFFFFF}
+[data-theme="dark"] #page-mon-espace .mes-shell #page-my-requests .mr-kpi,
+[data-theme="dark"] #page-mon-espace .mes-shell #page-my-requests .mr-empty{background:#000;border-color:rgba(255,255,255,.09)}
+
+/* ══ Accueil sans profil et accès à la performance ══
+   Une carte en deux parties : ce que l'on obtient à gauche, le
+   formulaire à droite, directement dans la page. */
+#page-mon-espace .mes-welcome,
+#page-mon-espace .mes-gate-card{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,1fr);gap:0;
+  max-width:920px;margin:8px auto;padding:0!important;overflow:hidden;text-align:left!important;
+  border-radius:28px!important;border:1px solid rgba(20,24,32,.07)!important;box-shadow:0 20px 50px -28px rgba(20,24,32,.35)!important;
+  background:#FFFFFF!important}
+[data-theme="dark"] #page-mon-espace .mes-welcome,
+[data-theme="dark"] #page-mon-espace .mes-gate-card{background:#000!important;border-color:rgba(255,255,255,.09)!important}
+#page-mon-espace .mes-welcome-l,
+#page-mon-espace .mes-gate-aside{padding:36px 36px 32px;
+  background:radial-gradient(120% 90% at 0% 0%,color-mix(in srgb,var(--m3-primary) 14%,transparent),transparent 60%),
+             radial-gradient(90% 70% at 100% 100%,color-mix(in srgb,#3FB7A0 10%,transparent),transparent 60%)}
+#page-mon-espace .mes-welcome-r{padding:36px;display:flex;align-items:center;border-left:1px solid rgba(20,24,32,.06)}
+[data-theme="dark"] #page-mon-espace .mes-welcome-r{border-left-color:rgba(255,255,255,.07)}
+#page-mon-espace .mes-welcome-eb{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--m3-primary)}
+#page-mon-espace .mes-welcome-t{font-size:26px;font-weight:600;letter-spacing:-.025em;margin:6px 0 6px;line-height:1.15;color:var(--m3-on-surface)}
+#page-mon-espace .mes-welcome-d{font-size:14px;color:var(--m3-on-surf-var);margin:0 0 22px;line-height:1.5}
+#page-mon-espace .mes-perks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+#page-mon-espace .mes-perks li{display:flex;gap:12px;align-items:flex-start}
+#page-mon-espace .mes-perk-i{width:36px;height:36px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:#FFFFFF;color:var(--m3-primary);box-shadow:0 1px 2px rgba(20,24,32,.08)}
+[data-theme="dark"] #page-mon-espace .mes-perk-i{background:#15161A;box-shadow:none}
+#page-mon-espace .mes-perks b{display:block;font-size:14px;font-weight:600;color:var(--m3-on-surface)}
+#page-mon-espace .mes-perks small{display:block;font-size:12.5px;color:var(--m3-on-surf-var);margin-top:2px;line-height:1.4}
+
+/* Formulaire */
+#page-mon-espace .mes-si{width:100%;display:flex;flex-direction:column;gap:12px}
+#page-mon-espace .mes-si-t{font-size:20px;font-weight:600;letter-spacing:-.02em;color:var(--m3-on-surface)}
+#page-mon-espace .mes-si-d{font-size:13px;color:var(--m3-on-surf-var);line-height:1.5;margin:-6px 0 4px}
+#page-mon-espace .mes-fl{display:flex;flex-direction:column;gap:6px}
+#page-mon-espace .mes-fl > span{font-size:12px;font-weight:600;color:var(--m3-on-surf-var)}
+#page-mon-espace .mes-in{height:46px;border-radius:14px;border:1px solid rgba(20,24,32,.14);background:#FFFFFF;padding:0 14px;
+  font-size:15px;color:var(--m3-on-surface);outline:none;transition:border-color .15s,box-shadow .15s}
+[data-theme="dark"] #page-mon-espace .mes-in{background:#0E0F12;border-color:rgba(255,255,255,.14)}
+#page-mon-espace .mes-in:focus{border-color:var(--m3-primary);box-shadow:0 0 0 4px color-mix(in srgb,var(--m3-primary) 16%,transparent)}
+#page-mon-espace .mes-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:-4px}
+#page-mon-espace .mes-chip{height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(20,24,32,.10);background:transparent;
+  font-size:12.5px;color:var(--m3-on-surface);cursor:pointer}
+[data-theme="dark"] #page-mon-espace .mes-chip{border-color:rgba(255,255,255,.14)}
+#page-mon-espace .mes-chip:hover{border-color:var(--m3-primary)}
+#page-mon-espace .mes-chip.on{background:var(--m3-primary);border-color:var(--m3-primary);color:#fff}
+#page-mon-espace .mes-si-err{min-height:0;font-size:12.5px;color:var(--m3-error)}
+#page-mon-espace .mes-si-err:empty{display:none}
+#page-mon-espace .mes-si-btn{height:48px;border:none;border-radius:14px;background:var(--m3-primary);color:#fff;font-size:15px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;margin-top:4px}
+#page-mon-espace .mes-si-btn:hover{filter:brightness(1.08)}
+#page-mon-espace .mes-si-btn:disabled{opacity:.6;cursor:wait}
+#page-mon-espace .mes-si-foot{font-size:12px;color:var(--m3-on-surf-var);text-align:center}
+
+/* Carte d'accès de Performance : le contenu d'origine passe à droite. */
+#page-mon-espace .mes-gate-card > :not(.mes-gate-aside){grid-column:2;margin-left:36px;margin-right:36px}
+#page-mon-espace .mes-gate-card > .mes-gate-aside{grid-column:1;grid-row:1 / span 8}
+#page-mon-espace .mes-gate-card .myperf-lock-ico{margin:36px 36px 0;width:44px;height:44px;border-radius:14px}
+#page-mon-espace .mes-gate-card .myperf-lock-t{font-size:20px!important;font-weight:600;letter-spacing:-.02em;margin-top:14px}
+#page-mon-espace .mes-gate-card .myperf-lock-d{display:none}
+#page-mon-espace .mes-gate-card .myperf-form{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+#page-mon-espace .mes-gate-card .myperf-form .form-control{height:46px;border-radius:14px!important;font-size:15px}
+#page-mon-espace .mes-gate-card .myperf-form .btn{height:48px;border-radius:14px!important;font-size:15px;font-weight:600;justify-content:center}
+#page-mon-espace .mes-gate-card .mes-gate-who{text-align:left}
+#page-mon-espace .mes-gate-card .myperf-gate-foot{margin-bottom:32px;text-align:left;border-top:none!important;padding-top:0!important}
+#page-mon-espace .myperf-gate{display:block}
+
+@media(max-width:760px){
+  #page-mon-espace .mes-welcome,#page-mon-espace .mes-gate-card{grid-template-columns:1fr;border-radius:22px!important}
+  #page-mon-espace .mes-welcome-l,#page-mon-espace .mes-gate-aside{padding:24px 20px}
+  #page-mon-espace .mes-welcome-r{padding:20px;border-left:none;border-top:1px solid rgba(20,24,32,.06)}
+  #page-mon-espace .mes-gate-card > :not(.mes-gate-aside){grid-column:1;margin-left:20px;margin-right:20px}
+  #page-mon-espace .mes-gate-card > .mes-gate-aside{grid-row:auto}
+  #page-mon-espace .mes-gate-card .myperf-lock-ico{margin:20px 20px 0}
+  #page-mon-espace .mes-welcome-t{font-size:22px}
+}
+#page-mon-espace .mes-gate-card .myperf-form{max-width:none!important;width:auto!important}
+#page-mon-espace .mes-gate-card .myperf-form .form-control,#page-mon-espace .mes-gate-card .myperf-form .btn{width:100%!important;max-width:none!important}
+#page-mon-espace .mes-gate-card .mes-gate-id{margin-left:0!important;padding-left:0!important}
+#page-mon-espace .mes-gate-card .myperf-lock-t,#page-mon-espace .mes-gate-card .myperf-lock-ico{justify-self:start}
+#page-mon-espace .mes-fl .pw-wrap,#page-mon-espace .mes-gate-card .pw-wrap{display:block;width:100%}
+#page-mon-espace .mes-fl .pw-wrap > input{width:100%;box-sizing:border-box}
+#page-mon-espace .pw-eye{right:8px}
+/* Pas de carte dans la carte : l'accueil et l'accès à la performance
+   s'inscrivent directement dans le bloc en verre, en deux colonnes
+   séparées par un simple filet. */
+#page-mon-espace .mes-welcome,
+#page-mon-espace .mes-gate-card,
+[data-theme="dark"] #page-mon-espace .mes-welcome,
+[data-theme="dark"] #page-mon-espace .mes-gate-card{background:transparent!important;border:none!important;box-shadow:none!important;
+  border-radius:0!important;max-width:980px;margin:12px auto 4px}
+#page-mon-espace .mes-welcome-l,#page-mon-espace .mes-gate-aside{background:none!important;padding:12px 40px 12px 8px}
+#page-mon-espace .mes-welcome-r{padding:12px 8px 12px 40px}
+#page-mon-espace .mes-gate-card > :not(.mes-gate-aside){margin-left:40px;margin-right:8px}
+#page-mon-espace .mes-gate-card .myperf-lock-ico{margin:12px 8px 0 40px}
+#page-mon-espace .mes-gate-card .myperf-gate-foot{margin-bottom:12px}
+#page-mon-espace .mes-gate-card > .mes-gate-aside{border-right:1px solid rgba(20,24,32,.08)}
+[data-theme="dark"] #page-mon-espace .mes-gate-card > .mes-gate-aside{border-right-color:rgba(255,255,255,.08)}
+#page-mon-espace .mes-perk-i{background:color-mix(in srgb,var(--m3-primary) 12%,transparent)!important;box-shadow:none!important}
+@media(max-width:760px){
+  #page-mon-espace .mes-welcome-l,#page-mon-espace .mes-gate-aside{padding:4px 4px 20px}
+  #page-mon-espace .mes-welcome-r{padding:20px 4px 4px}
+  #page-mon-espace .mes-gate-card > .mes-gate-aside{border-right:none;border-bottom:1px solid rgba(20,24,32,.08)}
+  #page-mon-espace .mes-gate-card > :not(.mes-gate-aside){margin-left:4px;margin-right:4px}
+  #page-mon-espace .mes-gate-card .myperf-lock-ico{margin:20px 4px 0}
+}
+#page-mon-espace .mes-gate-card .mes-gate-who{text-align:left!important}
+#page-mon-espace .mes-gate-card .mes-gate-id{display:inline-flex;justify-content:flex-start}
+
+/* ══════════════════════════════════════════════════════════
+   MY SPACE — version « parcours », épurée
+   Titre et onglets sur une ligne (onglet actif en pilule noire) ;
+   la journée en colonnes : un panneau doux par sujet, sa légende
+   dessous ; des boutons ronds ; une tuile noire pour l'essentiel.
+   ══════════════════════════════════════════════════════════ */
+#page-mon-espace .mx-top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:0 0 22px}
+#page-mon-espace .mx-head{margin:0!important}
+#page-mon-espace .mx-title{font-size:40px!important;font-weight:600!important;letter-spacing:-.035em;line-height:1;margin:0}
+#page-mon-espace .mx-sub{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:14px;color:var(--m3-on-surf-var)}
+#page-mon-espace .mx-notyou{padding:2px 6px!important;font-size:13px!important;color:var(--m3-on-surf-var)!important}
+#page-mon-espace .mx-lock{display:inline-flex;align-items:center;gap:6px;margin-left:8px;height:28px;padding:0 12px;border-radius:999px;border:1px solid rgba(20,24,32,.12);
+  background:transparent;font-size:12.5px;color:var(--m3-on-surface);cursor:pointer}
+[data-theme="dark"] #page-mon-espace .mx-lock{border-color:rgba(255,255,255,.14)}
+
+/* Onglets : texte simple, actif en pilule noire */
+#page-mon-espace .mx-top .mes-tabs{margin:0!important;background:transparent!important;padding:0!important;gap:4px}
+#page-mon-espace .mx-top .mes-tab{height:42px;min-height:42px;padding:0 18px;border-radius:999px;font-size:14px;color:var(--m3-on-surface);opacity:.75}
+#page-mon-espace .mx-top .mes-tab:hover{opacity:1;background:rgba(38,37,31,.05)}
+#page-mon-espace .mx-top .mes-tab .mes-tab-i{display:none}
+#page-mon-espace .mx-top .mes-tab.is-on{opacity:1;background:#111214!important;color:#fff!important;box-shadow:0 8px 20px -10px rgba(0,0,0,.6)!important}
+[data-theme="dark"] #page-mon-espace .mx-top .mes-tab.is-on{background:#F4F4F5!important;color:#111!important}
+#page-mon-espace .mx-top .mes-tab.is-on .mes-badge{background:#fff;color:#111}
+[data-theme="dark"] #page-mon-espace .mx-top .mes-tab.is-on .mes-badge{background:#111;color:#fff}
+
+#page-mon-espace .mes-shell{padding:22px!important}
+
+/* Colonnes */
+#page-mon-espace .mx{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,.95fr);gap:18px;align-items:start}
+#page-mon-espace .mx-col{display:flex;flex-direction:column;min-width:0}
+#page-mon-espace .mx-panel{background:#FFFFFF;border-radius:28px;padding:8px;min-height:120px;
+  box-shadow:0 1px 2px rgba(20,24,32,.04),0 12px 32px -20px rgba(20,24,32,.25)}
+[data-theme="dark"] #page-mon-espace .mx-panel{background:#0A0A0C;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+#page-mon-espace .mx-cap{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:12px;font-size:14px;font-weight:600;color:var(--m3-on-surface)}
+#page-mon-espace .mx-cap b{font-size:12px;font-weight:600;min-width:22px;height:22px;padding:0 7px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(38,37,31,.07);color:var(--m3-on-surf-var)}
+[data-theme="dark"] #page-mon-espace .mx-cap b{background:rgba(255,255,255,.09)}
+#page-mon-espace .mx-cap-link{border:none;background:none;padding:0 0 0 4px;font-size:12.5px;font-weight:600;color:var(--m3-primary);cursor:pointer}
+
+/* Lignes */
+#page-mon-espace .mx-row{display:flex;align-items:center;gap:12px;padding:12px 10px;border-radius:20px}
+#page-mon-espace .mx-row + .mx-row{border-top:1px solid rgba(20,24,32,.06);border-radius:0 0 20px 20px}
+[data-theme="dark"] #page-mon-espace .mx-row + .mx-row{border-top-color:rgba(255,255,255,.06)}
+#page-mon-espace .mx-row:hover{background:rgba(38,37,31,.03)}
+[data-theme="dark"] #page-mon-espace .mx-row:hover{background:rgba(255,255,255,.03)}
+#page-mon-espace .mx-ico{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:#F2F3F5;color:var(--m3-on-surface)}
+[data-theme="dark"] #page-mon-espace .mx-ico{background:#18191D}
+#page-mon-espace .mx-ico.is-ok{color:#2E9C86}
+#page-mon-espace .mx-prio{font:700 12px/1 'Quicksand',sans-serif}
+#page-mon-espace .mx-prio.is-p1{background:var(--m3-error);color:#fff}
+#page-mon-espace .mx-row.is-late .mx-ico:not(.mx-prio){background:color-mix(in srgb,var(--m3-error) 12%,transparent);color:var(--m3-error)}
+#page-mon-espace .mx-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;text-align:left;border:none;background:none;padding:0;cursor:pointer;color:inherit}
+#page-mon-espace .mx-txt b{font-size:14px;font-weight:600;line-height:1.3;color:var(--m3-on-surface);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#page-mon-espace .mx-txt small{font-size:12.5px;color:var(--m3-on-surf-var);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#page-mon-espace .mx-txt em{font-style:normal;color:var(--m3-error);font-weight:600}
+#page-mon-espace .mx-mono{font-family:'JetBrains Mono',monospace;font-size:11.5px}
+#page-mon-espace .mx-row.is-quiet .mx-txt b{font-weight:500}
+#page-mon-espace .mx-row.is-done .mx-txt b{color:var(--m3-on-surf-var);font-weight:500}
+#page-mon-espace .mx-cbtn{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  border:1px solid rgba(20,24,32,.12);background:transparent;color:var(--m3-on-surface);transition:background .15s,color .15s,border-color .15s}
+[data-theme="dark"] #page-mon-espace .mx-cbtn{border-color:rgba(255,255,255,.14)}
+#page-mon-espace .mx-row:hover .mx-cbtn,#page-mon-espace .mx-cbtn:hover{background:#111214;border-color:#111214;color:#fff}
+[data-theme="dark"] #page-mon-espace .mx-row:hover .mx-cbtn{background:#F4F4F5;border-color:#F4F4F5;color:#111}
+#page-mon-espace .mx-check{font-size:13px;font-weight:700;letter-spacing:-3px;color:#2E9C86;width:40px;text-align:center;flex-shrink:0}
+#page-mon-espace .mx-row.is-add .mx-ico{background:transparent;border:1px dashed rgba(20,24,32,.25)}
+[data-theme="dark"] #page-mon-espace .mx-row.is-add .mx-ico{border-color:rgba(255,255,255,.25)}
+#page-mon-espace .mx-row.is-add .mx-txt b{font-weight:500;color:var(--m3-on-surf-var)}
+#page-mon-espace .mx-empty{display:flex;align-items:center;gap:12px;padding:16px 10px;font-size:13.5px;color:var(--m3-on-surf-var)}
+
+/* Tuiles */
+#page-mon-espace .mx-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;border-radius:28px;
+  background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.8)}
+[data-theme="dark"] #page-mon-espace .mx-tiles{background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+#page-mon-espace .mx-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:132px;padding:16px;border-radius:22px;border:none;cursor:pointer;text-align:left;
+  background:#FFFFFF;color:var(--m3-on-surface);box-shadow:0 1px 2px rgba(20,24,32,.05);transition:transform .2s,box-shadow .2s}
+[data-theme="dark"] #page-mon-espace .mx-tile{background:#0A0A0C;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+#page-mon-espace .mx-tile:hover{box-shadow:0 14px 30px -16px rgba(20,24,32,.35)}
+#page-mon-espace .mx-tile-k{font-size:12.5px;font-weight:600;color:var(--m3-on-surf-var)}
+#page-mon-espace .mx-tile-v{font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1.05;margin-top:auto}
+#page-mon-espace .mx-tile-v small{font-size:14px;color:var(--m3-on-surf-var);letter-spacing:0}
+#page-mon-espace .mx-tile-s{font-size:12px;color:var(--m3-on-surf-var);line-height:1.3}
+#page-mon-espace .mx-tile.is-dark{background:#111214;color:#fff}
+#page-mon-espace .mx-tile.is-dark .mx-tile-k,#page-mon-espace .mx-tile.is-dark .mx-tile-s{color:rgba(255,255,255,.65)}
+#page-mon-espace .mx-tile.is-dark .mx-tile-v{font-size:20px;letter-spacing:-.02em}
+[data-theme="dark"] #page-mon-espace .mx-tile.is-dark{background:#F4F4F5;color:#111}
+[data-theme="dark"] #page-mon-espace .mx-tile.is-dark .mx-tile-k,[data-theme="dark"] #page-mon-espace .mx-tile.is-dark .mx-tile-s{color:rgba(0,0,0,.6)}
+
+@media(max-width:1350px){
+  #page-mon-espace .mx{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #page-mon-espace .mx-tiles-col{grid-column:1/-1}
+  #page-mon-espace .mx-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:980px){
+  #page-mon-espace .mx{grid-template-columns:1fr}
+  #page-mon-espace .mx-tiles{grid-template-columns:1fr 1fr}
+  #page-mon-espace .mx-title{font-size:32px!important}
+  #page-mon-espace .mx-top .mes-tabs{width:100%;overflow-x:auto}
+}
+@media(max-width:640px){
+  #page-mon-espace .mes-shell{padding:12px!important}
+  #page-mon-espace .mx-top .mes-tab{padding:0 14px;height:38px;min-height:38px}
+}
+#page-mon-espace .mx{align-items:stretch}
+#page-mon-espace .mx-panel{flex:1}
+#page-mon-espace .mx-tiles{flex:1;align-content:start}
+@media(max-width:640px){
+  #page-mon-espace .mx-top .mes-tabs{display:flex!important;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:2px}
+  #page-mon-espace .mx-top .mes-tabs::-webkit-scrollbar{display:none}
+  #page-mon-espace .mx-top .mes-tab{flex:0 0 auto;flex-direction:row!important;padding:0 14px!important;gap:6px!important}
+  #page-mon-espace .mx-top .mes-tab .mes-tab-l{overflow:visible}
+  #page-mon-espace .mx-top .mes-tab .mes-badge,
+  #page-mon-espace .mx-top .mes-tab .mes-tab-lock{position:static}
+}

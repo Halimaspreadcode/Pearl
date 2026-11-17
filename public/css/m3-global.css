@@ -1,0 +1,122 @@
+/* ══════════════════════════════════════════════
+   M3 GLOBAL — appliqué à TOUTES les pages
+   Les tokens sont définis sur .app (voir plus haut) : ils sont
+   donc disponibles partout, y compris dans .main.
+══════════════════════════════════════════════ */
+.main{background:var(--m3-surface)}
+.main .page-title{
+  font-size:22px;font-weight:500;letter-spacing:0;color:var(--m3-on-surface);
+}
+.main .page-sub{
+  font-size:13.5px;font-weight:400;color:var(--m3-on-surf-var);letter-spacing:.01em;
+}
+
+/* ── Boutons ── */
+.btn{
+  border-radius:var(--m3-r-full);
+  padding:0 20px;height:38px;
+  font-size:13px;font-weight:500;letter-spacing:.006em;
+  transition:background .2s var(--m3-ease),box-shadow .2s var(--m3-ease);
+}
+.btn-sm{height:32px;padding:0 14px;font-size:12.5px}
+.btn-primary{background:var(--m3-primary);color:#fff;box-shadow:none}
+.btn-primary:hover{
+  background:var(--m3-primary);box-shadow:0 1px 3px rgba(0,0,0,.2);transform:none;
+  filter:brightness(1.08);
+}
+[data-theme="dark"] .btn-primary{color:#1A1A1A}
+.btn-ghost{
+  background:transparent;color:var(--m3-on-surface);
+  border:1px solid var(--m3-outline);
+}
+.btn-ghost:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  border-color:var(--m3-outline);color:var(--m3-on-surface);
+}
+
+/* ── Champs ── */
+/* NB : les inputs déjà encapsulés dans un wrapper stylé (.dq-search, .fo-search,
+   .or-search) portent .bare-input et sont exclus — sinon bordure + rayon carré
+   débordent du wrapper. :not() ne peut pas contenir de sélecteur descendant,
+   d'où la classe posée directement sur l'input. */
+.filter-select,
+input[type="text"]:not(.nav-filter):not(.bare-input),
+input[type="date"],input[type="week"],
+input[type="month"],input[type="number"],select:not(.or-select),textarea:not(.bare-input){
+  border-radius:var(--m3-r-sm)!important;
+  border:1px solid var(--m3-outline)!important;
+  background:var(--m3-surface)!important;
+  color:var(--m3-on-surface)!important;
+  font-family:'Inter',sans-serif;
+}
+.filter-select:focus,
+input:not(.nav-filter):not(.bare-input):focus,
+select:focus,textarea:not(.bare-input):focus{
+  outline:none!important;border-color:var(--m3-primary)!important;
+  box-shadow:0 0 0 1px var(--m3-primary);
+}
+
+/* ── Chips de filtre ── */
+.filter-chip{
+  border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2);border:none;
+  color:var(--m3-on-surface);font-size:12px;font-weight:500;
+  padding:5px 10px 5px 12px;
+}
+
+/* ── Tableaux ── */
+.table-wrap{
+  background:var(--m3-surf-1);
+  border:1px solid var(--m3-outline-var);
+  border-radius:var(--m3-r-lg);
+  box-shadow:none;
+}
+[data-theme="dark"] .table-wrap{border-color:transparent}
+thead tr{background:var(--m3-surf-2);border-bottom:1px solid var(--m3-outline-var)}
+th{
+  font-size:11px;font-weight:500;letter-spacing:.05em;
+  color:var(--m3-on-surf-var);text-transform:none;
+  padding:12px 16px;
+}
+td{color:var(--m3-on-surface)}
+tbody tr{border-bottom:1px solid var(--m3-outline-var)}
+tbody tr:hover{background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent)}
+
+/* ── Modales ── */
+.modal{
+  border-radius:var(--m3-r-xl,28px);
+  background:var(--m3-surf-1);
+  border:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);
+}
+.modal-overlay{background:rgba(0,0,0,.4)}
+.modal-title{font-size:20px;font-weight:500;color:var(--m3-on-surface)}
+/* En-tête et pied gardaient `background:var(--white)` codé en dur, alors
+   que le corps de la modale suit --m3-surf-1. En sombre --white vaut
+   #111111 : les deux bandes peignaient donc du quasi-noir par-dessus la
+   surface, ce qui se lisait comme une modale « transparente ». Elles
+   héritent maintenant de la même surface que le reste. */
+.modal-header,.modal-footer{
+  background:var(--m3-surf-1);
+  border-color:var(--m3-outline-var);
+}
+.modal-header{border-radius:var(--m3-r-xl,28px) var(--m3-r-xl,28px) 0 0}
+.modal-footer{border-radius:0 0 var(--m3-r-xl,28px) var(--m3-r-xl,28px)}
+
+/* ── Cartes génériques des autres pages ── */
+.config-card,.fo-card{
+  border-radius:var(--m3-r-lg)!important;
+  border:1px solid var(--m3-outline-var)!important;
+  background:var(--m3-surf-1)!important;
+  box-shadow:none!important;
+}
+[data-theme="dark"] .config-card,
+[data-theme="dark"] .fo-card{border-color:transparent!important}
+
+/* ── Onglets / segmented ── */
+.hm-tab{
+  border-radius:var(--m3-r-sm)!important;
+  font-size:13px!important;font-weight:500!important;
+}
+
+

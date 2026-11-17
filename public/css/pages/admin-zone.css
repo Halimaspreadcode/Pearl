@@ -1,0 +1,175 @@
+/* ══════════════════════════════════════════════
+   CONFIG CARDS
+══════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   ZONE ADMIN — habillage Material 3 (Google)
+   Portée volontairement limitée aux pages d'administration : les
+   écrans FO gardent leur identité. On restyle le vocabulaire déjà
+   employé (.config-card, .form-control, .btn, .page-title) plutôt
+   que de réécrire 14 pages de balisage — même rendu, sans le risque
+   de casser des identifiants sur lesquels le JS s'appuie.
+   ══════════════════════════════════════════════════════════════ */
+#page-config,#page-cfg-annonces,#page-cfg-general,#page-cfg-sla,
+#page-cfg-goals,#page-cfg-perf,#page-cfg-rota,#page-cfg-security,#page-cfg-data,
+#page-cfg-quiz,#page-cfg-glossary,#page-audit,#page-shift-approvals,
+#page-data-quality,#page-ops-review,#page-cfg-o2o,#page-cfg-training,
+#page-mailing,#page-export,#page-equipe{
+  /* Jetons M3 de base pour TOUTES les pages admin. Seules cfg-sla /
+     cfg-goals / cfg-perf les redéclaraient : les autres pages tombaient
+     sur les replis (#202124), soit du texte quasi noir sur fond sombre —
+     donc invisible. Définis ici, ils couvrent les 15 pages d'un coup, la
+     variante sombre juste en dessous. */
+  --m3-primary:        #4F6A85;
+  --m3-primary-cont:   #E4EAF0;
+  --m3-on-primary-cont:#2F4A66;
+  --m3-surface:        #FCFBF8;
+  --m3-surf-1:         #F7F5F0;
+  --m3-surf-2:         #F0ECE5;
+  --m3-surf-3:         #E8E3DA;
+  --m3-on-surface:     #26251F;
+  --m3-on-surf-var:    #6D695F;
+  --m3-outline:        #CEC8BC;
+  --m3-outline-var:    #E6E1D7;
+
+  --gm-surf:var(--m3-surf,#fff);
+  --gm-surf1:var(--m3-surf-1,#F8F9FA);
+  --gm-surf2:var(--m3-surf-2,#F1F3F4);
+  --gm-line:var(--m3-outline-var,#E3E3E3);
+  --gm-ink:var(--m3-on-surface,#202124);
+  --gm-ink2:var(--m3-on-surf-var,#5F6368);
+  --gm-pri:var(--m3-primary,#C7000B);
+  --gm-el1:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15);
+  --gm-el2:0 1px 2px rgba(60,64,67,.3),0 2px 6px 2px rgba(60,64,67,.15);
+}
+[data-theme="dark"] #page-config,[data-theme="dark"] #page-cfg-annonces,
+[data-theme="dark"] #page-cfg-general,[data-theme="dark"] #page-cfg-sla,
+[data-theme="dark"] #page-cfg-goals,[data-theme="dark"] #page-cfg-perf,
+[data-theme="dark"] #page-cfg-rota,[data-theme="dark"] #page-cfg-security,
+[data-theme="dark"] #page-cfg-data,[data-theme="dark"] #page-cfg-quiz,
+[data-theme="dark"] #page-cfg-glossary,[data-theme="dark"] #page-audit,
+[data-theme="dark"] #page-shift-approvals,[data-theme="dark"] #page-data-quality,
+[data-theme="dark"] #page-ops-review,[data-theme="dark"] #page-cfg-o2o,
+[data-theme="dark"] #page-cfg-training,
+[data-theme="dark"] #page-mailing,[data-theme="dark"] #page-export,
+[data-theme="dark"] #page-equipe{
+  --m3-primary:        #FF5C5C;
+  --m3-primary-cont:   #2A1618;
+  --m3-on-primary-cont:#FF9A9A;
+  --m3-surface:        #000000;
+  --m3-surf-1:         #0E0E10;
+  --m3-surf-2:         #151517;
+  --m3-surf-3:         #1F1F22;
+  --m3-on-surface:     #E3E3E3;
+  --m3-on-surf-var:    #9AA0A6;
+  --m3-outline:        #8E918F;
+  --m3-outline-var:    #333537;
+}
+
+/* ── Titres de page ── */
+.gm-scope .page-title{
+  font-size:24px;font-weight:400;letter-spacing:0;color:var(--gm-ink);
+}
+.gm-scope .page-sub{
+  font-size:13.5px;color:var(--gm-ink2);margin-top:4px;margin-bottom:24px;
+}
+
+/* ── Cartes ── */
+.gm-scope .config-card,
+.gm-scope .or-panel,
+.gm-scope .dq-panel{
+  background:var(--gm-surf);border:1px solid var(--gm-line);
+  border-radius:16px;padding:22px 24px;margin-bottom:14px;
+  box-shadow:none;transition:box-shadow .2s;
+}
+.gm-scope .config-card:hover,
+.gm-scope .or-panel:hover,
+.gm-scope .dq-panel:hover{box-shadow:var(--gm-el1)}
+.gm-scope .config-card h3,
+.gm-scope .or-panel-title,
+.gm-scope .dq-panel-title{
+  font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;
+  color:var(--gm-ink);border-bottom:none;padding-bottom:0;margin-bottom:16px;
+}
+
+/* ── Champs ── */
+/* .or-select est exclu : c'est une pastille de filtre à hauteur fixe
+   (32 px) avec sa propre gouttière pour le chevron. Le padding vertical
+   de 10 px imposé ici rognait le texte en haut et en bas, et les 13 px
+   à droite passaient sous la flèche. Sa mise en forme vit avec elle,
+   plus bas. */
+.gm-scope .form-control,
+.gm-scope .filter-select,
+.gm-scope .search-input{
+  border:1px solid var(--m3-outline,#79747E);border-radius:8px;
+  padding:10px 13px;font-size:14px;background:transparent;color:var(--gm-ink);
+  transition:border-color .15s,box-shadow .15s;
+}
+.gm-scope .form-control:focus,
+.gm-scope .filter-select:focus,
+.gm-scope .or-select:focus,
+.gm-scope .search-input:focus{
+  border-color:var(--gm-pri);box-shadow:inset 0 0 0 1px var(--gm-pri);outline:none;
+}
+.gm-scope .form-label{
+  font-size:12px;font-weight:500;letter-spacing:.01em;
+  text-transform:none;color:var(--gm-ink2);margin-bottom:6px;
+}
+
+/* ── Boutons : pilule Material ── */
+.gm-scope .btn{
+  border-radius:var(--m3-r-full,999px);font-weight:600;letter-spacing:.01em;
+  transition:box-shadow .2s,filter .15s,background .15s;
+}
+.gm-scope .btn-primary{
+  background:var(--gm-pri);border-color:transparent;color:#fff;box-shadow:none;
+}
+.gm-scope .btn-primary:hover{box-shadow:var(--gm-el1);filter:brightness(1.06)}
+.gm-scope .btn-ghost{
+  background:transparent;border:1px solid var(--m3-outline,#79747E);color:var(--gm-ink);
+}
+.gm-scope .btn-ghost:hover{background:var(--gm-surf2)}
+.gm-scope .btn-sm{height:36px;padding:0 20px;font-size:13px}
+
+/* ── Tableaux ── */
+.gm-scope .table-wrap{
+  border:1px solid var(--gm-line);border-radius:16px;overflow:hidden;background:var(--gm-surf);
+}
+.gm-scope table thead th{
+  background:var(--gm-surf1);color:var(--gm-ink2);
+  font-size:12px;font-weight:500;letter-spacing:.01em;text-transform:none;
+  padding:14px 16px;border-bottom:1px solid var(--gm-line);
+}
+.gm-scope table tbody td{
+  padding:13px 16px;font-size:13.5px;color:var(--gm-ink);
+  border-bottom:1px solid var(--gm-line);
+}
+.gm-scope table tbody tr:last-child td{border-bottom:none}
+.gm-scope table tbody tr:hover{background:var(--gm-surf1)}
+
+/* ── Sommaire de la Configuration ── */
+.gm-scope .cfg-hub-card{
+  border:1px solid var(--gm-line);border-radius:16px;padding:18px 20px;
+  background:var(--gm-surf);box-shadow:none;
+}
+.gm-scope .cfg-hub-card:hover{
+  border-color:var(--gm-line);box-shadow:var(--gm-el2);transform:none;
+}
+.gm-scope .cfg-hub-t{font-size:15px;font-weight:500;color:var(--gm-ink)}
+.gm-scope .cfg-hub-d{font-size:13px;color:var(--gm-ink2)}
+
+/* ── Écran de déverrouillage ── */
+.gm-scope .m3-lock-card{
+  border-radius:24px;padding:28px;border:1px solid var(--gm-line);
+  box-shadow:var(--gm-el1);background:var(--gm-surf);
+}
+
+[data-theme="dark"] .gm-scope .config-card,
+[data-theme="dark"] .gm-scope .or-panel,
+[data-theme="dark"] .gm-scope .dq-panel,
+[data-theme="dark"] .gm-scope .cfg-hub-card,
+[data-theme="dark"] .gm-scope .table-wrap,
+[data-theme="dark"] .gm-scope .m3-lock-card{
+  background:var(--m3-surf-1);border-color:transparent;
+}
+[data-theme="dark"] .gm-scope table thead th{background:var(--m3-surf-2)}
+

@@ -1,0 +1,250 @@
+/* ══════════════════════════════════════════════════════════════
+   RAPPORTS (menu › Reporting › Rapports)
+
+   Même vocabulaire que la page Équipe (team.css) : en-tête sobre,
+   onglets soulignés, surfaces à trait fin. La page est aussi celle des
+   FO et BO (Daily, Weekly, Monthly) : ses jetons partent des jetons M3
+   globaux (layout-m3.css), pas de ceux de la zone admin.
+
+   Les écrans montés dans #rp-mount gardent leur propre feuille (elles
+   sont ancrées sur leur identifiant) ; on n'y retire ici que leur titre,
+   remplacé par celui de la page et par l'onglet.
+   ══════════════════════════════════════════════════════════════ */
+#page-rapports{
+  --rp-surf:var(--m3-surface,#fff);
+  --rp-surf-2:var(--m3-surf-1,#F8F9FA);
+  --rp-line:var(--m3-outline-var,#E3E3E3);
+  --rp-ink:var(--m3-on-surface,#1F1F1F);
+  --rp-mute:var(--m3-on-surf-var,#5F6368);
+  --rp-pri:var(--m3-primary,#C7000B);
+  --rp-pri-cont:var(--m3-primary-cont,#FDECEC);
+  --rp-on-pri-cont:var(--m3-on-primary-cont,#8C0009);
+  padding-bottom:40px;
+}
+[data-theme="dark"] #page-rapports{
+  --rp-surf:var(--m3-surf-1,#0E0E10);
+  --rp-surf-2:var(--m3-surf-2,#151517);
+  --rp-line:rgba(255,255,255,.08);
+}
+#page-rapports .rp-head .page-sub{margin-bottom:16px}
+
+/* ── Onglets ── */
+#page-rapports .rp-tabs{
+  display:flex;gap:2px;margin-bottom:16px;border-bottom:1px solid var(--rp-line);
+  overflow-x:auto;scrollbar-width:none;
+}
+#page-rapports .rp-tabs::-webkit-scrollbar{display:none}
+#page-rapports .rp-tab{
+  position:relative;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;
+  padding:11px 14px;border:none;background:none;cursor:pointer;white-space:nowrap;
+  font:inherit;font-size:13.5px;color:var(--rp-mute);border-radius:12px 12px 0 0;
+}
+#page-rapports .rp-tab:hover{background:var(--rp-surf-2);color:var(--rp-ink)}
+#page-rapports .rp-tab.is-on{color:var(--rp-pri);font-weight:600}
+#page-rapports .rp-tab.is-on::after{
+  content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:3px;
+  border-radius:3px 3px 0 0;background:var(--rp-pri);
+}
+#page-rapports .rp-tab:focus-visible{outline:2px solid var(--rp-pri);outline-offset:-2px}
+#page-rapports .rp-badge{
+  min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:inline-grid;place-items:center;
+  font-size:11px;font-weight:600;background:var(--rp-pri);color:#fff;
+}
+#page-rapports .rp-note{
+  padding:24px;border-radius:16px;text-align:center;font-size:13px;
+  color:var(--rp-mute);background:var(--rp-surf-2);
+}
+
+/* ── Écrans montés : leur titre est celui de la page et de l'onglet.
+   Les sous-titres restent — ils portent la date, la semaine ou le mois. */
+#rp-mount > .page > div:first-child > .page-title,
+#rp-mount > .page > .page-header .page-title,
+#rp-mount > .page > .gsla-head .page-title,
+#rp-mount > #page-ops-review .or-head .page-title,
+#rp-mount > #page-export > .page-header{display:none}
+#rp-mount > #page-export{padding-top:2px}
+
+/* ══════════════════════════════════════════════════════════════
+   ONGLET EXPORTS (#page-export, fragment admin)
+   Une ligne par fichier : ce qu'il contient, son format, un bouton.
+   Plus de grille de boutons aux libellés tronqués : on lit la liste.
+   ══════════════════════════════════════════════════════════════ */
+#page-export{
+  --exp-line:var(--m3-outline-var,#E3E3E3);
+  --exp-mute:var(--m3-on-surf-var,#5F6368);
+}
+[data-theme="dark"] #page-export{--exp-line:rgba(255,255,255,.08)}
+#page-export .exp-intro{margin:0 0 18px;font-size:13px;color:var(--exp-mute);max-width:720px;line-height:1.5}
+#page-export .exp-sec{max-width:980px;margin-bottom:18px}
+#page-export .exp-sec-t{
+  margin:0 0 8px;padding:0;border:none;font-size:13px;font-weight:600;
+  color:var(--exp-mute);letter-spacing:.01em;
+}
+#page-export .exp-list{
+  border:1px solid var(--exp-line);border-radius:16px;overflow:hidden;
+  background:var(--m3-surface,#fff);
+}
+[data-theme="dark"] #page-export .exp-list{background:var(--m3-surf-1,#0E0E10)}
+#page-export .exp-row{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;min-width:0;
+}
+#page-export .exp-row + .exp-row{border-top:1px solid var(--exp-line)}
+#page-export .exp-row-b{flex:1;min-width:0}
+#page-export .exp-row-t{font-size:14px;font-weight:500;color:var(--m3-on-surface,#1F1F1F)}
+#page-export .exp-row-d{font-size:12px;color:var(--exp-mute);margin-top:2px;line-height:1.4}
+#page-export .exp-fmt{
+  flex-shrink:0;padding:2px 10px;border-radius:999px;font-size:11.5px;font-weight:500;
+  background:var(--m3-surf-2,#F1F3F4);color:var(--exp-mute);
+}
+#page-export .exp-btn{
+  flex-shrink:0;display:inline-flex;align-items:center;height:34px;padding:0 14px;border:none;
+  border-radius:999px;background:var(--m3-primary-cont,#FDECEC);color:var(--m3-on-primary-cont,#8C0009);
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;
+}
+#page-export .exp-btn:hover:not(:disabled){filter:brightness(.97)}
+#page-export .exp-btn:disabled{opacity:.6;cursor:progress}
+#page-export .exp-btn:focus-visible{outline:2px solid var(--m3-primary,#C7000B);outline-offset:2px}
+#page-export .exp-status{min-height:20px;margin-top:4px;font-size:13px;color:var(--exp-mute)}
+#page-export .exp-status.is-ok{color:var(--ok-fg)}
+#page-export .exp-status.is-err{color:var(--red)}
+
+@media (max-width:560px){
+  #page-rapports .rp-tab{padding:10px 11px}
+  #page-export .exp-row{flex-wrap:wrap;padding:12px 14px}
+  #page-export .exp-row-b{flex:1 1 100%}
+  #page-export .exp-btn{margin-left:auto}
+}
+
+/* ══════════════════════════════════════════════════════════
+   REPORTS — plus calme, plus lisible
+   · onglets en rail, l'actif en noir ; contenu dans le bloc en verre ;
+   · une barre par rapport : ‹ date ›, la date en clair, Customize et
+     Export à droite ;
+   · signature et sections dans « Customize », replié par défaut ;
+   · le document : carte blanche arrondie, bandeau noir sobre, poignées
+     de réorganisation visibles seulement au survol.
+   ══════════════════════════════════════════════════════════ */
+.main:has(#page-rapports.active){background:transparent!important}
+#page-rapports .rp-tabs{display:inline-flex!important;gap:3px!important;padding:4px!important;border-radius:999px!important;background:rgba(38,37,31,.06)!important;border:none!important;margin-bottom:16px!important;width:auto!important}
+[data-theme="dark"] #page-rapports .rp-tabs{background:rgba(255,255,255,.07)!important}
+#page-rapports .rp-tab{height:36px;padding:0 16px!important;border-radius:999px!important;border:none!important;color:var(--m3-on-surf-var)}
+#page-rapports .rp-tab::after{display:none!important}
+#page-rapports .rp-tab.is-on{background:#111214!important;color:#fff!important}
+[data-theme="dark"] #page-rapports .rp-tab.is-on{background:#F4F4F5!important;color:#111!important}
+#page-rapports .rp-panel{border-radius:28px;padding:20px;
+  background:linear-gradient(160deg,rgba(255,255,255,.45),rgba(255,255,255,.3));border:1px solid rgba(255,255,255,.9);
+  -webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 40px -22px rgba(20,24,32,.22)}
+[data-theme="dark"] #page-rapports .rp-panel{background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border-color:rgba(255,255,255,.09);box-shadow:none}
+
+/* Barre d'outils commune */
+#page-rapports .rpt-bar,#page-rapports .rpt-toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 16px!important}
+#page-rapports .rpt-bar-date{margin:0!important;font-size:15px!important;font-weight:600;color:var(--m3-on-surface)!important}
+#page-rapports .rpt-bar-r,#page-rapports .rpt-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#page-rapports .rpt-datenav{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:999px;background:#FFFFFF;border:1px solid rgba(20,24,32,.10)}
+[data-theme="dark"] #page-rapports .rpt-datenav{background:#0A0A0C;border-color:rgba(255,255,255,.12)}
+#page-rapports .rpt-dn-btn{width:32px;height:32px;border-radius:50%;border:none;background:transparent;font-size:18px;line-height:1;color:var(--m3-on-surface);cursor:pointer}
+#page-rapports .rpt-dn-btn:hover{background:rgba(38,37,31,.07)}
+#page-rapports .rpt-dn-date{border:none;background:transparent;font:600 13px 'Quicksand',sans-serif;color:var(--m3-on-surface);padding:0 6px;outline:none}
+#page-rapports .rpt-btn,#page-rapports .rpt-toolbar .btn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px!important;border-radius:999px!important;
+  border:1px solid rgba(20,24,32,.12)!important;background:#FFFFFF!important;color:var(--m3-on-surface)!important;font:600 13px 'Quicksand',sans-serif!important;cursor:pointer;box-shadow:none!important}
+[data-theme="dark"] #page-rapports :is(.rpt-btn,.rpt-toolbar .btn){background:#0A0A0C!important;border-color:rgba(255,255,255,.12)!important}
+#page-rapports .rpt-btn[aria-expanded="true"]{border-color:var(--m3-on-surface)!important}
+#page-rapports .rpt-btn.is-pri,#page-rapports .rpt-toolbar .btn-primary{background:#111214!important;color:#fff!important;border-color:#111214!important}
+[data-theme="dark"] #page-rapports :is(.rpt-btn.is-pri,.rpt-toolbar .btn-primary){background:#F4F4F5!important;color:#111!important;border-color:#F4F4F5!important}
+#page-rapports .rpt-nav .filter-select{border-radius:999px!important}
+
+/* « Customize » : replié ; ouvert, une carte au-dessus du rapport */
+#page-rapports .rpt-layout{display:flex!important;flex-direction:column!important;gap:14px!important}
+#page-rapports .rpt-side-panel{display:none!important;order:-1;width:100%!important;position:static!important;border-radius:22px!important;
+  border:1px solid rgba(20,24,32,.07)!important;background:#FFFFFF!important;box-shadow:none!important}
+#page-rapports .rpt-side-panel.is-open{display:grid!important;grid-template-columns:minmax(200px,1fr) 2fr;gap:0}
+[data-theme="dark"] #page-rapports .rpt-side-panel{background:#0A0A0C!important;border-color:rgba(255,255,255,.08)!important}
+#page-rapports .rpt-side-panel-group{padding:16px 20px!important;border:none!important}
+#page-rapports .rpt-side-panel-group + .rpt-side-panel-group{border-left:1px solid rgba(20,24,32,.07)!important}
+#page-rapports .rpt-side-panel-group label{display:inline-flex!important;margin:4px 14px 4px 0!important}
+#page-rapports .rpt-side-note{font-size:12px;color:var(--m3-on-surf-var);margin-top:8px}
+
+/* Le document */
+#page-rapports .rpt-main{max-width:none}
+#page-rapports .rpt-doc{max-width:none!important;border-radius:24px!important;border:1px solid rgba(20,24,32,.07)!important;box-shadow:0 1px 2px rgba(20,24,32,.04),0 12px 32px -20px rgba(20,24,32,.25)!important}
+#page-rapports .rpt-doc-title{background:#111214!important;font-size:15px!important;letter-spacing:.08em!important;padding:16px 24px!important}
+[data-theme="dark"] #page-rapports .rpt-doc-title{background:#1A1B1F!important}
+#page-rapports .rpt-doc-meta{background:#1E1F23!important;color:#fff!important}
+#page-rapports .rpt-handle{opacity:0;transition:opacity .15s}
+#page-rapports .rpt-sec-bar:hover .rpt-handle{opacity:.55}
+@media(max-width:760px){#page-rapports .rpt-side-panel.is-open{grid-template-columns:1fr}#page-rapports .rp-panel{padding:12px}}
+#page-rapports .rpt-main{width:100%!important;flex:1 1 auto!important}
+#page-rapports .rpt-doc{width:100%!important}
+:root:not([data-theme="dark"]) #page-rapports{--white:#FFFFFF;--bg2:#F4F5F7;--bg:#F4F5F7;--line:#E7E9EC}
+[data-theme="dark"] #page-rapports{--white:#0A0A0C;--bg2:#141518;--line:rgba(255,255,255,.08)}
+:root:not([data-theme="dark"]) #page-rapports{--m3-surf-2:#F4F5F7;--m3-surf-1:#FFFFFF;--m3-surface:#FFFFFF}
+[data-theme="dark"] #page-rapports{--m3-surf-2:#141518;--m3-surf-1:#0A0A0C;--m3-surface:#0A0A0C}
+/* Hebdo et mensuel : le titre de page redondant (« Weekly Report ») est
+   déjà dans l'onglet ; la période reste lisible dans la barre. */
+#page-rapports :is(#page-weekly-report,#page-monthly-report) > .page-header .page-title{display:none}
+#page-rapports :is(#page-weekly-report,#page-monthly-report) > .page-header{margin:0 0 10px!important}
+#page-rapports :is(#page-weekly-report,#page-monthly-report) > .page-header .page-sub{font-size:15px!important;font-weight:600;color:var(--m3-on-surface)!important;margin:0!important}
+#page-rapports select.rpt-dn-date{appearance:none;-webkit-appearance:none;cursor:pointer;padding:0 6px!important}
+#page-rapports .rpt-bar-date:empty{display:none}
+#page-rapports .rpt-datenav .rpt-dn-date{border:none!important;box-shadow:none!important;background:transparent!important;height:auto!important;min-width:0!important;width:auto!important}
+
+/* ── Rapport quotidien : sections lisibles ─────────────────────
+   Un seul document ; à l'intérieur, des blocs séparés par un filet,
+   chacun avec un vrai titre, son compteur et un repli. */
+#page-rapports .rd-doc{overflow:visible!important;background:var(--white)}
+#page-rapports .rd-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;padding:26px 28px 18px}
+#page-rapports .rd-eyebrow{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--m3-on-surf-var,var(--mute))}
+#page-rapports .rd-title{margin:4px 0 0;font-size:26px;font-weight:600;letter-spacing:-.02em;color:var(--m3-on-surface,var(--dark))}
+#page-rapports .rd-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+#page-rapports .rd-author{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--m3-on-surf-var,var(--mute))}
+#page-rapports .rd-author input{border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--m3-on-surface,var(--dark));font:600 13px Quicksand,system-ui,sans-serif;padding:7px 14px;min-width:240px;outline:none}
+#page-rapports .rd-author input:focus{border-color:var(--m3-on-surface,var(--dark))}
+#page-rapports .rd-site{font-size:12px;color:var(--m3-on-surf-var,var(--mute))}
+#page-rapports .rd-nav{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 28px;
+  background:color-mix(in srgb,var(--white) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+#page-rapports .rd-nav::-webkit-scrollbar{display:none}
+#page-rapports .rd-nav button{flex:none;display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;
+  color:var(--m3-on-surface,var(--dark));font:600 12.5px Quicksand,system-ui,sans-serif;cursor:pointer;transition:background .15s,border-color .15s}
+#page-rapports .rd-nav button:hover{background:var(--bg2);border-color:transparent}
+#page-rapports .rd-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--bg2);
+  font:700 11px Quicksand,system-ui,sans-serif;color:var(--m3-on-surf-var,var(--mute));letter-spacing:0;text-transform:none}
+#page-rapports .rd-count.is-alert{background:#D64545;color:#fff}
+#page-rapports .rd-body{padding:0 0 12px}
+#page-rapports .rd-sec{border-top:1px solid var(--line);scroll-margin-top:64px;transition:background .6s}
+#page-rapports .rd-sec:first-child{border-top:none}
+#page-rapports .rd-sec.is-flash{animation:rd-flash 1.2s ease}
+@keyframes rd-flash{0%,30%{background:color-mix(in srgb,var(--bg2) 100%,transparent)}100%{background:transparent}}
+#page-rapports .rd-sec .rpt-sec-bar{margin:0!important;padding:18px 28px 12px!important;border:none!important;font-size:16px!important;font-weight:600!important;
+  letter-spacing:-.01em!important;text-transform:none!important;color:var(--m3-on-surface,var(--dark))!important;cursor:default}
+#page-rapports .rd-sec .rpt-sec-bar[draggable="true"]{cursor:grab}
+#page-rapports .rd-fold{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:999px;border:none;background:transparent;
+  color:var(--m3-on-surf-var,var(--mute));cursor:pointer;transition:transform .2s,background .15s}
+#page-rapports .rd-fold:hover{background:var(--bg2)}
+#page-rapports .rd-sec.is-col .rd-fold{transform:rotate(-90deg)}
+#page-rapports .rd-sec.is-col .rd-sec-body{display:none}
+#page-rapports .rd-sec.is-col .rpt-sec-bar{padding-bottom:18px!important}
+#page-rapports .rd-sec-body{padding:0 28px 22px}
+#page-rapports .rd-sec-body table{margin-bottom:0!important}
+#page-rapports .rd-sec-body > div[style*="border-top"]{background:transparent!important;border-top:none!important;padding:10px 0 0!important}
+#page-rapports .rd-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:8px}
+#page-rapports .rd-kpi{background:var(--white);padding:14px 18px;display:flex;flex-direction:column;gap:4px}
+#page-rapports .rd-kpi span{font-size:12px;font-weight:600;color:var(--m3-on-surf-var,var(--mute))}
+#page-rapports .rd-kpi b{font-size:26px;font-weight:600;letter-spacing:-.02em;color:var(--m3-on-surface,var(--dark));font-variant-numeric:tabular-nums}
+#page-rapports .rd-kpi.is-alert b{color:#D64545}
+#page-rapports .rd-empty{display:flex;align-items:center;gap:8px;padding:14px 18px;border-radius:14px;background:var(--bg2);font-size:13px;font-weight:600;color:var(--m3-on-surf-var,var(--mute))}
+#page-rapports .rd-empty.is-ok{color:#2E8B57}
+[data-theme="dark"] #page-rapports .rd-empty.is-ok{color:#6FD39B}
+@media(max-width:760px){#page-rapports .rd-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #page-rapports :is(.rd-head,.rd-nav){padding-left:16px;padding-right:16px}#page-rapports .rd-sec .rpt-sec-bar{padding:16px!important}
+  #page-rapports .rd-sec-body{padding:0 16px 18px}#page-rapports .rd-meta{align-items:flex-start}#page-rapports .rd-author input{min-width:0;width:100%}}
+@media(prefers-reduced-motion:reduce){#page-rapports .rd-sec.is-flash{animation:none}}
+#page-rapports #daily-report-date{display:none}
+/* Poignées de réordonnancement : dans la marge, sans décaler le titre */
+#page-rapports .rd-sec .rpt-sec-bar{position:relative}
+#page-rapports .rd-sec .rpt-handle:first-child{display:none!important}
+#page-rapports .rd-sec .rpt-handle{position:absolute;left:8px;top:50%;transform:translateY(-50%);flex-direction:column;gap:0!important;line-height:1}
+#page-rapports .rd-sec .rpt-handle span{padding:1px 3px}
+#page-rapports .rd-nav{border-radius:0}
+/* « Add a row » : bouton principal noir (blanc en sombre), comme partout */
+#page-rapports .rpt-tool.is-primary{background:#111214!important;color:#fff!important;border-color:#111214!important}
+[data-theme="dark"] #page-rapports .rpt-tool.is-primary{background:#F4F4F5!important;color:#111!important;border-color:#F4F4F5!important}

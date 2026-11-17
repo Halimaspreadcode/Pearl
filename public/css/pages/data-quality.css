@@ -1,0 +1,451 @@
+/* ── 19. CONFIG ────────────────────────────────────────── */
+#page-config .config-card{
+  border-radius:var(--m3-r-xl);
+  border:1px solid var(--m3-outline-var);
+  background:var(--m3-surf-1);box-shadow:none;padding:20px 22px;
+}
+[data-theme="dark"] #page-config .config-card{border-color:transparent}
+#page-config .config-card h3{
+  font-size:14px;font-weight:500;letter-spacing:0;text-transform:none;
+  color:var(--m3-on-surface);
+  border-bottom:1px solid var(--m3-outline-var);
+  padding-bottom:12px;margin-bottom:16px;
+}
+#page-config .config-export-desc{font-size:13.5px;color:var(--m3-on-surface)}
+#page-config .config-export-desc small{color:var(--m3-on-surf-var)}
+
+/* ── 20. DATA QUALITY ──────────────────────────────────── */
+/* Refonte Material 3 : la page est passée d'un empilement de tableaux
+   à un parcours en trois temps — état global (héro), où agir
+   (recommandations / concentrations), puis le détail filtrable. */
+#page-data-quality .table-wrap{
+  border-radius:var(--m3-r-lg);border:none;
+  background:var(--m3-surf-2);box-shadow:none;
+}
+#page-data-quality .badge{border-radius:var(--m3-r-full)}
+#page-data-quality .form-control{border-radius:var(--m3-r-sm)}
+
+/* Jetons de sévérité : une seule source pour toute la page, au lieu
+   des hex répétés à chaque composant. */
+#page-data-quality,
+#page-data-quality *{
+  --dq-err:#D93025;   --dq-err-on:#C5221F;   --dq-err-bg:#FCE8E6;
+  /* #B06000 ne donnait que 4.34:1 sur son fond ambré — sous le seuil AA. */
+  --dq-warn:#F9AB00;  --dq-warn-on:#8F4E00;  --dq-warn-bg:#FEF7E0;
+  --dq-info:#1A73E8;  --dq-info-on:#1967D2;  --dq-info-bg:#E8F0FE;
+  --dq-ok:#1E8E3E;    --dq-ok-on:#137333;    --dq-ok-bg:#E6F4EA;
+
+  /* Contours : voir #page-ops-review — mêmes jetons, même correction. */
+  --m3-outline-var:#7C8085;
+  --m3-sep:#E3E3E3;
+  --m3-outline:#7C8085;
+}
+[data-theme="dark"] #page-data-quality,
+[data-theme="dark"] #page-data-quality *{
+  --dq-err:#F28B82;   --dq-err-on:#F28B82;   --dq-err-bg:#2A1618;
+  --dq-warn:#FDD663;  --dq-warn-on:#FDD663;  --dq-warn-bg:#2A2416;
+  --dq-info:#8AB4F8;  --dq-info-on:#8AB4F8;  --dq-info-bg:#172033;
+  --dq-ok:#81C995;    --dq-ok-on:#81C995;    --dq-ok-bg:#0F2A17;
+
+  --m3-outline-var:#797C80;
+  --m3-sep:#2D2E30;
+  --m3-outline:#797C80;
+}
+
+/* ── En-tête ── */
+.dq-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;margin-bottom:20px;
+}
+.dq-head .page-sub{margin-bottom:0}
+.dq-head-actions{display:flex;gap:4px;align-items:center}
+.dq-icon-btn{
+  width:40px;height:40px;flex-shrink:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:none;background:transparent;cursor:pointer;
+  border-radius:var(--m3-r-full);color:var(--m3-on-surf-var);
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease);
+}
+.dq-icon-btn svg{width:20px;height:20px}
+.dq-icon-btn:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surface);
+}
+.dq-icon-btn.spin svg{animation:dq-spin .6s var(--m3-ease)}
+@keyframes dq-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* ── Héro : score + répartition ── */
+/* Le score seul ne dit pas s'il se dégrade ni de quoi il est fait ;
+   l'anneau porte la note, la barre empilée sa composition. */
+.dq-hero{
+  display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;
+  background:var(--m3-surf-1);border-radius:var(--m3-r-xl);
+  padding:24px 28px;margin-bottom:16px;
+}
+[data-theme="dark"] .dq-hero{background:var(--m3-surf-2)}
+.dq-gauge{position:relative;width:132px;height:132px;flex-shrink:0}
+.dq-gauge svg{width:132px;height:132px;transform:rotate(-90deg)}
+.dq-gauge-track{stroke:var(--m3-surf-3);fill:none;stroke-width:11}
+.dq-gauge-fill{
+  fill:none;stroke-width:11;stroke-linecap:round;
+  transition:stroke-dashoffset .9s var(--m3-ease);
+}
+.dq-gauge.ok   .dq-gauge-fill{stroke:var(--dq-ok)}
+.dq-gauge.warn .dq-gauge-fill{stroke:var(--dq-warn)}
+.dq-gauge.err  .dq-gauge-fill{stroke:var(--dq-err)}
+.dq-gauge-mid{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;
+}
+.dq-gauge-n{font-size:34px;font-weight:500;line-height:1;color:var(--m3-on-surface)}
+.dq-gauge-n small{font-size:16px;font-weight:400;color:var(--m3-on-surf-var)}
+.dq-gauge-l{
+  font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+.dq-hero-body{min-width:0}
+.dq-hero-verdict{
+  font-size:19px;font-weight:500;line-height:1.3;
+  color:var(--m3-on-surface);margin-bottom:4px;
+}
+.dq-hero-sub{font-size:13.5px;color:var(--m3-on-surf-var);line-height:1.5;margin-bottom:16px}
+.dq-hero-sub b{color:var(--m3-on-surface);font-weight:500}
+
+/* Barre empilée : composition des anomalies */
+.dq-stack{display:flex;height:10px;border-radius:var(--m3-r-full);overflow:hidden;background:var(--m3-surf-3)}
+.dq-stack-seg{transition:width .6s var(--m3-ease)}
+.dq-stack-seg.err {background:var(--dq-err)}
+.dq-stack-seg.warn{background:var(--dq-warn)}
+.dq-stack-seg.info{background:var(--dq-info)}
+
+/* Statistiques cliquables sous la barre — servent aussi de filtres */
+.dq-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.dq-stat{
+  display:inline-flex;align-items:baseline;gap:7px;
+  padding:7px 14px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2);border:1px solid transparent;
+  font-size:12.5px;color:var(--m3-on-surf-var);cursor:pointer;
+  transition:background .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+[data-theme="dark"] .dq-stat{background:var(--m3-surf-3)}
+.dq-stat:hover{border-color:var(--m3-outline)}
+.dq-stat[aria-pressed="true"]{
+  background:var(--m3-secondary-cont);color:var(--m3-on-primary-cont);
+}
+.dq-stat-n{font-size:15px;font-weight:500;color:var(--m3-on-surface)}
+.dq-stat.err  .dq-stat-n{color:var(--dq-err-on)}
+.dq-stat.warn .dq-stat-n{color:var(--dq-warn-on)}
+.dq-stat.info .dq-stat-n{color:var(--dq-info-on)}
+.dq-stat.ok   .dq-stat-n{color:var(--dq-ok-on)}
+.dq-stat.static{cursor:default}
+.dq-stat.static:hover{border-color:transparent}
+
+@media(max-width:820px){
+  .dq-hero{grid-template-columns:1fr;justify-items:center;text-align:center;gap:18px}
+  .dq-stats{justify-content:center}
+}
+
+/* ── Recommandations ── */
+.dq-reco{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px}
+/* Fond neutre uniforme : les fonds teintés + liserés colorés faisaient
+   quatre blocs criards alignés. La sévérité passe par une seule
+   pastille, le reste garde la surface de la page. */
+.dq-reco-item{
+  position:relative;padding:14px 18px 14px 38px;
+  border-radius:var(--m3-r-lg);border:none;
+  background:var(--m3-surf-1);
+}
+[data-theme="dark"] .dq-reco-item{background:var(--m3-surf-2)}
+.dq-reco-item::before{
+  content:'';position:absolute;left:18px;top:19px;
+  width:8px;height:8px;border-radius:var(--m3-r-full);
+  background:var(--m3-outline);
+}
+.dq-reco-item.crit::before{background:var(--dq-err)}
+.dq-reco-item.warn::before{background:var(--dq-warn)}
+.dq-reco-item.info::before{background:var(--dq-info)}
+.dq-reco-text{font-size:13.5px;line-height:1.45;color:var(--m3-on-surface)}
+.dq-reco-text b{font-weight:500}
+.dq-reco-hint{font-size:12px;line-height:1.45;color:var(--m3-on-surf-var);margin-top:5px}
+
+/* ── Panneaux : hotspots & owners ── */
+.dq-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;margin-bottom:20px}
+.dq-panel{
+  background:var(--m3-surf-1);border-radius:var(--m3-r-xl);padding:20px 22px;
+}
+[data-theme="dark"] .dq-panel{background:var(--m3-surf-2)}
+.dq-panel-title{font-size:14.5px;font-weight:500;color:var(--m3-on-surface)}
+.dq-panel-sub{font-size:12px;color:var(--m3-on-surf-var);line-height:1.45;margin-top:3px}
+.dq-panel-title + .dq-own-row,
+.dq-panel-sub   + .dq-hot-row{margin-top:14px}
+
+.dq-own-row{display:flex;align-items:center;gap:12px;padding:6px 0}
+.dq-own-name{
+  flex:0 0 118px;font-size:12.5px;color:var(--m3-on-surface);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.dq-own-track{
+  flex:1;display:flex;height:8px;border-radius:var(--m3-r-full);
+  overflow:hidden;background:var(--m3-surf-3);
+}
+.dq-own-fill{transition:width .5s var(--m3-ease)}
+.dq-own-fill.err {background:var(--dq-err)}
+.dq-own-fill.warn{background:var(--dq-warn)}
+.dq-own-n{
+  flex:0 0 30px;text-align:right;font-size:12.5px;
+  font-weight:500;color:var(--m3-on-surface);
+}
+.dq-panel-foot{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  margin-top:14px;padding-top:12px;border-top:1px solid var(--m3-outline-var);
+  font-size:11.5px;color:var(--m3-on-surf-var);
+}
+.dq-key{width:9px;height:9px;border-radius:2px;display:inline-block;margin-left:8px}
+.dq-key:first-child{margin-left:0}
+.dq-key.err {background:var(--dq-err)}
+.dq-key.warn{background:var(--dq-warn)}
+
+.dq-hot-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;margin:0 -10px;border-radius:var(--m3-r-sm);
+  cursor:pointer;transition:background .15s var(--m3-ease);
+}
+.dq-hot-row:hover{background:color-mix(in srgb,var(--m3-on-surface) 6%,transparent)}
+.dq-hot-tt{
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;
+  color:var(--m3-on-surf-var);flex-shrink:0;
+}
+.dq-hot-title{
+  flex:1;min-width:0;font-size:12.5px;color:var(--m3-on-surface);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.dq-hot-badge{
+  flex-shrink:0;font-size:11px;font-weight:500;
+  padding:3px 10px;border-radius:var(--m3-r-full);
+  background:var(--dq-err-bg);color:var(--dq-err-on);
+}
+
+/* ── Barre d'outils : recherche + puces ── */
+.dq-toolbar{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.dq-search{
+  position:relative;display:flex;align-items:center;
+  height:38px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2);padding:0 6px 0 14px;
+  transition:background .2s var(--m3-ease),box-shadow .2s var(--m3-ease);
+}
+.dq-search:focus-within{
+  background:var(--m3-surface);
+  box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 1px var(--m3-primary);
+}
+.dq-search > svg{width:16px;height:16px;color:var(--m3-on-surf-var);flex-shrink:0}
+.dq-search input{
+  flex:1;min-width:0;width:100%;height:100%;
+  border:none!important;outline:none;background:transparent!important;
+  border-radius:0!important;box-shadow:none!important;
+  padding:0 9px;font-size:13px;font-family:inherit;color:var(--m3-on-surface);
+}
+.dq-search input::placeholder{color:var(--m3-on-surf-var)}
+.dq-search-clear{
+  width:26px;height:26px;flex-shrink:0;border:none;background:transparent;
+  cursor:pointer;border-radius:var(--m3-r-full);color:var(--m3-on-surf-var);
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.dq-search-clear svg{width:16px;height:16px}
+.dq-search-clear:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+
+/* Puces de filtre M3 (remplacent trois <select>) */
+.dq-chiprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dq-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  height:32px;padding:0 14px;border-radius:var(--m3-r-sm);
+  border:1px solid var(--m3-outline-var);background:transparent;
+  font-size:13px;font-weight:500;font-family:inherit;letter-spacing:.01em;
+  color:var(--m3-on-surf-var);cursor:pointer;white-space:nowrap;
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+.dq-chip:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+.dq-chip svg{width:15px;height:15px;flex-shrink:0}
+.dq-chip .dq-chip-n{
+  font-size:11px;font-weight:500;padding:1px 6px;
+  border-radius:var(--m3-r-full);background:var(--m3-surf-3);
+  color:var(--m3-on-surf-var);
+}
+.dq-chip.active{
+  background:var(--m3-secondary-cont);color:var(--m3-on-primary-cont);
+  border-color:transparent;
+}
+.dq-chip.active .dq-chip-n{background:color-mix(in srgb,var(--m3-on-primary-cont) 14%,transparent);color:inherit}
+.dq-chip-sep{width:1px;height:20px;background:var(--m3-sep);margin:0 2px}
+
+/* ── Ligne de résultats ── */
+.dq-resultbar{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;margin-bottom:12px;min-height:24px;
+  font-size:12.5px;color:var(--m3-on-surf-var);
+}
+.dq-resultbar b{color:var(--m3-on-surface);font-weight:500}
+.dq-resultbar-right{display:flex;align-items:center;gap:6px}
+.dq-linkbtn{
+  border:none;background:transparent;cursor:pointer;font-family:inherit;
+  font-size:12.5px;font-weight:500;color:var(--m3-primary);
+  padding:6px 12px;border-radius:var(--m3-r-full);
+  transition:background .15s var(--m3-ease);
+}
+.dq-linkbtn:hover{background:color-mix(in srgb,var(--m3-primary) 10%,transparent)}
+
+/* ── État vide / squelette ── */
+.dq-empty{text-align:center;padding:72px 0;color:var(--m3-on-surf-var)}
+.dq-empty svg{width:52px;height:52px;display:block;margin:0 auto 16px;color:var(--dq-ok);opacity:.85}
+.dq-empty-title{font-size:17px;font-weight:500;color:var(--m3-on-surface)}
+.dq-empty-sub{font-size:13px;color:var(--m3-on-surf-var);margin-top:6px}
+.dq-skeleton > div{
+  height:96px;border-radius:var(--m3-r-xl);margin-bottom:12px;
+  background:linear-gradient(90deg,var(--m3-surf-1) 25%,var(--m3-surf-2) 37%,var(--m3-surf-1) 63%);
+  background-size:400% 100%;animation:dq-shimmer 1.4s ease infinite;
+}
+@keyframes dq-shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+
+/* ── Cartes de règle ── */
+/* Repliées par défaut : la page affichait 20 tableaux ouverts d'un
+   coup, ce qui noyait les erreurs sous les avertissements. */
+.dqr{
+  background:var(--m3-surf-1);border:none;
+  border-radius:var(--m3-r-xl);margin-bottom:12px;
+  overflow:hidden;box-shadow:none;
+}
+[data-theme="dark"] .dqr{background:var(--m3-surf-2)}
+.dqr-head{
+  display:flex;align-items:center;gap:16px;padding:16px 22px;
+  cursor:pointer;user-select:none;
+  transition:background .15s var(--m3-ease);
+}
+/* Pas de liseré coloré : la puce de sévérité porte déjà l'information,
+   et quatre barres verticales de couleur alourdissaient la liste. */
+.dqr-accent{display:none}
+.dqr-head:hover{background:color-mix(in srgb,var(--m3-on-surface) 4%,transparent)}
+.dqr.open .dqr-head{background:color-mix(in srgb,var(--m3-on-surface) 4%,transparent)}
+.dqr-head-main{flex:1;min-width:0}
+.dqr-tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.dqr-sev{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:500;letter-spacing:.02em;
+  border-radius:var(--m3-r-full);padding:3px 10px;
+}
+.dqr-sev svg{width:11px;height:11px}
+.dqr.err  .dqr-sev{background:var(--dq-err-bg);color:var(--dq-err-on)}
+.dqr.warn .dqr-sev{background:var(--dq-warn-bg);color:var(--dq-warn-on)}
+.dqr.info .dqr-sev{background:var(--dq-info-bg);color:var(--dq-info-on)}
+.dqr-cat{
+  font-size:11px;font-weight:500;letter-spacing:.02em;
+  border-radius:var(--m3-r-full);padding:3px 10px;text-transform:none;
+}
+.dqr-id{
+  font-size:10.5px;color:var(--m3-on-surf-var);
+  background:var(--m3-surf-3);border:none;
+  border-radius:var(--m3-r-full);padding:2px 8px;
+}
+.dqr-title-main{font-size:15px;font-weight:500;color:var(--m3-on-surface);line-height:1.35}
+.dqr-desc{
+  font-size:13px;color:var(--m3-on-surf-var);line-height:1.5;margin-top:4px;
+  display:none;
+}
+.dqr.open .dqr-desc{display:block}
+.dqr-fix{
+  display:none;align-items:flex-start;gap:7px;margin-top:10px;
+  padding:10px 14px;border-radius:var(--m3-r-sm);
+  background:var(--m3-surf-2);
+  font-size:12.5px;line-height:1.5;color:var(--m3-on-surface);
+}
+[data-theme="dark"] .dqr-fix{background:var(--m3-surf-3)}
+.dqr.open .dqr-fix{display:flex}
+.dqr-fix svg{width:14px;height:14px;margin-top:2px;flex-shrink:0;color:var(--dq-ok)}
+.dqr-count{
+  display:flex;flex-direction:column;align-items:flex-end;
+  gap:1px;flex-shrink:0;line-height:1.1;
+}
+.dqr-count-n{font-size:24px;font-weight:500;color:var(--m3-on-surface)}
+.dqr-count-l{font-size:11px;color:var(--m3-on-surf-var)}
+.dqr-caret{
+  width:32px;height:32px;flex-shrink:0;border-radius:var(--m3-r-full);
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--m3-on-surf-var);
+  transition:transform .2s var(--m3-ease),background .15s var(--m3-ease);
+}
+.dqr-caret svg{width:18px;height:18px}
+.dqr.open .dqr-caret{transform:rotate(180deg)}
+
+/* Corps replié : pas de max-height animée — les tableaux ont des
+   hauteurs très variables et une valeur fixe tronquait les grandes
+   règles. */
+.dqr-body{display:none}
+.dqr.open .dqr-body{display:block}
+
+.dqr-tablewrap{overflow-x:auto}
+.dqr-table{width:100%;border-collapse:collapse}
+.dqr-table th{
+  padding:10px 16px;text-align:left;
+  font-size:11px;font-weight:500;letter-spacing:.03em;text-transform:none;
+  color:var(--m3-on-surf-var);white-space:nowrap;
+  background:var(--m3-surf-2);border-bottom:none;
+}
+[data-theme="dark"] .dqr-table th{background:var(--m3-surf-3)}
+.dqr-table td{padding:11px 16px;font-size:12.5px;color:var(--m3-on-surface);white-space:nowrap}
+.dqr-table tbody tr{border-bottom:1px solid var(--m3-sep);cursor:pointer}
+.dqr-table tbody tr:last-child{border-bottom:none}
+.dqr-table tbody tr:hover{background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent)}
+.dqr-site{
+  display:inline-block;font-size:11px;font-weight:500;
+  padding:2px 9px;border-radius:var(--m3-r-full);
+}
+.dqr-site-sn{background:var(--dq-info-bg);color:var(--dq-info-on)}
+.dqr-site-ci{background:var(--dq-ok-bg);color:var(--dq-ok-on)}
+.dqr-tt{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--m3-on-surf-var)}
+.dqr-title{font-weight:500;max-width:230px;overflow:hidden;text-overflow:ellipsis}
+.dqr-dim{color:var(--m3-on-surf-var);font-size:12px}
+.dqr-miss{color:var(--dq-err-on);font-size:12px;font-weight:500}
+.dqr-detail{max-width:290px;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+.dqr.err  .dqr-detail,.dqr.err  .dqr-th-problem{color:var(--dq-err-on)}
+.dqr.warn .dqr-detail,.dqr.warn .dqr-th-problem{color:var(--dq-warn-on)}
+.dqr.info .dqr-detail,.dqr.info .dqr-th-problem{color:var(--dq-info-on)}
+
+/* Surlignage des termes recherchés */
+.dq-mark{
+  background:color-mix(in srgb,var(--dq-warn) 40%,transparent);
+  color:inherit;border-radius:3px;padding:0 1px;
+}
+
+/* Pied de tableau : « voir les N restantes » */
+.dqr-more{
+  width:100%;border:none;background:transparent;cursor:pointer;
+  font-family:inherit;font-size:12.5px;font-weight:500;
+  color:var(--m3-primary);padding:12px;
+  border-top:1px solid var(--m3-outline-var);
+  transition:background .15s var(--m3-ease);
+}
+.dqr-more:hover{background:color-mix(in srgb,var(--m3-primary) 8%,transparent)}
+
+@media(max-width:700px){
+  .dqr-head{padding:14px 16px;gap:12px}
+  .dqr-count-l{display:none}
+  .dq-own-name{flex-basis:90px}
+}
+
+/* Écran d'accès restreint — commun à Data Quality, Ops Review, Config */
+.m3-lock-card{
+  background:var(--m3-surf-2);border:none;
+  border-radius:var(--m3-r-xl);
+  padding:32px 30px;max-width:400px;width:100%;
+  box-shadow:none;color:var(--m3-on-surface);
+}
+.m3-lock-card p{color:var(--m3-on-surf-var)!important}
+.m3-lock-card .form-control{
+  border-radius:var(--m3-r-sm)!important;
+  background:var(--m3-surface)!important;
+}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--mute)}
+

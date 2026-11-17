@@ -1,0 +1,1574 @@
+    <div class="page gm-scope" id="page-config">
+
+      <!-- Login screen -->
+      <div id="config-login-screen" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+        <div class="m3-lock-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span style="font-size:16px;font-weight:600">Restricted access</span>
+          </div>
+          <p style="font-size:13px;color:var(--mute);margin-bottom:20px">This page is restricted to administrators. Enter the password to continue.</p>
+          <input class="form-control" id="config-password" type="password" placeholder="Password" style="margin-bottom:10px"
+            onkeydown="if(event.key==='Enter') verifyConfig()">
+          <div id="config-auth-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:10px">Incorrect password.</div>
+          <div class="m3-lock-note">A single unlock grants access to Configuration, Data Quality and Ops Review for 8 h.</div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-ghost btn-sm" onclick="window.renderPage('dashboard')">Cancel</button>
+            <button class="btn btn-primary btn-sm" id="config-submit" onclick="verifyConfig()">Sign in</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Config content : sommaire. Chaque rubrique est désormais une
+           page à part entière, atteignable depuis la barre latérale ou
+           depuis ces raccourcis. -->
+      <div id="config-main-screen" style="display:none">
+      <div class="cfh-head"><div>
+      <div class="page-title">Configuration</div>
+      <div class="page-sub">Everything that sets up FOps, grouped by purpose</div></div>
+      <div class="cfg-hub-search">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>
+        <input id="cfg-hub-q" type="search" placeholder="Search a section…"
+               autocomplete="off" aria-label="Search a section" oninput="renderConfigHub()">
+      </div></div>
+      <div class="cfg-hub" id="cfg-hub"></div>
+      </div><!-- /config-main-screen -->
+    </div>
+
+    <div class="page gm-scope" id="page-cfg-annonces">
+      <div class="gann-head">
+        <div>
+          <div class="page-title">Annonces</div>
+          <div class="page-sub">Broadcast a message to the whole FO team</div>
+        </div>
+        <button class="gann-fab" type="button" onclick="ouvrirCompositeur()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New announcement
+        </button>
+      </div>
+
+      <!-- Deux colonnes : ce qu'on écrit à la main (annonces) à gauche, ce
+           qui part tout seul (rappels automatiques) à droite. Les deux
+           arrivent dans la même cloche chez le FO. -->
+      <div class="gann-layout">
+      <section class="gann-col">
+      <!-- Compositeur : replié par défaut. La page s'ouvre sur ce qui
+           est diffusé, pas sur un formulaire vide. -->
+      <div class="gann-compose" id="gann-compose" hidden>
+        <div class="gann-compose-bar">
+          <span class="gann-compose-t">New announcement</span>
+          <button class="gann-icon-btn" type="button" onclick="fermerCompositeur()" aria-label="Fermer">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div class="gann-field">
+          <input class="gann-input" id="ann-title" maxlength="120" placeholder=" "
+            oninput="majApercuAnnonce()">
+          <label class="gann-label" for="ann-title">Title</label>
+        </div>
+
+        <div class="gann-field">
+          <textarea class="gann-input gann-area" id="ann-body" rows="4" maxlength="2000"
+            placeholder=" " oninput="majApercuAnnonce()"></textarea>
+          <label class="gann-label" for="ann-body">Message</label>
+          <div class="gann-help"><span id="ann-count">0</span> / 2000</div>
+        </div>
+
+        <div class="gann-row">
+          <div class="gann-seg" role="group" aria-label="Level">
+            <button type="button" class="gann-chip is-on" data-level="info"     onclick="choisirNiveau('info')">Info</button>
+            <button type="button" class="gann-chip"        data-level="warning"  onclick="choisirNiveau('warning')">Important</button>
+            <button type="button" class="gann-chip"        data-level="critical" onclick="choisirNiveau('critical')">Critical</button>
+          </div>
+          <!-- Format : dans la cloche, ou en bande en haut de l'écran pour
+               tout le monde (grandes annonces). -->
+          <div class="gann-seg" role="group" aria-label="Format">
+            <button type="button" class="gann-chip is-on" data-display="panel"  onclick="choisirFormat('panel')" title="In the reminders bell">Panel</button>
+            <button type="button" class="gann-chip"        data-display="banner" onclick="choisirFormat('banner')" title="Full-width band at the top of the app, for everyone">Bande</button>
+          </div>
+          <div class="gann-field gann-field-sm">
+            <select class="gann-input gann-select" id="ann-ttl">
+              <option value="1">24 hours</option>
+              <option value="3">3 days</option>
+              <option value="7" selected>7 days</option>
+              <option value="14">14 days</option>
+              <option value="30">30 days</option>
+            </select>
+            <label class="gann-label gann-label-fixed" for="ann-ttl">Display duration</label>
+          </div>
+        </div>
+
+        <!-- Aperçu : le message tel que l'équipe le verra dans sa cloche.
+             Publier à l'aveugle est la première cause d'annonce ratée. -->
+        <div class="gann-preview" id="gann-preview" hidden>
+          <div class="gann-preview-cap">Preview in the bell</div>
+          <div class="gann-preview-card" id="gann-preview-card"></div>
+        </div>
+
+        <div class="gann-actions">
+          <span id="ann-msg" class="gann-msg"></span>
+          <button class="gann-btn-text" type="button" onclick="fermerCompositeur()">Cancel</button>
+          <button class="gann-btn" type="button" onclick="publierAnnonce()">Publish</button>
+        </div>
+      </div>
+
+      <div class="gann-list-head">
+        <span>Active announcements</span>
+        <span class="gann-count" id="ann-total"></span>
+      </div>
+      <div id="ann-list"></div>
+      </section>
+      <section class="gann-col gann-col-rules">
+
+      <!-- Rappels automatiques : l'autre moitié de ce que la cloche
+           affiche. Une annonce est écrite à la main ; un rappel est
+           déduit des données. Les deux arrivent au même endroit chez
+           le FO, ils se règlent donc au même endroit ici. -->
+      <div class="gann-list-head">
+        <span>Automatic reminders</span>
+        <span class="gann-count" id="nfr-total"></span>
+      </div>
+      <div class="gann-rules-note">
+        These reminders are not written by hand: they fire on their own from the
+        FO's data (progress, tickets, tasks, quizzes). Disabling a rule removes it
+        from the bell for the whole team.
+      </div>
+      <div id="nfr-list"></div>
+      </section>
+      </div>
+    </div>
+
+    <div class="page gm-scope" id="page-cfg-general">
+      <div class="page-title">General</div>
+      <div class="page-sub">Domains, FO team, statuses and time references</div>
+        <div class="config-grid">
+        <div class="config-card">
+          <h3>Active domains</h3>
+          <div id="config-domains" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
+          <div style="display:flex;gap:8px">
+            <input class="form-control" id="new-domain" placeholder="New domain..." style="flex:1;max-width:280px">
+            <button class="btn btn-primary btn-sm" onclick="addDomain()">Add</button>
+          </div>
+        </div>
+
+        <div class="config-card">
+          <h3>Front Office Team</h3>
+          <div id="config-fo-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input class="form-control" id="new-fo" placeholder="Full name..." style="flex:1;min-width:180px;max-width:240px">
+            <input class="form-control idt-mono" id="new-fo-id" placeholder="ID Huawei" style="width:150px" maxlength="12">
+            <select class="form-control" id="new-fo-tracker" style="width:72px">
+              <option value="SN">SN</option>
+              <option value="CI">CI</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="addFo()">Add</button>
+          </div>
+          <p style="font-size:11.5px;color:var(--mute);margin:8px 0 0;line-height:1.5">
+            The Huawei ID identifies the agent when consulting their
+            performance. It can be added later by clicking the ID
+            d’un agent dans la liste.
+          </p>
+        </div>
+
+        <div class="config-card">
+          <h3>Notation FO - Performance &amp; Engagement</h3>
+          <p style="font-size:11.5px;color:var(--mute);margin:-4px 0 12px">
+            Manual score (0-100) used for the ranking and the Trust Matrix. The displayed performance combines this score with automatic ticket indicators (50/50).
+          </p>
+          <div id="config-fo-ratings"></div>
+        </div>
+
+        <div class="config-card">
+          <h3>Ticket Statuses</h3>
+          <div id="config-ticket-statuses" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
+          <div style="display:flex;gap:8px">
+            <input class="form-control" id="new-ticket-status" placeholder="New status..." style="flex:1;max-width:240px">
+            <button class="btn btn-primary btn-sm" onclick="addTicketStatus()">Add</button>
+          </div>
+        </div>
+
+        <div class="config-card">
+          <h3>Time Reference - Time Left</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px">
+            <div class="form-group">
+              <label class="form-label">TRACKER SN</label>
+              <select class="form-control" id="cfg-tref-osn" onchange="saveTimeRef()">
+                <option>Occur Time</option><option>Detection Time</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">TRACKER CI</label>
+              <select class="form-control" id="cfg-tref-oci" onchange="saveTimeRef()">
+                <option>Occur Time</option><option>Detection Time</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        </div>
+    </div>
+
+    <div class="page gm-scope gsla" id="page-cfg-sla">
+      <!-- En-tête : titre à gauche, action primaire à droite. Le bouton
+           reste visible pendant la saisie (sticky) parce que la liste des
+           SLA peut être plus longue qu'un écran. -->
+      <div class="gsla-head">
+        <div>
+          <div class="page-title">SLA</div>
+          <div class="page-sub">Contractual durations and counting mode</div>
+        </div>
+        <button class="gsla-fab" onclick="saveSlaHours()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Save
+        </button>
+      </div>
+
+      <div class="gsla-card">
+        <div class="gsla-card-head">
+          <h3 class="gsla-card-t">Reference durations</h3>
+          <p class="gsla-card-d">
+            The <strong>Problem Bug P1/P2</strong> types have two independent durations:
+            Workaround (contournement) et Final Resolution. Le statut SLA du ticket
+            reflects the more urgent of the two.
+          </p>
+        </div>
+        <div id="config-sla" class="gsla-list"></div>
+      </div>
+
+      <div class="gsla-card">
+        <div class="gsla-card-head">
+          <h3 class="gsla-card-t">Working mode</h3>
+          <p class="gsla-card-d">
+            Determines the clock used to count down durations. The
+            <strong>Cal / Biz</strong> setting — whether weekends are included — is set
+            ligne par ligne ci-dessus.
+          </p>
+        </div>
+
+        <!-- Deux choix exclusifs : des cartes radio plutôt qu'un select,
+             pour que la différence entre Live et Drill se lise sans ouvrir
+             un menu. -->
+        <div class="gsla-modes" role="radiogroup" aria-label="Operational context">
+          <label class="gsla-mode">
+            <input type="radio" name="cfg-work-mode-opt" value="live" onchange="saveSLAMode()">
+            <span class="gsla-mode-body">
+              <span class="gsla-mode-t">Live</span>
+              <span class="gsla-mode-d">Horloge continue, 24 h/24 et 7 j/7</span>
+            </span>
+            <span class="gsla-mode-tick" aria-hidden="true"></span>
+          </label>
+          <label class="gsla-mode">
+            <input type="radio" name="cfg-work-mode-opt" value="drill" onchange="saveSLAMode()">
+            <span class="gsla-mode-body">
+              <span class="gsla-mode-t">Drill</span>
+              <span class="gsla-mode-d">Business hours only, 8:30 – 17:30</span>
+            </span>
+            <span class="gsla-mode-tick" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <!-- Conservé (masqué) : saveSLAMode() et le reste de l'app lisent
+             encore cette valeur par son identifiant. -->
+        <select id="cfg-work-mode" hidden aria-hidden="true" tabindex="-1">
+          <option value="live">Live</option>
+          <option value="drill">Drill</option>
+        </select>
+
+        <div class="gsla-hint">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span id="cfg-sla-hint"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page gm-scope gsla" id="page-cfg-goals">
+      <div class="gsla-head">
+        <div>
+          <div class="page-title">Objectifs</div>
+          <div class="page-sub">Team targets and performance tracking</div>
+        </div>
+        <button class="gsla-fab" onclick="saveGoals()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Save
+        </button>
+      </div>
+
+      <div class="gsla-card">
+        <div class="gsla-card-head">
+          <h3 class="gsla-card-t">Team targets</h3>
+          <p class="gsla-card-d">
+            Quatre familles, reprises du plan trimestriel. Chaque cible est
+            shown on the FO Dashboard with its progress, measured over the
+            selected period. <strong>Leaving a field empty</strong> removes the
+            objective from the display — the row then turns dotted.
+          </p>
+        </div>
+        <div id="config-goals" class="gsla-list"></div>
+        <div class="gsla-hint">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>La mention <strong>Plan</strong> en regard d'une ligne rappelle la cible
+          official target for the quarter. It is a reference point: the team can aim for
+          another value over a given period without changing it.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         ÉQUIPE — une seule entrée pour tout ce qui concerne les agents
+
+         Six rubriques (My Team, Performance FO, Suivi des objectifs,
+         One-to-One, Assigner des tâches, Agenda Training) répondaient
+         chacune à un morceau de la question « où en est cet agent ? ».
+         Elles sont réunies ici sur deux niveaux : l'équipe (une carte
+         par agent, ce qui demande une action) et la fiche d'un agent.
+
+         Les écrans existants ne sont pas réécrits : team-hub.js déplace
+         leur conteneur (#page-cfg-perf, #page-cfg-o2o…) dans #eq-mount
+         selon l'onglet ouvert. Leurs identifiants, leur style et leur JS
+         restent donc les mêmes ; les anciens noms de page redirigent ici.
+
+         Les zones que le JS réécrit (#eq-head, #eq-tabs, #eq-sub,
+         #eq-grid, #eq-own) ne contiennent jamais d'écran déplacé : un
+         innerHTML sur l'une d'elles ne peut pas détruire #eq-mount.
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page gm-scope" id="page-equipe">
+      <!-- Deux colonnes : la liste de l'équipe, toujours visible à gauche
+           (on sait où l'on est et l'on passe d'un agent à l'autre d'un
+           clic), et à droite la vue de l'équipe ou la fiche de l'agent. -->
+      <div class="eq-shell">
+      <aside class="eq-rail" aria-label="Agents">
+        <div class="eq-rail-search">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>
+          <input id="eq-rail-q" type="search" placeholder="Chercher un agent…" autocomplete="off" aria-label="Chercher un agent" oninput="eqRailSearch(this.value)">
+        </div>
+        <nav id="eq-rail-list"></nav>
+      </aside>
+      <div class="eq-main">
+      <div id="eq-head"></div>
+      <div class="eq-tabbar">
+        <div class="eq-tabs" id="eq-tabs" role="tablist" aria-label="Équipe"></div>
+        <div id="eq-sub"></div>
+      </div>
+      <div class="eq-panel" id="eq-panel" role="tabpanel">
+
+        <!-- Vue Agents. Le champ de recherche est posé ici une fois pour
+             toutes : redessiner la grille à chaque frappe ne le recrée pas. -->
+        <div class="eq-agents" id="eq-agents" hidden>
+          <div class="eq-toolbar">
+            <div class="eq-search">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>
+              <input id="eq-q" type="search" placeholder="Rechercher un agent…" autocomplete="off"
+                     aria-label="Rechercher un agent" oninput="eqOnSearch(this.value)">
+            </div>
+            <div class="eq-seg" id="eq-filter" role="group" aria-label="Filtrer les agents"></div>
+          </div>
+          <p class="eq-summary" id="eq-summary" aria-live="polite"></p>
+          <div class="eq-grid" id="eq-grid"></div>
+        </div>
+
+        <div id="eq-own"></div>
+        <div id="eq-mount"></div>
+      </div>
+      </div><!-- /eq-main -->
+      </div><!-- /eq-shell -->
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PERFORMANCE FO — notation individuelle + Trust Matrix
+         Réunit ce qui était éparpillé : la Trust Matrix (déplacée
+         depuis le FO Dashboard, où elle n'avait pas sa place devant
+         toute l'équipe) et la notation par agent selon le barème du
+         plan trimestriel. On choisit un FO, on voit où il en est.
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page gm-scope gsla" id="page-cfg-perf">
+      <!-- Plus de titre ni d'onglets propres : l'écran n'est plus affiché
+           que monté dans la page Équipe, qui porte les siens (voir
+           team-hub.js). La vue affichée suit perfUI.tab (setPerfTab). -->
+      <div class="gsla-head">
+        <button class="gsla-fab" onclick="savePerfScorecard()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Save
+        </button>
+      </div>
+
+      <!-- Mois noté. L'agent est choisi par la fiche de la page Équipe
+           (perfUI.fo) : l'ancien sélecteur à pastilles n'y était jamais visible. -->
+      <div class="perf-bar">
+        <div class="perf-monthbar">
+          <label class="form-label" for="perf-month">Scored month</label>
+          <input class="form-control" type="month" id="perf-month" onchange="onPerfMonthChange()">
+        </div>
+      </div>
+
+      <!-- Vue 1 — notation du mois : mesures + barème -->
+      <section class="perf-view" id="perf-view-note">
+        <div id="perf-sheet"></div>
+      </section>
+
+      <!-- Vue 2 — entretiens et objectifs personnels du plan trimestriel -->
+      <section class="perf-view" id="perf-view-o2o" hidden>
+        <div id="perf-o2o"></div>
+      </section>
+
+      <!-- Vue 4 — objectifs déposés par les agents, en attente de décision.
+           Elle ne dépend pas de l'agent sélectionné : ce qui attend une
+           décision attend, quel que soit le profil ouvert. -->
+      <section class="perf-view" id="perf-view-review" hidden>
+        <div id="perf-obj-review"></div>
+      </section>
+
+      <!-- Vue 5 — historique des sessions d'objectifs et leurs bilans.
+           Le rapport reste téléchargeable après la clôture : c'est
+           justement le document de fin de trimestre. -->
+      <section class="perf-view" id="perf-view-sessions" hidden>
+        <div id="perf-sessions"></div>
+      </section>
+
+      <!-- Ouverture d'une session. Les bornes se choisissent ici, et la
+           case de reprise permet de repartir des objectifs déjà posés en
+           entretien plutôt que d'une liste vide. Le corps est rempli par
+           objRevOpenSession(), qui connaît le nombre d'objectifs repris. -->
+      <div class="modal-overlay" id="obj-session-modal">
+        <div class="modal" style="max-width:520px">
+          <div class="modal-header">
+            <div class="modal-title">Open an objectives session</div>
+            <button class="modal-close" onclick="closeModal('obj-session-modal')">×</button>
+          </div>
+          <div class="modal-body" id="obj-session-body"></div>
+        </div>
+      </div>
+
+      <!-- Vue 3 — positionnement de toute l'équipe -->
+      <section class="perf-view" id="perf-view-team" hidden>
+        <div class="gsla-card">
+          <div class="gsla-card-head">
+            <h3 class="gsla-card-t">Trust Matrix</h3>
+            <p class="gsla-card-d">
+              Positioning of each FO on two axes: performance measured
+              by the score, and trust earned through rigorous execution.
+              The goal for the quarter is to bring the whole team into
+              <strong>Top performer</strong>.
+            </p>
+          </div>
+          <div id="perf-trust"></div>
+        </div>
+      </section>
+    </div>
+    <!-- ══════════════════════════════════════════════════════════
+         MY TEAM — vue d'encadrement
+         Performance FO note un agent à la fois ; ici on regarde
+         l'équipe entière d'un coup : qui porte, qui décroche, et
+         sur quel critère l'écart se creuse.
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page gm-scope gsla" id="page-cfg-myteam">
+      <div class="gsla-head">
+        <div class="mt-headctl">
+          <input class="form-control" type="month" id="mt-month" onchange="onMyTeamMonthChange()"
+                 aria-label="Scored month">
+        </div>
+      </div>
+
+      <!-- Une seule ligne de contexte plutôt qu'une grille de tuiles :
+           l'écran sert à comparer des agents, pas à lire cinq compteurs
+           d'équipe. Les chiffres restent, en retrait. -->
+      <div class="mt-summary" id="mt-summary"></div>
+
+      <div class="mt-tabs" role="tablist" aria-label="Vue équipe">
+        <button class="mt-tab is-on" role="tab" aria-selected="true"
+                id="mt-tab-rank" aria-controls="mt-view-rank"
+                onclick="setMyTeamTab('rank')">Classement</button>
+        <button class="mt-tab" role="tab" aria-selected="false"
+                id="mt-tab-extremes" aria-controls="mt-view-extremes"
+                onclick="setMyTeamTab('extremes')">Forts &amp; faibles</button>
+        <button class="mt-tab" role="tab" aria-selected="false"
+                id="mt-tab-criteria" aria-controls="mt-view-criteria"
+                onclick="setMyTeamTab('criteria')">Par critère</button>
+      </div>
+
+      <!-- Vue 1 — classement complet, triable. -->
+      <section class="mt-view" id="mt-view-rank" role="tabpanel" aria-labelledby="mt-tab-rank">
+        <div class="mt-sortbar" id="mt-sortbar"></div>
+        <div id="mt-rank"></div>
+        <p class="mt-foot">
+          Composite rank: the scored month from Performance FO where it exists,
+          weighted by how much of the scale was covered, completed by live ticket
+          delivery. Click a row for the breakdown.
+        </p>
+      </section>
+
+      <!-- Vue 2 — haut et bas de classement, côte à côte. -->
+      <section class="mt-view" id="mt-view-extremes" role="tabpanel" aria-labelledby="mt-tab-extremes" hidden>
+        <div class="mt-split" id="mt-extremes"></div>
+      </section>
+
+      <!-- Vue 3 — un critère à la fois : où l'équipe tient, où elle lâche. -->
+      <section class="mt-view" id="mt-view-criteria" role="tabpanel" aria-labelledby="mt-tab-criteria" hidden>
+        <div id="mt-criteria"></div>
+        <p class="mt-foot">
+          Team average per criterion, with the agents at each end. A criterion
+          nobody has been scored on reads as “not scored”, never as a zero.
+        </p>
+      </section>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SUIVI DES OBJECTIFS — page à part entière
+
+         Le suivi vivait dans l'onglet « Approvals » de Performance FO,
+         à côté de la file d'arbitrage. Deux gestes très différents :
+         arbitrer ce qui vient d'être déposé se fait en quelques minutes
+         par semaine, suivre l'avancement du trimestre se consulte. Les
+         mêler cachait le second derrière le premier, et un objectif
+         dépassé ne se voyait que si l'on pensait à ouvrir l'onglet.
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page gm-scope gsla" id="page-cfg-objectifs">
+      <div class="gsla-head">
+        <div class="obt-headctl" id="obt-sessbar"></div>
+      </div>
+
+      <!-- Rappel en exergue : ce qui a dépassé son échéance. Posé avant
+           tout le reste, parce que c'est la seule chose de cette page
+           qui appelle une décision aujourd'hui. -->
+      <div id="obt-alert"></div>
+
+      <div id="obt-kpis"></div>
+      <div id="obt-body"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         VUES PAR PROFIL
+
+         La barre latérale porte une trentaine d'entrées : chacune a été
+         ajoutée pour de bonnes raisons, mais personne n'a besoin des
+         trente. Un Back Office ne planifie pas de shifts, un observateur
+         ne saisit rien. Plutôt que de trancher à notre place ce que
+         chaque métier doit voir, on laisse l'admin composer la vue de
+         chaque profil — et la barre redevient lisible pour tout le monde.
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page gm-scope gsla" id="page-cfg-vues">
+      <div class="gsla-head">
+        <div>
+          <div class="page-title">Vues par profil</div>
+          <div class="page-sub">Les pages que chaque profil voit dans la barre latérale</div>
+        </div>
+        <button class="gsla-fab" onclick="saveNavProfiles()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Enregistrer
+        </button>
+      </div>
+
+      <div class="nvp-tabs" id="nvp-tabs" role="tablist" aria-label="Profil"></div>
+      <div id="nvp-body"></div>
+    </div>
+
+    <div class="page gm-scope" id="page-cfg-rota">
+      <div class="page-title">Shift Rota</div>
+      <div class="page-sub">Sites, slots and rota generation</div>
+        <div class="config-card" id="config-rota">
+          <h3>Shift Rota</h3>
+
+          <!-- site tabs -->
+          <div id="rota-site-tabs" style="display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--line);padding-bottom:0"></div>
+
+          <!-- add-site form -->
+          <div id="rota-add-site-form" style="display:none;border:1px dashed var(--line);border-radius:var(--r);padding:12px;margin-bottom:16px">
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+              <div><label class="form-label">Site name</label><input class="form-control" id="new-site-name" placeholder="e.g. Abidjan" style="width:160px"></div>
+              <div>
+                <label class="form-label">Tracker</label>
+                <select class="form-control" id="new-site-tracker" style="width:90px">
+                  <option value="SN">SN</option><option value="CI">CI</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="_rotaCreateSite()">Create site</button>
+              <button class="btn btn-ghost btn-sm" onclick="document.getElementById('rota-add-site-form').style.display='none'">Cancel</button>
+            </div>
+          </div>
+
+          <!-- per-site panel - rendered by JS -->
+          <div id="rota-site-panel"></div>
+
+          <!-- rota generator -->
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line)">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin-bottom:12px">Auto-generate schedule</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+              <div>
+                <label class="form-label" style="margin-bottom:4px">Site</label>
+                <select class="form-control" id="rota-gen-site" style="min-width:130px"></select>
+              </div>
+              <div>
+                <label class="form-label" style="margin-bottom:4px">Start date</label>
+                <input class="form-control" id="rota-gen-start" type="date" style="width:155px">
+              </div>
+              <div>
+                <label class="form-label" style="margin-bottom:4px">Weeks</label>
+                <select class="form-control" id="rota-gen-weeks" style="width:80px">
+                  <option value="1">1 wk</option><option value="2">2 wks</option>
+                  <option value="4" selected>4 wks</option><option value="8">8 wks</option>
+                </select>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="previewRota()">Preview</button>
+              <button class="btn btn-primary btn-sm" id="rota-save-btn" onclick="saveRotaToPlanning()" style="display:none">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Save to planning
+              </button>
+            </div>
+            <div id="rota-preview" style="margin-top:14px"></div>
+          </div>
+        </div>
+    </div>
+
+    <div class="page gm-scope" id="page-cfg-security">
+      <div class="page-title">Access & Security</div>
+      <div class="page-sub">Passwords and allowed IDs</div>
+
+        <div class="config-card" id="config-fo-access">
+          <h3>Codes personnels (connexion)</h3>
+          <p style="font-size:12.5px;color:var(--mute);margin:-2px 0 14px;line-height:1.5">
+            Chaque membre de l'équipe se connecte à FOps avec son ID Huawei et son code
+            personnel : c'est ce qui prouve qui il est. Une fois l'accès équipe actif,
+            le mot de passe d'équipe ne permet plus que de consulter — pour modifier
+            quoi que ce soit, il faut ce code. Il ouvre aussi « Ma performance ».
+            Le code n'est affiché qu'une fois, puis stocké chiffré. Le régénérer
+            invalide l'ancien et ferme les sessions ouvertes.
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <select class="form-control" id="foacc-fo" style="flex:1;min-width:180px"></select>
+            <input class="form-control idt-mono" id="foacc-id" placeholder="Agent Huawei ID" style="flex:1;min-width:180px">
+            <button class="btn btn-primary btn-sm" onclick="generateFoCode()">Generate a code</button>
+          </div>
+          <div id="foacc-new" style="display:none"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Agent</th><th>Huawei ID</th><th>Code created on</th>
+                <th>Consultations ouvertes</th><th style="width:90px"></th>
+              </tr></thead>
+              <tbody id="foacc-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="config-card" id="config-team-access">
+          <h3>Accès équipe</h3>
+          <p style="font-size:12.5px;color:var(--mute);margin:-2px 0 14px;line-height:1.5">
+            Une fois défini, ce mot de passe est demandé à l'ouverture de FOps : sans lui,
+            plus aucune donnée ne sort du serveur. Les agents peuvent aussi entrer avec
+            leur identifiant Huawei et leur code personnel ; le mot de passe admin fonctionne aussi.
+          </p>
+          <div id="team-access-state" style="font-size:12.5px;margin-bottom:12px"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input class="form-control" id="team-newpw" type="password" autocomplete="new-password"
+              placeholder="Mot de passe d'équipe (10 caractères min.)" style="flex:1;min-width:0"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();saveTeamPassword()}">
+            <button class="btn btn-primary btn-sm" onclick="saveTeamPassword()">Enregistrer</button>
+          </div>
+          <div style="font-size:11.5px;color:var(--mute);margin-top:8px;line-height:1.5">
+            Le changer déconnecte tout le monde (sauf les sessions admin).
+          </div>
+          <div id="team-newpw-msg" style="font-size:12px;margin-top:6px"></div>
+          <button class="btn btn-ghost btn-sm" id="team-disable-btn" style="margin-top:10px;display:none"
+            onclick="disableTeamPassword()">Désactiver le verrou</button>
+          <label style="display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.5;cursor:pointer">
+            <input type="checkbox" id="team-required" onchange="setIdentityRequired(this.checked)" style="margin-top:3px">
+            <span><b>Exiger le code personnel pour modifier</b><br>
+            <span style="color:var(--mute)">Même sans mot de passe d'équipe : tout le monde peut consulter,
+            mais seule une personne connectée avec son ID Huawei et son code peut modifier.
+            Délivre d'abord un code à chacun (carte « Codes personnels »).</span></span>
+          </label>
+        </div>
+
+        <div class="config-card" id="config-absence-access">
+          <h3>Absences access</h3>
+          <p style="font-size:12.5px;color:var(--mute);margin:-2px 0 14px;line-height:1.5">
+            Only the IDs listed here can open the Absences page,
+            and the password is still required. Empty list = nobody has access.
+          </p>
+
+          <label style="display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin-bottom:6px">
+            Allowed IDs
+          </label>
+          <div id="abs-allow-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input class="form-control" id="abs-allow-input" placeholder="Huawei ID (ex. hw1)"
+              style="flex:1;min-width:0"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();addAbsenceAllowedId()}">
+            <button class="btn btn-ghost btn-sm" onclick="addAbsenceAllowedId()">+ Add</button>
+          </div>
+          <div id="abs-allow-msg" style="font-size:12px;margin-top:8px"></div>
+
+          <div style="border-top:1px solid var(--line);margin:16px 0 0;padding-top:14px">
+            <label style="display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin-bottom:6px">
+              Reset the password
+            </label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <input class="form-control" id="abs-newpw" type="password" autocomplete="new-password"
+                placeholder="New password (8 chars min.)" style="flex:1;min-width:0"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();resetAbsencePassword()}">
+              <button class="btn btn-primary btn-sm" onclick="resetAbsencePassword()">Reset</button>
+            </div>
+            <div style="font-size:11.5px;color:var(--mute);margin-top:8px;line-height:1.5">
+              Open Absences sessions will be closed immediately.
+            </div>
+            <div id="abs-newpw-msg" style="font-size:12px;margin-top:6px"></div>
+          </div>
+        </div>
+
+        <div class="config-card">
+          <h3>Shift swap approval password</h3>
+          <p style="font-size:12px;color:var(--mute);margin:0 0 10px">Required to approve or reject shift swap / change requests.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input class="form-control" type="password" id="approval-password-input" placeholder="New password" style="flex:1;min-width:160px;max-width:240px">
+            <button class="btn btn-primary btn-sm" onclick="saveApprovalPassword()">Save</button>
+          </div>
+        </div>
+    </div>
+
+    <div class="page gm-scope" id="page-cfg-data">
+      <div class="page-title">Data</div>
+      <div class="page-sub">Équipe Back Office</div>
+        <div class="config-grid">
+        <div class="config-card" id="config-bo-list">
+          <h3>Back Office Team (BO)</h3>
+          <div id="bo-table-wrap" style="margin-bottom:14px"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input class="form-control" id="new-bo-name" placeholder="Name (e.g. First LAST)" style="flex:1;min-width:160px;max-width:240px">
+            <input class="form-control" id="new-bo-phone" placeholder="BO ID (e.g. 84435353)" style="flex:1;min-width:120px;max-width:180px">
+            <button class="btn btn-primary btn-sm" onclick="addBO()">Add BO</button>
+          </div>
+        </div>
+
+        <!-- Les exports (dont la sauvegarde JSON qui était ici) sont
+             réunis dans Rapports › Exports : un seul endroit à connaître. -->
+        <div class="config-card">
+          <h3>Exports</h3>
+          <div class="config-export-row">
+            <div class="config-export-desc">
+              Les exports sont dans Rapports › Exports
+              <small>Rapports, trackers, planning, absences, sauvegarde complète (JSON)</small>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="rpOpen('exports')">Ouvrir Rapports › Exports</button>
+          </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="page gm-scope" id="page-cfg-quiz">
+      <div class="page-title">Quiz</div>
+      <div class="page-sub">Team question bank and quizzes</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start">
+          <div class="config-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <h3 style="margin-bottom:0">Quizzes</h3>
+              <button class="btn btn-primary btn-sm" onclick="openNewQuiz()">+ New quiz</button>
+            </div>
+            <!-- Chercher par nom / module / niveau, puis restreindre à ce
+                 qui est réellement en ligne : les deux questions qu'on se
+                 pose devant 30 cours répartis sur six niveaux. -->
+            <div class="cfgq-toolbar">
+              <div class="cfgq-search">
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>
+                <input id="cfg-quiz-search" type="search" autocomplete="off"
+                       placeholder="Search a course, a module, a level…"
+                       aria-label="Search a quiz" oninput="renderQuizManage()">
+              </div>
+              <select class="filter-select" id="cfg-quiz-filter" aria-label="Filter quizzes" onchange="renderQuizManage()">
+                <option value="">All courses</option>
+                <option value="online">En ligne</option>
+                <option value="draft">Brouillons</option>
+                <option value="custom">Maison</option>
+                <option value="empty">Without questions</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" type="button" id="cfg-quiz-collapse" onclick="toggleQuizLevels()">Collapse all</button>
+            </div>
+            <div id="config-quiz-count" class="cfgq-count"></div>
+            <div id="config-quiz-list" style="margin-top:10px"></div>
+          </div>
+
+          <div class="config-card" id="config-quiz-questions-wrap" style="display:none">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <h3 style="margin-bottom:0" id="config-quiz-questions-title">Questions</h3>
+              <div style="display:flex;align-items:center;gap:8px">
+                <button class="btn btn-primary btn-sm" onclick="openNewQuizQuestion()">+ Add question</button>
+                <button class="btn btn-ghost btn-sm" type="button" onclick="closeQuizQuestions()" aria-label="Close questions" title="Close">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="cfgq-toolbar">
+              <div class="cfgq-search">
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>
+                <input id="cfg-question-search" type="search" autocomplete="off"
+                       placeholder="Search a question, an answer, a topic…"
+                       aria-label="Search a question" oninput="renderQuizQuestionsManage()">
+              </div>
+              <select class="filter-select" id="cfg-question-cat" aria-label="Filter by topic" onchange="renderQuizQuestionsManage()">
+                <option value="">All topics</option>
+              </select>
+            </div>
+            <div id="config-quiz-questions-count" class="cfgq-count"></div>
+            <div id="config-quiz-questions" style="margin-top:10px"></div>
+          </div>
+        </div>
+    </div>
+
+    <div class="page gm-scope" id="page-cfg-glossary">
+      <div class="page-title">Glossaire Logs</div>
+      <div class="page-sub">Terms recognised by the log analyser</div>
+        <div class="config-card">
+          <h3>Log analyser glossary</h3>
+          <p style="font-size:11.5px;color:var(--mute);margin:-4px 0 14px">
+            Mots-cles et definitions utilises par l'Analyseur de logs pour decoder automatiquement les valeurs des champs (acronymes, noms de clusters, plateformes, protocoles...).
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <input class="form-control" id="new-glossary-term" placeholder="Mot-cle (ex: vrrp)" style="flex:1;min-width:160px;max-width:220px">
+            <input class="form-control" id="new-glossary-def" placeholder="Definition" style="flex:2;min-width:240px">
+            <button class="btn btn-primary btn-sm" onclick="addGlossaryTermCfg()">Add</button>
+          </div>
+          <details style="margin-bottom:16px">
+            <summary style="cursor:pointer;font-size:12px;color:var(--mute)">Bulk import (paste JSON)</summary>
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+              <textarea class="form-control" id="glossary-json-input" rows="6" placeholder='{"vrrp": "Router redundancy protocol", "bgp": "Border Gateway Protocol"}' style="font-family:monospace;font-size:12px;resize:vertical"></textarea>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn btn-primary btn-sm" onclick="importGlossaryJsonCfg()">Import JSON</button>
+                <span id="glossary-json-status" style="font-size:11.5px;color:var(--mute)"></span>
+              </div>
+            </div>
+          </details>
+          <div style="max-height:420px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-sm)">
+            <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+              <thead>
+                <tr style="background:var(--bg2)">
+                  <th style="text-align:left;padding:8px 10px;font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em">Mot-cle</th>
+                  <th style="text-align:left;padding:8px 10px;font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em">Definition</th>
+                  <th style="width:50px"></th>
+                </tr>
+              </thead>
+              <tbody id="config-glossary-body"></tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SUIVI O2O — bilan, actions et profil agent.
+         Lecture seule : les objectifs et entretiens se saisissent
+         dans Performance FO. Cette page les met en perspective.
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="page gm-scope" id="page-cfg-o2o">
+      <div class="o2os-toolbar">
+        <div class="o2os-tabs" role="tablist">
+          <button class="o2os-tab is-on" role="tab" data-tab="bilan"  onclick="setO2OSTab('bilan')">Bilan &amp; suivi</button>
+          <button class="o2os-tab"       role="tab" data-tab="profil" onclick="setO2OSTab('profil')">Profil agent</button>
+        </div>
+        <div class="o2os-agent">
+          <label class="form-label" for="o2os-fo" style="margin-top:28px">Agent</label>
+    
+          <select class="form-control" id="o2os-fo" onchange="onO2OSAgentChange()"></select>
+        </div>
+      </div>
+
+      <div id="o2os-bilan"></div>
+      <div id="o2os-profil" style="display:none"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ATTRIBUTION DE TÂCHES — l'admin assigne, le FO exécute.
+         Les tâches créées ici atterrissent dans My Tasks avec un
+         habillage propre : le FO peut faire avancer le statut, mais
+         ni réécrire l'intitulé ni supprimer la tâche.
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="page gm-scope" id="page-cfg-assign">
+      <!-- Composeur : une seule ligne de saisie visible au repos, les
+           options se déplient. Assigner une tâche courante ne doit pas
+           demander de remplir six champs. -->
+      <div class="asg-composer" id="asg-composer">
+        <div class="asg-row">
+          <textarea class="asg-input" id="asg-task" rows="1" maxlength="220"
+                    placeholder="What should be done? e.g. Clear the pending MMC queue…"
+                    oninput="asgOnInput(this)"></textarea>
+          <button class="asg-send" id="asg-send" onclick="asgSubmit()" disabled>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            <span id="asg-send-label">Assign</span>
+          </button>
+        </div>
+
+        <!-- Destinataires : pastilles à cocher. Attribuer la même tâche à
+             trois agents est le cas courant ; un menu déroulant simple
+             aurait imposé trois passages dans le formulaire. -->
+        <div class="asg-who">
+          <div class="asg-lab">Assign to</div>
+          <div class="asg-chips" id="asg-fo-chips"></div>
+        </div>
+
+        <div class="asg-opts">
+          <div class="asg-field">
+            <label class="asg-lab" for="asg-due">Due date</label>
+            <input class="asg-ctl" id="asg-due" type="date" onchange="asgSyncPreview()">
+          </div>
+          <div class="asg-field">
+            <label class="asg-lab" for="asg-prio">Priority</label>
+            <select class="asg-ctl" id="asg-prio" onchange="asgSyncPreview()">
+              <option value="">Normal</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="asg-field asg-field-wide">
+            <label class="asg-lab" for="asg-note">Instructions (optional)</label>
+            <input class="asg-ctl" id="asg-note" maxlength="300"
+                   placeholder="Context, expected outcome…" oninput="asgSyncPreview()">
+          </div>
+        </div>
+
+        <div class="asg-foot">
+          <div class="asg-preview" id="asg-preview"></div>
+        </div>
+      </div>
+
+      <!-- Tâches déjà attribuées, groupées par agent. -->
+      <div class="asg-bar">
+        <div class="asg-segs" id="asg-segs" role="tablist"></div>
+        <select class="asg-ctl asg-filter" id="asg-filter-fo" onchange="renderAssignPage()" aria-label="Filter by agent">
+          <option value="">All agents</option>
+        </select>
+      </div>
+
+      <div id="asg-list"></div>
+    </div>
+
+    <div class="page gm-scope" id="page-cfg-training">
+      <div class="config-card">
+        <h3 id="trn-form-title">New session</h3>
+        <input type="hidden" id="trn-id">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <input class="form-control" id="trn-title" placeholder="Title (e.g. New SN tools)" style="flex:2;min-width:240px" maxlength="120">
+          <input class="form-control" id="trn-date" type="date" style="flex:1;min-width:150px">
+          <input class="form-control" id="trn-start" type="time" style="width:120px">
+          <input class="form-control" id="trn-end" type="time" style="width:120px">
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <input class="form-control" id="trn-trainer" placeholder="Formateur" style="flex:1;min-width:160px" maxlength="80">
+          <input class="form-control" id="trn-location" placeholder="Lieu (salle, Teams…)" style="flex:1;min-width:160px" maxlength="80">
+          <input class="form-control" id="trn-audience" placeholder="Attendees (e.g. Night FO team)" style="flex:2;min-width:200px" maxlength="200">
+        </div>
+        <textarea class="form-control" id="trn-notes" rows="2" placeholder="Notes (optional)" maxlength="1000" style="resize:vertical;margin-bottom:10px"></textarea>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-primary btn-sm" id="trn-save" onclick="saveTraining()">Add session</button>
+          <button class="btn btn-ghost btn-sm" id="trn-cancel" onclick="resetTrainingForm()" style="display:none">Cancel</button>
+          <span id="trn-status" style="font-size:11.5px;color:var(--mute)"></span>
+        </div>
+      </div>
+
+      <div class="config-card">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <h3 style="margin:0">Planned sessions</h3>
+          <label style="font-size:11.5px;color:var(--mute);display:flex;align-items:center;gap:5px;margin-left:auto">
+            <input type="checkbox" id="trn-show-past"> Show past sessions
+          </label>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Date</th><th>Time</th><th>Title</th>
+              <th>Formateur</th><th>Lieu</th><th>Participants</th><th style="width:170px"></th>
+            </tr></thead>
+            <tbody id="trn-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="page gm-scope" id="page-cfg-sessions">
+      <div class="page-title">Sessions actives</div>
+      <div class="page-sub">Users connected right now · page viewed · sign-out</div>
+      <div class="config-card">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <span id="sess-count" style="font-size:13px;font-weight:600"></span>
+          <span id="sess-updated" style="font-size:11.5px;color:var(--mute)"></span>
+          <label style="font-size:11.5px;color:var(--mute);display:flex;align-items:center;gap:5px;margin-left:auto">
+            <input type="checkbox" id="sess-auto" checked> Actualisation auto
+          </label>
+          <button class="btn btn-ghost btn-sm" onclick="refreshSessionsAdmin()">Actualiser</button>
+        </div>
+        <p style="font-size:11.5px;color:var(--mute);margin:-4px 0 14px">
+          The page shown is declared by the user's browser: it is an
+          indication of use, not proof. Signing out closes the current session;
+          the person can sign in again by re-entering their identity.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>User</th><th>Huawei ID</th><th>Role</th>
+              <th>Page viewed</th><th>Last seen</th><th style="width:120px"></th>
+            </tr></thead>
+            <tbody id="sess-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assistant IA (js/pages/ai/ai.js) : n'existe que dans le fragment admin. -->
+    <div class="page gm-scope" id="page-ai"><div id="ai-root"></div></div>
+    <div class="page gm-scope" id="page-imoc"><div id="imoc-root"></div></div>
+    <div class="page gm-scope" id="page-indicateurs"><div id="indicateurs-root"></div></div>
+    <div class="page gm-scope" id="page-cfg-parties"><div id="parties-root"></div></div>
+    <!-- L'ancien « Tableau de bord Big Brother » est désormais l'accueil de Big Brother (page-ai). -->
+    <div class="page gm-scope" id="page-ai-cockpit"></div>
+
+    <div class="page gm-scope" id="page-audit">
+      <div class="page-title">Audit Trail</div>
+      <div class="page-sub">Full history of all ticket changes</div>
+      <div class="table-filters" style="margin-bottom:12px">
+        <select class="filter-select" id="audit-filter-tracker" onchange="renderAudit()">
+          <option value="">Tout</option><option value="SN">SN</option><option value="CI">CI</option><option value="MAIL">Diffusion</option>
+        </select>
+        <select class="filter-select" id="audit-filter-action" onchange="renderAudit()">
+          <option value="">All actions</option><option value="create">create</option><option value="update">update</option><option value="delete">delete</option><option value="mail-sent">mail envoyé</option><option value="mail-failed">mail en échec</option>
+        </select>
+        <input class="search-input" id="audit-search" placeholder="Search..." oninput="renderAudit()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Date / Time</th><th>Tracker</th><th>Ticket</th>
+            <th>Action</th><th>Modified by</th><th>Changes</th>
+          </tr></thead>
+          <tbody id="audit-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="page gm-scope" id="page-shift-approvals">
+      <div class="ap-header">
+        <div>
+          <div class="ap-title">Approbations</div>
+          <div class="ap-sub" id="ap-subtitle">Shift change requests</div>
+        </div>
+        <div class="ap-header-actions">
+          <div class="ap-search">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>
+            <input id="ap-search" type="search" placeholder="Search an FO, a date, a reason…"
+                   autocomplete="off" oninput="renderShiftApprovals()">
+          </div>
+          <select class="ap-select" id="ap-sort" onchange="renderShiftApprovals()" aria-label="Trier">
+            <option value="urgency">Priority</option>
+            <option value="recent">Most recent</option>
+            <option value="oldest">Oldest</option>
+            <option value="date">Shift date</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Vue d'ensemble : chaque tuile est aussi un filtre -->
+      <div class="ap-overview" id="ap-overview"></div>
+
+      <!-- Décision groupée : apparaît dès qu'il y a plusieurs demandes en
+           attente (voir _apRenderBatchBar). -->
+      <div class="ap-batch" id="ap-batch" hidden></div>
+
+      <div id="shift-approvals-list" class="ap-list"></div>
+    </div>
+
+    <div class="page gm-scope" id="page-data-quality">
+
+      <!-- Login screen (shown when not unlocked) -->
+      <div id="dq-login-screen" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+        <div class="m3-lock-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span style="font-size:16px;font-weight:600">Restricted access</span>
+          </div>
+          <p style="font-size:13px;color:var(--mute);margin-bottom:20px">This page is restricted to administrators. Enter the password to continue.</p>
+          <input class="form-control" id="dq-password" type="password" placeholder="Password" style="margin-bottom:10px"
+            onkeydown="if(event.key==='Enter')verifyDQAccess()">
+          <div id="dq-auth-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:10px">Incorrect password.</div>
+          <div class="m3-lock-note">A single unlock grants access to Configuration, Data Quality and Ops Review for 8 h.</div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-ghost btn-sm" onclick="window.renderPage('dashboard')">Cancel</button>
+            <button class="btn btn-primary btn-sm" id="dq-submit" onclick="verifyDQAccess()">Sign in</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content (shown after unlock) -->
+      <div id="dq-main-screen" style="display:none">
+
+        <!-- En-tête -->
+        <div class="dq-head">
+          <div>
+            <div class="page-title">Data Quality</div>
+            <div class="page-sub">Consistency check of SN &amp; CI tickets · restricted access</div>
+          </div>
+          <div class="dq-head-actions">
+            <button class="dq-icon-btn" id="dq-refresh" title="Actualiser l'analyse" onclick="renderDataQuality()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+            <button class="dq-icon-btn" id="dq-export" title="Export anomalies to CSV" onclick="exportDataQualityCSV()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bandeau score + synthèse -->
+        <div id="dq-hero" class="dq-hero"></div>
+
+        <!-- Ce qu'il faut faire maintenant -->
+        <div id="dq-reco" class="dq-reco" style="display:none"></div>
+
+        <!-- Concentrations : owners / tickets cumulant -->
+        <div class="dq-panels">
+          <div id="dq-hotspots" class="dq-panel" style="display:none"></div>
+          <div id="dq-owners"   class="dq-panel" style="display:none"></div>
+        </div>
+
+        <!-- Barre de recherche + filtres à puces -->
+        <div class="dq-toolbar">
+          <div class="dq-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="dq-search" class="bare-input" type="text" autocomplete="off" spellcheck="false"
+              placeholder="Search a TT#, a title, an owner, a rule…"
+              oninput="dqOnSearch()">
+            <button class="dq-search-clear" id="dq-search-clear" title="Effacer" onclick="dqClearSearch()" style="display:none">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="dq-chiprow" id="dq-chips"></div>
+        </div>
+
+        <!-- Ligne d'état : n résultats · tri · reset -->
+        <div class="dq-resultbar" id="dq-resultbar"></div>
+
+        <div id="dq-content"><div class="dq-skeleton"><div></div><div></div><div></div></div></div>
+      </div>
+
+    </div>
+
+    <div class="page gm-scope" id="page-ops-review">
+
+      <!-- Login screen -->
+      <div id="or-login-screen" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+        <div class="m3-lock-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span style="font-size:16px;font-weight:600">Restricted access</span>
+          </div>
+          <p style="font-size:13px;color:var(--mute);margin-bottom:20px">This page is restricted to managers. Enter the password to access the Ops Review dashboard.</p>
+          <input class="form-control" id="or-password" type="password" placeholder="Password"
+            style="margin-bottom:10px" onkeydown="if(event.key==='Enter')verifyOpsReview()">
+          <div id="or-auth-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:10px">Incorrect password.</div>
+          <div class="m3-lock-note">A single unlock grants access to Configuration, Data Quality and Ops Review for 8 h.</div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-ghost btn-sm" onclick="window.renderPage('dashboard')">Cancel</button>
+            <button class="btn btn-primary btn-sm" id="or-submit" onclick="verifyOpsReview()">Sign in</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div id="or-main-screen" style="display:none">
+
+        <!-- En-tête -->
+        <div class="or-head">
+          <div>
+            <div class="page-title">Ops Review</div>
+            <div class="page-sub">Global view of incidents &amp; problems · restricted access</div>
+          </div>
+          <div class="or-head-actions">
+            <button class="or-icon-btn" title="Actualiser" onclick="_orLoadAndRender()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+            <button class="or-icon-btn" title="Exporter en Excel" onclick="exportOpsReviewXLSX()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bandeau de synthèse -->
+        <div id="or-hero" class="or-hero"></div>
+
+        <!-- Recherche + puces de filtre -->
+        <div class="or-toolbar">
+          <div class="or-toolbar-top">
+          <div class="or-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="or-search" class="bare-input" type="text" autocomplete="off" spellcheck="false"
+              placeholder="Search an ID, a title, a domain…" oninput="orOnSearch()">
+            <button class="or-search-clear" id="or-search-clear" title="Effacer" onclick="orClearSearch()" style="display:none">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <!-- Semaine & domaine restent des listes : trop de valeurs pour des puces -->
+          <div class="or-selectrow">
+            <select class="or-select" id="or-filter-week" onchange="renderOpsReview()">
+              <option value="">All weeks</option>
+            </select>
+            <select class="or-select" id="or-filter-domain" onchange="renderOpsReview()">
+              <option value="">All domains</option>
+            </select>
+            <!-- conservés masqués : la logique de filtrage lit encore leur .value -->
+            <select id="or-filter-affiliate" style="display:none"><option value=""></option></select>
+            <select id="or-filter-priority" style="display:none"><option value=""></option></select>
+            <select id="or-filter-status"   style="display:none"><option value=""></option></select>
+            <select id="or-filter-type"     style="display:none"><option value=""></option></select>
+          </div>
+          </div>
+          <div class="or-chiprow" id="or-chips"></div>
+        </div>
+
+        <!-- Ligne d'état -->
+        <div class="or-resultbar" id="or-resultbar"></div>
+
+        <!-- Répartitions -->
+        <div class="or-charts">
+          <div class="or-panel">
+            <div class="or-panel-title">By priority</div>
+            <div id="or-chart-priority"></div>
+          </div>
+          <div class="or-panel" id="or-panel-affiliate">
+            <div class="or-panel-title">By affiliate</div>
+            <div id="or-chart-affiliate"></div>
+          </div>
+          <div class="or-panel">
+            <div class="or-panel-title">By status</div>
+            <div id="or-chart-status"></div>
+          </div>
+        </div>
+
+        <!-- SLA & MTTR par filiale -->
+        <div id="or-sla-row" class="or-sla-row"></div>
+
+        <!-- Tableau des tickets -->
+        <div class="or-panel or-panel-flush">
+          <div class="or-table-head">
+            <span class="or-panel-title" id="or-table-title">Tickets</span>
+          </div>
+          <div class="or-tablewrap">
+            <table class="or-table" id="or-table">
+              <thead id="or-table-head"></thead>
+              <tbody id="or-table-body"></tbody>
+            </table>
+          </div>
+          <div id="or-table-empty" class="or-empty" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <div class="or-empty-title">No matching ticket</div>
+            <div class="or-empty-sub">Widen the search or reset the filters.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         EXPORT — le seul endroit où l'on télécharge un fichier complet
+         (onglet Exports de la page Rapports). Réunit ce qui était
+         dispersé : les boutons des pages, puis cette page et la carte
+         « Data export » de la rubrique Données, qui faisait doublon.
+         Chaque bouton appelle la fonction d'export déjà utilisée par sa
+         page, donc un fichier exporté d'ici est identique à celui d'avant.
+         Les boutons restés sur Data Quality, Ops Review ou un rapport
+         exportent la vue affichée : ils sont à leur place là-bas.
+         Vit dans le fragment admin : elle n'existe donc que pour une
+         session administrateur, comme les autres écrans d'ici.
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="page gm-scope" id="page-export">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Export</h1>
+          <p class="page-subtitle">Tous les exports de l'application, au même endroit.</p>
+        </div>
+      </div>
+      <p class="exp-intro">Les fichiers complets, au même endroit. Les boutons d'export
+        laissés sur Data Quality, Ops Review ou un rapport exportent ce que la page affiche.</p>
+
+      <section class="exp-sec">
+        <h2 class="exp-sec-t">Rapports</h2>
+        <div class="exp-list">
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Daily Report</div><div class="exp-row-d">Journée ouverte dans l’onglet Daily, sinon aujourd’hui</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Daily Report (Excel)" onclick="runExport(this,'daily-xlsx')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Weekly Report</div><div class="exp-row-d">Semaine ouverte dans l’onglet Weekly, sinon la semaine en cours</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Weekly Report (Excel)" onclick="runExport(this,'weekly-xlsx')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Weekly Report</div><div class="exp-row-d">Deck de la semaine — périmètre Sénégal uniquement</div></div>
+            <span class="exp-fmt">PowerPoint</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Weekly Report (PowerPoint)" onclick="runExport(this,'weekly-pptx')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Monthly Report</div><div class="exp-row-d">Mois ouvert dans l’onglet Monthly, sinon le mois en cours</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Monthly Report (Excel)" onclick="runExport(this,'monthly-xlsx')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Ops Review</div><div class="exp-row-d">Tickets affichés dans l’onglet Ops Review, filtres compris</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Ops Review (Excel)" onclick="runExport(this,'ops-review')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Statistiques</div><div class="exp-row-d">Répartition des tickets par statut, domaine et priorité</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Statistiques (Excel)" onclick="runExport(this,'stats')">Télécharger</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="exp-sec">
+        <h2 class="exp-sec-t">Trackers</h2>
+        <div class="exp-list">
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Tickets SN</div><div class="exp-row-d">Tracker complet, sans les filtres d’écran</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Tickets SN (Excel)" onclick="runExport(this,'tracker-sn')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Tickets CI</div><div class="exp-row-d">Tracker complet, sans les filtres d’écran</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Tickets CI (Excel)" onclick="runExport(this,'tracker-ci')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Tous les trackers</div><div class="exp-row-d">SN et CI dans une même feuille</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Tous les trackers (Excel)" onclick="runExport(this,'tracker-all')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Observations</div><div class="exp-row-d">Toutes les observations saisies</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Observations (Excel)" onclick="runExport(this,'observations')">Télécharger</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="exp-sec">
+        <h2 class="exp-sec-t">Planning &amp; RH</h2>
+        <div class="exp-list">
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Planning shifts</div><div class="exp-row-d">Une ligne par affectation, triée par date</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Planning shifts (Excel)" onclick="runExport(this,'planning')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Absences</div><div class="exp-row-d">Absences chargées dans la page Absences</div></div>
+            <span class="exp-fmt">CSV</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Absences (CSV)" onclick="runExport(this,'absences')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Rapport d’absence</div><div class="exp-row-d">Année et périmètre de la page Absences</div></div>
+            <span class="exp-fmt">PDF</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Rapport d’absence (PDF)" onclick="runExport(this,'absence-report-pdf')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Rapport d’absence</div><div class="exp-row-d">Même rapport, en classeur</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Rapport d’absence (Excel)" onclick="runExport(this,'absence-report')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Historique quiz</div><div class="exp-row-d">Résultats selon les filtres de la gestion des quiz</div></div>
+            <span class="exp-fmt">Excel</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Historique quiz (Excel)" onclick="runExport(this,'quiz')">Télécharger</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="exp-sec">
+        <h2 class="exp-sec-t">Données brutes</h2>
+        <div class="exp-list">
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Data Quality</div><div class="exp-row-d">Anomalies selon les filtres de la page Data Quality</div></div>
+            <span class="exp-fmt">CSV</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Data Quality (CSV)" onclick="runExport(this,'data-quality')">Télécharger</button>
+          </div>
+          <div class="exp-row">
+            <div class="exp-row-b"><div class="exp-row-t">Sauvegarde complète</div><div class="exp-row-d">Tickets SN et CI, observations, configuration, audit</div></div>
+            <span class="exp-fmt">JSON</span>
+            <button type="button" class="exp-btn" aria-label="Télécharger Sauvegarde complète (JSON)" onclick="runExport(this,'json')">Télécharger</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="export-status" class="exp-status" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         DIFFUSION — envoi programmé des rapports par mail.
+         Ordre de lecture = ordre d'usage : l'état (ça marche ?), les
+         envois programmés et leur journal au centre ; les réglages
+         qu'on touche une fois (groupes, serveur, test) sur le côté.
+         Le journal se rafraîchit seul : un envoi programmé part pendant
+         que la page est ouverte, il doit y apparaître sans recharger.
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="page gm-scope gsla" id="page-mailing">
+      <div class="gsla-head">
+        <div>
+          <div class="page-title">Diffusion</div>
+          <div class="page-sub">Envoi automatique des rapports par mail</div>
+        </div>
+      </div>
+
+      <div class="ml-kpis" id="ml-status"></div>
+      <div class="ml-alert" id="ml-alert" role="status" hidden></div>
+
+      <div class="ml-layout">
+        <div class="ml-main">
+          <!-- ── Envois programmés ── -->
+          <section class="ml-sec" id="ml-sec-sched">
+            <div class="ml-sec-h">
+              <div>
+                <h3 class="ml-sec-t">Envois programmés</h3>
+                <p class="ml-sec-d" id="ml-tz-note"></p>
+              </div>
+              <button class="ml-btn ml-btn-tonal" onclick="mlAddSchedule()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                Nouvel envoi
+              </button>
+            </div>
+            <div id="ml-schedules"></div>
+          </section>
+
+          <!-- ── Journal ── -->
+          <section class="ml-sec" id="ml-sec-log">
+            <div class="ml-sec-h">
+              <div>
+                <h3 class="ml-sec-t">Journal des envois</h3>
+                <p class="ml-sec-d" id="ml-log-upd">Mise à jour automatique</p>
+              </div>
+              <div class="ml-log-tools">
+                <div class="ml-seg" role="tablist" id="ml-log-filter">
+                  <button role="tab" data-f="all" class="is-on" onclick="mlLogFilter('all')">Tous</button>
+                  <button role="tab" data-f="ok" onclick="mlLogFilter('ok')">Réussis</button>
+                  <button role="tab" data-f="ko" onclick="mlLogFilter('ko')">Échecs</button>
+                </div>
+                <button class="ml-icon-btn" onclick="mlLoadLog()" title="Rafraîchir" aria-label="Rafraîchir le journal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></svg>
+                </button>
+              </div>
+            </div>
+            <div id="ml-log"></div>
+          </section>
+        </div>
+
+        <aside class="ml-side">
+          <!-- ── Groupes ── -->
+          <section class="ml-sec">
+            <div class="ml-sec-h">
+              <div>
+                <h3 class="ml-sec-t">Destinataires</h3>
+                <p class="ml-sec-d">Groupes utilisés par les envois programmés</p>
+              </div>
+              <button class="ml-btn ml-btn-text" onclick="mlAddGroup()">+ Groupe</button>
+            </div>
+            <div id="ml-groups"></div>
+          </section>
+
+          <!-- ── Serveur ── -->
+          <section class="ml-sec" id="ml-sec-smtp">
+            <details class="ml-fold" id="ml-smtp-fold">
+              <summary>
+                <div>
+                  <h3 class="ml-sec-t">Serveur d'envoi</h3>
+                  <p class="ml-sec-d" id="ml-smtp-sum"></p>
+                </div>
+                <svg class="ml-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+              </summary>
+              <div class="ml-grid">
+                <label class="ml-f ml-f-wide">Serveur SMTP
+                  <input class="form-control" id="ml-host" placeholder="smtp.gmail.com" oninput="_mlDirty('smtp',true)"></label>
+                <label class="ml-f">Port
+                  <input class="form-control" id="ml-port" type="number" placeholder="587" oninput="_mlDirty('smtp',true)"></label>
+                <label class="ml-f ml-f-full">Compte
+                  <input class="form-control" id="ml-user" placeholder="adresse@gmail.com" autocomplete="off" oninput="_mlDirty('smtp',true)"></label>
+                <label class="ml-f ml-f-full">Mot de passe d'application
+                  <input class="form-control" id="ml-pass" type="password" placeholder="(inchangé)" autocomplete="new-password" oninput="_mlDirty('smtp',true)"></label>
+                <label class="ml-f ml-f-full">Expéditeur affiché
+                  <input class="form-control" id="ml-from" placeholder="adresse@gmail.com" oninput="_mlDirty('smtp',true)"></label>
+              </div>
+              <p class="ml-hint" id="ml-pass-state"></p>
+
+              <details class="ml-help">
+                <summary>Gmail refuse le mot de passe du compte — que saisir ?</summary>
+                <p>
+                  Il faut un <b>mot de passe d'application</b> : 16 caractères, à générer sur
+                  <span class="ml-mono">myaccount.google.com → Sécurité → Mots de passe des applications</span>.
+                  La validation en deux étapes doit être activée pour que l'option apparaisse.
+                  Google l'affiche par groupes de quatre — <b>saisissez-le sans les espaces</b>.
+                  Une erreur <span class="ml-mono">535 BadCredentials</span> au test signifie
+                  presque toujours que c'est le mot de passe du compte qui a été saisi.
+                </p>
+                <p>
+                  <b>Raccourci :</b> renseigner <span class="ml-mono">SMTP_PASS</span>
+                  (et au besoin <span class="ml-mono">SMTP_USER</span>,
+                  <span class="ml-mono">SMTP_FROM</span>) dans le fichier
+                  <span class="ml-mono">.env</span> évite de ressaisir le secret ici après
+                  une réinstallation. Ce qui est saisi dans cette page reste prioritaire.
+                </p>
+              </details>
+            </details>
+          </section>
+
+          <!-- ── Test ── -->
+          <section class="ml-sec">
+            <h3 class="ml-sec-t">Envoi de test</h3>
+            <p class="ml-sec-d" style="margin-bottom:12px">Enregistre la configuration puis envoie un rapport à une seule adresse.</p>
+            <div class="ml-test">
+              <input class="form-control" id="ml-test-to" type="email" placeholder="adresse@exemple.com"
+                     onkeydown="if(event.key==='Enter')mlTest(document.getElementById('ml-test-btn'))">
+              <select class="form-control" id="ml-test-report"></select>
+              <select class="form-control" id="ml-test-country" aria-label="Pays">
+                <option value="SN">Sénégal</option><option value="CI">Côte d’Ivoire</option><option value="ALL">SN + CI</option>
+              </select>
+              <button class="ml-btn ml-btn-tonal" id="ml-test-btn" onclick="mlTest(this)">Envoyer le test</button>
+            </div>
+            <p class="ml-hint" id="ml-test-state" role="status"></p>
+          </section>
+
+          <!-- ── Alerte ── -->
+          <section class="ml-sec">
+            <h3 class="ml-sec-t">Alerte en cas d'échec</h3>
+            <p class="ml-sec-d" style="margin-bottom:12px">Un envoi programmé en échec est retenté 3 fois, toutes les 10 minutes.
+              Si toutes les relances échouent, un mail part à cette adresse.</p>
+            <input class="form-control" id="ml-alert-email" type="email" placeholder="adresse@exemple.com (facultatif)"
+                   oninput="_mlDirty('alert',true)">
+            <p class="ml-hint">L'alerte passe par le même serveur d'envoi : s'il est en panne, elle échoue aussi.
+              L'échec reste alors signalé dans l'application (Vue d'ensemble et cette page).</p>
+          </section>
+        </aside>
+      </div>
+
+      <!-- Aperçu d'un mail : objet, destinataires, pièce jointe et corps,
+           construits par le serveur exactement comme à l'envoi. -->
+      <div class="ml-modal" id="ml-preview" hidden role="dialog" aria-modal="true" aria-labelledby="ml-pv-subject"
+           onclick="if(event.target===this)mlClosePreview()">
+        <div class="ml-modal-box">
+          <div class="ml-modal-h">
+            <div class="ml-modal-meta">
+              <div class="ml-pv-l">Objet</div>
+              <div class="ml-pv-subject" id="ml-pv-subject"></div>
+              <div class="ml-pv-row"><span class="ml-pv-l">À</span> <span id="ml-pv-to"></span></div>
+              <div class="ml-pv-row"><span class="ml-pv-l">Pièce jointe</span> <span id="ml-pv-att"></span></div>
+            </div>
+            <button class="ml-icon-btn" onclick="mlClosePreview()" aria-label="Fermer l'aperçu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <iframe class="ml-pv-frame" id="ml-pv-frame" title="Corps du mail" sandbox=""></iframe>
+        </div>
+      </div>
+
+      <!-- Une seule barre d'enregistrement, qui n'apparaît que s'il y a
+           quelque chose à enregistrer : trois boutons « Enregistrer »
+           laissaient croire que chacun ne sauvait que sa section. -->
+      <div class="ml-savebar" id="ml-savebar" hidden>
+        <span class="ml-savebar-t">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+          Modifications non enregistrées
+        </span>
+        <button class="ml-btn ml-btn-text" onclick="renderMailingPage()">Annuler</button>
+        <button class="ml-btn ml-btn-filled" id="ml-save-btn" onclick="mlSave()">Enregistrer</button>
+      </div>
+    </div>

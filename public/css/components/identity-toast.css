@@ -1,0 +1,187 @@
+/* ══════════════════════════════════════════════
+   USER IDENTITY MODAL
+══════════════════════════════════════════════ */
+/* Refonte M3 : une seule surface continue (pas de bandes en-tête/pied),
+   coins 28px, graisses 500, aucun trait dur. Les champs sont des
+   surfaces tonales — la bordure ne sert qu'au focus. */
+#user-identity-modal .modal{
+  max-width:460px;
+  background:var(--m3-surf-1);
+  border:none;
+  border-radius:var(--m3-r-xl);
+  box-shadow:0 8px 28px rgba(0,0,0,.22);
+  overflow:hidden;
+}
+#user-identity-modal .modal-header,
+#user-identity-modal .modal-body,
+#user-identity-modal .modal-footer{
+  background:var(--m3-surf-1);
+  border:none;position:static;
+}
+/* En-tête aligné à gauche : trois lignes centrées pour un avatar, un
+   titre et un rôle occupaient beaucoup de hauteur pour peu d'info. */
+#user-identity-modal .modal-header{
+  text-align:left;display:block;padding:26px 26px 0;
+}
+#user-identity-modal .modal-body{padding:20px 26px 4px}
+#user-identity-modal .modal-footer{padding:12px 26px 22px}
+
+#user-identity-modal .modal-title{
+  font-size:20px;font-weight:500;letter-spacing:-.01em;
+  color:var(--m3-on-surface);line-height:1.25;
+}
+
+.idt-hero{display:flex;align-items:center;gap:16px}
+.idt-hero-txt{min-width:0;flex:1}
+.idt-sub{font-size:13px;color:var(--m3-on-surf-var);margin-top:3px;line-height:1.4}
+
+/* Rôle : une puce qui dit ce que le rôle implique, au lieu d'un
+   « Observer · h50056630 » en rouge dont le sens n'était pas donné. */
+.idt-role-wrap{margin-top:8px;min-height:0}
+.idt-role{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 10px;border-radius:var(--m3-r-full);
+  font-size:11.5px;font-weight:500;
+  background:var(--m3-surf-3);color:var(--m3-on-surf-var);
+}
+.idt-role svg{width:12px;height:12px;flex-shrink:0}
+.idt-role.fo{background:#E6F4EA;color:#137333}
+.idt-role.bo{background:#E8F0FE;color:#1967D2}
+.idt-role.obs{background:#FEF7E0;color:#B06000}
+[data-theme="dark"] .idt-role.fo{background:#0F2A17;color:#81C995}
+[data-theme="dark"] .idt-role.bo{background:#172033;color:#8AB4F8}
+[data-theme="dark"] .idt-role.obs{background:#2A2416;color:#FDD663}
+.idt-role-note{
+  font-size:11.5px;color:var(--m3-on-surf-var);
+  margin-top:6px;line-height:1.4;
+}
+
+.idt-field{margin-bottom:16px}
+.idt-field-last{margin-bottom:4px}
+.idt-mono{font-family:'JetBrains Mono',monospace;letter-spacing:.02em}
+
+/* Suggestions FO / BO en puces */
+.idt-suggest{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.idt-sg{
+  border:1px solid var(--m3-outline-var);background:transparent;
+  border-radius:var(--m3-r-full);padding:4px 11px;
+  font-size:12px;font-family:inherit;color:var(--m3-on-surf-var);
+  cursor:pointer;white-space:nowrap;
+  transition:background .15s var(--m3-ease),color .15s var(--m3-ease),border-color .15s var(--m3-ease);
+}
+.idt-sg:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);color:var(--m3-on-surface)}
+.idt-sg-more{border-style:dashed;cursor:default}
+.idt-sg-more:hover{background:transparent;color:var(--m3-on-surf-var)}
+
+/* Validation en ligne de l'ID Huawei */
+.idt-input-wrap{position:relative}
+/* Réserve la place du check pour que le texte ne saute pas à l'apparition. */
+.idt-input-wrap .form-control{padding-right:34px}
+.idt-check{
+  position:absolute;right:11px;top:50%;
+  width:16px;height:16px;color:#137333;pointer-events:none;
+  opacity:0;transform:translateY(-50%) scale(.7);
+  transition:opacity .16s var(--m3-ease),transform .16s var(--m3-ease);
+}
+.idt-check.show{opacity:1;transform:translateY(-50%) scale(1)}
+[data-theme="dark"] .idt-check{color:#81C995}
+.idt-hint{font-size:11.5px;margin-top:6px;line-height:1.4;color:var(--m3-on-surf-var);min-height:0}
+.idt-hint.err{color:#C5221F}
+[data-theme="dark"] .idt-hint.err{color:#F28B82}
+#user-identity-modal .form-control.is-err{border-color:#D93025!important}
+[data-theme="dark"] #user-identity-modal .form-control.is-err{border-color:#F28B82!important}
+
+.idt-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;width:100%}
+.idt-actions .btn-primary{flex:1;justify-content:center}
+/* Bouton inactif tant que les deux champs requis ne sont pas remplis :
+   avant, on cliquait pour découvrir l'erreur en toast. */
+#user-identity-modal .btn-primary[disabled]{
+  opacity:.5;cursor:not-allowed;pointer-events:none;
+}
+#user-identity-modal .form-label{
+  font-size:12px;font-weight:500;letter-spacing:.01em;
+  text-transform:none;color:var(--m3-on-surf-var);
+  margin-bottom:6px;
+}
+/* Champs : surface tonale, coin 12px, focus à 2px comme partout ailleurs. */
+#user-identity-modal .form-control{
+  background:var(--m3-surf-2)!important;
+  border:1px solid transparent!important;
+  border-radius:var(--m3-r-sm)!important;
+  color:var(--m3-on-surface)!important;
+  font-size:14px;padding:12px 14px!important;
+  transition:border-color .15s var(--m3-ease),background .15s var(--m3-ease);
+}
+#user-identity-modal .form-control:focus{
+  border-color:var(--m3-primary)!important;
+  background:var(--m3-surface)!important;
+  box-shadow:none!important;
+}
+/* Bouton principal : pilule pleine, la signature M3. */
+#user-identity-modal .btn-primary{
+  border-radius:var(--m3-r-full);
+  font-size:14px;font-weight:500;letter-spacing:.01em;
+  padding:12px!important;box-shadow:none;
+}
+#user-identity-modal .btn-ghost{
+  border-radius:var(--m3-r-full);font-weight:500;
+  color:var(--m3-on-surf-var);
+}
+#user-identity-modal .modal-close{
+  background:transparent;color:var(--m3-on-surf-var);
+  width:36px;height:36px;border-radius:var(--m3-r-full);
+  font-size:19px;
+}
+#user-identity-modal .modal-close:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surface);
+}
+
+.identity-hero-avatar{
+  width:58px;height:58px;flex-shrink:0;border-radius:var(--m3-r-full);
+  display:flex;align-items:center;justify-content:center;
+  font-size:21px;font-weight:500;color:#fff;letter-spacing:.01em;
+  margin:0;transition:background .2s var(--m3-ease);
+  box-shadow:none;
+}
+/* ══════════════════════════════════════════════
+   TOGGLE / TOAST
+══════════════════════════════════════════════ */
+.settings-panel{display:grid;gap:12px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-size:13px;font-weight:500;color:var(--dark)}
+.settings-desc{font-size:11px;color:var(--mute);margin-top:1px}
+
+.toggle{position:relative;display:inline-block;width:36px;height:20px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--line);border-radius:20px;cursor:pointer;transition:.18s}
+.toggle input:checked+.toggle-slider{background:var(--red)}
+.toggle-slider:before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.18s;box-shadow:var(--sh-xs)}
+.toggle input:checked+.toggle-slider:before{transform:translateX(16px)}
+
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:3000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{
+  background:var(--white);border:1px solid var(--line);
+  color:var(--dark);padding:10px 14px;border-radius:var(--r);font-size:12.5px;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:var(--sh-md);animation:slideIn .15s ease;max-width:340px;pointer-events:all;
+}
+.toast.success{}
+.toast.error  {color:var(--red)}
+@keyframes slideIn{from{transform:translateX(12px);opacity:0}to{transform:none;opacity:1}}
+
+/* ── SKELETON ── */
+.skeleton{
+  background:linear-gradient(90deg,var(--bg2) 25%,var(--line) 50%,var(--bg2) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite;
+  border-radius:var(--r-sm);
+  display:inline-block;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton-card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:28px 28px 22px}
+.skeleton-text{height:12px;width:80%;margin:4px 0}
+.skeleton-value{height:44px;width:60%;margin:10px 0}
+.skeleton-row{height:44px;margin:2px 0;border-radius:var(--r-sm)}
+

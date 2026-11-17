@@ -1,0 +1,35 @@
+node_modules/
+data/backups/
+*.log
+.DS_Store
+_attic/
+data-test/
+
+# Dépôt public : les données (noms, scores, condensés de mots de passe) et
+# les secrets restent sur la machine, jamais dans git.
+data/
+.env
+
+# Copies de travail des agents, réglages locaux
+.claude/
+# Lien symbolique créé par le harnais de test
+node_modules
+
+# Espace de travail du test de non-régression
+tools/regression/.work/
+
+# Watchdog : copie des données pendant une mise à jour, état des essais
+.update-save/
+.watchdog-state.json
+
+# Secrets écrits par l'application (clé de l'assistant IA) : jamais dans git,
+# même si data/ est versionné. Voir server/services/ai.js.
+data/*.secret
+data-test/*.secret
+
+# Certificats HTTPS (clé privée de l'autorité locale) : jamais dans git.
+data/tls/
+
+# Vecteurs de la base de connaissances (recherche par le sens) : binaires
+# volumineux, recalculés par l'application à partir des documents.
+data/ai_kb_vec/

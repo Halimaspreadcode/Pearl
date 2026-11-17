@@ -1,0 +1,2877 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FOps</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='1' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%233FB7A0'/%3E%3Cstop offset='1' stop-color='%234F6A85'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M6 34A28 28 0 0 1 34 6' fill='none' stroke='url(%23g)' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M13 34A21 21 0 0 1 34 13' fill='none' stroke='url(%23g)' stroke-width='4.5' stroke-linecap='round' opacity='.7'/%3E%3Cpath d='M20 34A14 14 0 0 1 34 20' fill='none' stroke='url(%23g)' stroke-width='4.5' stroke-linecap='round' opacity='.45'/%3E%3Ccircle cx='31' cy='31' r='4.5' fill='%23F2A65A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- Polices chargées sans bloquer l'affichage : derrière un proxy qui laisse
+     pendre Google Fonts, la page restait blanche. Police du système en attendant. -->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<!-- Feuilles de style : l'ordre de chargement reproduit l'ordre de la cascade
+     de l'ancien app.css unique, suivi des styles autrefois en ligne dans le body
+     (modale « Generate year », modale FO task). Ne pas réordonner. -->
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/pages/dashboard-grid.css">
+<link rel="stylesheet" href="/css/components/table.css">
+<link rel="stylesheet" href="/css/pages/reports.css">
+<link rel="stylesheet" href="/css/components.css">
+<link rel="stylesheet" href="/css/pages/admin-zone.css">
+<link rel="stylesheet" href="/css/pages/sla.css">
+<link rel="stylesheet" href="/css/pages/perf.css">
+<link rel="stylesheet" href="/css/pages/o2o.css">
+<link rel="stylesheet" href="/css/pages/o2o-guide.css">
+<link rel="stylesheet" href="/css/pages/academy.css">
+<link rel="stylesheet" href="/css/pages/trust-matrix.css">
+<link rel="stylesheet" href="/css/pages/announcements.css">
+<link rel="stylesheet" href="/css/pages/my-performance.css">
+<link rel="stylesheet" href="/css/pages/my-objectives.css">
+<link rel="stylesheet" href="/css/pages/objectives-admin.css">
+<link rel="stylesheet" href="/css/pages/o2o-tracking.css">
+<link rel="stylesheet" href="/css/pages/task-assign.css">
+<link rel="stylesheet" href="/css/pages/fo-dashboard.css">
+<link rel="stylesheet" href="/css/components/identity-toast.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/m3-global.css">
+<link rel="stylesheet" href="/css/pages/trackers.css">
+<link rel="stylesheet" href="/css/pages/observations.css">
+<link rel="stylesheet" href="/css/pages/approvals.css">
+<link rel="stylesheet" href="/css/pages/weekly-progress.css">
+<link rel="stylesheet" href="/css/pages/weekly-progress-report.css">
+<link rel="stylesheet" href="/css/pages/reminders.css">
+<link rel="stylesheet" href="/css/pages/quiz.css">
+<link rel="stylesheet" href="/css/pages/quiz-player.css">
+<link rel="stylesheet" href="/css/pages/shift-planning.css">
+<link rel="stylesheet" href="/css/pages/ops-review.css">
+<link rel="stylesheet" href="/css/pages/data-quality.css">
+<link rel="stylesheet" href="/css/pages/dashboard-m3.css">
+<link rel="stylesheet" href="/css/pages/dashboard-bento.css">
+<link rel="stylesheet" href="/css/pages/dashboard-activity.css">
+<link rel="stylesheet" href="/css/pages/dashboard-widgets.css">
+<link rel="stylesheet" href="/css/layout-m3.css">
+<link rel="stylesheet" href="/css/sky.css">
+<link rel="stylesheet" href="/css/pages/daily-checkup.css">
+<link rel="stylesheet" href="/css/pages/absences-requests.css">
+<link rel="stylesheet" href="/css/pages/my-team.css">
+<link rel="stylesheet" href="/css/pages/obj-tracking.css">
+<link rel="stylesheet" href="/css/pages/nav-profiles.css">
+<link rel="stylesheet" href="/css/pages/mailing.css">
+<link rel="stylesheet" href="/css/pages/ai.css">
+<link rel="stylesheet" href="/css/pages/genyear-modal.css">
+<link rel="stylesheet" href="/css/pages/fo-task-modal.css">
+<link rel="stylesheet" href="/css/components/ticket-suggest.css">
+<link rel="stylesheet" href="/css/pages/team.css">
+<link rel="stylesheet" href="/css/pages/rapports.css">
+<link rel="stylesheet" href="/css/pages/mon-espace.css">
+<link rel="stylesheet" href="/css/pages/admin-ux.css">
+<link rel="stylesheet" href="/css/pages/imoc.css">
+<link rel="stylesheet" href="/css/pages/indicateurs.css">
+<link rel="stylesheet" href="/css/pages/parties.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <svg class="sidebar-logo" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="fops-logo-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#3FB7A0"/><stop offset="1" stop-color="#4F6A85"/></linearGradient></defs><path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="url(#fops-logo-g)" stroke-width="4.5" stroke-linecap="round"/><path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="url(#fops-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".7"/><path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="url(#fops-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".45"/><circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg>
+        <div>
+          <div class="sidebar-brand-name">FOps</div>
+          <div class="sidebar-brand-sub">Front Office</div>
+        </div>
+      </div>
+      <button type="button" class="sb-rail-toggle" id="sb-rail-toggle"
+        onclick="toggleSidebarRail()" aria-label="Collapse menu"
+        aria-expanded="true" title="Collapse menu (Ctrl+B)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      </button>
+    </div>
+
+    <div class="nav-filter-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <!-- Ce champ n'est PAS un champ de formulaire et ne doit jamais
+           être rempli par le navigateur.
+
+           Trois protections, parce qu'aucune ne suffit seule :
+             · autocomplete="new-password" — Chrome ignore "off" sur les
+               champs qu'il croit reconnaître, mais respecte cette valeur ;
+             · name aléatoire (posé en JS) — sans nom stable, le gestionnaire
+               de mots de passe n'a aucune clé à laquelle rattacher une valeur ;
+             · readonly levé au premier focus — un champ en lecture seule au
+               chargement est ignoré par l'autofill, et redevient éditable
+               dès que l'utilisateur clique dedans.
+           Sans ça, le nom de l'utilisateur réapparaissait à chaque
+           rechargement et le menu s'affichait pré-filtré. -->
+      <input type="search" class="nav-filter" id="nav-filter" placeholder="Filter menu…"
+        autocomplete="new-password" autocorrect="off" readonly
+        autocapitalize="off" spellcheck="false" aria-label="Filter menu"
+        data-lpignore="true" data-1p-ignore data-form-type="other"
+        oninput="filterNav(this.value)"
+        onfocus="this.removeAttribute('readonly')"
+        onkeydown="if(event.key==='Escape'){this.value='';filterNav('')}">
+    </div>
+    <div class="sidebar-body">
+      <!-- Bascule Simple / Admin. Visible seulement quand une session
+           admin est ouverte : sans session, il n'y a rien à basculer.
+           En mode Admin la barre ne montre que les écrans d'admin, en
+           mode Simple uniquement les écrans courants. -->
+      <div id="nav-mode-switch" class="nav-mode-switch">
+        <button type="button" class="nav-mode-btn" data-mode="simple"
+          onclick="setNavMode('simple')">Simple</button>
+        <button type="button" class="nav-mode-btn" data-mode="admin"
+          onclick="setNavMode('admin')">Admin</button>
+      </div>
+
+      <!-- Écrans épinglés : remplis par renderPinnedNav() selon le profil.
+           Masqué tant que rien n'est épinglé, pour ne pas laisser un titre
+           orphelin en haut de la barre. -->
+      <div id="nav-pinned-wrap" hidden>
+        <div class="sidebar-section sidebar-section-pin">
+          <span>Pinned</span>
+          
+        </div>
+        <div id="nav-pinned"></div>
+        <div class="nav-pin-sep"></div>
+      </div>
+
+      <div class="sidebar-section">General</div>
+
+      <div class="nav-item active" data-page="dashboard">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span class="nav-item-label">Dashboard</span>
+        </div>
+      </div>
+
+      <!-- My Space : l'espace personnel de l'agent. Réunit My Tasks,
+           My Requests, My Performance (objectifs compris) et Quiz en
+           onglets (js/pages/espace/mon-espace.js) ; leurs anciens noms de
+           page y redirigent. La pastille compte ce qui attend l'agent. -->
+      <div class="nav-item" data-page="mon-espace">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="nav-item-label">My Space</span>
+        </div>
+        <span class="nav-item-badge" id="mes-badge" style="display:none"></span>
+      </div>
+
+      <div class="sidebar-section">Trackers</div>
+
+
+      <div class="nav-item" data-page="sn">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+          <span class="nav-item-label">Tracker SN</span>
+        </div>
+        <span class="nav-item-badge" id="sb-count-sn">-</span>
+      </div>
+
+      <div class="nav-item" data-page="ci">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+          <span class="nav-item-label">Tracker CI</span>
+        </div>
+        <span class="nav-item-badge" id="sb-count-ci">-</span>
+      </div>
+
+      <div class="nav-item" data-page="global" style="display:none">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span class="nav-item-label">Tracker Global</span>
+        </div>
+        <span class="nav-item-badge" id="sb-count-global">-</span>
+      </div>
+
+      <div class="sidebar-section" data-section="operational" onclick="toggleSidebarSection(this)">
+        Operational
+        <svg class="sidebar-section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="sidebar-group" data-group="operational">
+
+      <div class="nav-item" data-page="observations">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span class="nav-item-label">Observations</span>
+        </div>
+      </div>
+
+      <div class="nav-item" data-page="fo-dashboard">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="nav-item-label">FO Dashboard</span>
+        </div>
+      </div>
+
+      <!-- Handover Board : l'entrée avait été retirée du menu, la page
+           restant joignable par renderPage('fo-handover'). Une page sans
+           point d'entrée est une page perdue — elle est de nouveau
+           listée, et se règle maintenant par profil dans
+           Admin › Vues par profil. -->
+      <div class="nav-item" data-page="fo-handover">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2v4l-4-4H9a1.994 1.994 0 0 1-1.414-.586"/><path d="M11 14H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1"/></svg>
+          <span class="nav-item-label">Handover Board</span>
+        </div>
+        <span class="nav-item-badge" id="sb-count-handover" style="display:none"></span>
+      </div>
+
+      <div class="nav-item" data-page="shift-planning">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+          <span class="nav-item-label">Shift Planning</span>
+        </div>
+      </div>
+
+      <div class="nav-item nav-mode-off" data-page="shift-approvals">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="nav-item-label">Approbations</span>
+        </div>
+        <span class="nav-item-badge" id="shift-requests-badge" style="display:none"></span>
+      </div>
+
+      <div class="nav-item" data-page="absences">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9.5" y1="15.5" x2="14.5" y2="19.5"/><line x1="14.5" y1="15.5" x2="9.5" y2="19.5"/></svg>
+          <span class="nav-item-label">Absences</span>
+        </div>
+        <!-- Badge des demandes en attente, sinon cadenas : la page a son
+             propre mot de passe, le signaler évite un clic pour rien. -->
+        <span style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <span class="nav-item-badge" id="abs-pending-badge" style="display:none"></span>
+          <svg style="width:11px;height:11px;flex-shrink:0;opacity:.4;color:var(--sb-text)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+      </div>
+
+      <!-- Daily Check-up : masqué, remplacé par My Tasks (weekly-progress).
+           L'écran reste dans le document, les liens existants continuent
+           de fonctionner ; seule l'entrée de menu disparaît. -->
+      <div class="nav-item" data-page="fo-tasks" style="display:none">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span class="nav-item-label">Daily Check-up</span>
+        </div>
+        <span class="nav-item-badge" id="sb-count-tasks">-</span>
+      </div>
+
+      <!-- My Tasks et Quiz : onglets de My Space (voir plus haut). -->
+
+      </div><!-- /sidebar-group operational -->
+
+      <div class="sidebar-section" data-section="reporting" onclick="toggleSidebarSection(this)">
+        Reporting
+        <svg class="sidebar-section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="sidebar-group" data-group="reporting">
+
+      <!-- Rapports : Daily, Weekly, Monthly, Ops Review, Diffusion et
+           Exports en onglets (js/pages/reports/reports-hub.js). Visible
+           dans les deux modes ; chacun n'y voit que ses onglets. -->
+      <div class="nav-item" data-page="rapports">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="17" x2="8" y2="14"/><line x1="12" y1="17" x2="12" y2="11"/><line x1="16" y1="17" x2="16" y2="15"/></svg>
+          <span class="nav-item-label">Rapports</span>
+        </div>
+      </div>
+
+      <div class="nav-item nav-mode-off" data-page="audit">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span class="nav-item-label">Audit Trail</span>
+        </div>
+      </div>
+
+      <!-- L'accueil de Big Brother (ai-cockpit.js) remplace l'ancien tableau de bord. -->
+      <div class="nav-item nav-mode-off" data-page="ai">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>
+          <span class="nav-item-label">Big Brother</span>
+        </div>
+      </div>
+
+      <!-- KPI / PI définis avec Big Brother, suivis automatiquement. -->
+      <div class="nav-item nav-mode-off" data-page="indicateurs">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+          <span class="nav-item-label">Indicateurs</span>
+        </div>
+      </div>
+
+      <!-- Tickets relevés dans IMOC (eTicket), à la demande de l'admin. -->
+      <div class="nav-item nav-mode-off" data-page="imoc">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 0 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 0 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>
+          <span class="nav-item-label">Tickets IMOC</span>
+        </div>
+      </div>
+
+      </div><!-- /sidebar-group reporting -->
+
+      <div class="sidebar-section">Outils</div>
+
+      <div class="nav-item" data-page="log-analyzer">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span class="nav-item-label">Analyseur</span>
+        </div>
+      </div>
+
+      <!-- Academy : entrée unique des formations (DigitalView, Process
+           ITSM), avec intro, heatmaps et cours en plein écran. Les anciennes
+           pages « digitalview » et « process-training » y mènent. -->
+      <div class="nav-item" data-page="academy">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          <span class="nav-item-label">Academy</span>
+        </div>
+      </div>
+
+      <!-- Boîte à idées : tableau blanc de post-its (page autonome /idees,
+           ouverte ici dans un cadre, et partageable par lien). -->
+      <div class="nav-item" data-page="ideas">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>
+          <span class="nav-item-label">Idea box</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section nav-mode-off" data-section="admin" onclick="toggleSidebarSection(this)">
+        Admin
+        <svg class="sidebar-section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="sidebar-group nav-mode-off" data-group="admin">
+
+      <div class="nav-item nav-mode-off" data-page="config">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span class="nav-item-label">Vue d’ensemble</span>
+        </div>
+      </div>
+
+<!-- Équipe : réunit My Team, Performance FO, Suivi des objectifs,
+     One-to-One, Assigner des tâches et Agenda Training (onglets). -->
+<div class="nav-item nav-mode-off" data-page="equipe">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="nav-item-label">Équipe</span>
+        </div>
+      </div>
+<div class="nav-item nav-mode-off" data-page="cfg-annonces">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+          <span class="nav-item-label">Annonces</span>
+        </div>
+      </div>
+<div class="nav-item nav-mode-off" data-page="data-quality">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span class="nav-item-label">Data Quality</span>
+        </div>
+        <span class="nav-item-badge" id="sb-count-dq" style="background:var(--red)"></span>
+      </div>
+
+      <!-- Les rubriques de configuration (Général, SLA, Objectifs, Performance
+           FO, Shift Rota, Accès & Sécurité, Données, Quiz, Glossaire Logs,
+           Sessions actives) ne sont plus listées ici : on y accède par la
+           Vue d'ensemble, qui en est déjà le sommaire. Les pages elles-mêmes
+           restent en place et joignables via window.renderPage('cfg-...'). -->
+
+
+
+      </div><!-- /sidebar-group admin -->
+    </div><!-- /sidebar-body -->
+
+    <!-- sidebar footer -->
+    <div class="sidebar-footer">
+      <div style="font-size:10px;color:var(--mute);text-align:center;padding:6px 0">Designed by Halima GUEYE</div>
+    </div>
+  </nav>
+
+  <!-- ══ TOPBAR ══ -->
+  <header class="topbar">
+    <button class="topbar-btn hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <!-- Barre de commande : tout chercher, tout faire (Ctrl+K ou « / »). -->
+    <div class="tb-search" role="combobox" aria-haspopup="listbox" aria-owns="cmd-panel">
+      <svg class="tb-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="cmd-input" type="search" autocomplete="off" spellcheck="false" aria-label="Rechercher ou lancer une action"
+        placeholder="Rechercher un ticket, une personne, une page… ou taper une action">
+      <kbd class="tb-search-kbd" aria-hidden="true">Ctrl K</kbd>
+      <div id="cmd-panel" class="cmd-panel" role="listbox"></div>
+    </div>
+    <button type="button" class="topbar-btn" id="cmd-open-mobile" aria-label="Rechercher">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    </button>
+    <div class="topbar-right">
+      <div class="topbar-breach" id="breach-badge" role="button" tabindex="0" title="Voir les tickets en dépassement SLA" onclick="globalSearch('breach')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span id="breach-count-label">0 BREACH</span>
+      </div>
+
+      <div id="country-toggle">
+        <button type="button" id="country-btn-all" class="country-toggle-btn" onclick="setActiveCountry('ALL')" title="Vue globale (SN + CI)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Global</span>
+        </button>
+        <button type="button" id="country-btn-sn" class="country-toggle-btn" onclick="setActiveCountry('SN')" title="Dakar (SN)">
+          <svg width="14" height="10" viewBox="0 0 3 2"><rect width="1" height="2" x="0" fill="#00853F"/><rect width="1" height="2" x="1" fill="#FDEF42"/><rect width="1" height="2" x="2" fill="#E31B23"/><polygon points="1.5,0.55 1.61,0.88 1.95,0.88 1.67,1.08 1.78,1.41 1.5,1.21 1.22,1.41 1.33,1.08 1.05,0.88 1.39,0.88" fill="#00853F"/></svg>
+          <span>SN</span>
+        </button>
+        <button type="button" id="country-btn-ci" class="country-toggle-btn" onclick="setActiveCountry('CI')" title="Abidjan (CI)">
+          <svg width="14" height="10" viewBox="0 0 3 2"><rect width="1" height="2" x="0" fill="#F77F00"/><rect width="1" height="2" x="1" fill="#FFFFFF"/><rect width="1" height="2" x="2" fill="#009E60"/></svg>
+          <span>CI</span>
+        </button>
+      </div>
+
+      <div class="tb-clock" id="topbar-clock"></div>
+
+      <!-- Visible uniquement quand une session admin est ouverte :
+           sinon rien n'indiquait qu'un accès élevé était actif. -->
+      <button class="topbar-btn" id="admin-session-btn" onclick="AdminSession.logout()"
+        title="Admin session active — click to close" style="display:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+      </button>
+
+      <!-- Cloche de rappels — FO uniquement. Masquée par défaut : c'est
+           le JS qui la révèle selon le rôle, pour qu'un BO ou un
+           observateur ne voie jamais un compteur qui ne le concerne pas. -->
+      <div class="nf-wrap" id="nf-wrap" style="display:none">
+        <button class="topbar-btn nf-bell" id="nf-bell" onclick="NF.toggle(event)"
+                title="My reminders" aria-haspopup="dialog" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="nf-badge" id="nf-badge" hidden></span>
+        </button>
+        <div class="nf-panel" id="nf-panel" role="dialog" aria-label="My reminders" hidden></div>
+      </div>
+
+      <button class="topbar-btn" id="theme-btn" onclick="toggleTheme()" title="Dark / Light mode">
+        <svg id="theme-icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="theme-icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+
+      <div class="user-pill" onclick="openUserModal()" id="user-pill" title="Set your profile">
+        <div class="user-avatar" id="user-avatar-top" style="position:relative">?
+          <span id="user-pill-dot" style="position:absolute;top:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--tb-bg);animation:pulse 2s infinite"></span>
+        </div>
+        <span id="user-name-top">Set profile</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title" id="dash-quote"></div>
+        <div class="page-sub" id="dash-date"></div>
+      </div>
+
+      <!-- Tout le contenu du dashboard, dans un grand bloc arrondi posé sur le fond. -->
+      <div class="dash-panel">
+
+      <!-- En-tête du bloc : titre et période à gauche, réglages à droite.
+           Une seule ligne, deux contrôles : un menu de période (au lieu de
+           quatre boutons) et l'export en bouton-icône. -->
+      <div class="dash-head">
+        <div class="dash-head-l">
+          <div class="dash-head-t">Overview</div>
+          <span id="dash-period-label" class="dash-head-sub"></span>
+          <!-- Online users - stack of avatars, fans out on hover -->
+          <div class="presence" id="dash-presence" style="display:none">
+            <div class="presence-stack" id="dash-presence-stack"></div>
+            <span class="presence-label" id="dash-presence-label"></span>
+            <div class="presence-panel" id="dash-presence-panel" role="tooltip"></div>
+          </div>
+        </div>
+        <div id="dash-period-bar" class="dash-head-r">
+          <div id="dash-period-custom" style="display:none;align-items:center;gap:6px">
+            <select id="dash-custom-type" class="filter-select" onchange="onDashCustomTypeChange()" style="height:34px;padding:4px 8px;font-size:12px">
+              <option value="week">Specific week</option>
+              <option value="month">Specific month</option>
+            </select>
+            <input id="dash-custom-week"  type="week"  class="filter-select" oninput="renderDashboard()" style="height:34px;padding:4px 8px;font-size:12px;display:none">
+            <input id="dash-custom-month" type="month" class="filter-select" oninput="renderDashboard()" style="height:34px;padding:4px 8px;font-size:12px">
+          </div>
+          <label class="dash-period-sel" title="Période">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <select id="dash-period-select" onchange="setDashPeriod(this.value)" aria-label="Période">
+              <option value="all">All time</option>
+              <option value="month">This month</option>
+              <option value="week">This week</option>
+              <option value="custom">Custom…</option>
+            </select>
+          </label>
+          <button class="dash-icon-btn" onclick="exportStatsExcel()" title="Exporter les statistiques (Excel)" aria-label="Exporter en Excel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- INSIGHTS : ce qui mérite attention, calculé à la volée. Les pastilles SLA
+           déplient les listes juste en dessous. -->
+      <div id="dash-insights" class="d-insights"></div>
+
+      <!-- Breach alert -->
+      <div id="breach-alert" class="breach-alert">
+        <div class="breach-alert-title" onclick="toggleBreachCollapse()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          SLA Breach Tickets
+          <span class="breach-alert-count" id="breach-alert-count">0</span>
+          <svg class="breach-collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="breach-list"></div>
+      </div>
+
+      <!-- Near breach alert -->
+      <div id="near-breach-alert" class="near-breach-alert">
+        <div class="breach-alert-title" onclick="toggleNearBreachCollapse()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Near SLA Breach Tickets
+          <span class="breach-alert-count" id="near-breach-alert-count">0</span>
+          <svg class="breach-collapse-icon near-breach-collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="near-breach-list"></div>
+      </div>
+
+
+      <!-- BENTO DASHBOARD GRID -->
+      <div class="dash-grid" id="dash-grid">
+
+        <!-- ── BANDEAU KPI ──────────────────────────────────
+             Les 6 cartes d'origine racontaient une seule histoire
+             (le volume) en occupant deux rangées entières. Regroupées
+             en une bande compacte : même information, un tiers de la
+             hauteur, et la comparaison entre chiffres devient possible
+             puisqu'ils sont enfin côte à côte.
+             Les id sont conservés — le JS n'a pas à changer. -->
+        <div class="d-kpibar d-card-full">
+
+          <button class="d-kpi" id="dc-total" onclick="renderPage('sn')">
+            <span class="d-kpi-label">Total tickets</span>
+            <span class="d-kpi-value" id="dc-total-val">-</span>
+            <span class="d-kpi-sub" id="dc-total-sub">Combined total</span>
+            <span class="d-chart-bars d-kpi-spark" title="Last 7 days" id="dc-total-chart"></span>
+          </button>
+
+          <button class="d-kpi" id="dc-open" onclick="renderPage('sn')">
+            <span class="d-kpi-label">Open &amp; active</span>
+            <span class="d-kpi-value" id="dc-open-val">-</span>
+            <span class="d-kpi-sub" id="dc-open-sub">pending</span>
+            <span class="d-chart-bars d-kpi-spark" title="Last 7 days" id="dc-open-chart"></span>
+          </button>
+
+          <button class="d-kpi" id="dc-breach"
+                  onclick="(function(){var a=document.getElementById('breach-alert');if(a&&a.classList.contains('collapsed')){toggleBreachCollapse();renderDashInsightsAgain();}a&&a.scrollIntoView({behavior:'smooth',block:'center'});})()">
+            <span class="d-kpi-label">SLA breach</span>
+            <span class="d-kpi-value" id="dc-breach-val">-</span>
+            <span class="d-kpi-sub" id="dc-breach-sub">tickets en rupture</span>
+            <span class="d-chart-bars d-kpi-spark" title="Last 7 days" id="dc-breach-chart"></span>
+          </button>
+
+          <button class="d-kpi" id="dc-resolved" onclick="renderPage('sn')">
+            <span class="d-kpi-label">Resolved</span>
+            <span class="d-kpi-value" id="dc-res-val">-</span>
+            <span class="d-kpi-sub" id="dc-res-sub">closed tickets</span>
+            <span class="d-chart-bars d-kpi-spark" title="Last 7 days" id="dc-res-chart"></span>
+          </button>
+
+          <button class="d-kpi" id="dc-today" onclick="renderPage('sn')">
+            <span class="d-kpi-label">Opened today</span>
+            <span class="d-kpi-value" id="dc-today-val">-</span>
+            <span class="d-kpi-sub">new tickets</span>
+            <span class="d-chart-bars d-kpi-spark" title="Last 7 days" id="dc-today-chart"></span>
+          </button>
+
+          <!-- La conformité garde son anneau : c'est la seule mesure
+               qui se lit mieux en proportion qu'en nombre. -->
+          <div class="d-kpi d-kpi-sla" id="dc-sla">
+            <span class="d-kpi-label">SLA compliance</span>
+            <div class="d-kpi-sla-row">
+              <svg width="52" height="52" viewBox="0 0 48 48" class="d-kpi-ring">
+                <circle cx="24" cy="24" r="18" fill="none" stroke="var(--bg2)" stroke-width="5"/>
+                <circle id="dc-sla-ring" cx="24" cy="24" r="18" fill="none" stroke="var(--dark)" stroke-width="5"
+                  stroke-linecap="round" stroke-dasharray="113.1" stroke-dashoffset="113.1"
+                  transform="rotate(-90 24 24)" style="transition:stroke-dashoffset .7s,stroke .3s"/>
+              </svg>
+              <div>
+                <span class="d-kpi-value" id="dc-sla-val">-</span>
+                <span class="d-kpi-sub" id="dc-sla-sub">compliance rate</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ══════════════════════════════════════════════════
+             BENTO EXPRESSIF
+             Quatre cartes, quatre formes distinctes, une seule
+             idée par carte. Les données sont celles déjà
+             calculées par _computeDashboardKpis() : rien de
+             nouveau n'est inventé côté chiffres.
+             ══════════════════════════════════════════════════ -->
+
+        <!-- Carte A : volume — chiffre clé + comparaison mensuelle -->
+        <div class="bx bx-dark d-card-wide" id="bx-volume">
+          <div class="bx-head">
+            <div>
+              <div class="bx-title">Ticket volume</div>
+              <div class="bx-sub" id="bx-volume-sub">—</div>
+            </div>
+            <label class="bx-pill" title="Bar breakdown">
+              <select id="bx-volume-mode" onchange="renderBentoCards()">
+                <option value="tracker">By country</option>
+                <option value="status">By status</option>
+                <option value="domain">By domain</option>
+                <option value="priority">By priority</option>
+              </select>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </label>
+          </div>
+          <div class="bx-volume-body" style="display:flex;align-items:flex-end;gap:24px;flex:1;margin-top:26px;min-height:150px">
+            <div style="flex-shrink:0">
+              <div class="bx-figure-lbl">
+                Tickets
+                <span class="bx-arrow">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                </span>
+              </div>
+              <div class="bx-figure" id="bx-volume-val">—</div>
+            </div>
+            <div class="bx-cols" id="bx-volume-cols"></div>
+            <!-- Répartition du découpage choisi. Remplace les cartes
+                 By Domain / By Priority / By Status : même donnée,
+                 mais l'axe se choisit au lieu d'être figé. -->
+            <div class="bx-break" id="bx-volume-break"></div>
+          </div>
+          <div class="bx-legend" id="bx-volume-legend"></div>
+        </div>
+
+        <!-- Carte B : derniers tickets ouverts -->
+        <div class="bx bx-soft d-card-wide" id="bx-recent">
+          <div class="bx-head">
+            <div style="display:flex;align-items:center;gap:14px;min-width:0">
+              <span class="bx-ico bx-ico-dark">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>
+              </span>
+              <div style="min-width:0">
+                <div class="bx-title">Latest tickets</div>
+                <div class="bx-sub" id="bx-recent-sub">—</div>
+              </div>
+            </div>
+            <div class="bx-avs" id="bx-recent-avs" hidden></div>
+          </div>
+          <div class="bx-rows" id="bx-recent-rows"></div>
+        </div>
+
+        <!-- Carte C : timeline de charge + tuiles chiffrées -->
+        <div class="bx bx-plain d-card-full" id="bx-forecast">
+          <div class="bx-split">
+            <div style="display:flex;flex-direction:column;min-width:0">
+              <div style="display:flex;align-items:flex-start;gap:14px">
+                <span class="bx-ico bx-ico-accent">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                </span>
+                <div style="min-width:0">
+                  <div class="bx-title">Recent activity</div>
+                  <div class="bx-sub" id="bx-forecast-sub">—</div>
+                </div>
+              </div>
+              <div class="bx-tl" id="bx-forecast-tl"></div>
+            </div>
+            <!-- Colonne latérale : une seule carte, le taux d'absence.
+                 Les tuiles SLA / Résolus qui l'occupaient doublonnaient
+                 le bandeau KPI du haut ; l'absence, elle, n'était
+                 visible nulle part ailleurs. -->
+            <div class="bx-tiles">
+              <div class="bx-tile bx-tile-abs" id="bx-tile-abs">
+                <button class="bx-tile-out" title="Open the rota"
+                        onclick="renderPage('shift-planning')">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                </button>
+                <div class="bx-tile-lbl">Absence rate</div>
+
+                <div class="bx-abs-main">
+                  <!-- Anneau : le taux se lit en proportion, pas en
+                       nombre — un demi-cercle serait redondant avec la
+                       jauge de la carte D juste en dessous. -->
+                  <svg class="bx-abs-ring" viewBox="0 0 72 72" width="72" height="72" aria-hidden="true">
+                    <circle cx="36" cy="36" r="30" fill="none" stroke="var(--act-track)" stroke-width="8"/>
+                    <circle id="bx-abs-ring" cx="36" cy="36" r="30" fill="none"
+                            stroke="var(--act-in)" stroke-width="8" stroke-linecap="round"
+                            stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                            transform="rotate(-90 36 36)"/>
+                  </svg>
+                  <div style="min-width:0">
+                    <div class="bx-tile-val" id="bx-tile-abs-val">—</div>
+                    <div class="bx-abs-sub" id="bx-tile-abs-sub">—</div>
+                  </div>
+                </div>
+
+                <!-- Répartition : qui est absent, combien de jours.
+                     Sans elle le taux ne dit pas s'il vient d'un agent
+                     en congé long ou de dix absences ponctuelles. -->
+                <div class="bx-abs-list" id="bx-tile-abs-list"></div>
+                <div class="bx-abs-foot" id="bx-tile-abs-foot">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards By Domain / By Priority / By Status retirées :
+             leur contenu est désormais servi par le panneau latéral
+             du widget "Volume de tickets", qui affiche la répartition
+             du découpage sélectionné. Trois cartes de plus disaient la
+             même chose sans laisser choisir l'axe.
+             Les conteneurs restent dans le DOM, masqués : statsList()
+             et renderDomainBars() continuent d'y écrire sans erreur. -->
+        <div style="display:none">
+          <div id="dc-domain-list"></div>
+          <div id="dc-domain-detail"></div>
+          <div id="dc-prio-list"></div>
+          <div id="dc-status-list"></div>
+        </div>
+
+        <!-- Les camemberts Statut/Domaine/Priorité ont été retirés :
+             ils redisaient ce que les cartes By Priority / By Status /
+             By Domain montrent déjà, en moins lisible (un angle se
+             compare moins bien qu'une barre). Le conteneur reste, masqué,
+             pour ne pas casser renderStatsPieCharts(). -->
+        <div id="dc-pies-body" style="display:none"></div>
+
+        <!-- Card 10 : Heatmap FO Workload (col 3-4) -->
+        <div class="d-card d-card-full" id="dc-heatmap" style="overflow:hidden">
+          <div class="d-card-head" style="flex-shrink:0;flex-wrap:wrap;gap:8px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span class="bx-title" style="font-size:21px;font-weight:600;letter-spacing:-.02em;color:var(--m3-on-surface)">Workload by Front Office</span>
+              <!-- Légende : une échelle continue, pas 4 paliers nommés.
+                   Les couleurs suivent les tokens du thème, elles ne
+                   sont plus codées en dur (le rouge n'apparaît qu'en
+                   haut d'échelle, là où il signale une surcharge). -->
+              <div class="hm-legend">
+                <span>Less</span>
+                <span class="hm-legend-cell" data-v="0"></span>
+                <span class="hm-legend-cell" data-v="1"></span>
+                <span class="hm-legend-cell" data-v="2"></span>
+                <span class="hm-legend-cell" data-v="3"></span>
+                <span class="hm-legend-cell" data-v="4"></span>
+                <span>More</span>
+              </div>
+            </div>
+            <div id="heatmap-period-tabs" style="display:flex;gap:2px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:2px;margin-left:auto">
+              <button class="hm-tab active" data-period="day" onclick="setHeatmapPeriod('day')">Day</button>
+              <button class="hm-tab" data-period="week" onclick="setHeatmapPeriod('week')">Week</button>
+              <button class="hm-tab" data-period="month" onclick="setHeatmapPeriod('month')">Month</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div id="dc-heatmap-body" style="overflow-x:auto;margin-top:8px;flex:1"></div>
+            <!-- Toujours visible : il réserve sa place au lieu
+                 d'apparaître et de recomprimer la grille. -->
+            <div id="hm-hover-panel" style="flex-shrink:0;width:160px;padding:14px 16px;font-size:11px;margin-top:8px;min-height:104px"><div class="hm-hover-idle">Hover a cell<br>for details</div></div>
+          </div>
+        </div>
+
+      </div>
+      <!-- hidden legacy grids kept for JS compat -->
+      <div class="kpi-grid" id="kpi-grid" style="display:none"></div>
+      <div class="bento-grid" id="bento-stats" style="display:none">
+        <div class="bento-card"><div id="stats-domain"></div></div>
+        <div class="bento-card"><div id="stats-priority"></div></div>
+        <div class="bento-card"><div id="stats-type"></div></div>
+        <div class="bento-card"><div id="stats-status"></div></div>
+      </div>
+      </div><!-- /dash-panel -->
+    </div>
+
+    <!-- TRACKER SN -->
+    <div class="page" id="page-sn">
+      <div class="page-title" style="margin-bottom:8px">Tracker SN</div>
+      <div class="page-sub" style="margin-bottom:20px">Dakar · Senegal tickets</div>
+      <div class="dash-panel tr-shell">
+      <div class="tr-views" id="sn-views" role="tablist" aria-label="Quick views"></div>
+      <div class="tracker-filter-bar" id="sn-filter-bar">
+        <div class="tfb-row1">
+          <div class="tfb-search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="tfb-search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input tfb-search" id="sn-search" placeholder="Search TT#, title, FO, domain…" oninput="filterTable('sn');updateTrackerFilterBadges('sn')">
+          </div>
+          <div class="tfb-actions">
+            <span class="tk-count" id="sn-result-count"></span>
+            <button id="sn-reset-btn" class="btn btn-ghost btn-sm tfb-reset" onclick="resetTrackerFilters('sn')" style="display:none">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Reset
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="exportTrackerExcel('sn')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export
+            </button>
+            <button class="btn btn-primary btn-sm tfb-new" onclick="openNewTicket('sn')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New ticket
+            </button>
+          </div>
+        </div>
+        <div class="tfb-row2">
+          <select class="filter-select" id="sn-filter-status" onchange="filterTable('sn');updateTrackerFilterBadges('sn')"><option value="">All statuses</option></select>
+          <select class="filter-select" id="sn-filter-priority" onchange="filterTable('sn');updateTrackerFilterBadges('sn')"><option value="">All priorities</option></select>
+          <select class="filter-select" id="sn-filter-fo" onchange="filterTable('sn');updateTrackerFilterBadges('sn')"><option value="">All FOs</option></select>
+          <select class="filter-select" id="sn-filter-domain" onchange="filterTable('sn');updateTrackerFilterBadges('sn')"><option value="">All domains</option></select>
+          <div class="tfb-daterange">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tfb-cal-icon"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input class="filter-select" id="sn-filter-date-from" type="date" onchange="filterTable('sn');updateTrackerFilterBadges('sn')" title="Open date — from">
+            <span class="tfb-arrow">→</span>
+            <input class="filter-select" id="sn-filter-date-to" type="date" onchange="filterTable('sn');updateTrackerFilterBadges('sn')" title="Open date — to">
+          </div>
+        </div>
+        <div class="tfb-chips" id="sn-active-chips" style="display:none"></div>
+      </div>
+      <div class="table-wrap">
+        <table id="sn-table"><thead><tr id="sn-thead-row"></tr></thead><tbody id="sn-tbody"></tbody></table>
+      </div>
+      </div>
+    </div>
+
+    <!-- TRACKER CI -->
+    <div class="page" id="page-ci">
+      <div class="page-title" style="margin-bottom:8px">Tracker CI</div>
+      <div class="page-sub" style="margin-bottom:20px">Abidjan · Côte d'Ivoire tickets</div>
+      <div class="dash-panel tr-shell">
+      <div class="tr-views" id="ci-views" role="tablist" aria-label="Quick views"></div>
+      <div class="tracker-filter-bar" id="ci-filter-bar">
+        <div class="tfb-row1">
+          <div class="tfb-search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="tfb-search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input tfb-search" id="ci-search" placeholder="Search TT#, title, FO, domain…" oninput="filterTable('ci');updateTrackerFilterBadges('ci')">
+          </div>
+          <div class="tfb-actions">
+            <span class="tk-count" id="ci-result-count"></span>
+            <button id="ci-reset-btn" class="btn btn-ghost btn-sm tfb-reset" onclick="resetTrackerFilters('ci')" style="display:none">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Reset
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="exportTrackerExcel('ci')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export
+            </button>
+            <button class="btn btn-primary btn-sm tfb-new" onclick="openNewTicket('ci')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New ticket
+            </button>
+          </div>
+        </div>
+        <div class="tfb-row2">
+          <select class="filter-select" id="ci-filter-status" onchange="filterTable('ci');updateTrackerFilterBadges('ci')"><option value="">All statuses</option></select>
+          <select class="filter-select" id="ci-filter-priority" onchange="filterTable('ci');updateTrackerFilterBadges('ci')"><option value="">All priorities</option></select>
+          <select class="filter-select" id="ci-filter-fo" onchange="filterTable('ci');updateTrackerFilterBadges('ci')"><option value="">All FOs</option></select>
+          <select class="filter-select" id="ci-filter-domain" onchange="filterTable('ci');updateTrackerFilterBadges('ci')"><option value="">All domains</option></select>
+          <div class="tfb-daterange">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tfb-cal-icon"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input class="filter-select" id="ci-filter-date-from" type="date" onchange="filterTable('ci');updateTrackerFilterBadges('ci')" title="Open date — from">
+            <span class="tfb-arrow">→</span>
+            <input class="filter-select" id="ci-filter-date-to" type="date" onchange="filterTable('ci');updateTrackerFilterBadges('ci')" title="Open date — to">
+          </div>
+        </div>
+        <div class="tfb-chips" id="ci-active-chips" style="display:none"></div>
+      </div>
+      <div class="table-wrap">
+        <table id="ci-table"><thead><tr id="ci-thead-row"></tr></thead><tbody id="ci-tbody"></tbody></table>
+      </div>
+      </div>
+    </div>
+
+    <!-- TRACKER GLOBAL -->
+    <div class="page" id="page-global">
+      <div class="page-title" style="margin-bottom:8px">Tracker Global</div>
+      <div class="page-sub" style="margin-bottom:20px">Combined view — Dakar (SN) + Abidjan (CI) · read-only</div>
+      <div class="dash-panel tr-shell">
+      <div class="tr-views" id="global-views" role="tablist" aria-label="Quick views"></div>
+      <div class="tracker-filter-bar" id="global-filter-bar">
+        <div class="tfb-row1">
+          <div class="tfb-search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="tfb-search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input tfb-search" id="global-tracker-search" placeholder="Search TT#, title, FO, domain…" oninput="filterTable('global');updateTrackerFilterBadges('global')">
+          </div>
+          <div class="tfb-actions">
+            <span class="tk-count" id="global-result-count"></span>
+            <button id="global-reset-btn" class="btn btn-ghost btn-sm tfb-reset" onclick="resetTrackerFilters('global')" style="display:none">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Reset
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="exportGlobalTrackerExcel()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export
+            </button>
+          </div>
+        </div>
+        <div class="tfb-row2">
+          <select class="filter-select" id="global-filter-site" onchange="filterTable('global');updateTrackerFilterBadges('global')">
+            <option value="">All sites</option>
+            <option value="sn">SN — Dakar</option>
+            <option value="ci">CI — Abidjan</option>
+          </select>
+          <select class="filter-select" id="global-filter-status" onchange="filterTable('global');updateTrackerFilterBadges('global')"><option value="">All statuses</option></select>
+          <select class="filter-select" id="global-filter-priority" onchange="filterTable('global');updateTrackerFilterBadges('global')"><option value="">All priorities</option></select>
+          <select class="filter-select" id="global-filter-fo" onchange="filterTable('global');updateTrackerFilterBadges('global')"><option value="">All FOs</option></select>
+          <select class="filter-select" id="global-filter-domain" onchange="filterTable('global');updateTrackerFilterBadges('global')"><option value="">All domains</option></select>
+          <div class="tfb-daterange">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tfb-cal-icon"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input class="filter-select" id="global-filter-date-from" type="date" onchange="filterTable('global');updateTrackerFilterBadges('global')" title="Open date — from">
+            <span class="tfb-arrow">→</span>
+            <input class="filter-select" id="global-filter-date-to" type="date" onchange="filterTable('global');updateTrackerFilterBadges('global')" title="Open date — to">
+          </div>
+        </div>
+        <div class="tfb-chips" id="global-active-chips" style="display:none"></div>
+      </div>
+      <div class="table-wrap">
+        <table id="global-table"><thead><tr id="global-thead-row"></tr></thead><tbody id="global-tbody"></tbody></table>
+      </div>
+      </div>
+    </div>
+
+    <!-- OBSERVATIONS -->
+    <div class="page" id="page-observations">
+      <!-- En-tête Google : titre, recherche en pilule, action primaire.
+           Les filtres passent en jetons sous la barre — on voit ce qui
+           est actif sans déplier trois menus. -->
+      <div class="gobs-head">
+        <div class="gobs-head-id">
+          <div class="page-title">Observations</div>
+          <div class="page-sub">Operational log · SN &amp; CI</div>
+        </div>
+        <div class="gobs-head-actions">
+          <div class="gobs-search" id="gobs-search-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="obs-search" type="search" autocomplete="off" spellcheck="false"
+                   placeholder="Search an observation…" oninput="renderObservations()">
+            <button class="gobs-search-clear" type="button" title="Clear" onclick="obsClearSearch()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <button class="gobs-fab" onclick="openNewObs()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add
+          </button>
+        </div>
+      </div>
+
+      <div class="dash-panel gobs-shell">
+      <!-- Filtres : segmenté pour le statut (trois états exclusifs qu'on
+           bascule sans cesse), menus discrets pour le reste. -->
+      <div class="gobs-filters">
+        <div class="gobs-seg" role="group" aria-label="Statut">
+          <button class="gobs-seg-btn" data-status="Open"        onclick="obsSetStatus('Open')">Open<span class="gobs-n" id="gobs-n-Open"></span></button>
+          <button class="gobs-seg-btn" data-status="In Progress" onclick="obsSetStatus('In Progress')">In progress<span class="gobs-n" id="gobs-n-In Progress"></span></button>
+          <button class="gobs-seg-btn" data-status="Closed"      onclick="obsSetStatus('Closed')">Closed<span class="gobs-n" id="gobs-n-Closed"></span></button>
+          <button class="gobs-seg-btn" data-status=""            onclick="obsSetStatus('')">All<span class="gobs-n" id="gobs-n-all"></span></button>
+        </div>
+        <select class="gobs-select" id="obs-filter-priority" onchange="renderObservations()" aria-label="Priority">
+          <option value="">Any priority</option>
+          <option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
+        </select>
+        <select class="gobs-select" id="obs-filter-source" onchange="renderObservations()" aria-label="Source">
+          <option value="">SN + CI</option>
+          <option>SN</option><option>CI</option>
+        </select>
+        <!-- Conservé masqué : renderObservations() lit encore ce champ. -->
+        <select id="obs-filter-status" hidden aria-hidden="true" tabindex="-1">
+          <option value="Open" selected>Open</option>
+          <option value=""></option>
+          <option value="In Progress">In Progress</option>
+          <option value="Closed">Closed</option>
+        </select>
+        <span class="gobs-count" id="obs-count"></span>
+      </div>
+
+      <div id="obs-list"></div>
+      </div>
+    </div>
+
+    <!-- FO DASHBOARD -->
+    <div class="page" id="page-fo-dashboard">
+      <div class="fo-toolbar">
+        <div>
+          <div class="page-title">FO Dashboard</div>
+          <div class="page-sub" style="margin-bottom:0">Performance by Front Office · SN + CI combined</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div class="fo-seg" id="fo-dash-period-seg">
+            <button data-val="all" class="active" onclick="_setFoPeriod('all')">Tout</button>
+            <button data-val="today" onclick="_setFoPeriod('today')">Aujourd'hui</button>
+            <button data-val="week" onclick="_setFoPeriod('week')">Semaine</button>
+            <button data-val="month" onclick="_setFoPeriod('month')">Mois</button>
+          </div>
+          <div class="fo-seg" id="fo-dash-tracker-seg">
+            <button data-val="both" class="active" onclick="_setFoTracker('both')">SN + CI</button>
+            <button data-val="sn" onclick="_setFoTracker('sn')">SN</button>
+            <button data-val="ci" onclick="_setFoTracker('ci')">CI</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="openKpiConfigModal()" title="Configure visible KPIs">Configure KPIs</button>
+          <!-- hidden inputs kept so existing logic that reads .value still works -->
+          <select id="fo-dash-period" style="display:none"><option value="all" selected></option><option value="today"></option><option value="week"></option><option value="month"></option></select>
+          <select id="fo-dash-tracker" style="display:none"><option value="both" selected></option><option value="sn"></option><option value="ci"></option></select>
+        </div>
+      </div>
+
+      <!-- Kudos : podium positif de la semaine, en tête de page -->
+      <div id="fo-kudos" class="fo-kudos"></div>
+
+      <div id="fo-kpi-bar" class="fo-kpis"></div>
+
+      <!-- Objectifs d'équipe : cibles configurables + avancement -->
+      <div class="fo-card" id="fo-goals-card">
+        <div class="fo-card-head">
+          <div class="fo-card-title">Team objectives</div>
+          <div class="fo-card-meta" id="fo-goals-meta"></div>
+        </div>
+        <div id="fo-goals"></div>
+      </div>
+
+      <!-- Activité hors tickets : tâches, weekly progress, formation, absences -->
+      <div class="fo-activity" id="fo-activity"></div>
+
+      <div class="fo-card">
+        <div class="fo-card-head">
+          <div class="fo-card-title">Resolved tickets trend</div>
+          <div class="fo-card-meta">14 derniers jours</div>
+        </div>
+        <div id="fo-evolution-chart"></div>
+      </div>
+
+      <!-- Le classement nominatif et la Trust Matrix vivent désormais
+           dans Admin › Performance FO : ce sont des outils d'encadrement,
+           pas un tableau de bord d'équipe affiché à tous. -->
+
+      </div>
+
+    <!-- KPI CONFIG MODAL -->
+    <div class="modal-overlay" id="kpi-config-modal">
+      <div class="modal" style="max-width:460px">
+        <div class="modal-header">
+          <div class="modal-title">KPI configuration</div>
+          <button class="modal-close" onclick="closeModal('kpi-config-modal')">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group" id="kpi-auth-wrap">
+            <label class="form-label">Password required</label>
+            <input class="form-control" id="kpi-config-pw" type="password" placeholder="••••••••"
+              onkeydown="if(event.key==='Enter') unlockKpiConfig()">
+            <div id="kpi-auth-error" style="color:var(--red,#e74c3c);font-size:12px;margin-top:6px;display:none">Incorrect password</div>
+            <button class="btn btn-primary" style="margin-top:10px;width:100%" onclick="unlockKpiConfig()">Unlock</button>
+          </div>
+          <div id="kpi-toggle-wrap" style="display:none">
+            <p style="font-size:12px;color:var(--mute);margin-bottom:14px">Enable or disable each indicator. Changes are saved to JSON.</p>
+            <div id="kpi-toggle-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+              <button class="btn btn-ghost btn-sm" onclick="closeModal('kpi-config-modal')">Cancel</button>
+              <button class="btn btn-primary btn-sm" onclick="saveKpiConfig()">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOG ANALYZER -->
+    <div class="page" id="page-log-analyzer" style="margin:-28px -28px -32px">
+      <iframe src="/log-analyzer.html" style="width:100%;height:calc(100vh - 56px);border:none;display:block"></iframe>
+    </div>
+
+    <!-- Formation DigitalView. L'iframe n'est chargée qu'à la première
+         ouverture (formation.js) : 190 Ko que personne ne télécharge
+         s'il ne s'en sert pas. -->
+    <div class="page" id="page-digitalview">
+      <iframe id="dv-frame" title="DigitalView · Formation"></iframe>
+      <button type="button" class="dv-team-btn" id="dv-team-btn" hidden onclick="dvTeamOpen()">Team progress</button>
+      <div class="dv-team" id="dv-team" hidden></div>
+    </div>
+
+    <!-- Academy (js/pages/academy/academy.js) : hub des formations. -->
+    <div class="page" id="page-academy"><div id="academy-root"></div></div>
+    <div class="page" id="page-ideas"><iframe id="ideas-frame" title="Idea box" data-src="/idees?embed=1" allow="clipboard-write"></iframe></div>
+
+    <!-- Formation Process ITSM, chargée à la première ouverture comme
+         DigitalView. Même suivi d'équipe, sur sa propre progression. -->
+    <div class="page" id="page-process-training">
+      <iframe id="pt-frame" title="Process ITSM · Formation"></iframe>
+      <button type="button" class="dv-team-btn" id="pt-team-btn" hidden onclick="dvTeamOpen('process')">Team progress</button>
+      <div class="dv-team" id="pt-team" hidden></div>
+    </div>
+
+    <!-- CONFIG -->
+    <!-- Point d'insertion du fragment admin. Sous /admin/app le serveur
+         remplit le marqueur ci-dessous ; dans l'app publique il le laisse
+         vide et ensureAdminFragment() insère les pages juste après cette ancre. -->
+    <div id="admin-slot" hidden></div>
+    <!--ADMIN_CONFIG_PAGE-->
+
+    <!-- RAPPORTS — Daily, Weekly, Monthly, Ops Review, Diffusion, Exports.
+         Les écrans ne sont pas réécrits : reports-hub.js déplace leur
+         conteneur (#page-daily-report, #page-mailing…) dans #rp-mount selon
+         l'onglet ouvert. Ops Review, Diffusion et Exports vivent dans le
+         fragment admin : leurs onglets n'existent que pour une session admin.
+         #rp-head, #rp-tabs et #rp-own sont réécrits par le JS et ne
+         contiennent jamais d'écran déplacé. -->
+    <div class="page" id="page-rapports">
+      <div id="rp-head"></div>
+      <div class="rp-tabs" id="rp-tabs" role="tablist" aria-label="Rapports"></div>
+      <div class="rp-panel" id="rp-panel" role="tabpanel">
+        <div id="rp-own"></div>
+        <div id="rp-mount"></div>
+      </div>
+    </div>
+
+    <!-- DAILY REPORT -->
+    <div class="page" id="page-daily-report">
+      <!-- Une barre : la date à gauche (‹ date ›), les actions à droite.
+           Signature et sections passent dans « Customize », replié. -->
+      <div class="rpt-bar">
+        <div class="rpt-datenav">
+          <button class="rpt-dn-btn" onclick="changeDailyDate(-1)" title="Previous day" aria-label="Previous day">‹</button>
+          <input class="rpt-dn-date" type="date" id="daily-sel-date" onchange="goToDailyDate()" aria-label="Report date">
+          <button class="rpt-dn-btn" onclick="changeDailyDate(1)" title="Next day" aria-label="Next day">›</button>
+        </div>
+        <div class="page-sub rpt-bar-date" id="daily-report-date"></div>
+        <div class="rpt-bar-r">
+          <button class="rpt-btn" onclick="rptToggleCustomize('daily')" aria-expanded="false" id="rpt-cust-daily">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+            Customize</button>
+          <button class="rpt-btn is-pri" onclick="exportDailyExcel()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Excel</button>
+        </div>
+      </div>
+      <div class="rpt-layout">
+        <div id="daily-report-content" class="rpt-main"></div>
+        <div class="rpt-side-panel" id="rpt-side-daily"></div>
+      </div>
+    </div>
+
+    <!-- WEEKLY REPORT -->
+    <div class="page" id="page-weekly-report">
+      <!-- Même structure que le dashboard : bloc titre+sous-titre, puis une
+           barre d'outils sur sa propre ligne. Tout entassé sur une seule
+           ligne, le sous-titre se retrouvait orphelin sous les boutons. -->
+      <div class="page-header">
+        <div class="page-title">Weekly Report</div>
+        <div class="page-sub" id="weekly-report-date"></div>
+      </div>
+      <div class="rpt-toolbar">
+        <div class="rpt-datenav">
+          <button class="rpt-dn-btn" onclick="changeWeek(-1)" title="Previous week" aria-label="Previous week">‹</button>
+          <input class="rpt-dn-date" type="date" id="weekly-sel-date" onchange="goToWeek()" aria-label="Week">
+          <button class="rpt-dn-btn" onclick="changeWeek(1)" title="Next week" aria-label="Next week">›</button>
+        </div>
+        <div class="rpt-bar-date" data-mirror="weekly-report-date"></div>
+        <div class="rpt-actions">
+          <button class="btn btn-ghost btn-sm" onclick="exportWeeklyExcel()">Export Excel</button>
+          <button class="btn btn-primary btn-sm" id="weekly-pptx-btn" onclick="exportWeeklyPptx()">PPTX preview</button>
+          <!-- Revue commune Dakar × Abidjan : disponible quel que soit le
+               site sélectionné, puisqu'elle couvre les deux. -->
+          <button class="btn btn-secondary btn-sm" id="weekly-combined-btn" onclick="openWeeklyCombined()"
+                  title="Weekly performance deck presented to both teams">Dakar × Abidjan deck</button>
+        </div>
+      </div>
+      <!-- Plus de panneau latéral : le récap occupe toute la largeur. -->
+      <div id="weekly-report-content"></div>
+    </div>
+
+    <!-- AUDIT TRAIL -->
+
+    <!-- MONTHLY REPORT -->
+    <div class="page" id="page-monthly-report">
+      <!-- Même structure que le dashboard et que la page hebdo. -->
+      <div class="page-header">
+        <div class="page-title">Monthly Report</div>
+        <div class="page-sub" id="monthly-report-label"></div>
+      </div>
+      <div class="rpt-toolbar">
+        <div class="rpt-datenav">
+          <button class="rpt-dn-btn" onclick="changeMonth(-1)" title="Previous month" aria-label="Previous month">‹</button>
+          <select class="rpt-dn-date" id="monthly-sel-month" onchange="goToMonth()" aria-label="Month">
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+          <!-- Options are generated around the current year (see fillMonthlyYears)
+               so the picker does not expire the way a hard-coded list does. -->
+          <select class="rpt-dn-date" id="monthly-sel-year" onchange="goToMonth()" aria-label="Year"></select>
+          <button class="rpt-dn-btn" onclick="changeMonth(1)" title="Next month" aria-label="Next month">›</button>
+        </div>
+        <div class="rpt-actions">
+          <button class="btn btn-primary btn-sm" onclick="exportMonthlyExcel()">Export Excel</button>
+        </div>
+      </div>
+      <div id="monthly-report-content"></div>
+    </div>
+
+
+    <!-- FO HANDOVER BOARD -->
+    <div class="page" id="page-fo-handover">
+      <div id="fo-handover-root"></div>
+    </div>
+
+    <!-- SHIFT PLANNING -->
+    <div class="page" id="page-shift-planning">
+      <div class="sp-topbar">
+        <div>
+          <div class="page-title">Shift Planning</div>
+          <div class="page-sub" style="margin-bottom:0">FO rotations — click an assignment to edit it</div>
+        </div>
+        <div class="sp-toolbar">
+          <div class="sp-nav">
+            <button class="sp-nav-btn" onclick="shiftWeekOffset--;renderShiftPlanning()" title="Previous month" aria-label="Previous month">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="sp-month" id="shift-week-label" aria-live="polite"></span>
+            <button class="sp-nav-btn" onclick="shiftWeekOffset++;renderShiftPlanning()" title="Next month" aria-label="Next month">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <button class="sp-chip" onclick="shiftWeekOffset=0;window._shiftActiveWeek=undefined;renderShiftPlanning()">Today</button>
+          <button class="sp-chip" id="btn-hide-weekends" onclick="toggleHideWeekends()" title="Hide/show weekends" aria-pressed="false">Weekends</button>
+          <button class="sp-chip" onclick="openHolidaysModal()">Public holidays</button>
+          <button class="sp-chip" onclick="generateYearRota()" title="Generate the full year in continuity with history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Generate the year
+          </button>
+          <button class="sp-fab" onclick="openNewShift()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add
+          </button>
+        </div>
+      </div>
+      <div class="dash-panel sp-shell"><div id="shift-planning-grid"></div></div>
+    </div>
+
+    <!-- SHIFT APPROVALS -->
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MES DEMANDES — page de soumission FO
+         Contrepartie publique d'Approbations : le FO saisit ici, la
+         décision se prend en Admin. Aucun bouton de décision ne doit
+         apparaître sur cette page.
+         ═══════════════════════════════════════════════════════════ -->
+    <!-- ═══════════════════════════════════════════════════════════
+         MY SPACE — l'espace personnel de l'agent
+         « Today » (ce qu'il faut faire maintenant, puis quelques
+         repères) et les écrans personnels en onglets. Ces écrans ne
+         sont pas réécrits : mon-espace.js déplace leur conteneur
+         (#page-weekly-progress, #page-my-requests, #page-my-perf,
+         #page-quiz) dans #mes-mount. Les zones réécrites par le JS
+         (#mes-head, #mes-tabs, #mes-own) ne contiennent jamais d'écran
+         déplacé.
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-mon-espace">
+      <!-- Titre et onglets sur une ligne, puis le contenu dans le bloc en verre. -->
+      <div class="mx-top">
+        <div id="mes-head"></div>
+        <div class="mes-tabs" id="mes-tabs" role="tablist" aria-label="My Space"></div>
+      </div>
+      <div class="dash-panel mes-shell">
+        <div class="mes-panel" id="mes-panel" role="tabpanel">
+          <div id="mes-own"></div>
+          <div id="mes-mount"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MA PERFORMANCE — consultation par l'agent lui-même.
+         Aucune donnée n'est chargée avant authentification : le
+         serveur ne renvoie que la note du porteur du code, jamais
+         celle de l'équipe. Ne jamais ajouter ici de comparaison
+         entre agents, ce serait sortir du cadre voulu.
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-my-perf">
+      <div class="page-title">My Performance</div>
+      <div class="page-sub">Your own review — visible only to you</div>
+
+      <!-- Bandeau de contrôle, session admin uniquement. Permet de voir la
+           fiche telle que l'agent la voit, sans emprunter son code d'accès.
+           Masqué par défaut : c'est renderMyPerf() qui l'affiche après avoir
+           constaté une session admin, et le serveur revérifie de son côté —
+           cacher un élément n'est pas un contrôle d'accès. -->
+      <div id="myperf-admin-bar" class="myperf-admin-bar" style="display:none">
+        <div class="myperf-admin-l">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Contrôle admin — fiche vue par l'agent</span>
+        </div>
+        <select class="filter-select" id="myperf-admin-fo" onchange="adminViewFoPerf(this.value)">
+          <option value="">— Choisir un agent —</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="adminExitFoPerf()">Quitter</button>
+      </div>
+
+      <!-- Écran d'accès. Centré et seul sur la page : tant que l'agent n'a
+           pas prouvé qui il est, il n'y a rien d'autre à montrer. -->
+      <div id="myperf-login" class="myperf-gate">
+        <div class="myperf-card myperf-gate-card">
+          <div class="myperf-lock-ico">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="myperf-lock-t">Personal access</div>
+          <div class="myperf-lock-d">
+            Enter your Huawei ID and the personal code given to you by your
+            manager. You will only ever see your own review.
+          </div>
+          <div class="myperf-form">
+            <input class="form-control idt-mono" id="myperf-id" placeholder="Huawei ID (e.g. h50056630)"
+                   autocomplete="off" onkeydown="if(event.key==='Enter')myPerfLogin()">
+            <input class="form-control idt-mono" id="myperf-code" placeholder="Personal code" type="password"
+                   autocomplete="off" onkeydown="if(event.key==='Enter')myPerfLogin()">
+            <button class="btn btn-primary btn-sm" id="myperf-submit" onclick="myPerfLogin()">View my performance</button>
+          </div>
+          <div id="myperf-error" class="myperf-err"></div>
+          <div class="myperf-gate-foot">
+            Your session closes automatically after 30 minutes of inactivity,
+            and when you close this tab.
+          </div>
+        </div>
+      </div>
+
+      <div id="myperf-result" style="display:none"></div>
+    </div>
+
+    <div class="page" id="page-my-requests">
+      <div class="mr-head">
+        <div>
+          <div class="page-title">My Requests</div>
+          <div class="mr-sub">Submit a shift request — it goes to Admin for approval.</div>
+        </div>
+        <div class="mr-head-actions">
+          <select class="filter-select" id="mr-who" onchange="renderMyRequests()"></select>
+          <button class="btn btn-primary btn-sm" onclick="openMyRequestModal()">New request</button>
+        </div>
+      </div>
+
+      <div class="mr-kpis" id="mr-kpis"></div>
+      <div id="mr-list"></div>
+    </div>
+
+    <!-- FO TASKS (Daily Check-up) -->
+    <!-- ═══════════════════════════════════════════════════════════
+         WEEKLY PROGRESS
+         Le tableau de bord hebdomadaire de l'équipe. La question à
+         laquelle la page doit répondre en un coup d'œil est « où en
+         est-on cette semaine, et qu'est-ce qui traîne ? ».
+         D'où l'ordre : navigateur de semaine → tuiles-filtres →
+         insight → vue. Chaque tuile est cliquable : voir un chiffre
+         donne envie de voir ce qu'il y a derrière.
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-weekly-progress">
+
+      <!-- En-tête : identité de la page + action primaire -->
+      <div class="wp-header">
+        <div class="wp-header-id">
+          <div class="wp-title">My Tasks</div>
+          <div class="wp-sub" id="wp-subtitle">What the team delivered this week</div>
+        </div>
+        <div class="wp-header-actions">
+          <div class="wp-search">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>
+            <input id="wp-search" type="search" placeholder="Search a task, an FO…"
+                   autocomplete="off" oninput="wpOnSearch(this.value)" aria-label="Rechercher">
+            <button class="wp-search-clear" id="wp-search-clear" onclick="wpClearSearch()" title="Clear" aria-label="Clear search">
+              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+          </div>
+          <button class="wp-fab" onclick="openNewProgressItem()" title="Add an item (N)">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>
+            <span>Add</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigateur de semaine : la semaine est l'unité de la page,
+           elle mérite un contrôle dédié plutôt qu'un input date perdu. -->
+      <div class="wp-weekbar">
+        <button class="wp-weeknav" onclick="changeProgressWeek(-1)" title="Previous week (←)" aria-label="Previous week">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+
+        <button class="wp-weekpick" id="wp-weekpick" onclick="document.getElementById('progress-sel-date').showPicker?.();document.getElementById('progress-sel-date').focus()">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14z"/></svg>
+          <span class="wp-weekpick-main" id="wp-week-range">—</span>
+          <span class="wp-weekpick-tag" id="wp-week-tag"></span>
+        </button>
+        <input type="date" id="progress-sel-date" class="wp-datehidden" onchange="goToProgressWeek()" tabindex="-1" aria-label="Go to week">
+
+        <button class="wp-weeknav" onclick="changeProgressWeek(1)" title="Next week (→)" aria-label="Next week">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </button>
+
+        <button class="wp-today" id="wp-today-btn" onclick="goToThisWeek()" title="Back to the current week (T)">This week</button>
+
+        <div class="wp-weekbar-spacer"></div>
+
+        <!-- Filtre propriétaire : sur une équipe de 10, « qui a fait quoi »
+             est la deuxième question posée après « où en est-on ». -->
+        <select class="wp-select" id="wp-owner-filter" onchange="wpSetOwner(this.value)" aria-label="Filter by FO">
+          <option value="">Whole team</option>
+        </select>
+        <select class="wp-select" id="wp-sort" onchange="wpSetSort(this.value)" aria-label="Sort">
+          <option value="smart">Smart sort</option>
+          <option value="status">By status</option>
+          <option value="owner">By FO</option>
+          <option value="recent">Recently modified</option>
+          <option value="alpha">Alphabetical</option>
+        </select>
+      </div>
+
+      <!-- Vue d'ensemble : chaque tuile est aussi un filtre -->
+      <div class="wp-overview" id="wp-overview"></div>
+
+      <!-- Insight : une phrase actionnable, pas un mur de chiffres -->
+      <div id="wp-insight"></div>
+
+      <!-- Sélecteur de vue -->
+      <div class="wp-viewbar">
+        <div class="wp-tabs" id="progress-view-tabs" role="tablist">
+          <button class="wp-tab" data-view="board" onclick="setProgressView('board')" role="tab">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 5h6v14H3zm7 0h5v14h-5zm6 0h5v14h-5z"/></svg>Board
+          </button>
+          <button class="wp-tab" data-view="list" onclick="setProgressView('list')" role="tab">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 5h18v2H3zm0 6h18v2H3zm0 6h18v2H3z"/></svg>List
+          </button>
+          <button class="wp-tab" data-view="timeline" onclick="setProgressView('timeline')" role="tab">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M4 18h3v-7H4zm6.5 0h3V6h-3zM17 18h3v-4h-3z"/></svg>Trend
+          </button>
+          <button class="wp-tab" data-view="insights" onclick="setProgressView('insights')" role="tab">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-4 12.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26A7 7 0 0 0 12 2m-2 19h4v1h-4z"/></svg>Insights
+          </button>
+          <button class="wp-tab" data-view="report" onclick="setProgressView('report')" role="tab">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>Report
+          </button>
+        </div>
+        <div class="wp-activefilters" id="wp-activefilters"></div>
+      </div>
+
+      <div id="weekly-progress-list"></div>
+    </div>
+
+    <div class="page" id="page-fo-tasks">
+      <div class="dchk-head">
+        <div>
+          <div class="page-title">Daily Check-up</div>
+          <div class="page-sub">Tasks assigned to FOs — tick them once done</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openNewFOTask()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Assigner une tâche
+        </button>
+      </div>
+
+      <!-- Barre d'avancement du jour : la question « où en est-on
+           aujourd'hui ? » se répondait auparavant en comptant les
+           cartes à la main. -->
+      <div class="dchk-hero" id="dchk-hero"></div>
+
+      <!-- Filtres : segments pour le statut (4 valeurs, choix fréquent),
+           select pour le FO (liste variable). -->
+      <div class="dchk-filters">
+        <div class="dchk-seg" id="dchk-seg-status" role="tablist" aria-label="Filter by status"></div>
+        <select class="filter-select" id="fotask-filter-fo" onchange="renderFOTasks()" aria-label="Filter by FO">
+          <option value="">All FOs</option>
+        </select>
+        <label class="dchk-toggle">
+          <input type="checkbox" id="dchk-hide-done" onchange="renderFOTasks()">
+          <span>Hide completed tasks</span>
+        </label>
+      </div>
+
+      <div id="fo-tasks-list"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         QUIZ
+         Deux publics sur une même page : le FO qui vient réviser
+         (onglet Quiz) et le manager qui regarde où l'équipe pêche
+         (onglet Résultats). D'où deux entrées distinctes plutôt
+         qu'un tableau unique qui ne servirait bien ni l'un ni
+         l'autre.
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-quiz">
+
+      <div class="qz-header">
+        <div class="qz-header-id">
+          <div class="qz-title">Quiz</div>
+          <div class="qz-sub">EMOC procedures, SLA and tools — at your own pace</div>
+        </div>
+        <div class="qz-header-actions">
+          <div class="qz-search">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>
+            <input id="quiz-search-input" type="search" placeholder="Search a quiz…"
+                   autocomplete="off" oninput="renderQuizPlay()" aria-label="Search a quiz">
+          </div>
+        </div>
+      </div>
+
+      <div class="qz-tabs" role="tablist">
+        <button class="qz-tab active" data-quiz-tab="play" onclick="switchQuizTab('play')" role="tab">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>Quiz
+        </button>
+        <button class="qz-tab" data-quiz-tab="history" onclick="switchQuizTab('history')" role="tab">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M13 3a9 9 0 0 0-9 9H1l4 4 4-4H6a7 7 0 1 1 7 7v2a9 9 0 0 0 0-18m-1 5v5l4.25 2.52.75-1.23-3.5-2.07V8z"/></svg>Results
+        </button>
+      </div>
+
+      <div id="quiz-tab-play" class="quiz-tab-content">
+        <div id="quiz-play-area" class="qz-grid"></div>
+      </div>
+
+      <div id="quiz-tab-history" class="quiz-tab-content" style="display:none">
+        <div class="qz-filters">
+          <select class="qz-select" id="quiz-hist-filter-quiz" onchange="renderQuizHistory()" aria-label="Filter by quiz">
+            <option value="">All quizzes</option>
+          </select>
+          <select class="qz-select" id="quiz-hist-filter-user" onchange="renderQuizHistory()" aria-label="Filter by person">
+            <option value="">Whole team</option>
+          </select>
+          <select class="qz-select" id="quiz-hist-filter-period" onchange="renderQuizHistory()" aria-label="Period">
+            <option value="all">All time</option>
+            <option value="today">Today</option>
+            <option value="week">This week</option>
+            <option value="month">This month</option>
+          </select>
+          <div class="qz-filters-spacer"></div>
+          <button class="qz-btn" id="quiz-hist-export" onclick="exportQuizHistoryExcel()">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"/></svg>
+            Export
+          </button>
+        </div>
+        <div id="quiz-stats-summary"></div>
+        <div id="quiz-history-table"></div>
+      </div>
+    </div>
+
+    <!-- DATA QUALITY PAGE -->
+
+    <!-- ══════════════════════════════════════════
+         OPS REVIEW PAGE
+    ══════════════════════════════════════════ -->
+
+    <!-- ══════════════════════════════════════════════
+         SUIVI DES ABSENCES
+         Page verrouillée par son propre mot de passe : les routes
+         /api/absences exigent le jeton, donc le verrou garde vraiment
+         la donnée et pas seulement l'affichage.
+    ══════════════════════════════════════════════ -->
+    <div class="page" id="page-absences">
+
+      <!-- Écran de verrouillage -->
+      <div id="abs-login-screen" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+        <div class="m3-lock-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span style="font-size:16px;font-weight:600">Absence tracking</span>
+          </div>
+          <p style="font-size:13px;color:var(--mute);margin-bottom:20px">This data is confidential (reasons, sick leave, balances). Enter the dedicated password to continue.</p>
+          <input class="form-control" id="abs-password" type="password" placeholder="Password" style="margin-bottom:10px"
+            onkeydown="if(event.key==='Enter')verifyAbsenceAccess()">
+          <div id="abs-auth-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:10px">Incorrect password.</div>
+          <div class="m3-lock-note">Separate from admin access. The session lasts 8 h and ends with the tab.</div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-ghost btn-sm" onclick="window.renderPage('dashboard')">Cancel</button>
+            <button class="btn btn-primary btn-sm" id="abs-submit" onclick="verifyAbsenceAccess()">Sign in</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenu (après déverrouillage) -->
+      <div id="abs-main-screen" style="display:none">
+
+        <div class="abs-head">
+          <div>
+            <div class="page-title">Absence tracking</div>
+            <div class="abs-sub" id="abs-period-label">—</div>
+          </div>
+          <div class="abs-head-actions">
+            <select class="filter-select" id="abs-year" onchange="renderAbsences()"></select>
+            <button class="btn btn-ghost btn-sm" onclick="exportAbsenceReportPDF()">Rapport d'absence (PDF)</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportAbsencesCSV()">Export CSV</button>
+            <button class="btn btn-ghost btn-sm" onclick="AbsenceSession.logout()" title="Lock the page">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Verrouiller
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openAbsenceModal()">New absence</button>
+          </div>
+        </div>
+
+        <!-- KPI de période -->
+        <div class="abs-kpis" id="abs-kpis"></div>
+
+        <!-- Conflits planning : le vrai apport du croisement -->
+        <div id="abs-conflicts"></div>
+
+        <!-- Demandes FO (lecture seule). Les absences saisies ici sont le
+             registre RH ; les demandes viennent des agents et se décident
+             en Admin. On les montre pour que le suivi RH voie ce qui
+             arrive, sans dupliquer la décision sur deux écrans. -->
+        <div id="abs-fo-requests"></div>
+
+        <div class="abs-grid">
+          <!-- Calendrier mensuel -->
+          <div class="abs-card abs-card-cal">
+            <div class="abs-card-head">
+              <div>
+                <div class="abs-card-title">Calendrier</div>
+                <div class="abs-card-sub" id="abs-cal-sub">—</div>
+              </div>
+              <div class="abs-cal-nav">
+                <button onclick="absShiftMonth(-1)" title="Previous month">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button onclick="absShiftMonth(1)" title="Next month">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="abs-cal" id="abs-calendar"></div>
+            <div class="abs-legend" id="abs-legend"></div>
+          </div>
+
+          <!-- Soldes de congés -->
+          <div class="abs-card">
+            <div class="abs-card-head">
+              <div>
+                <div class="abs-card-title">Leave balances</div>
+                <div class="abs-card-sub" id="abs-bal-sub">—</div>
+              </div>
+            </div>
+            <div class="abs-balances" id="abs-balances"></div>
+          </div>
+        </div>
+
+        <!-- Liste -->
+        <div class="abs-card">
+          <div class="abs-card-head">
+            <div>
+              <div class="abs-card-title">Absences</div>
+              <div class="abs-card-sub" id="abs-list-sub">—</div>
+            </div>
+            <div class="abs-filters">
+              <input class="filter-select" id="abs-f-search" placeholder="Search…" oninput="renderAbsenceList()">
+              <select class="filter-select" id="abs-f-agent" onchange="renderAbsenceList()"><option value="">All agents</option></select>
+              <select class="filter-select" id="abs-f-type" onchange="renderAbsenceList()"><option value="">All types</option></select>
+              <select class="filter-select" id="abs-f-status" onchange="renderAbsenceList()"><option value="">All statuses</option></select>
+              <select class="filter-select" id="abs-f-notice" onchange="renderAbsenceList()"><option value="">All notice periods</option></select>
+            </div>
+          </div>
+          <!-- Actions groupées : masquée tant qu'aucune ligne n'est cochée.
+               Seules les demandes « Demandée » portent une case — décider
+               en lot d'une absence déjà validée n'aurait pas de sens. -->
+          <div id="abs-batch-bar" class="abs-batch-bar" style="display:none">
+            <span id="abs-batch-count" class="abs-batch-n"></span>
+            <button class="btn btn-primary btn-sm" onclick="absBatchDecide('Validée')">Approuver</button>
+            <button class="btn btn-ghost btn-sm" onclick="absBatchDecide('Refusée')">Rejeter</button>
+            <button class="btn btn-ghost btn-sm" onclick="_absToggleAll(false)">Annuler</button>
+          </div>
+          <div id="abs-table"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MODALE ABSENCE ── -->
+<div class="modal-overlay" id="absence-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <span id="absence-modal-title">New absence</span>
+      <button class="modal-close" onclick="closeModal('absence-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="abs-id">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Agent <span class="req">*</span></label>
+          <select class="form-control" id="abs-fo"><option value="">- Select -</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type <span class="req">*</span></label>
+          <select class="form-control" id="abs-type"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Du <span class="req">*</span></label>
+          <input class="form-control" id="abs-from" type="date" onchange="absSyncDates()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Au <span class="req">*</span></label>
+          <input class="form-control" id="abs-to" type="date" onchange="absSyncDates()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Statut</label>
+          <select class="form-control" id="abs-status"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Half day</label>
+          <select class="form-control" id="abs-half" onchange="absSyncDates()">
+            <option value="">Non</option>
+            <option value="am">Matin</option>
+            <option value="pm">Afternoon</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notified?</label>
+          <select class="form-control" id="abs-notice" onchange="absSyncDates()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notified on</label>
+          <input class="form-control" id="abs-notice-date" type="date" onchange="absSyncDates()">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Reason / Note</label>
+          <textarea class="form-control" id="abs-reason" rows="2" placeholder="Additional details..."></textarea>
+        </div>
+        <!-- Retour immédiat : jours décomptés et conflits de planning,
+             avant l'enregistrement plutôt qu'après. -->
+        <div class="form-group full">
+          <div class="abs-preview" id="abs-preview">Enter the dates to see the count.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="abs-delete-btn" style="display:none;margin-right:auto" onclick="deleteAbsence()">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal('absence-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAbsence()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ FULLSCREEN PLAYER -->
+<div id="quiz-fullscreen" style="display:none;position:fixed;inset:0;z-index:1300;background:var(--bg);overflow-y:auto">
+  <div style="max-width:680px;margin:0 auto;padding:32px 20px 60px;min-height:100%;display:flex;flex-direction:column;justify-content:center">
+    <div id="quiz-fullscreen-content"></div>
+  </div>
+</div>
+
+<!-- ── SIDEBAR OVERLAY (mobile) ── -->
+<div id="sidebar-overlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:149"></div>
+
+<!-- ── SAVE SPINNER ── -->
+<div id="save-spinner">
+  <div id="save-spinner-icon"></div>
+  <span>Saving...</span>
+</div>
+
+<!-- ── USER IDENTITY MODAL ── -->
+<div class="modal-overlay" id="user-identity-modal">
+  <div class="modal">
+    <div class="modal-header" style="position:relative">
+      <button class="modal-close" id="identity-modal-close" onclick="closeModal('user-identity-modal')" style="display:none;position:absolute;top:12px;right:12px">×</button>
+      <!-- Avatar + rôle sur une ligne : l'aperçu tenait sur trois lignes
+           centrées pour deux informations. -->
+      <div class="idt-hero">
+        <div class="identity-hero-avatar" id="identity-preview-avatar">?</div>
+        <div class="idt-hero-txt">
+          <div class="modal-title" id="identity-modal-title">Who are you?</div>
+          <div class="idt-sub" id="identity-modal-sub">Identify yourself so your actions are logged</div>
+          <div class="idt-role-wrap" id="identity-preview-role"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group idt-field">
+        <label class="form-label" for="identity-name-input">Nom complet <span class="req">*</span></label>
+        <!-- Pas de list="…" : les puces ci-dessous remplacent le
+             <datalist>, dont la flèche native promettait la même liste
+             une seconde fois. -->
+        <input class="form-control" id="identity-name-input" placeholder="First name LAST NAME" autocomplete="off"
+          oninput="updateIdentityPreview()" onkeydown="idtNameKey(event)">
+        <!-- Suggestions cliquables : le <datalist> seul est invisible
+             jusqu'à la frappe, donc personne ne savait que la liste
+             des FO/BO existait. -->
+        <div class="idt-suggest" id="identity-suggest"></div>
+      </div>
+      <div class="form-group idt-field idt-field-last">
+        <label class="form-label" for="identity-huawei-input">ID Huawei <span class="req">*</span></label>
+        <div class="idt-input-wrap">
+          <input class="form-control idt-mono" id="identity-huawei-input" placeholder="ex : hw12345678" autocomplete="off"
+            oninput="updateIdentityPreview()" onkeydown="if(event.key==='Enter')saveIdentity()">
+          <!-- Le format valide se signale par un check dans le champ, pas
+               par une ligne de texte : l'info tient au même endroit que la
+               saisie. Seules les erreurs gardent un message explicatif. -->
+          <svg class="idt-check" id="identity-hw-check" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <div class="idt-hint" id="identity-hw-hint"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="idt-actions">
+        <button class="btn btn-ghost btn-sm" id="identity-cancel-wrap" onclick="closeModal('user-identity-modal')" style="display:none">Cancel</button>
+        <button class="btn btn-primary" id="identity-submit" onclick="saveIdentity()">
+          <span id="identity-submit-label">Confirm my identity</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET SIDE PANEL -->
+<div class="side-panel-overlay" id="ticket-modal" onclick="handleTicketPanelOverlayClick(event)">
+  <div class="side-panel">
+
+    <!-- Header -->
+    <div class="side-panel-header">
+      <div class="side-panel-header-left">
+        <div class="side-panel-eyebrow">
+          <span class="side-panel-eyebrow-dot" id="sp-eyebrow-dot"></span>
+          <span id="sp-tracker-badge" class="sp-eyebrow-mono"></span>
+        </div>
+        <div class="side-panel-title" id="modal-title">New ticket</div>
+        <div class="side-panel-sub" id="modal-step-label">Step 1 / 2 - Essential information</div>
+      </div>
+      <button class="side-panel-close" onclick="SidePanel.requestClose('ticket-modal')" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Tabs — role=tab + tabindex : navigables au clavier, ce qui
+         n'était pas le cas des <div> nues d'origine. -->
+    <div class="side-panel-tabs" role="tablist">
+      <div class="side-panel-tab active" id="step-tab-1" role="tab" tabindex="0"
+           aria-selected="true" onclick="goStep(1)"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goStep(1)}">
+        <span class="sp-tab-num">1</span>Essential
+      </div>
+      <div class="side-panel-tab" id="step-tab-2" role="tab" tabindex="0"
+           aria-selected="false" onclick="goStep(2)"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goStep(2)}">
+        <span class="sp-tab-num">2</span>Details &amp; RCA
+        <span id="rca-tab-badge" class="sp-tab-badge" style="display:none">Requis</span>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="side-panel-body">
+      <form id="ticket-form">
+
+        <!-- ── STEP 1 ── -->
+        <div id="step-1" class="form-grid">
+
+          <div class="form-group full sp-lead">
+            <label class="form-label">Title <span class="req">*</span></label>
+            <input class="form-control" name="title" required placeholder="Describe the incident in one line">
+          </div>
+
+          <div class="sp-section-label">Identifiants</div>
+
+          <div class="form-group">
+            <label class="form-label">Oceane TT# <span class="req">*</span></label>
+            <input class="form-control" name="sn_tt" required maxlength="15" placeholder="Ex: ALRS-2M5P1"
+              style="font-family:'JetBrains Mono',monospace">
+          </div>
+          <div class="form-group">
+            <label class="form-label">IMOC TT#</label>
+            <input class="form-control" name="imoc_tt" placeholder="IMOC number"
+              style="font-family:'JetBrains Mono',monospace">
+          </div>
+
+          <div class="sp-section-label">Classification</div>
+
+          <div class="form-group">
+            <label class="form-label">Type <span class="req">*</span></label>
+            <select class="form-control" name="type" required>
+              <option value="">-</option>
+              <option>Incident</option><option>Problem Bug</option><option>Problem non Bug</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Domain <span class="req">*</span></label>
+            <select class="form-control" name="domain" required id="form-domain"><option value="">-</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority <span class="req">*</span></label>
+            <select class="form-control" name="priority" required>
+              <option value="">-</option>
+              <option>P1</option><option>P2</option><option>P3</option><option>P4</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Severity <span class="req">*</span></label>
+            <select class="form-control" name="severity" required>
+              <option value="">-</option>
+              <option>Critical</option><option>Major</option><option>Minor</option><option>Warning</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status <span class="req">*</span></label>
+            <select class="form-control" name="status" required id="form-status" onchange="onStatusChange(this.value)">
+              <option>Open</option><option>In Progress</option>
+              <option>Resolved</option><option>Closed</option><option>On Hold</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">FO Owner <span class="req">*</span></label>
+            <select class="form-control" name="fo_owner" required id="form-fo-owner"><option value="">-</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assigned To</label>
+            <select class="form-control" name="assigned_to" id="form-assigned-to"><option value="">-</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">BO Handling <span class="req">*</span></label>
+            <select class="form-control" name="bo_handling" required id="form-bo-handling">
+              <option value="">-</option>
+            </select>
+          </div>
+
+          <div class="sp-section-label">Chronologie</div>
+
+          <div class="form-group">
+            <label class="form-label">Occur Time <span class="req">*</span></label>
+            <input class="form-control" name="occur_time" type="datetime-local" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Open Date <span class="req">*</span></label>
+            <input class="form-control" name="open_date" type="datetime-local" required>
+          </div>
+
+          <div class="form-group full sp-subcard" id="update-block" style="display:none">
+            <div class="sp-subcard-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.78"/></svg>
+              Quick update
+            </div>
+            <div class="form-grid" style="gap:10px">
+              <div class="form-group full">
+                <textarea class="form-control" name="update_action" placeholder="Action taken..." style="min-height:56px"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Modified by</label>
+                <select class="form-control" name="modified_by" id="form-modified-by"><option value="">-</option></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Shift</label>
+                <select class="form-control" name="shift" id="form-shift"><option value="">-</option></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 2 ── -->
+        <div id="step-2" class="form-grid" style="display:none">
+
+          <!-- RCA required banner (shown only when status = Closed) -->
+          <div id="rca-required-banner" class="sp-note sp-note-alert" style="display:none">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Status <strong>Closed</strong> — RCA is mandatory: fill in Root Cause, RC Category and Corrective Actions before saving.</span>
+          </div>
+
+          <div class="sp-section-label">Timing & Assignation</div>
+
+          <div class="form-group">
+            <label class="form-label">Detection Time</label>
+            <input class="form-control" name="detection_time" type="datetime-local">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Close Date</label>
+            <input class="form-control" name="close_date" type="datetime-local">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Workaround Date</label>
+            <input class="form-control" name="workaround_date" type="datetime-local">
+          </div>
+          <div class="form-group" id="rca-group-rc-category">
+            <label class="form-label" id="rca-label-rc-category">RC Category</label>
+            <select class="form-control" name="rc_category" id="form-rc-category">
+              <option value="">-</option>
+              <option>Hardware</option><option>Software</option><option>Network</option>
+              <option>Configuration</option><option>Human Error</option><option>Process</option><option>Unknown</option>
+            </select>
+          </div>
+
+          <div class="sp-section-label" id="rca-section-label">Analyse & RCA</div>
+
+          <div class="form-group full" id="rca-group-root-cause">
+            <label class="form-label" id="rca-label-root-cause">Root Cause</label>
+            <textarea class="form-control" name="root_cause" id="form-root-cause" placeholder="Identified root cause..." style="min-height:64px"></textarea>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">RC Description</label>
+            <textarea class="form-control" name="rc_description" placeholder="Detailed description..." style="min-height:56px"></textarea>
+          </div>
+          <div class="form-group full" id="rca-group-corrective">
+            <label class="form-label" id="rca-label-corrective">Corrective Actions</label>
+            <textarea class="form-control" name="corrective_actions" id="form-corrective-actions" placeholder="Corrective actions..." style="min-height:56px"></textarea>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Observations</label>
+            <textarea class="form-control" name="observations" placeholder="Observations and deviations..." style="min-height:56px"></textarea>
+          </div>
+
+          <div class="sp-section-label">Links &amp; Comments</div>
+
+          <div class="form-group">
+            <label class="form-label">RCA Link</label>
+            <input class="form-control" name="lien_rca" placeholder="RCA document URL">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alarm Link</label>
+            <input class="form-control" name="lien_alarme" placeholder="Source alarm URL">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Comments</label>
+            <textarea class="form-control" name="comments" placeholder="Free comments..." style="min-height:56px"></textarea>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="side-panel-footer">
+      <button class="btn btn-ghost btn-sm sp-danger" style="display:none" id="btn-delete" onclick="deleteTicket()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Delete
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="SidePanel.requestClose('ticket-modal')">Cancel</button>
+      <button class="btn btn-ghost btn-sm" id="btn-prev" onclick="goStep(1)" style="display:none">← Back</button>
+      <span class="tq-left" id="tq-left" aria-live="polite"></span>
+      <button class="btn btn-ghost btn-sm" id="btn-next" onclick="goStep(2)">Details &amp; RCA →</button>
+      <button class="btn btn-primary btn-sm" id="btn-save" onclick="saveTicket()" style="display:none">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Save ticket
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- OBS MODAL -->
+<div class="side-panel-overlay" id="obs-modal" onclick="if(event.target===this)SidePanel.requestClose('obs-modal')">
+  <div class="side-panel">
+    <div class="side-panel-header">
+      <div class="side-panel-header-left">
+        <div class="side-panel-title">New observation</div>
+        <div class="side-panel-sub">Operational log · SN &amp; CI</div>
+      </div>
+      <button class="side-panel-close" onclick="SidePanel.requestClose('obs-modal')" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="side-panel-body">
+      <form id="obs-form" class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Observation <span class="req">*</span></label>
+          <textarea class="form-control" name="observation" required placeholder="Observation description..." style="min-height:80px"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Source</label>
+          <select class="form-control" name="source"><option>SN</option><option>CI</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">OCEANE TT# <span style="color:var(--mute);font-weight:400">(optional)</span></label>
+          <input class="form-control" name="tracker_tt" placeholder="Ex: ALRS-2M5P1">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Impact</label>
+          <input class="form-control" name="impact" placeholder="Operational impact">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Proposed Solution</label>
+          <input class="form-control" name="proposed_solution" placeholder="Proposed solution or action">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-control" name="priority">
+            <option value="">-</option>
+            <option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" name="status">
+            <option>Open</option><option>In Progress</option><option>Closed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Author</label>
+          <select class="form-control" name="author" id="obs-author-select">
+            <option value="">- Select -</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="side-panel-footer">
+      <button class="btn btn-ghost btn-sm" onclick="SidePanel.requestClose('obs-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveObs()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Save observation
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SHIFT MODAL -->
+<div class="modal-overlay" id="shift-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title" id="shift-modal-title">Add shift</div>
+      <button class="modal-close" onclick="closeModal('shift-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="shift-form" class="form-grid">
+        <div class="form-group">
+          <label class="form-label">FO <span class="req">*</span></label>
+          <select class="form-control" name="fo" required id="shift-fo-select"><option value="">-</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date <span class="req">*</span></label>
+          <input class="form-control" name="date" type="date" required id="shift-date-input">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Shift <span class="req">*</span></label>
+          <select class="form-control" name="shift" required id="shift-type-select"><option value="">-</option></select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Note</label>
+          <input class="form-control" name="note" placeholder="Optional note">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" style="color:var(--red);margin-right:auto;display:none" id="shift-btn-delete" onclick="deleteShift()">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal('shift-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveShift()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHIFT REQUEST MODAL -->
+<div class="modal-overlay" id="shift-request-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div class="modal-title">Change request</div>
+      <button class="modal-close" onclick="closeModal('shift-request-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="shift-request-info" style="background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px"></div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Your identity <span class="req">*</span></label>
+          <select class="form-control" id="sreq-identity"><option value="">- Select -</option></select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Request type</label>
+          <select class="form-control" id="sreq-type">
+            <option value="swap">Swap with a colleague</option>
+            <option value="change">Shift change</option>
+            <option value="absence">Absence / Leave</option>
+            <option value="onsite">On-Site (Delivery)</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
+        <div class="form-group full" id="sreq-swap-group" style="display:none">
+          <label class="form-label">Swap with</label>
+          <select class="form-control" id="sreq-swap-with"><option value="">- Select -</option></select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Note / Reason <span class="req">*</span></label>
+          <textarea class="form-control" id="sreq-note" rows="3" placeholder="Explain the reason for the request..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('shift-request-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitShiftRequest()">Send request</button>
+    </div>
+  </div>
+</div>
+
+<!-- MY REQUEST MODAL (soumission FO autonome) -->
+<!-- Demande de shift : même panneau latéral que la saisie de ticket. -->
+<div class="side-panel-overlay" id="my-request-modal" onclick="if(event.target===this)SidePanel.requestClose('my-request-modal')">
+  <div class="side-panel mrq-panel">
+    <div class="side-panel-header">
+      <div class="side-panel-header-left">
+        <div class="side-panel-eyebrow">
+          <span class="side-panel-eyebrow-dot"></span>
+          <span class="sp-eyebrow-mono">MY SPACE · REQUEST</span>
+        </div>
+        <div class="side-panel-title">New request</div>
+        <div class="side-panel-sub">Goes to Admin for approval</div>
+      </div>
+      <button class="side-panel-close" onclick="SidePanel.requestClose('my-request-modal')" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="side-panel-body">
+      <!-- Identity is prefilled from the signed-in user; shown as a banner
+           rather than a dropdown so the common case needs no input at all. -->
+      <div class="mrq-id" id="mrq-id-banner">
+        <div class="mrq-id-av" id="mrq-id-av"></div>
+        <div class="mrq-id-txt">
+          <div class="mrq-id-name" id="mrq-id-name">—</div>
+          <div class="mrq-id-sub">Requesting as you</div>
+        </div>
+        <button type="button" class="mrq-id-change" onclick="mrqToggleIdentity()">Change</button>
+      </div>
+      <div class="form-group full" id="mrq-fo-group" style="display:none">
+        <label class="form-label">Agent <span class="req">*</span></label>
+        <select class="form-control" id="mrq-fo" onchange="mrqOnIdentityPick()"><option value="">- Select -</option></select>
+      </div>
+
+      <div class="form-group full">
+        <label class="form-label">Request type</label>
+        <div class="mrq-types" id="mrq-types"></div>
+        <input type="hidden" id="mrq-type" value="swap">
+      </div>
+
+      <div class="form-group full">
+        <label class="form-label">Date <span class="req">*</span></label>
+        <div class="mrq-quick" id="mrq-quick"></div>
+        <input class="form-control" type="date" id="mrq-date">
+        <div class="mrq-range" id="mrq-range-group" style="display:none;margin-top:8px">
+          <label class="form-label" style="margin-bottom:4px">Through</label>
+          <input class="form-control" type="date" id="mrq-date-to">
+        </div>
+      </div>
+
+      <!-- Live read of the roster for the chosen agent/date. -->
+      <div class="mrq-ctx" id="mrq-current"></div>
+
+      <div class="form-group full" id="mrq-swap-group">
+        <label class="form-label">Swap with <span class="req">*</span></label>
+        <select class="form-control" id="mrq-swap-with" onchange="mrqRenderContext()"><option value="">- Select -</option></select>
+      </div>
+      <div class="form-group full" id="mrq-target-group" style="display:none">
+        <label class="form-label">Requested shift <span class="req">*</span></label>
+        <select class="form-control" id="mrq-target-shift" onchange="mrqRenderContext()"><option value="">- Select -</option></select>
+      </div>
+
+      <div class="form-group full">
+        <label class="form-label">Reason <span class="req">*</span></label>
+        <div class="mrq-chips" id="mrq-reason-chips"></div>
+        <textarea class="form-control" id="mrq-note" rows="3" placeholder="Briefly explain the reason..."></textarea>
+      </div>
+    </div>
+    <div class="side-panel-footer">
+      <button class="btn btn-ghost btn-sm" onclick="SidePanel.requestClose('my-request-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="mrq-submit" onclick="submitMyRequest()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send request
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- APPROVAL DECISION MODAL -->
+<div class="modal-overlay" id="ap-decide-modal">
+  <div class="modal ap-decide" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title" id="ap-decide-title">Approve request</div>
+      <button class="modal-close" onclick="closeModal('ap-decide-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="ap-decide-recap" id="ap-decide-recap"></div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label" for="ap-decide-approver">Your name <span class="req">*</span></label>
+          <input class="form-control" id="ap-decide-approver" autocomplete="name" placeholder="Approver name">
+        </div>
+        <div class="form-group full" id="ap-decide-reason-group">
+          <label class="form-label" for="ap-decide-reason">Rejection reason <span class="req">*</span></label>
+          <textarea class="form-control" id="ap-decide-reason" rows="2" placeholder="Explain the rejection to the requester…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label" for="ap-decide-password">Approval password <span class="req">*</span></label>
+          <input class="form-control" type="password" id="ap-decide-password" autocomplete="current-password" placeholder="••••••••">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('ap-decide-modal')">Cancel</button>
+      <button class="btn btn-primary" id="ap-decide-confirm" onclick="apConfirmDecision()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOLIDAYS MODAL -->
+<div class="modal-overlay" id="holidays-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">Public holidays</div>
+      <button class="modal-close" onclick="closeModal('holidays-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="hol-add">
+        <div class="hol-add-row">
+          <div class="form-group">
+            <label class="form-label">Date <span class="req">*</span></label>
+            <input class="form-control" type="date" id="holiday-date-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nom <span class="req">*</span></label>
+            <input class="form-control" id="holiday-name-input" placeholder="e.g. Labour Day"
+                   onkeydown="if(event.key==='Enter')addHoliday()">
+          </div>
+          <div class="form-group" style="max-width:130px">
+            <label class="form-label">Site</label>
+            <select class="form-control" id="holiday-country-input">
+              <option value="">Both</option>
+              <option value="SN">Senegal</option>
+              <option value="CI">Ivory Coast</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addHoliday()">+ Add</button>
+      </div>
+
+      <div class="hol-toolbar">
+        <div class="hol-filters" id="hol-year-tabs"></div>
+        <div class="hol-count" id="hol-count"></div>
+      </div>
+
+      <div id="holidays-list" class="hol-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('holidays-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- GENERATE YEAR ROTA — confirmation admin -->
+<div class="modal-overlay" id="genyear-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">Generate the year</div>
+      <button class="modal-close" onclick="closeModal('genyear-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="genyear-warn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>
+          <strong>This cannot be undone.</strong> The existing rota
+          will be replaced across the whole generated period.
+        </div>
+      </div>
+
+      <div class="genyear-recap" id="genyear-recap"></div>
+
+      <div class="form-group" style="margin-top:16px">
+        <label class="form-label" for="genyear-password">Admin password <span class="req">*</span></label>
+        <input class="form-control bare-input" type="password" id="genyear-password"
+               autocomplete="current-password" placeholder="Required to confirm"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();confirmGenerateYear()}">
+        <div class="genyear-error" id="genyear-error" style="display:none"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('genyear-modal')">Cancel</button>
+      <button class="btn btn-primary" id="genyear-submit" onclick="confirmGenerateYear()">Generate</button>
+    </div>
+  </div>
+</div>
+
+<!-- Aperçu du PPTX hebdomadaire. Le contenu est rendu depuis le fichier
+     réellement généré (cf. js/pptx-preview.js), pas depuis une maquette
+     parallèle : ce que l'on voit ici est ce qui part sur le disque. -->
+<div class="modal-overlay" id="pptx-preview-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        Preview du rapport hebdomadaire
+        <span id="pptx-preview-count" class="text-muted" style="font-weight:400;font-size:12px;margin-left:8px"></span>
+      </div>
+      <button class="modal-close" onclick="closeModal('pptx-preview-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="pptx-preview-scroll" id="pptx-preview-body"></div>
+      <div class="pptx-preview-note">
+        Preview rendered from the generated file. Typography may differ
+        slightly from PowerPoint; positions, colours and content are
+        those of the file itself.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('pptx-preview-modal')">Close</button>
+      <button class="btn btn-primary" onclick="downloadWeeklyPptx()">⬇ Download PPTX</button>
+    </div>
+  </div>
+</div>
+
+<!-- FO TASK MODAL -->
+<div class="side-panel-overlay" id="fo-task-modal" onclick="if(event.target===this) SidePanel.requestClose('fo-task-modal')">
+  <div class="side-panel sp-md">
+
+    <div class="side-panel-header">
+      <div class="side-panel-header-left">
+        <div class="side-panel-eyebrow">
+          <span class="side-panel-eyebrow-dot"></span>
+          <span>Daily check-up</span>
+        </div>
+        <div class="side-panel-title" id="fo-task-modal-title">Assign task</div>
+        <div class="side-panel-sub" id="fo-task-modal-sub">New task for a Front Office agent</div>
+      </div>
+      <button class="side-panel-close" onclick="SidePanel.requestClose('fo-task-modal')" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="side-panel-body">
+      <form id="fo-task-form" autocomplete="off">
+
+        <!-- task title -->
+        <div class="form-group sp-lead">
+          <label class="form-label">Task <span class="req">*</span></label>
+          <textarea class="form-control" name="title" required placeholder="Describe the task clearly…" style="min-height:72px;resize:none"></textarea>
+        </div>
+
+        <!-- assignee row -->
+        <div class="form-group">
+          <label class="form-label">Assigned to <span class="req">*</span></label>
+          <div class="sp-row">
+            <div id="fotask-fo-avatar" class="sp-avatar">?</div>
+            <select class="form-control" name="assigned_to" required id="fotask-fo-select" onchange="updateFOTaskAvatar()"><option value="">- Select FO -</option></select>
+            <span id="fotask-fo-tracker-badge" class="sp-chip-ro" style="display:none"></span>
+          </div>
+        </div>
+
+        <!-- priority pills -->
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <div id="fotask-priority-pills" class="sp-chips">
+            <label class="fotask-pill fotask-pill-active"><input type="radio" name="priority" value="">Aucune</label>
+            <label class="fotask-pill fotask-pill-low"><input type="radio" name="priority" value="Low">Low</label>
+            <label class="fotask-pill fotask-pill-med"><input type="radio" name="priority" value="Medium">Medium</label>
+            <label class="fotask-pill fotask-pill-danger"><input type="radio" name="priority" value="High">High</label>
+          </div>
+        </div>
+
+        <!-- recurrence pills -->
+        <div class="form-group">
+          <label class="form-label">Recurrence</label>
+          <div id="fotask-recur-pills" class="sp-chips">
+            <label class="fotask-pill fotask-pill-active"><input type="radio" name="recurrence" value="" checked>One-off</label>
+            <label class="fotask-pill"><input type="radio" name="recurrence" value="daily">Daily</label>
+            <label class="fotask-pill"><input type="radio" name="recurrence" value="weekly">Weekly</label>
+            <label class="fotask-pill"><input type="radio" name="recurrence" value="monthly">Monthly</label>
+          </div>
+        </div>
+
+        <!-- due date -->
+        <div class="form-group">
+          <label class="form-label">Due date</label>
+          <input class="form-control sp-narrow" name="due_date" type="date">
+        </div>
+
+        <!-- notes -->
+        <div class="form-group">
+          <label class="form-label">Notes <span class="opt">(optional)</span></label>
+          <textarea class="form-control" name="notes" placeholder="Additional instructions, context, links…" style="min-height:64px"></textarea>
+        </div>
+
+        <input type="hidden" name="status">
+      </form>
+    </div>
+    <div class="side-panel-footer">
+      <button class="btn btn-ghost btn-sm sp-danger" style="display:none" id="fotask-btn-delete" onclick="deleteFOTask()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Delete
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="SidePanel.requestClose('fo-task-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveFOTask()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Save task
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- WEEKLY PROGRESS SIDE PANEL -->
+<div class="side-panel-overlay" id="progress-modal" onclick="if(event.target===this) SidePanel.requestClose('progress-modal')">
+  <div class="side-panel sp-sm">
+
+    <div class="side-panel-header">
+      <div class="side-panel-header-left">
+        <div class="side-panel-eyebrow">
+          <span class="side-panel-eyebrow-dot"></span>
+          <span id="progress-modal-eyebrow">Weekly progress</span>
+        </div>
+        <div class="side-panel-title" id="progress-modal-title">Nouvel item</div>
+        <div class="side-panel-sub" id="progress-modal-sub">What is planned or delivered this week</div>
+      </div>
+      <button class="side-panel-close" onclick="SidePanel.requestClose('progress-modal')" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="side-panel-body">
+      <form id="progress-form" autocomplete="off">
+
+        <div class="form-group sp-lead">
+          <div class="sp-label-row">
+            <label class="form-label">Task / Achievement <span class="req">*</span></label>
+            <span id="progress-char-count" class="sp-counter">0 / 220</span>
+          </div>
+          <textarea class="form-control" name="task" required maxlength="220" placeholder="e.g. Close pending MMC tickets…" style="min-height:88px" oninput="_onProgressTaskInput(this)"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Site</label>
+          <select class="form-control sp-narrow" name="tracker" id="progress-tracker-select" onchange="_updateProgressPreview()">
+            <option value="SN">Dakar (SN)</option>
+            <option value="CI">Abidjan (CI)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Statut</label>
+          <div id="progress-status-pills" class="sp-chips" onchange="_updateProgressPreview()">
+            <label class="fotask-pill fotask-pill-active"><input type="radio" name="status" value="Planned" checked>Planned</label>
+            <label class="fotask-pill fotask-pill-med"><input type="radio" name="status" value="In Progress">En cours</label>
+            <label class="fotask-pill fotask-pill-low"><input type="radio" name="status" value="Done">Fait</label>
+          </div>
+        </div>
+
+        <div class="sp-note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="progress-week-context"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Preview</label>
+          <div id="progress-preview" class="obs-card" style="cursor:default"></div>
+        </div>
+      </form>
+    </div>
+    <div class="side-panel-footer">
+      <button class="btn btn-ghost btn-sm sp-danger" style="display:none" id="progress-btn-delete" onclick="deleteProgressItemFromModal()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</button>
+      <button class="btn btn-ghost btn-sm" onclick="SidePanel.requestClose('progress-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveProgressItemFromModal()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ SIDE PANEL (name/description) -->
+<div class="side-panel-overlay" id="quiz-modal" onclick="if(event.target===this) SidePanel.requestClose('quiz-modal')">
+  <div class="side-panel sp-sm">
+
+    <div class="side-panel-header">
+      <div class="side-panel-header-left">
+        <div class="side-panel-eyebrow">
+          <span class="side-panel-eyebrow-dot"></span>
+          <span>Quiz</span>
+        </div>
+        <div class="side-panel-title" id="quiz-modal-title">New quiz</div>
+        <div class="side-panel-sub">Quiz name and description</div>
+      </div>
+      <button class="side-panel-close" onclick="SidePanel.requestClose('quiz-modal')" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="side-panel-body">
+      <form id="quiz-form" autocomplete="off">
+
+        <div class="form-group">
+          <label class="form-label">Name <span class="req">*</span></label>
+          <input class="form-control" name="name" required placeholder="e.g. EMOC Basics">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description <span class="opt">(optional)</span></label>
+          <textarea class="form-control" name="description" placeholder="Short description..." style="min-height:64px"></textarea>
+        </div>
+
+        <!-- Le niveau ordonne le parcours côté apprenant et fixe la
+             récompense : il n'est pas décoratif, d'où le champ requis. -->
+        <div class="form-group">
+          <label class="form-label">Level <span class="req">*</span></label>
+          <select class="form-control sp-narrow" name="level" required onchange="updateQuizXpHint(this.value)">
+            <option value="1">Niveau 1 · Fondamentaux (10 XP)</option>
+            <option value="2">Level 2 · Beginner (20 XP)</option>
+            <option value="3">Level 3 · Intermediate (30 XP)</option>
+            <option value="4">Level 4 · Advanced (45 XP)</option>
+            <option value="5">Level 5 · Expert (60 XP)</option>
+            <option value="6">Niveau 6 · Expert (80 XP)</option>
+          </select>
+          <div class="form-hint" id="quiz-level-hint" style="font-size:11px;color:var(--mute);margin-top:5px"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">XP reward <span class="opt">(optional, blank = from level)</span></label>
+          <input class="form-control sp-tiny" type="number" min="1" name="xp_reward" placeholder="auto">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Max attempts per user <span class="opt">(optional, blank = unlimited)</span></label>
+          <input class="form-control sp-tiny" type="number" min="1" name="max_attempts" placeholder="e.g. 3">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Pass threshold (%) <span class="opt">(optional, default 60%)</span></label>
+          <input class="form-control sp-tiny" type="number" min="0" max="100" name="pass_threshold" placeholder="60">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Questions per round <span class="opt" id="quiz-qpr-hint">(optional, blank = all questions)</span></label>
+          <input class="form-control sp-tiny" type="number" min="1" name="questions_per_round" placeholder="e.g. 10">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Timer mode</label>
+          <select class="form-control sp-narrow" name="timer_mode" onchange="updateQuizTimerLabel(this.value)">
+            <option value="per_question">Per question</option>
+            <option value="global">Global (whole quiz)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" id="quiz-timer-value-label">Seconds per question</label>
+          <input class="form-control sp-tiny" type="number" min="5" name="timer_value" placeholder="30">
+        </div>
+      </form>
+    </div>
+    <div class="side-panel-footer">
+      <button class="btn btn-ghost btn-sm sp-danger" style="display:none" id="quiz-btn-delete" onclick="deleteQuiz()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Delete
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="SidePanel.requestClose('quiz-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveQuiz()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Save quiz
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ QUESTION SIDE PANEL -->
+<div class="side-panel-overlay" id="quiz-question-modal" onclick="if(event.target===this) SidePanel.requestClose('quiz-question-modal')">
+  <div class="side-panel sp-md">
+
+    <div class="side-panel-header">
+      <div class="side-panel-header-left">
+        <div class="side-panel-eyebrow">
+          <span class="side-panel-eyebrow-dot"></span>
+          <span>Quiz</span>
+        </div>
+        <div class="side-panel-title" id="quiz-question-modal-title">Add question</div>
+        <div class="side-panel-sub">Knowledge quiz question</div>
+      </div>
+      <button class="side-panel-close" onclick="SidePanel.requestClose('quiz-question-modal')" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="side-panel-body">
+      <form id="quiz-question-form" autocomplete="off">
+
+        <div class="form-group sp-lead">
+          <label class="form-label">Question <span class="req">*</span></label>
+          <textarea class="form-control" name="question" required placeholder="Question text..." style="min-height:72px"></textarea>
+        </div>
+
+        <!-- Réponses : la bonne réponse se désigne directement sur la
+             ligne concernée, au lieu d'un select « A/B/C/D » séparé qui
+             obligeait à relire les champs pour savoir ce que valait « C ».
+             Le select d'origine est conservé, masqué, et synchronisé — la
+             validation et l'enregistrement continuent de lire [name=correct]. -->
+        <div class="form-group">
+          <div class="sp-label-row">
+            <label class="form-label">Answers <span class="req">*</span></label>
+            <span class="sp-counter">Tick the correct answer</span>
+          </div>
+          <div class="sp-answers" onchange="syncQuizCorrect()">
+            <div class="sp-answer">
+              <label class="sp-answer-mark" title="Marquer A comme correcte">
+                <input type="radio" name="correct_pick" value="A">
+                <span class="sp-answer-letter">A</span>
+              </label>
+              <input class="form-control" name="option_a" required placeholder="Option A (requise)">
+            </div>
+            <div class="sp-answer">
+              <label class="sp-answer-mark" title="Marquer B comme correcte">
+                <input type="radio" name="correct_pick" value="B">
+                <span class="sp-answer-letter">B</span>
+              </label>
+              <input class="form-control" name="option_b" required placeholder="Option B (requise)">
+            </div>
+            <div class="sp-answer">
+              <label class="sp-answer-mark" title="Marquer C comme correcte">
+                <input type="radio" name="correct_pick" value="C">
+                <span class="sp-answer-letter">C</span>
+              </label>
+              <input class="form-control" name="option_c" placeholder="Option C (optionnelle)">
+            </div>
+            <div class="sp-answer">
+              <label class="sp-answer-mark" title="Marquer D comme correcte">
+                <input type="radio" name="correct_pick" value="D">
+                <span class="sp-answer-letter">D</span>
+              </label>
+              <input class="form-control" name="option_d" placeholder="Option D (optionnelle)">
+            </div>
+          </div>
+          <!-- pas de `required` : masqué, il ferait échouer checkValidity()
+               sans bulle affichable. La validation est faite dans saveQuizQuestion. -->
+          <select name="correct" hidden aria-hidden="true" tabindex="-1">
+            <option value="">-</option>
+            <option value="A">A</option><option value="B">B</option>
+            <option value="C">C</option><option value="D">D</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category <span class="opt">(optional)</span></label>
+          <input class="form-control" name="category" placeholder="e.g. SLA, Procedures, Tools">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Points <span class="opt">(optional, default 1)</span></label>
+          <input class="form-control sp-tiny" type="number" min="1" name="points" placeholder="1">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Explanation <span class="opt">(optional, shown to the user after they answer)</span></label>
+          <textarea class="form-control" name="explanation" placeholder="Why is this the correct answer..." style="min-height:64px"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="side-panel-footer">
+      <button class="btn btn-ghost btn-sm sp-danger" style="display:none" id="quiz-question-btn-delete" onclick="deleteQuizQuestion()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Delete
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="SidePanel.requestClose('quiz-question-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveQuizQuestion()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Save question
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<!-- Servi depuis node_modules (voir server/index.js) et non plus depuis un
+     CDN : les exports Excel doivent fonctionner sur une VM sans Internet. -->
+<!-- Connexion d'équipe : avant tout appel à l'API (voir server/auth/team-gate.js). -->
+<script src="/js/core/team-gate.js"></script>
+<script src="/vendor/exceljs.min.js"></script>
+<!-- Coquille : thème, barre latérale, bascule Simple/Admin, langue/pays,
+     identité. Autrefois en ligne ici ; chargés avant app.js, dans cet ordre. -->
+<script src="/js/core/theme-sidebar.js"></script>
+<script src="/js/core/nav-mode.js"></script>
+<script src="/js/core/locale.js"></script>
+<script src="/js/core/identity.js"></script>
+<script src="/vendor/jszip.min.js"></script>
+<script src="/js/pptx-preview.js"></script>
+<!-- Générateur du classeur daily, partagé avec le serveur. Chargé AVANT
+     les scripts de l'application, qui l'appellent : l'ordre compte, un `<script>` classique
+     s'exécute au moment où il est rencontré. -->
+<script src="/js/daily-workbook.js"></script>
+<!-- Application : scripts classiques (globaux partagés, gestionnaires onclick en
+     ligne), dans l'ordre de l'ancien app.js unique. L'ordre compte : les
+     enveloppes successives de window.renderPage et les `const` lus au
+     chargement supposent que les fichiers précédents sont déjà évalués. -->
+<script src="/js/core/state.js"></script>
+<script src="/js/core/init.js"></script>
+<script src="/js/core/utils.js"></script>
+<script src="/js/pages/dashboard/dashboard.js"></script>
+<script src="/js/pages/dashboard/dashboard-bento.js"></script>
+<script src="/js/pages/dashboard/dashboard-charts.js"></script>
+<script src="/js/core/sky.js"></script>
+<script src="/js/components/global-search.js"></script>
+<script src="/js/pages/tracker.js"></script>
+<script src="/js/components/ticket-modal.js"></script>
+<script src="/js/components/ticket-suggest.js"></script>
+<script src="/js/components/ticket-quick.js"></script>
+<script src="/js/pages/observations.js"></script>
+<script src="/js/pages/fo-dashboard/fo-dashboard.js"></script>
+<script src="/js/pages/fo-dashboard/fo-ranking.js"></script>
+<script src="/js/pages/fo-dashboard/fo-activity.js"></script>
+<script src="/js/components/kpi-config-modal.js"></script>
+<script src="/js/pages/config/config.js"></script>
+<script src="/js/pages/config/team-objectives.js"></script>
+<script src="/js/pages/perf/perf.js"></script>
+<script src="/js/pages/perf/perf-comments.js"></script>
+<script src="/js/pages/o2o/o2o.js"></script>
+<script src="/js/pages/o2o/o2o-objectives.js"></script>
+<script src="/js/pages/o2o/o2o-guide.js"></script>
+<script src="/js/components/modal-sidepanel.js"></script>
+<script src="/js/pages/config/absence-access.js"></script>
+<script src="/js/pages/config/team-access.js"></script>
+<script src="/js/components/step-nav.js"></script>
+<script src="/js/pages/config/config-auth.js"></script>
+<script src="/js/pages/config/announcements.js"></script>
+<script src="/js/core/admin-session.js"></script>
+<script src="/js/pages/data-quality/dq-rules.js"></script>
+<script src="/js/pages/data-quality/dq-page.js"></script>
+<script src="/js/pages/audit.js"></script>
+<script src="/js/pages/ai/ai.js"></script>
+<script src="/js/pages/ai/ai-cockpit.js"></script>
+<script src="/js/pages/imoc/imoc.js"></script>
+<script src="/js/pages/indicateurs/indicateurs.js"></script>
+<script src="/js/pages/config/parties.js"></script>
+<script src="/js/pages/reports/reports-common.js"></script>
+<script src="/js/pages/reports/report-layout.js"></script>
+<script src="/js/pages/reports/report-columns.js"></script>
+<script src="/js/pages/reports/reports-daily.js"></script>
+<script src="/js/pages/reports/reports-weekly.js"></script>
+<script src="/js/pages/reports/report-export.js"></script>
+<script src="/js/pages/reports/weekly-pptx.js"></script>
+<script src="/js/pages/reports/weekly-combined.js"></script>
+<script src="/js/pages/shift-planning/rota-config.js"></script>
+<script src="/js/pages/shift-planning/shift-planning.js"></script>
+<script src="/js/pages/fo-tasks.js"></script>
+<script src="/js/pages/weekly-progress/wp-core.js"></script>
+<script src="/js/pages/weekly-progress/wp-views.js"></script>
+<script src="/js/pages/weekly-progress/wp-report.js"></script>
+<script src="/js/pages/quiz/quiz-path.js"></script>
+<script src="/js/pages/quiz/quiz-play.js"></script>
+<script src="/js/pages/quiz/quiz-manage.js"></script>
+<script src="/js/pages/quiz/quiz-results.js"></script>
+<script src="/js/pages/shift-planning/rota-generate.js"></script>
+<script src="/js/pages/shift-approvals.js"></script>
+<script src="/js/pages/my-requests.js"></script>
+<script src="/js/pages/holidays.js"></script>
+<script src="/js/pages/fo-handover.js"></script>
+<script src="/js/pages/export.js"></script>
+<script src="/js/pages/mailing/mailing.js"></script>
+<script src="/js/pages/mailing/mailing-groups-log.js"></script>
+<script src="/js/core/page-dispatch.js"></script>
+<script src="/js/pages/reports/reports-monthly.js"></script>
+<script src="/js/pages/ops-review.js"></script>
+<script src="/js/core/presence.js"></script>
+<script src="/js/pages/o2o/o2o-tracking.js"></script>
+<script src="/js/pages/config/task-assign.js"></script>
+<script src="/js/pages/perf/my-performance.js"></script>
+<script src="/js/pages/perf/my-performance-radar.js"></script>
+<script src="/js/pages/perf/my-insight.js"></script>
+<script src="/js/pages/objectives/my-objectives.js"></script>
+<script src="/js/pages/objectives/objectives-admin.js"></script>
+<script src="/js/pages/objectives/objectives-history.js"></script>
+<script src="/js/pages/config/training-agenda.js"></script>
+<script src="/js/pages/config/active-sessions.js"></script>
+<script src="/js/pages/absences/absences.js"></script>
+<script src="/js/pages/absences/absences-bulk.js"></script>
+<script src="/js/pages/absences/absence-report.js"></script>
+<script src="/js/core/page-wrappers.js"></script>
+<script src="/js/pages/pinned.js"></script>
+<script src="/js/components/reminders.js"></script>
+<script src="/js/components/announce-banner.js"></script>
+<script src="/js/pages/admin/my-team.js"></script>
+<script src="/js/pages/admin/obj-tracking.js"></script>
+<script src="/js/pages/admin/nav-profiles.js"></script>
+<script src="/js/pages/team/team-signals.js"></script>
+<script src="/js/pages/team/team-hub.js"></script>
+<script src="/js/pages/reports/reports-hub.js"></script>
+<script src="/js/pages/espace/espace-signals.js"></script>
+<script src="/js/pages/espace/mon-espace.js"></script>
+<!-- Après les scripts de l'application : restauration des sélecteurs, revalidation de l'identité,
+     bouton « œil » des champs mot de passe (autrefois en ligne ici). -->
+<script src="/js/core/shell-hooks.js"></script>
+<script src="/js/components/password-eye.js"></script>
+<!-- Démarrage (init) : toujours en dernier. -->
+<script src="/js/pages/formation.js"></script>
+<script src="/js/pages/academy/academy.js"></script>
+<script src="/js/core/nav-new.js"></script>
+<script src="/js/core/auto-reload.js"></script>
+<script src="/js/core/boot.js"></script>
+</body>
+</html>

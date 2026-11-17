@@ -1,0 +1,222 @@
+/* ══════════════════════════════════════════════════════════════
+   ANNONCES — habillage Material 3 (Google)
+   Étiquettes flottantes, chips de sélection, élévation douce et
+   formes très arrondies : les codes visuels de Material, appliqués
+   avec les tokens --m3-* déjà présents dans le projet.
+   ══════════════════════════════════════════════════════════════ */
+.gann-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:20px;
+}
+.gann-fab{
+  display:inline-flex;align-items:center;gap:8px;flex-shrink:0;
+  height:40px;padding:0 20px;border:none;cursor:pointer;font:inherit;
+  font-size:13.5px;font-weight:600;border-radius:var(--m3-r-full,999px);
+  background:var(--m3-primary,#C7000B);color:#fff;
+  box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15);
+  transition:box-shadow .2s,filter .2s;
+}
+.gann-fab:hover{box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15);filter:brightness(1.06)}
+
+/* Carte compositeur */
+.gann-compose{
+  background:var(--m3-surf,var(--white));
+  border:1px solid var(--m3-outline-var,#E3E3E3);
+  border-radius:16px;padding:20px;margin-bottom:24px;max-width:720px;
+  box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15);
+}
+.gann-compose[hidden]{display:none}
+.gann-compose-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.gann-compose-t{font-size:15px;font-weight:600;color:var(--m3-on-surface,var(--dark))}
+.gann-icon-btn{
+  display:flex;align-items:center;justify-content:center;width:32px;height:32px;
+  border:none;background:none;cursor:pointer;color:var(--m3-on-surf-var,var(--mute));
+  border-radius:var(--m3-r-full,999px);transition:background .15s;
+}
+.gann-icon-btn:hover{background:var(--m3-surf-2,#F1F3F4)}
+
+/* Champ à étiquette flottante */
+.gann-field{position:relative;margin-bottom:20px}
+.gann-field-sm{margin-bottom:0;min-width:170px;flex:1}
+.gann-input{
+  width:100%;padding:15px 14px 7px;font:inherit;font-size:14px;
+  color:var(--m3-on-surface,var(--dark));background:transparent;
+  border:1px solid var(--m3-outline,#79747E);border-radius:6px;
+  outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.gann-input:focus{border-color:var(--m3-primary,#C7000B);box-shadow:inset 0 0 0 1px var(--m3-primary,#C7000B)}
+.gann-area{resize:vertical;min-height:96px;line-height:1.5}
+.gann-select{padding:15px 14px 7px;cursor:pointer;appearance:none}
+.gann-label{
+  position:absolute;left:11px;top:14px;padding:0 4px;pointer-events:none;
+  font-size:14px;color:var(--m3-on-surf-var,var(--mute));background:var(--m3-surf,var(--white));
+  transition:top .15s,font-size .15s,color .15s;
+}
+.gann-input:focus + .gann-label,
+.gann-input:not(:placeholder-shown) + .gann-label,
+.gann-label-fixed{top:-7px;font-size:11.5px}
+.gann-input:focus + .gann-label{color:var(--m3-primary,#C7000B)}
+.gann-help{
+  position:absolute;right:12px;bottom:-17px;
+  font-size:11px;color:var(--m3-on-surf-var,var(--mute));
+}
+
+.gann-row{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+
+/* Chips de niveau */
+.gann-seg{display:flex;gap:8px;flex-wrap:wrap}
+.gann-chip{
+  height:32px;padding:0 14px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:500;
+  border:1px solid var(--m3-outline,#79747E);border-radius:8px;
+  background:transparent;color:var(--m3-on-surf-var,var(--mute));
+  transition:background .15s,color .15s,border-color .15s;
+}
+.gann-chip:hover{background:var(--m3-surf-2,#F1F3F4)}
+.gann-chip.is-on{
+  background:var(--m3-primary,#C7000B);border-color:var(--m3-primary,#C7000B);color:#fff;
+}
+
+/* Aperçu */
+.gann-preview{
+  border-top:1px solid var(--m3-outline-var,#E3E3E3);
+  padding-top:16px;margin-bottom:18px;
+}
+.gann-preview[hidden]{display:none}
+.gann-preview-cap{
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--m3-on-surf-var,var(--mute));margin-bottom:10px;
+}
+.gann-preview-card{
+  border:1px solid var(--m3-outline-var,#E3E3E3);
+  background:var(--m3-surf-1,#F8F9FA);border-radius:10px;padding:12px 14px;
+}
+.gann-preview-tag{
+  display:inline-block;font-size:9.5px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--gann-c,var(--accent));
+  border:1px solid var(--gann-c,var(--accent));border-radius:20px;padding:1px 8px;margin-bottom:6px;
+}
+.gann-preview-t{font-size:13.5px;font-weight:700;color:var(--m3-on-surface,var(--dark));margin-bottom:3px}
+.gann-preview-b{
+  font-size:12.5px;color:var(--m3-on-surf-var,var(--mute));line-height:1.5;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+
+.gann-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.gann-msg{flex:1;min-width:0;font-size:12.5px}
+.gann-btn{
+  height:40px;padding:0 24px;border:none;cursor:pointer;font:inherit;
+  font-size:13.5px;font-weight:600;border-radius:var(--m3-r-full,999px);
+  background:var(--m3-primary,#C7000B);color:#fff;transition:filter .15s,box-shadow .2s;
+}
+.gann-btn:hover{filter:brightness(1.06);box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15)}
+.gann-btn-text{
+  height:40px;padding:0 16px;border:none;background:none;cursor:pointer;font:inherit;
+  font-size:13.5px;font-weight:600;color:var(--m3-primary,#C7000B);
+  border-radius:var(--m3-r-full,999px);transition:background .15s;
+}
+.gann-btn-text:hover{background:var(--m3-surf-2,#F1F3F4)}
+
+/* Liste */
+.gann-list-head{
+  display:flex;align-items:center;gap:10px;margin:0 0 12px;
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--m3-on-surf-var,var(--mute));
+}
+.gann-count{
+  background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surf-var,var(--mute));
+  border-radius:var(--m3-r-full,999px);padding:1px 9px;font-size:11px;letter-spacing:0;
+}
+.gann-card{
+  display:flex;gap:14px;align-items:flex-start;max-width:720px;
+  background:var(--m3-surf,var(--white));
+  border:1px solid var(--m3-outline-var,#E3E3E3);border-radius:14px;
+  padding:16px 18px;margin-bottom:10px;transition:box-shadow .2s;
+}
+.gann-card:hover{box-shadow:0 1px 2px rgba(60,64,67,.3),0 2px 6px 2px rgba(60,64,67,.15)}
+.gann-dot{
+  flex-shrink:0;width:38px;height:38px;border-radius:var(--m3-r-full,999px);
+  display:flex;align-items:center;justify-content:center;
+  background:var(--gann-cc,#E8F0FE);color:var(--gann-c,var(--accent));
+}
+.gann-card-main{flex:1;min-width:0}
+.gann-card-t{
+  font-size:14px;font-weight:600;color:var(--m3-on-surface,var(--dark));
+  margin-bottom:3px;overflow-wrap:anywhere;
+}
+.gann-card-b{
+  font-size:13px;color:var(--m3-on-surf-var,var(--mute));line-height:1.5;
+  white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:8px;
+}
+.gann-card-meta{font-size:11.5px;color:var(--m3-on-surf-var,var(--mute))}
+.gann-empty{
+  max-width:720px;text-align:center;padding:44px 24px;
+  border:1px dashed var(--m3-outline-var,#E3E3E3);border-radius:14px;
+  color:var(--m3-on-surf-var,var(--mute));font-size:13px;line-height:1.55;
+}
+[data-theme="dark"] .gann-compose,
+[data-theme="dark"] .gann-card{background:var(--m3-surf-1);border-color:transparent}
+[data-theme="dark"] .gann-label{background:var(--m3-surf-1)}
+
+/* ── Rappels automatiques ──────────────────────────────────────
+   Mêmes cartes que les annonces, mais l'action n'est pas « retirer » :
+   une règle se coupe et se rallume, elle ne se supprime pas. */
+.gann-rules-note{
+  max-width:720px;margin:-4px 0 14px;font-size:12.5px;line-height:1.55;
+  color:var(--m3-on-surf-var,var(--mute));
+}
+.gann-rule-grp{
+  max-width:720px;margin:18px 0 8px;font-size:11.5px;font-weight:600;
+  color:var(--m3-on-surf-var,var(--mute));letter-spacing:.03em;
+}
+.gann-rule{align-items:center;gap:16px}
+/* Une règle coupée reste parfaitement lisible : on la signale par le
+   libellé « Désactivé » et un liseré éteint, pas en la délavant. */
+.gann-rule.is-off .gann-dot{background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surf-var,var(--mute))}
+.gann-rule-freq{
+  font-size:12px;color:var(--m3-on-surf-var,var(--mute));line-height:1.45;margin-top:2px;
+}
+.gann-rule-state{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  margin-top:6px;display:inline-block;
+}
+.gann-rule.is-off .gann-rule-state{color:var(--m3-on-surf-var,var(--mute))}
+.gann-rule.is-on  .gann-rule-state{color:var(--ok-fg,#1E8E3E)}
+
+/* Interrupteur : bouton natif, pas de checkbox cachée — l'état est
+   porté par aria-checked, lisible au lecteur d'écran. */
+.gann-sw{
+  flex:none;width:44px;height:24px;border-radius:999px;border:1px solid transparent;
+  background:var(--m3-surf-2,#DADCE0);cursor:pointer;padding:0;position:relative;
+  transition:background .18s ease;
+}
+.gann-sw::after{
+  content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;
+  border-radius:50%;background:var(--white,#fff);transition:transform .18s ease;
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+.gann-sw[aria-checked="true"]{background:var(--accent,#1A73E8)}
+.gann-sw[aria-checked="true"]::after{transform:translateX(20px)}
+.gann-sw:focus-visible{outline:2px solid var(--accent,#1A73E8);outline-offset:2px}
+[data-theme="dark"] .gann-sw{background:var(--m3-surf-3,#3C3D3F)}
+
+
+/* ── Mise en page en deux colonnes ─────────────────────────────
+   Tout était plafonné à 720 px : la moitié droite de l'écran restait
+   vide. Annonces à gauche, rappels automatiques à droite. */
+.gann-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
+.gann-col{min-width:0;background:var(--m3-surf,#fff);border:1px solid var(--m3-outline-var,#E7E9EC);border-radius:22px;padding:20px 22px}
+[data-theme="dark"] .gann-col{background:#0A0A0C;border-color:rgba(255,255,255,.09)}
+.gann-col :is(.gann-compose,.gann-card,.gann-empty,.gann-rules-note,.gann-rule-grp){max-width:none}
+.gann-col .gann-compose{box-shadow:none;border-color:var(--m3-outline,#D5D7DC);margin-bottom:18px}
+.gann-col .gann-list-head{font-size:15px;font-weight:600;text-transform:none;letter-spacing:-.01em;color:var(--m3-on-surface,#141518);margin-bottom:14px}
+.gann-col .gann-card{border-radius:16px;box-shadow:none}
+.gann-col .gann-card:hover{box-shadow:none;border-color:var(--m3-outline,#D5D7DC)}
+.gann-col-rules .gann-card{padding:12px 14px}
+.gann-col-rules .gann-dot{width:32px;height:32px}
+.gann-col .gann-empty{padding:28px 18px}
+@media (max-width:1100px){.gann-layout{grid-template-columns:1fr}}
+/* Dans une colonne : des lignes, pas des cartes dans une carte. */
+.gann-col .gann-card{border:0!important;border-top:1px solid var(--m3-outline-var,#E7E9EC)!important;border-radius:0!important;background:none!important;padding:12px 2px!important;margin:0!important}
+[data-theme="dark"] .gann-col .gann-card{border-top-color:rgba(255,255,255,.09)!important}
+.gann-col #ann-list .gann-card:first-child,.gann-col .gann-rule-grp + .gann-card,.gann-col #nfr-list > .gann-card:first-child{border-top:0!important}
+.gann-col .gann-rule-grp{margin:16px 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:.06em}

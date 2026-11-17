@@ -1,0 +1,246 @@
+/* ══════════════════════════════════════════════════════════
+   BENTO EXPRESSIF — 4 cartes
+   Formes très arrondies, aplats pleins, une seule teinte
+   d'accent par carte. Les couleurs viennent des tokens du
+   thème (rouge = alerte, bleu = neutre chiffré) : rien n'est
+   codé en dur, le mode sombre suit automatiquement.
+   ═══════════════════════════════════════════════════════════ */
+#page-dashboard .bx{
+  border-radius:var(--m3-r-xl);
+  padding:26px 28px;
+  display:flex;flex-direction:column;
+  min-height:0;
+}
+/* La carte sombre : inverse le contraste pour porter le chiffre clé. */
+#page-dashboard .bx-dark{
+  background:#1F2023;color:#FFFFFF;
+}
+[data-theme="dark"] #page-dashboard .bx-dark{background:#0E0E0F}
+#page-dashboard .bx-soft{background:var(--m3-surf-2)}
+#page-dashboard .bx-plain{background:var(--m3-surface);border:1px solid var(--m3-outline-var)}
+[data-theme="dark"] #page-dashboard .bx-plain{background:var(--m3-surf-1);border-color:transparent}
+
+#page-dashboard .bx-title{
+  font-size:21px;font-weight:600;letter-spacing:-.02em;line-height:1.2;
+}
+#page-dashboard .bx-sub{
+  font-size:12.5px;margin-top:5px;opacity:.62;font-weight:400;
+}
+#page-dashboard .bx-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+}
+/* Pilule de sélection (le "Monthly ⌄" de la maquette) */
+/* ── Sélecteur : surface pleine, pas un contour flottant ──
+   La bordure en currentColor à 26% donnait un trait gris terne sur
+   le fond noir de la carte, et le chevron se collait au bord droit.
+   Un fond tonal léger tient le contrôle sans dessiner de cadre. */
+#page-dashboard .bx-pill{
+  display:inline-flex;align-items:center;gap:2px;
+  height:36px;padding:0 14px;
+  border-radius:var(--m3-r-full);
+  color:inherit;border:none;
+  background:color-mix(in srgb,currentColor 10%,transparent);
+  font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;
+  cursor:pointer;flex-shrink:0;
+  transition:background .18s var(--m3-ease);
+}
+#page-dashboard .bx-pill:hover{
+  background:color-mix(in srgb,currentColor 17%,transparent);
+}
+/* anneau de focus clavier — le contrôle reste atteignable au Tab */
+#page-dashboard .bx-pill:focus-within{
+  background:color-mix(in srgb,currentColor 17%,transparent);
+  box-shadow:0 0 0 2px color-mix(in srgb,currentColor 45%,transparent);
+}
+/* La règle globale sur `select` (bordure + fond en !important)
+   redessinait une seconde pastille à l'intérieur de celle-ci. Il faut
+   donc du !important pour l'annuler, pas par confort mais parce
+   qu'elle en utilise elle-même. */
+#page-dashboard .bx-pill select{
+  appearance:none;-webkit-appearance:none;
+  background:transparent!important;
+  border:none!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  outline:none;
+  height:auto!important;
+  color:inherit!important;font:inherit;cursor:pointer;
+  padding:0 4px 0 0!important;margin:0;
+}
+#page-dashboard .bx-pill select:focus{
+  border-color:transparent!important;box-shadow:none!important;
+}
+/* Les options s'affichent dans le menu natif du système : il ignore
+   la couleur héritée du fond sombre, on la repose explicitement. */
+#page-dashboard .bx-pill select option{
+  background:var(--m3-surface);color:var(--m3-on-surface);
+}
+#page-dashboard .bx-pill svg{
+  margin-left:0;pointer-events:none;opacity:.6;flex-shrink:0;
+  transition:opacity .18s var(--m3-ease);
+}
+#page-dashboard .bx-pill:hover svg{opacity:1}
+/* Rond icône */
+#page-dashboard .bx-ico{
+  width:44px;height:44px;border-radius:var(--m3-r-full);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+#page-dashboard .bx-ico-dark{background:#1F2023;color:#fff}
+[data-theme="dark"] #page-dashboard .bx-ico-dark{background:#000}
+#page-dashboard .bx-ico-accent{background:var(--m3-primary);color:#fff}
+
+/* ── Carte 1 : volume, chiffre + barres empilées ────────── */
+#page-dashboard .bx-figure{
+  font-size:44px;font-weight:600;letter-spacing:-.04em;line-height:1;
+}
+#page-dashboard .bx-figure-lbl{
+  display:flex;align-items:center;gap:7px;
+  font-size:12.5px;opacity:.7;margin-bottom:10px;
+}
+#page-dashboard .bx-arrow{
+  width:19px;height:19px;border-radius:var(--m3-r-full);
+  background:var(--m3-primary);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+#page-dashboard .bx-cols{
+  display:flex;align-items:flex-end;gap:14px;height:100%;
+}
+/* Les colonnes sont larges et trapues comme dans la maquette :
+   une barre étroite se lit comme un trait, pas comme un volume. */
+#page-dashboard .bx-col{
+  flex:1;min-width:78px;max-width:112px;
+  display:flex;flex-direction:column;
+  justify-content:flex-end;gap:8px;
+}
+#page-dashboard .bx-col-cap{
+  font-size:12px;font-weight:500;opacity:.85;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* La piste hachurée = le reste du maximum. Elle donne l'échelle
+   sans avoir à écrire un axe. */
+#page-dashboard .bx-col-track{
+  border-radius:var(--m3-r-md);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  overflow:hidden;
+  background:repeating-linear-gradient(-45deg,
+    color-mix(in srgb,currentColor 13%,transparent) 0 1px,
+    transparent 1px 6px);
+}
+#page-dashboard .bx-col-stack{
+  display:flex;flex-direction:column;justify-content:flex-end;gap:3px;
+  border-radius:var(--m3-r-md);overflow:hidden;
+  transition:height .6s var(--m3-ease);
+}
+#page-dashboard .bx-seg{
+  transition:height .6s var(--m3-ease);
+  min-height:0;
+}
+#page-dashboard .bx-seg-a{background:var(--m3-primary)}
+#page-dashboard .bx-seg-b{background:color-mix(in srgb,var(--m3-primary) 42%,#FFFFFF)}
+[data-theme="dark"] #page-dashboard .bx-seg-b{
+  background:color-mix(in srgb,var(--m3-primary) 45%,#000000);
+}
+#page-dashboard .bx-legend{
+  display:flex;flex-wrap:wrap;gap:12px;margin-top:18px;
+  font-size:11.5px;opacity:.75;
+}
+#page-dashboard .bx-legend span.k{display:inline-flex;align-items:center;gap:6px}
+#page-dashboard .bx-legend i{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+
+/* ── Carte 2 : liste de pilules + avatars empilés ───────── */
+#page-dashboard .bx-avs{display:flex;flex-shrink:0}
+#page-dashboard .bx-av{
+  width:36px;height:36px;border-radius:var(--m3-r-full);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:#fff;
+  border:2px solid var(--m3-surf-2);
+  margin-left:-11px;flex-shrink:0;
+}
+#page-dashboard .bx-av:first-child{margin-left:0}
+#page-dashboard .bx-rows{
+  display:flex;flex-direction:column;gap:8px;margin-top:18px;
+}
+#page-dashboard .bx-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-3);
+  cursor:pointer;text-align:left;border:none;width:100%;
+  font-family:'Inter',sans-serif;
+  transition:background .18s var(--m3-ease);
+}
+#page-dashboard .bx-row:hover{background:color-mix(in srgb,var(--m3-on-surface) 14%,var(--m3-surf-3))}
+#page-dashboard .bx-row-ico{
+  color:var(--m3-on-surf-var);display:flex;flex-shrink:0;
+}
+#page-dashboard .bx-row-main{flex:1;min-width:0;display:block}
+#page-dashboard .bx-row-t{
+  display:block;
+  font-size:13px;font-weight:500;color:var(--m3-on-surface);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#page-dashboard .bx-row-s{
+  display:block;
+  font-size:11px;color:var(--m3-on-surf-var);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#page-dashboard .bx-row-v{
+  font-size:12.5px;font-weight:600;color:var(--m3-on-surface);
+  flex-shrink:0;font-variant-numeric:tabular-nums;
+}
+#page-dashboard .bx-row-v.alert{color:var(--m3-error)}
+
+/* ── Carte 3 : timeline + deux tuiles d'accent ──────────── */
+#page-dashboard .bx-split{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch;
+}
+#page-dashboard .bx-tl{display:flex;flex-direction:column;gap:0;margin-top:18px}
+#page-dashboard .bx-tl-item{
+  display:grid;grid-template-columns:12px 1fr;gap:14px;
+  padding-bottom:16px;position:relative;
+}
+#page-dashboard .bx-tl-item:last-child{padding-bottom:0}
+/* Le trait relie les points ; il s'arrête au dernier. */
+#page-dashboard .bx-tl-item:not(:last-child)::before{
+  content:'';position:absolute;left:5px;top:14px;bottom:0;
+  width:2px;background:var(--m3-outline-var);
+}
+#page-dashboard .bx-tl-dot{
+  width:12px;height:12px;border-radius:var(--m3-r-full);
+  border:2px solid var(--m3-outline);background:var(--m3-surface);
+  margin-top:3px;z-index:1;
+}
+#page-dashboard .bx-tl-item.on .bx-tl-dot{
+  background:var(--m3-on-surface);border-color:var(--m3-on-surface);
+}
+/* display:block — les deux lignes sont des <span> dans le markup et
+   doivent s'empiler comme dans la maquette (date puis détail). */
+#page-dashboard .bx-tl-k{
+  display:block;
+  font-size:14px;font-weight:600;color:var(--m3-on-surface);letter-spacing:-.01em;
+}
+#page-dashboard .bx-tl-v{
+  display:block;
+  font-size:12px;color:var(--m3-on-surf-var);margin-top:3px;line-height:1.4;
+}
+#page-dashboard .bx-tiles{display:flex;flex-direction:column;gap:14px}
+#page-dashboard .bx-tile{
+  flex:1;border-radius:var(--m3-r-lg);padding:20px 22px;
+  display:flex;flex-direction:column;
+  position:relative;min-height:132px;
+}
+#page-dashboard .bx-tile-a{
+  background:color-mix(in srgb,var(--m3-primary) 15%,var(--m3-surface));
+}
+#page-dashboard .bx-tile-b{background:var(--m3-surf-2)}
+#page-dashboard .bx-tile-lbl{font-size:12px;color:var(--m3-on-surf-var)}
+#page-dashboard .bx-tile-val{
+  font-size:32px;font-weight:600;letter-spacing:-.03em;line-height:1;
+  color:var(--m3-on-surface);margin-top:8px;
+}
+#page-dashboard .bx-tile-out{
+  position:absolute;top:16px;right:18px;color:var(--m3-on-surf-var);
+  background:none;border:none;cursor:pointer;padding:2px;display:flex;
+  border-radius:var(--m3-r-sm);transition:color .15s;
+}
+#page-dashboard .bx-tile-out:hover{color:var(--m3-on-surface)}
+

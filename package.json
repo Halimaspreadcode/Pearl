@@ -1,0 +1,44 @@
+{
+  "name": "fops",
+  "version": "2.8.0",
+  "description": "FOps - Front Office Ticket Tracker - DKR",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "watchdog": "node server/watchdog.js",
+    "service:install": "node scripts/service.js install",
+    "service:uninstall": "node scripts/service.js uninstall",
+    "service:status": "node scripts/service.js status",
+    "service:restart": "node scripts/service.js restart",
+    "service:stop": "node scripts/service.js stop",
+    "service:start": "node scripts/service.js start",
+    "https:setup": "node scripts/https-setup.js",
+    "dev": "node --watch server/index.js",
+    "test:run": "PORT=3001 DATA_DIR=./data-test node server/index.js",
+    "test:seed": "rm -rf ./data-test && cp -R ./data ./data-test && rm -rf ./data-test/backups",
+    "migrate": "node migrate-data.js",
+    "restore:team": "node scripts/restore-team.js",
+    "test": "node --test tests/"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
+    "express": "^4.22.2",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^7.1.0",
+    "jszip": "^3.10.1",
+    "playwright-core": "1.63.0",
+    "pptxgenjs": "^4.0.1",
+    "undici": "^6.29.0",
+    "uuid": "^11.1.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "overrides": {
+    "image-size": "^2.0.4",
+    "uuid": "^11.1.1"
+  }
+}

@@ -1,0 +1,419 @@
+/* ── Attribution de tâches (Admin) ────────────────────────────
+   Même vocabulaire Material que le Suivi O2O : surfaces tonales sans
+   trait, pastilles arrondies, une seule graisse forte. La page tient en
+   deux temps — un composeur en haut, ce qui a déjà été donné en bas. */
+#page-cfg-assign{
+  --m3-r-lg:16px; --m3-r-md:12px; --m3-r-sm:8px; --m3-r-full:999px;
+  --m3-ease:cubic-bezier(.2,0,0,1);
+}
+
+/* Composeur : une carte élevée, détachée de la liste. C'est l'action
+   principale de l'écran, elle mérite de flotter au-dessus. */
+#page-cfg-assign .asg-composer{
+  border-radius:var(--m3-r-lg);padding:18px 20px 16px;margin-bottom:26px;
+  background:var(--m3-surface);
+  box-shadow:0 1px 2px rgba(60,64,67,.3),0 2px 6px 2px rgba(60,64,67,.1);
+}
+[data-theme="dark"] #page-cfg-assign .asg-composer{
+  background:var(--m3-surf-2);box-shadow:0 2px 10px rgba(0,0,0,.5);
+}
+#page-cfg-assign .asg-row{display:flex;gap:12px;align-items:flex-start}
+/* Zone de saisie : elle grandit avec le texte (hauteur pilotée en JS).
+   Pas de cadre — le fond tonal suffit, et le champ se lit comme une
+   feuille sur laquelle on écrit. */
+#page-cfg-assign .asg-input{
+  flex:1;min-height:46px;max-height:140px;resize:none;overflow-y:auto;
+  padding:13px 16px;border:none;border-radius:var(--m3-r-md);
+  background:var(--m3-surf-1);color:var(--m3-on-surface);
+  font:inherit;font-size:14.5px;line-height:1.5;
+  transition:box-shadow .18s var(--m3-ease);
+}
+[data-theme="dark"] #page-cfg-assign .asg-input{background:var(--m3-surf-3)}
+#page-cfg-assign .asg-input:focus{
+  outline:none;box-shadow:inset 0 0 0 2px var(--m3-primary);
+}
+#page-cfg-assign .asg-input::placeholder{color:var(--m3-on-surf-var)}
+
+/* Bouton d'envoi : bouton rempli M3. Désactivé tant que l'intitulé ou
+   les destinataires manquent — plutôt qu'un message d'erreur après coup. */
+#page-cfg-assign .asg-send{
+  flex:none;display:inline-flex;align-items:center;gap:8px;height:46px;
+  padding:0 22px;border:none;border-radius:var(--m3-r-full);
+  background:var(--m3-primary);color:#fff;font:inherit;font-size:13.5px;
+  font-weight:500;cursor:pointer;letter-spacing:.01em;
+  transition:filter .18s var(--m3-ease),box-shadow .18s var(--m3-ease),opacity .18s;
+}
+#page-cfg-assign .asg-send:hover:not(:disabled){
+  filter:brightness(1.08);box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+#page-cfg-assign .asg-send:disabled{
+  background:color-mix(in srgb,var(--m3-on-surface) 12%,transparent);
+  color:var(--m3-on-surf-var);cursor:not-allowed;
+}
+#page-cfg-assign .asg-send:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+
+/* Destinataires : pastilles à cocher. Cochée, la pastille prend le
+   conteneur primaire — même code visuel que l'onglet actif du Suivi. */
+#page-cfg-assign .asg-who{margin-top:16px}
+#page-cfg-assign .asg-lab{
+  font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--m3-on-surf-var);margin-bottom:9px;display:block;
+}
+#page-cfg-assign .asg-chips{display:flex;gap:8px;flex-wrap:wrap}
+#page-cfg-assign .asg-chip{
+  display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px 0 6px;
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-full);
+  background:transparent;color:var(--m3-on-surface);font:inherit;font-size:13px;
+  cursor:pointer;
+  transition:background .16s var(--m3-ease),border-color .16s var(--m3-ease);
+}
+#page-cfg-assign .asg-chip:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+#page-cfg-assign .asg-chip.is-on{
+  background:var(--m3-primary-cont);color:var(--m3-on-primary-cont);border-color:transparent;
+}
+#page-cfg-assign .asg-chip:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+#page-cfg-assign .asg-chip-av{
+  width:24px;height:24px;border-radius:50%;flex:none;color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:600;letter-spacing:.02em;
+}
+#page-cfg-assign .asg-chip-all{padding:0 16px;color:var(--m3-primary);font-weight:500}
+
+/* Options : champs « outlined » M3, étiquette au-dessus du trait. */
+#page-cfg-assign .asg-opts{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:14px;margin-top:18px;
+}
+#page-cfg-assign .asg-field-wide{grid-column:span 2;min-width:220px}
+@media (max-width:640px){#page-cfg-assign .asg-field-wide{grid-column:span 1}}
+#page-cfg-assign .asg-field{position:relative}
+#page-cfg-assign .asg-field .asg-lab{
+  position:absolute;top:-7px;left:12px;z-index:1;margin:0;
+  padding:0 6px;background:var(--m3-surface);text-transform:none;
+  font-size:11px;letter-spacing:.02em;
+}
+[data-theme="dark"] #page-cfg-assign .asg-field .asg-lab{background:var(--m3-surf-2)}
+#page-cfg-assign .asg-ctl{
+  width:100%;height:44px;padding:0 13px;
+  border:1px solid var(--m3-outline);border-radius:var(--m3-r-sm);
+  background:transparent;color:var(--m3-on-surface);font:inherit;font-size:13.5px;
+  transition:border-color .16s var(--m3-ease),box-shadow .16s var(--m3-ease);
+}
+#page-cfg-assign .asg-ctl:focus{
+  outline:none;border-color:var(--m3-primary);box-shadow:0 0 0 1px var(--m3-primary);
+}
+
+/* Aperçu : la carte telle que le FO la verra, à droite le décompte des
+   destinataires. Assigner sans voir ce qui part est le meilleur moyen
+   d'envoyer un intitulé bancal à toute l'équipe. */
+#page-cfg-assign .asg-foot{margin-top:18px}
+#page-cfg-assign .asg-preview{
+  display:flex;gap:18px;flex-wrap:wrap;align-items:center;
+  padding:14px 16px;border-radius:var(--m3-r-md);
+  background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-cfg-assign .asg-preview{background:var(--m3-surf-3)}
+#page-cfg-assign .asg-pv-card{
+  flex:1;min-width:250px;display:flex;gap:12px;align-items:flex-start;
+  padding:13px 14px;border-radius:var(--m3-r-md);background:var(--m3-surface);
+}
+[data-theme="dark"] #page-cfg-assign .asg-pv-card{background:var(--m3-surf-1)}
+#page-cfg-assign .asg-pv-check{
+  width:20px;height:20px;border-radius:50%;flex:none;margin-top:2px;
+  border:1.5px solid var(--m3-outline);
+}
+#page-cfg-assign .asg-pv-b{flex:1;min-width:0}
+#page-cfg-assign .asg-pv-t{font-size:13.5px;line-height:1.5;color:var(--m3-on-surface)}
+#page-cfg-assign .asg-pv-n{
+  font-size:12px;line-height:1.55;color:var(--m3-on-surf-var);margin-top:5px;
+  padding-left:10px;border-left:2px solid var(--m3-outline-var);
+}
+#page-cfg-assign .asg-pv-m{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:9px;
+  font-size:11.5px;color:var(--m3-on-surf-var);
+}
+#page-cfg-assign .asg-pv-side{
+  flex:none;max-width:280px;font-size:12.5px;color:var(--m3-on-surf-var);line-height:1.55;
+}
+#page-cfg-assign .asg-pv-side b{color:var(--m3-on-surface);font-weight:500}
+
+/* Barre de la liste : segments de filtre + sélecteur d'agent. */
+#page-cfg-assign .asg-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:18px;
+}
+#page-cfg-assign .asg-segs{
+  display:inline-flex;border:1px solid var(--m3-outline-var);
+  border-radius:var(--m3-r-full);overflow:hidden;background:var(--m3-surface);
+}
+[data-theme="dark"] #page-cfg-assign .asg-segs{background:var(--m3-surf-1)}
+#page-cfg-assign .asg-segs button{
+  display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 18px;
+  border:none;background:transparent;color:var(--m3-on-surf-var);
+  font:inherit;font-size:13px;font-weight:500;cursor:pointer;
+  transition:background .18s var(--m3-ease),color .18s var(--m3-ease);
+}
+#page-cfg-assign .asg-segs button + button{border-left:1px solid var(--m3-outline-var)}
+#page-cfg-assign .asg-segs button:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);color:var(--m3-on-surface);
+}
+#page-cfg-assign .asg-segs button.is-on{
+  background:var(--m3-primary-cont);color:var(--m3-on-primary-cont);
+}
+#page-cfg-assign .asg-segs button span{
+  font-size:11px;font-variant-numeric:tabular-nums;
+  padding:1px 7px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 10%,transparent);
+}
+#page-cfg-assign .asg-filter{width:auto;min-width:190px;height:38px}
+
+/* Une pile par agent : la question posée ici est « qu'ai-je donné à
+   qui », pas « quelles tâches existent ». */
+#page-cfg-assign .asg-grp{
+  border-radius:var(--m3-r-lg);padding:16px 20px 8px;margin-bottom:14px;
+  background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-cfg-assign .asg-grp{background:var(--m3-surf-2)}
+#page-cfg-assign .asg-grp-h{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font-size:14px;color:var(--m3-on-surface);margin-bottom:6px;
+}
+#page-cfg-assign .asg-grp-h b{font-weight:500}
+#page-cfg-assign .asg-grp-av{
+  width:30px;height:30px;border-radius:50%;flex:none;color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;letter-spacing:.02em;
+}
+#page-cfg-assign .asg-grp-n{
+  font-size:11px;padding:2px 9px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 9%,transparent);
+  color:var(--m3-on-surf-var);font-variant-numeric:tabular-nums;
+}
+#page-cfg-assign .asg-grp-n.is-late{
+  background:var(--m3-primary-cont);color:var(--m3-on-primary-cont);font-weight:500;
+}
+
+/* Lignes : réglées au trait, sans cadre par ligne. */
+#page-cfg-assign .asg-rows{display:flex;flex-direction:column}
+#page-cfg-assign .asg-row-i{
+  display:flex;align-items:flex-start;gap:12px;padding:13px 0;
+  border-top:1px solid var(--m3-outline-var);
+}
+#page-cfg-assign .asg-row-i:first-child{border-top:none}
+#page-cfg-assign .asg-row-i.is-done .asg-row-t{
+  text-decoration:line-through;color:var(--m3-on-surf-var);
+}
+/* Pastille de statut : trois états, une seule tache de couleur par
+   ligne. Le mot est écrit juste en dessous, la pastille sert de repère
+   pour balayer la colonne. */
+#page-cfg-assign .asg-dot{
+  width:9px;height:9px;border-radius:50%;flex:none;margin-top:6px;
+  background:var(--m3-outline);
+}
+#page-cfg-assign .asg-dot.s-plan{background:var(--m3-outline)}
+#page-cfg-assign .asg-dot.s-prog{background:#E37400}
+#page-cfg-assign .asg-dot.s-done{background:#1E8E3E}
+[data-theme="dark"] #page-cfg-assign .asg-dot.s-prog{background:#FCC934}
+[data-theme="dark"] #page-cfg-assign .asg-dot.s-done{background:#81C995}
+#page-cfg-assign .asg-row-b{flex:1;min-width:0}
+#page-cfg-assign .asg-row-t{font-size:13.5px;line-height:1.5;color:var(--m3-on-surface)}
+#page-cfg-assign .asg-row-n{
+  font-size:12px;line-height:1.55;color:var(--m3-on-surf-var);margin-top:5px;
+  padding-left:10px;border-left:2px solid var(--m3-outline-var);
+}
+#page-cfg-assign .asg-row-m{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;
+  font-size:11.5px;color:var(--m3-on-surf-var);
+}
+#page-cfg-assign .asg-sep{opacity:.5}
+#page-cfg-assign .asg-late{color:var(--m3-primary);font-weight:500}
+#page-cfg-assign .asg-na{color:var(--m3-on-surf-var);font-size:12.5px}
+
+/* Actions de ligne : discrètes au repos, visibles au survol. Sans
+   survol (tactile), elles restent affichées. */
+#page-cfg-assign .asg-row-a{
+  display:flex;gap:2px;flex:none;opacity:0;transition:opacity .14s var(--m3-ease);
+}
+#page-cfg-assign .asg-row-i:hover .asg-row-a,
+#page-cfg-assign .asg-row-i:focus-within .asg-row-a{opacity:1}
+@media (hover:none){#page-cfg-assign .asg-row-a{opacity:1}}
+#page-cfg-assign .asg-iact{
+  width:30px;height:30px;border:none;background:none;border-radius:50%;
+  color:var(--m3-on-surf-var);cursor:pointer;padding:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .15s var(--m3-ease),color .15s var(--m3-ease);
+}
+#page-cfg-assign .asg-iact:hover{background:var(--m3-surf-3);color:var(--m3-on-surface)}
+#page-cfg-assign .asg-iact.danger:hover{color:var(--m3-primary)}
+
+#page-cfg-assign .asg-empty{
+  padding:48px 24px;text-align:center;border-radius:var(--m3-r-lg);
+  background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-cfg-assign .asg-empty{background:var(--m3-surf-2)}
+#page-cfg-assign .asg-empty-t{font-size:14px;color:var(--m3-on-surface);font-weight:500}
+#page-cfg-assign .asg-empty-s{font-size:12.5px;color:var(--m3-on-surf-var);margin-top:6px}
+
+/* Pastilles réutilisées de My Tasks : la page Admin doit montrer la même
+   carte que celle que le FO recevra, sinon l'aperçu ment. */
+#page-cfg-assign .wp-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2px 9px;border-radius:var(--m3-r-full);
+  font-size:10.5px;font-weight:600;letter-spacing:.01em;
+  background:color-mix(in srgb,var(--m3-on-surface) 9%,transparent);
+  color:var(--m3-on-surf-var);
+}
+#page-cfg-assign .wp-pill.s-adm{background:rgba(26,115,232,.12);color:#1657B8}
+[data-theme="dark"] #page-cfg-assign .wp-pill.s-adm{background:rgba(138,180,248,.18);color:#A8C7FA}
+#page-cfg-assign .wp-pill.s-plan{background:color-mix(in srgb,var(--m3-on-surface) 9%,transparent);color:var(--m3-on-surf-var)}
+#page-cfg-assign .wp-pill.s-prog{background:rgba(227,116,0,.14);color:#B35C00}
+#page-cfg-assign .wp-pill.s-done{background:rgba(30,142,62,.14);color:#1E8E3E}
+[data-theme="dark"] #page-cfg-assign .wp-pill.s-prog{background:rgba(252,201,52,.18);color:#FCC934}
+[data-theme="dark"] #page-cfg-assign .wp-pill.s-done{background:rgba(129,201,149,.18);color:#81C995}
+#page-cfg-assign .wp-pill.s-prio-high{background:rgba(217,48,37,.13);color:#C5221F}
+#page-cfg-assign .wp-pill.s-prio-medium{background:rgba(227,116,0,.14);color:#B35C00}
+#page-cfg-assign .wp-pill.s-prio-low{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);color:var(--m3-on-surf-var);
+}
+[data-theme="dark"] #page-cfg-assign .wp-pill.s-prio-high{background:rgba(242,139,130,.18);color:#F28B82}
+[data-theme="dark"] #page-cfg-assign .wp-pill.s-prio-medium{background:rgba(252,201,52,.18);color:#FCC934}
+
+/* Le sommaire n'est plus une grille unique de dix-huit cartes mais une
+   suite de sections : on y cherche par intention (« piloter l'équipe »,
+   « régler l'outil ») avant de chercher par nom. */
+.cfg-hub{margin-top:20px}
+.cfg-hub-sec{margin-bottom:26px}
+.cfg-hub-sec:last-child{margin-bottom:0}
+.cfg-hub-sec-h{
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  padding-bottom:9px;margin-bottom:12px;border-bottom:1px solid var(--line);
+}
+.cfg-hub-sec-t{
+  font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--dark);margin:0;padding:0;border:none;
+}
+.cfg-hub-sec-d{font-size:12px;color:var(--mute)}
+.cfg-hub-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;
+}
+.cfg-hub-none{padding:24px;text-align:center;color:var(--mute);font-size:13px}
+
+/* Carte : titre, état, description. L'état est le seul ajout qui compte —
+   il dit ce qui attend une décision avant qu'on ouvre l'écran. */
+.cfg-hub-top{
+  display:flex;align-items:baseline;justify-content:space-between;gap:8px;width:100%;
+}
+.cfg-hub-b{
+  font-size:10px;font-weight:700;letter-spacing:.2px;padding:2px 8px;
+  border-radius:999px;flex-shrink:0;white-space:nowrap;
+  background:var(--m3-surf-2,#F1F3F4);color:var(--gray);
+}
+[data-theme="dark"] .cfg-hub-b{background:var(--m3-surf-3)}
+.cfg-hub-b.is-ok{background:var(--ok-bg);color:var(--ok-fg)}
+.cfg-hub-b.is-warn{background:#FEF7E0;color:#E65100}
+[data-theme="dark"] .cfg-hub-b.is-warn{background:#2A1F08;color:#FBBC04}
+.cfg-hub-b.is-bad{background:var(--red-l,#FCE8E6);color:var(--red)}
+[data-theme="dark"] .cfg-hub-b.is-bad{background:#2A1113;color:#FF8A80}
+/* Recherche du sommaire : même trait et même rayon que les cartes, pour
+   que le champ appartienne visiblement à la grille qu'il filtre.
+   Le fond vient de --input-bg (et non --white) : c'est la variable des
+   champs de saisie, la seule qui reste lisible sur le noir du thème
+   sombre — --white y vaut #111111, quasi invisible sur #000. */
+.cfg-hub-search{
+  display:flex;align-items:center;gap:8px;margin-top:16px;max-width:360px;
+  padding:8px 12px;border:1px solid var(--line);border-radius:10px;
+  background:var(--input-bg);color:var(--gray);
+  transition:border-color .12s,box-shadow .12s;
+}
+.cfg-hub-search:focus-within{
+  border-color:var(--red);box-shadow:0 0 0 3px rgba(199,0,11,.12);
+}
+.cfg-hub-search input{
+  flex:1;border:0;outline:0;background:transparent;
+  font:inherit;font-size:13px;color:var(--dark);
+}
+/* --mute (#555) est trop sombre sur fond noir : --gray reste discret
+   sans devenir illisible. */
+.cfg-hub-search input::placeholder{color:var(--gray);opacity:1}
+/* Croix de réinitialisation : la croix native de WebKit est dessinée en
+   sombre et ne suit pas le thème. On la redessine en masque, coloré par
+   --gray, donc correct en clair comme en sombre. Même procédé que la
+   recherche de la page Approbations. */
+.cfg-hub-search input::-webkit-search-cancel-button{
+  -webkit-appearance:none;height:14px;width:14px;cursor:pointer;
+  background:var(--gray);
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/></svg>") center/contain no-repeat;
+}
+/* Pas de variante .gm-scope ici : --gm-surf dérive de --m3-surf, qui n'est
+   défini que par certaines pages (ops-review, cfg-sla, observations…) et
+   jamais pour #page-config. En thème sombre il restait donc blanc, et le
+   champ ressortait en clair sur la page noire. --input-bg, lui, est défini
+   dans les deux thèmes. On garde seulement le rayon, pour rester dans le
+   style arrondi des cartes de cette page. */
+.gm-scope .cfg-hub-search{border-radius:16px}
+.cfg-hub-card{
+  display:flex;flex-direction:column;gap:3px;text-align:left;
+  padding:14px 16px;border:1px solid var(--line);border-radius:10px;
+  background:var(--white);cursor:pointer;font:inherit;
+  transition:border-color .12s,box-shadow .12s,transform .12s;
+}
+.cfg-hub-card:hover{
+  border-color:var(--red);box-shadow:0 2px 10px rgba(0,0,0,.07);transform:translateY(-1px);
+}
+.cfg-hub-t{font-size:14px;font-weight:700;color:var(--dark)}
+.cfg-hub-d{font-size:12px;color:var(--mute);line-height:1.4}
+[data-theme="dark"] .cfg-hub-card{background:transparent}
+
+.config-card{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:var(--r-lg);padding:18px 22px;margin-bottom:12px;box-shadow:var(--sh-xs);
+}
+.config-card h3{font-size:11.5px;font-weight:700;color:var(--dark);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.06em}
+.config-export-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.config-export-desc{font-size:12.5px;color:var(--mid)}
+.config-export-desc small{display:block;font-size:11px;color:var(--mute);margin-top:2px}
+
+/* ── Configuration → Quiz : barres de recherche ──────────────
+   La pastille de recherche de la page Quiz apprenant est portée ici :
+   même geste des deux côtés. Elle ne peut pas être réutilisée telle
+   quelle, son sélecteur étant limité à #page-quiz. */
+#page-cfg-quiz .cfgq-toolbar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;
+}
+#page-cfg-quiz .cfgq-search{
+  display:flex;align-items:center;gap:8px;flex:1;min-width:180px;
+  height:38px;padding:0 13px;
+  background:var(--m3-surf-2,#F1F3F4);border-radius:var(--m3-r-full,999px);
+  color:var(--m3-on-surf-var,#5f6368);
+  transition:background .18s ease,box-shadow .18s ease;
+}
+#page-cfg-quiz .cfgq-search:focus-within{
+  background:var(--white);
+  box-shadow:inset 0 0 0 1px var(--gm-pri,var(--dark));
+}
+#page-cfg-quiz .cfgq-search svg{flex-shrink:0;opacity:.75}
+#page-cfg-quiz .cfgq-search input{
+  border:none;background:none;outline:none;flex:1;min-width:0;
+  font:inherit;font-size:12.5px;color:var(--gm-ink,var(--dark));
+}
+#page-cfg-quiz .cfgq-search input::-webkit-search-cancel-button{display:none}
+#page-cfg-quiz .cfgq-toolbar .filter-select{height:38px;font-size:12.5px;padding:0 10px}
+#page-cfg-quiz .cfgq-count{
+  font-size:11px;color:var(--mute);margin-top:9px;min-height:14px;
+}
+/* Un niveau replié : l'en-tête reste, les cartes disparaissent. Sur six
+   niveaux, c'est le seul moyen de garder la page lisible d'un coup d'œil. */
+#page-cfg-quiz .cfgq-level-head{cursor:pointer;user-select:none}
+#page-cfg-quiz .cfgq-level-head:hover .cfgq-caret{opacity:1}
+#page-cfg-quiz .cfgq-caret{
+  opacity:.5;flex-shrink:0;transition:transform .18s ease,opacity .18s ease;
+}
+#page-cfg-quiz .cfgq-level.collapsed .cfgq-caret{transform:rotate(-90deg)}
+#page-cfg-quiz .cfgq-level.collapsed .cfgq-level-body{display:none}
+/* Le terme cherché, surligné dans la carte : sur une question de trois
+   lignes, il évite de relire pour comprendre pourquoi elle est là. */
+#page-cfg-quiz mark.cfgq-hit{
+  background:rgba(255,200,0,.34);color:inherit;
+  border-radius:3px;padding:0 1px;font-weight:600;
+}
+

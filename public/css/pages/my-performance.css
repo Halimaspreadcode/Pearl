@@ -1,0 +1,383 @@
+/* Sommaire de la Configuration : raccourcis vers les rubriques,
+   devenues des pages a part entiere. */
+/* ── My Performance ───────────────────────────────────────────
+   La page occupe toute la largeur, mais reste une page de lecture
+   personnelle : aucun chiffre d'un collègue, aucun classement. La
+   richesse vient du détail de SA propre notation — le score, ce qui
+   le compose, et sa trajectoire — pas d'une mise en comparaison.
+   Deux états mutuellement exclusifs : la porte, puis le tableau. */
+#page-my-perf{--mp-gap:16px}
+
+/* Porte d'accès : seule chose à l'écran tant qu'on n'est pas identifié,
+   donc centrée verticalement plutôt que collée en haut à gauche. */
+.myperf-gate{display:flex;justify-content:center;padding:36px 0 24px}
+.myperf-card{
+  padding:26px 24px;
+  border:1px solid var(--line);border-radius:var(--r-xl,16px);
+  background:var(--white);
+}
+.myperf-gate-card{width:100%;max-width:420px;text-align:center;box-shadow:var(--sh-sm)}
+.myperf-lock-ico{
+  width:52px;height:52px;margin:0 auto 12px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg2);color:var(--gray);
+}
+.myperf-lock-t{font-size:15px;font-weight:700;color:var(--dark)}
+.myperf-lock-d{font-size:12.5px;color:var(--gray);margin:6px auto 16px;max-width:340px;line-height:1.5}
+.myperf-form{display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto}
+.myperf-err{font-size:11.5px;color:var(--red);font-weight:600;margin-top:10px;min-height:16px}
+.myperf-gate-foot{
+  font-size:11px;color:var(--mute);line-height:1.5;
+  margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+}
+
+/* ── Tableau personnel ──────────────────────────────────────── */
+.myperf-res{display:flex;flex-direction:column;gap:var(--mp-gap);margin-top:18px}
+
+/* Barre d'identité : qui, quelle période, et la sortie. */
+.myperf-idbar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:14px 18px;border:1px solid var(--line);border-radius:var(--r-xl,16px);
+  background:var(--white);
+}
+.myperf-av{
+  width:42px;height:42px;flex:none;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--accent);color:#fff;font-size:15px;font-weight:700;
+  letter-spacing:.02em;
+}
+.myperf-idtxt{min-width:0}
+.myperf-who{font-size:15px;font-weight:700;color:var(--dark);letter-spacing:-.01em}
+.myperf-period{font-size:11.5px;color:var(--gray);margin-top:2px}
+.myperf-idbar-sp{flex:1 1 auto}
+.myperf-pill{
+  display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 11px;
+  border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.01em;
+  background:var(--bg2);color:var(--gray);
+}
+.myperf-pill.live{background:var(--ok-bg);color:var(--ok-fg)}
+.myperf-pill.draft{background:var(--p3-bg);color:var(--p3-fg)}
+
+/* Hero : le score et ce qu'il vaut. Deux colonnes — l'anneau porte le
+   chiffre, la colonne de droite dit ce qu'il signifie. Sur petit écran
+   elles s'empilent, l'anneau restant en premier. */
+.myperf-hero{
+  display:grid;grid-template-columns:minmax(200px,240px) 1fr;gap:28px;align-items:center;
+  padding:26px 28px;border:1px solid var(--line);border-radius:var(--r-xl,16px);
+  background:var(--white);box-shadow:var(--sh-xs);
+}
+.myperf-ring{position:relative;width:172px;height:172px;margin:0 auto}
+.myperf-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+/* La piste doit rester lisible : sans elle l'arc flotte et on ne voit
+   plus la part manquante, qui est justement ce que le score raconte. */
+.myperf-ring-track{fill:none;stroke:var(--line);stroke-width:12;opacity:.9}
+[data-theme="dark"] .myperf-ring-track{stroke:color-mix(in srgb,var(--dark) 16%,transparent);opacity:1}
+.myperf-ring-val{
+  fill:none;stroke:var(--accent);stroke-width:12;stroke-linecap:round;
+  transition:stroke-dashoffset .8s cubic-bezier(.2,0,0,1);
+}
+.myperf-ring.lv4 .myperf-ring-val{stroke:var(--ok-fg)}
+.myperf-ring.lv3 .myperf-ring-val{stroke:var(--accent)}
+.myperf-ring.lv2 .myperf-ring-val{stroke:var(--p2-fg)}
+.myperf-ring.lv1 .myperf-ring-val{stroke:var(--red)}
+.myperf-ring-mid{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;
+}
+.myperf-score{font-size:40px;font-weight:700;color:var(--dark);letter-spacing:-.03em;line-height:1}
+.myperf-score span{font-size:14px;font-weight:500;color:var(--mute);letter-spacing:0}
+.myperf-score.na{font-size:20px;color:var(--mute)}
+.myperf-score-cap{font-size:10px;font-weight:600;color:var(--mute);text-transform:uppercase;letter-spacing:.08em}
+
+.myperf-heroside{min-width:0}
+.myperf-level{font-size:26px;font-weight:700;color:var(--dark);letter-spacing:-.02em;line-height:1.2}
+.myperf-level-d{font-size:12.5px;color:var(--gray);line-height:1.55;margin-top:6px;max-width:52ch}
+/* Jauge en paliers : dit la position sans exiger de lire un chiffre. */
+.myperf-gauge{display:flex;gap:6px;margin:16px 0 4px}
+.myperf-step{flex:1;max-width:74px;height:6px;border-radius:999px;background:var(--bg2)}
+.myperf-step.on{background:var(--accent)}
+.myperf-hero.lv4 .myperf-step.on{background:var(--ok-fg)}
+.myperf-hero.lv2 .myperf-step.on{background:var(--p2-fg)}
+.myperf-hero.lv1 .myperf-step.on{background:var(--red)}
+.myperf-steplabels{display:flex;gap:6px;font-size:9.5px;color:var(--mute);letter-spacing:.02em}
+.myperf-steplabels span{flex:1;max-width:74px;line-height:1.3}
+/* Le palier atteint se lit sans avoir à recompter les segments allumés. */
+.myperf-hero.lv1 .myperf-steplabels span:nth-child(1),
+.myperf-hero.lv2 .myperf-steplabels span:nth-child(2),
+.myperf-hero.lv3 .myperf-steplabels span:nth-child(3),
+.myperf-hero.lv4 .myperf-steplabels span:nth-child(4){color:var(--dark);font-weight:700}
+.myperf-trend{
+  display:inline-flex;align-items:center;gap:7px;margin-top:16px;
+  padding:7px 13px;border-radius:999px;background:var(--bg2);
+  font-size:12px;font-weight:600;color:var(--gray);
+}
+.myperf-trend.up{background:var(--ok-bg);color:var(--ok-fg)}
+.myperf-trend.down{background:var(--p1-bg);color:var(--p1-fg)}
+.myperf-trend b{font-weight:700}
+
+/* Grille des sections basses : critères à gauche, colonne d'appoint
+   à droite. Une seule colonne sous 1080px. */
+.myperf-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:var(--mp-gap);align-items:start}
+.myperf-col{display:flex;flex-direction:column;gap:var(--mp-gap)}
+.myperf-sec{
+  padding:20px 22px;border:1px solid var(--line);border-radius:var(--r-xl,16px);
+  background:var(--white);
+}
+.myperf-sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px}
+.myperf-sec-t{font-size:13.5px;font-weight:700;color:var(--dark);letter-spacing:-.01em}
+.myperf-sec-n{font-size:11px;color:var(--mute);white-space:nowrap;flex:none}
+.myperf-sec-d{font-size:11.5px;color:var(--gray);line-height:1.5;margin-bottom:16px}
+
+/* Critères : une ligne = un libellé, son poids, sa barre et sa note.
+   La barre porte la lecture, le chiffre ne fait que la confirmer. */
+.myperf-crit{display:flex;flex-direction:column;gap:15px}
+.myperf-crit-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center}
+.myperf-crit-row + .myperf-crit-row{padding-top:15px;border-top:1px solid var(--line)}
+.myperf-crit-l{display:flex;align-items:center;gap:8px;min-width:0}
+/* Le nom peut être ellipsé ; ce qui ne doit jamais l'être, c'est la note
+   à droite, sinon la ligne perd son information principale. */
+.myperf-crit-n{
+  font-size:12.5px;font-weight:600;color:var(--dark);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+}
+.myperf-crit-v{white-space:nowrap}
+.myperf-crit-w{
+  font-size:9.5px;font-weight:700;color:var(--mute);background:var(--bg2);
+  border-radius:999px;padding:2px 7px;letter-spacing:.03em;flex:none;
+}
+.myperf-crit-v{font-size:12.5px;font-weight:700;color:var(--dark);font-variant-numeric:tabular-nums}
+.myperf-crit-v.na{color:var(--mute);font-weight:500}
+.myperf-crit-v i{font-style:normal;font-size:10.5px;font-weight:600;margin-left:6px}
+.myperf-crit-v i.up{color:var(--ok-fg)}
+.myperf-crit-v i.down{color:var(--red)}
+.myperf-bar{grid-column:1/-1;height:7px;border-radius:999px;background:var(--bg2);overflow:hidden}
+/* Sur fond sombre, --bg2 disparaît : sans piste visible, un critère non
+   noté laisse un trou et une barre courte perd son échelle. */
+[data-theme="dark"] .myperf-bar{background:color-mix(in srgb,var(--dark) 14%,transparent)}
+.myperf-bar>i{
+  display:block;height:100%;border-radius:999px;background:var(--accent);
+  transition:width .7s cubic-bezier(.2,0,0,1);
+}
+.myperf-bar>i.g{background:var(--ok-fg)}
+.myperf-bar>i.o{background:var(--p2-fg)}
+.myperf-bar>i.r{background:var(--red)}
+.myperf-crit-h{font-size:11px;color:var(--gray);grid-column:1/-1;line-height:1.45}
+
+/* Toile d'araignée : six barres alignées se lisent comme six verdicts,
+   la forme se lit comme un profil. Traits fins, une seule surface
+   colorée — c'est le contour qui porte l'information. */
+.myperf-rdwrap{display:flex;gap:26px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.myperf-rd{width:100%;max-width:340px;height:auto;flex:none}
+.myperf-rd-grid{fill:none;stroke:var(--line);stroke-width:1}
+.myperf-rd-axis{stroke:var(--line);stroke-width:1}
+/* L'anneau cible est un repère, pas une donnée : pointillé, sans
+   remplissage, il ne doit jamais concurrencer le profil tracé. */
+.myperf-rd-target{fill:none;stroke:var(--mute);stroke-width:1;stroke-dasharray:3 3;opacity:.85}
+.myperf-rd-area{
+  fill:color-mix(in srgb,var(--accent) 14%,transparent);
+  stroke:var(--accent);stroke-width:2;stroke-linejoin:round;
+}
+.myperf-rd-dot{fill:var(--accent)}
+.myperf-rd-lab{font-size:9.5px;font-weight:600;fill:var(--dark)}
+.myperf-rd-lab.is-na{fill:var(--mute);opacity:.75}
+.myperf-rd-val{font-size:9px;font-weight:600;fill:var(--gray);font-variant-numeric:tabular-nums}
+.myperf-rd-side{flex:1;min-width:190px;display:flex;flex-direction:column;gap:9px}
+.myperf-rd-moy{display:flex;align-items:baseline;gap:9px}
+.myperf-rd-moy b{
+  font-size:30px;font-weight:700;color:var(--dark);line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+}
+.myperf-rd-moy span{font-size:11.5px;color:var(--gray)}
+.myperf-rd-legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray);flex-wrap:wrap}
+.myperf-rd-key{width:11px;height:3px;border-radius:999px;flex:none}
+.myperf-rd-key.you{background:var(--accent)}
+.myperf-rd-key.tgt{background:var(--mute);margin-left:8px}
+.myperf-rd-note{font-size:11px;color:var(--gray);line-height:1.5}
+
+/* Historique : sparkline en colonnes. 6 mois suffisent à voir une
+   pente ; au-delà on lirait un graphe, pas une tendance. */
+.myperf-hist{display:flex;align-items:flex-end;gap:10px;height:118px;padding-top:6px}
+.myperf-hcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.myperf-hbar{
+  width:100%;max-width:34px;border-radius:6px 6px 3px 3px;background:var(--accent);
+  min-height:4px;transition:height .7s cubic-bezier(.2,0,0,1);
+}
+/* Même échelle de teintes que les critères : une colonne rouge dans
+   l'historique et une barre rouge dans le détail disent la même chose. */
+.myperf-hbar.b{background:var(--accent)}
+.myperf-hbar.g{background:var(--ok-fg)}
+.myperf-hbar.o{background:var(--p2-fg)}
+.myperf-hbar.r{background:var(--red)}
+.myperf-hbar.empty{background:var(--line)}
+[data-theme="dark"] .myperf-hbar.empty{background:color-mix(in srgb,var(--dark) 20%,transparent)}
+/* Le mois courant se distingue par un liseré, pas par une autre couleur :
+   sa teinte porte déjà son niveau. */
+.myperf-hbar.now{outline:2px solid var(--dark);outline-offset:2px}
+.myperf-hval{font-size:10.5px;font-weight:700;color:var(--dark);font-variant-numeric:tabular-nums}
+.myperf-hval.na{color:var(--mute);font-weight:500}
+.myperf-hm{font-size:9.5px;color:var(--mute);text-transform:uppercase;letter-spacing:.05em}
+.myperf-hm.now{color:var(--dark);font-weight:700}
+
+/* Faits marquants : 2 chiffres d'appoint, format tuile. */
+.myperf-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.myperf-stat{padding:13px 14px;border-radius:var(--r-lg,12px);background:var(--bg2)}
+[data-theme="dark"] .myperf-stat{background:color-mix(in srgb,var(--dark) 10%,transparent)}
+.myperf-stat-v{font-size:19px;font-weight:700;color:var(--dark);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.myperf-stat-l{font-size:10.5px;color:var(--gray);margin-top:3px;line-height:1.35}
+
+/* Liste « ce qui compte » : conseils tirés des critères les plus bas. */
+.myperf-tips{display:flex;flex-direction:column;gap:11px}
+.myperf-tip{display:flex;gap:10px;align-items:flex-start}
+.myperf-tip-i{
+  width:22px;height:22px;flex:none;border-radius:50%;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg2);color:var(--gray);font-size:10.5px;font-weight:700;
+}
+.myperf-tip-t{font-size:12px;font-weight:600;color:var(--dark)}
+.myperf-tip-d{font-size:11px;color:var(--gray);line-height:1.45;margin-top:2px}
+
+.myperf-note{
+  display:flex;gap:10px;align-items:flex-start;
+  font-size:11.5px;color:var(--p3-fg);line-height:1.5;
+  padding:12px 14px;border-radius:var(--r-lg,12px);background:var(--p3-bg);
+}
+.myperf-note svg{flex:none;margin-top:1px}
+.myperf-foot{
+  font-size:11.5px;color:var(--gray);line-height:1.55;
+  padding:14px 18px;border-radius:var(--r-xl,16px);
+  border:1px dashed var(--line);background:transparent;
+}
+
+
+/* ── Insight Big Brother (js/pages/perf/my-insight.js) ───────────
+   Une carte sobre, de la même famille que les autres blocs de la fiche :
+   pas de boîte dans la boîte, pas de barre latérale. */
+.mins{--mi-ink:var(--m3-on-surface,#1F1F1F);--mi-mute:var(--m3-on-surf-var,#5F6368);--mi-line:var(--m3-outline-var,#E6E6E6);
+  --mi-soft:var(--m3-surf-1,#F6F7F8);--mi-ok:#1E8E3E;--mi-ok-bg:#E6F4EA;--mi-warm:#FFF4E0;--mi-warm-ink:#7A4A00;
+  position:relative;border:1px solid var(--mi-line);border-radius:20px;padding:22px 24px;background:var(--m3-surface,#fff);color:var(--mi-ink);
+  display:flex;flex-direction:column;gap:18px}
+[data-theme="dark"] .mins{--mi-ink:#E8EAED;--mi-mute:#9AA0A6;--mi-line:rgba(255,255,255,.08);--mi-soft:#151517;--mi-ok:#81C995;--mi-ok-bg:rgba(129,201,149,.12);
+  --mi-warm:rgba(253,214,99,.08);--mi-warm-ink:#FDD663;background:#0E0E10}
+.mins svg{width:16px;height:16px;flex:none}
+.mins-badge{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--mi-ink);color:var(--m3-surface,#fff);flex:none}
+[data-theme="dark"] .mins-badge{color:#0E0E10}
+.mins-badge.is-sm{width:22px;height:22px}
+.mins-badge.is-sm svg{width:12px;height:12px}
+/* Vide et attente */
+.mins.is-empty,.mins.is-wait{flex-direction:row;align-items:center;gap:14px;flex-wrap:wrap}
+.mins.is-empty>div,.mins.is-wait>div:not(.mins-dots){flex:1;min-width:220px;display:flex;flex-direction:column;gap:3px}
+.mins.is-empty b,.mins.is-wait b{font-size:15px}
+.mins.is-empty small,.mins.is-wait small{font-size:13px;color:var(--mi-mute);line-height:1.5}
+.mins-btn{border:0;border-radius:999px;padding:10px 20px;background:var(--mi-ink);color:var(--m3-surface,#fff);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+[data-theme="dark"] .mins-btn{color:#0E0E10}
+.mins-dots{display:flex;gap:5px}
+.mins-dots i{width:7px;height:7px;border-radius:50%;background:var(--mi-mute);animation:mins-dot 1s infinite}
+.mins-dots i:nth-child(2){animation-delay:.15s}.mins-dots i:nth-child(3){animation-delay:.3s}
+@keyframes mins-dot{0%,80%,100%{opacity:.25}40%{opacity:1}}
+/* En-tête */
+.mins-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mins-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--mi-mute);letter-spacing:.01em}
+.mins-hist{border:1px solid var(--mi-line)!important;border-radius:999px!important;background:var(--m3-surface,#fff)!important;color:var(--mi-ink)!important;font:inherit;font-size:12.5px;padding:5px 10px;cursor:pointer;box-shadow:none!important;outline:none!important}
+[data-theme="dark"] .mins-hist{background:#0E0E10!important}
+.mins-title{margin:-6px 0 0;font-size:20px;line-height:1.35;font-weight:650;letter-spacing:-.01em}
+/* Colonnes */
+.mins-cols{display:grid;grid-template-columns:1fr 1.25fr;gap:28px}
+.mins-k{display:block;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mi-mute);margin-bottom:10px}
+.mins-ok,.mins-gain{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.mins-ok li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5}
+.mins-tick{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--mi-ok-bg);color:var(--mi-ok);flex:none}
+.mins-tick svg{width:13px;height:13px}
+.mins-gain li{display:flex;gap:12px;align-items:flex-start}
+.mins-n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--mi-soft);font-size:12px;font-weight:700;flex:none}
+.mins-gain b{font-size:14px;font-weight:600}
+.mins-gain p{margin:3px 0 0;font-size:13.5px;line-height:1.5;color:var(--mi-mute)}
+.mins-gain .mins-how{color:var(--mi-ink);font-weight:500}
+/* Cette semaine */
+.mins-week{display:flex;gap:14px;align-items:center;padding:14px 16px;border-radius:16px;background:var(--mi-warm);color:var(--mi-ink)}
+.mins-week-ico{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--m3-surface,#fff);color:var(--mi-warm-ink);flex:none}
+[data-theme="dark"] .mins-week-ico{background:#0E0E10}
+.mins-week .mins-k{margin-bottom:2px;color:var(--mi-warm-ink)}
+.mins-week p{margin:0;font-size:14.5px;font-weight:500;line-height:1.45}
+.mins-enc{margin:-4px 0 0;font-size:14px;color:var(--mi-mute)}
+/* Pied */
+.mins-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--mi-line);font-size:12px;color:var(--mi-mute)}
+.mins-ghost{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--mi-line);border-radius:999px;padding:6px 12px;background:none;color:var(--mi-ink);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.mins-ghost:hover{background:var(--mi-soft)}
+.mins-ghost svg{width:14px;height:14px}
+.mins-muted{font-size:12px;color:var(--mi-mute)}
+.mins-err{width:100%;font-size:13px;padding:9px 12px;border-radius:12px;background:#FCE8E6;color:#C5221F}
+[data-theme="dark"] .mins-err{background:rgba(242,139,130,.12);color:#F28B82}
+@media (max-width:760px){
+  .mins{padding:18px}
+  .mins-cols{grid-template-columns:1fr;gap:20px}
+  .mins-title{font-size:18px}
+}
+
+/* Tâches du mois (Ma performance) */
+.myperf-tasks{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.myperf-task{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:12.5px}
+.myperf-task-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.myperf-task-d{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mute)}
+.myperf-task-s{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;background:var(--bg2);color:var(--mute)}
+.myperf-task-s.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.myperf-task-s.late{background:var(--p1-bg);color:var(--p1-fg)}
+.myperf-task-s.today{background:var(--p2-bg);color:var(--p2-fg)}
+
+/* ══════════════════════════════════════════════════════════
+   MY PERFORMANCE — plus lisible
+   · la note dans une grande carte noire (blanche en sombre), avec trois
+     repères : écart au mois précédent, moyenne, meilleur mois ;
+   · cartes blanches à grands rayons, comme le reste de My Space ;
+   · historique monochrome, le mois en cours en noir ;
+   · les chiffres par critère affichés sous la toile.
+   ══════════════════════════════════════════════════════════ */
+#page-my-perf .myperf-idbar{background:transparent!important;border:none!important;box-shadow:none!important;padding:0 4px!important}
+#page-my-perf .myperf-hero{background:#111214!important;color:#fff!important;border:none!important;border-radius:28px!important;padding:30px 34px!important;gap:36px!important}
+[data-theme="dark"] #page-my-perf .myperf-hero{background:#F4F4F5!important;color:#111!important}
+#page-my-perf .myperf-hero :is(.myperf-level,.myperf-score,.myperf-score span){color:inherit!important}
+#page-my-perf .myperf-hero :is(.myperf-level-d,.myperf-score-cap,.myperf-steplabels span){color:inherit!important;opacity:.65}
+#page-my-perf .myperf-hero .myperf-level{font-size:30px!important;font-weight:600;letter-spacing:-.02em}
+#page-my-perf .myperf-hero .myperf-ring-track{stroke:rgba(255,255,255,.14)!important}
+#page-my-perf .myperf-hero .myperf-ring-val{stroke:#fff!important}
+[data-theme="dark"] #page-my-perf .myperf-hero .myperf-ring-track{stroke:rgba(0,0,0,.12)!important}
+[data-theme="dark"] #page-my-perf .myperf-hero .myperf-ring-val{stroke:#111!important}
+#page-my-perf .myperf-hero .myperf-step{background:rgba(255,255,255,.18)!important}
+#page-my-perf .myperf-hero .myperf-step.on{background:#fff!important}
+[data-theme="dark"] #page-my-perf .myperf-hero .myperf-step{background:rgba(0,0,0,.12)!important}
+[data-theme="dark"] #page-my-perf .myperf-hero .myperf-step.on{background:#111!important}
+#page-my-perf .myperf-hero .myperf-trend{background:rgba(255,255,255,.12)!important;color:inherit!important;border:none!important}
+[data-theme="dark"] #page-my-perf .myperf-hero .myperf-trend{background:rgba(0,0,0,.07)!important}
+#page-my-perf .myperf-herokpis{display:flex;gap:28px;margin:18px 0 14px;flex-wrap:wrap}
+#page-my-perf .myperf-herokpis div{display:flex;flex-direction:column;gap:2px}
+#page-my-perf .myperf-herokpis b{font-size:24px;font-weight:600;letter-spacing:-.02em;line-height:1}
+#page-my-perf .myperf-herokpis span{font-size:12px;opacity:.65}
+
+#page-my-perf .myperf-sec,#page-my-perf .myperf-note,#page-my-perf .myperf-foot{background:#FFFFFF!important;border:none!important;border-radius:26px!important;
+  box-shadow:0 1px 2px rgba(20,24,32,.04),0 12px 32px -20px rgba(20,24,32,.25)!important;padding:22px 24px!important}
+[data-theme="dark"] #page-my-perf :is(.myperf-sec,.myperf-note,.myperf-foot){background:#0A0A0C!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)!important}
+#page-my-perf .myperf-sec-t{font-size:18px!important;font-weight:600!important;letter-spacing:-.01em}
+#page-my-perf .myperf-sec-d{font-size:13px!important}
+#page-my-perf .myperf-foot{box-shadow:none!important;background:transparent!important;text-align:center;font-size:12.5px!important}
+
+/* Historique : une seule teinte */
+#page-my-perf .myperf-hbar:not(.empty){background:color-mix(in srgb,var(--m3-primary,#4F6A85) 40%,transparent)!important;border:none!important;outline:none!important;border-radius:10px!important}
+#page-my-perf .myperf-hbar.now:not(.empty){background:#111214!important}
+[data-theme="dark"] #page-my-perf .myperf-hbar.now:not(.empty){background:#F4F4F5!important}
+#page-my-perf .myperf-stat{background:rgba(38,37,31,.04)!important;border-radius:16px!important}
+[data-theme="dark"] #page-my-perf .myperf-stat{background:rgba(255,255,255,.05)!important}
+
+/* Valeurs par critère sous la toile */
+#page-my-perf .myperf-crit.is-compact{margin-top:18px;padding-top:16px;border-top:1px solid rgba(20,24,32,.07)}
+[data-theme="dark"] #page-my-perf .myperf-crit.is-compact{border-top-color:rgba(255,255,255,.08)}
+#page-my-perf .myperf-crit.is-compact .myperf-crit-h{display:none}
+#page-my-perf .myperf-bar{background:rgba(38,37,31,.07)!important;border-radius:999px!important;height:8px!important}
+[data-theme="dark"] #page-my-perf .myperf-bar{background:rgba(255,255,255,.08)!important}
+#page-my-perf .myperf-bar i{border-radius:999px!important;background:var(--m3-primary,#4F6A85)!important}
+#page-my-perf .myperf-bar i.r{background:var(--m3-error,#A9493B)!important}
+#page-my-perf .myperf-bar i.g{background:#2E9C86!important}
+#page-my-perf .myperf-tip-i{background:#111214!important;color:#fff!important}
+[data-theme="dark"] #page-my-perf .myperf-tip-i{background:#F4F4F5!important;color:#111!important}
+@media(max-width:760px){#page-my-perf .myperf-hero{padding:22px!important;gap:20px!important}#page-my-perf .myperf-herokpis{gap:18px}}
+/* Moyenne, meilleur mois et écart sont dans la carte de la note : pas deux fois. */
+#page-my-perf .myperf-hist + .myperf-stats{display:none!important}
+#page-my-perf .myperf-hero .myperf-trend{display:none!important}

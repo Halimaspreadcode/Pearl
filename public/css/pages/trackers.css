@@ -1,0 +1,499 @@
+/* ══════════════════════════════════════════════
+   M3 — PAGES INDIVIDUELLES
+   Chaque bloc cible une page précise. Les composants
+   réellement partagés (btn, table, modal) restent dans
+   le bloc global plus haut.
+══════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════
+   1-3. TRACKERS : SN · CI · Global
+   Refonte Material 3 / Google.
+   Principes : surface unique, zéro bordure dure, respiration
+   généreuse, la couleur uniquement porteuse de sens.
+══════════════════════════════════════════════ */
+#page-sn,#page-ci,#page-global{
+  --tk-gutter:24px;
+  --tk-row-h:48px;
+  color:var(--m3-on-surface);
+  font-feature-settings:"ss01" on,"cv05" on;
+}
+/* La surface tonale couvre toute la zone scrollable, comme le Dashboard. */
+.main:has(#page-sn.active),
+.main:has(#page-ci.active),
+.main:has(#page-global.active){background:var(--m3-surface)}
+
+/* ── En-tête de page : hiérarchie Google Sans ── */
+#page-sn .page-title,#page-ci .page-title,#page-global .page-title{
+  font-size:24px;font-weight:500;line-height:1.25;
+  letter-spacing:-.01em;color:var(--m3-on-surface);
+  margin-bottom:4px!important;
+}
+#page-sn .page-sub,#page-ci .page-sub,#page-global .page-sub{
+  font-size:14px;font-weight:400;color:var(--m3-on-surf-var);
+  letter-spacing:.01em;margin-bottom:20px!important;
+}
+
+/* ── Barre de filtres : plus une "carte", juste une zone d'outils ──
+   Le cadre + l'ombre empilaient deux boîtes (barre puis tableau) et
+   écrasaient la page. On la laisse respirer sur la surface. */
+#page-sn .tracker-filter-bar,
+#page-ci .tracker-filter-bar,
+#page-global .tracker-filter-bar{
+  background:transparent;
+  border:none;
+  border-radius:0;
+  box-shadow:none;
+  padding:0;
+  margin-bottom:16px;
+  gap:14px;
+}
+#page-sn .tfb-row1,#page-ci .tfb-row1,#page-global .tfb-row1{gap:12px}
+#page-sn .tfb-row2,#page-ci .tfb-row2,#page-global .tfb-row2{gap:8px}
+
+/* Recherche : pill M3, la même que la topbar. Le fond tonal remplace
+   la bordure — c'est lui qui signale la zone de saisie. */
+.tfb-search{
+  border-radius:var(--m3-r-full)!important;
+  background:var(--m3-surf-2)!important;
+  border:1px solid transparent!important;
+  height:44px;
+  font-size:14px!important;
+  padding-left:44px!important;
+  color:var(--m3-on-surface)!important;
+  transition:background .2s var(--m3-ease),box-shadow .2s var(--m3-ease);
+}
+.tfb-search::placeholder{color:var(--m3-on-surf-var);opacity:1}
+.tfb-search:hover{background:var(--m3-surf-3)!important}
+.tfb-search:focus{
+  background:var(--m3-surface)!important;
+  border-color:transparent!important;
+  box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 1px var(--m3-outline-var);
+  outline:none!important;
+}
+.tfb-search-wrap{max-width:460px}
+.tfb-search-icon{left:16px;color:var(--m3-on-surf-var)}
+
+/* Selects : chips M3 outlined. Au repos ils s'effacent, une fois
+   actifs ils passent en container tonal — l'état se lit d'un coup d'œil. */
+#page-sn .tfb-row2 .filter-select,
+#page-ci .tfb-row2 .filter-select,
+#page-global .tfb-row2 .filter-select{
+  height:36px;margin-bottom:0!important;
+  border-radius:var(--m3-r-sm)!important;
+  border:1px solid var(--m3-outline-var)!important;
+  background:transparent!important;
+  color:var(--m3-on-surf-var)!important;
+  font-size:13px!important;font-weight:500;letter-spacing:.01em;
+  padding:0 10px;
+  transition:background .2s var(--m3-ease),border-color .2s var(--m3-ease),color .2s var(--m3-ease);
+}
+#page-sn .tfb-row2 .filter-select:hover,
+#page-ci .tfb-row2 .filter-select:hover,
+#page-global .tfb-row2 .filter-select:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)!important;
+  color:var(--m3-on-surface)!important;
+}
+.tracker-filter-bar select.filter-select[data-active="1"],
+.tracker-filter-bar input.filter-select[data-active="1"]{
+  background:var(--m3-secondary-cont)!important;
+  border-color:transparent!important;
+  color:var(--m3-on-surface)!important;
+  font-weight:500;
+}
+
+/* Plage de dates : un seul groupe visuel plutôt que deux champs isolés. */
+#page-sn .tfb-daterange,#page-ci .tfb-daterange,#page-global .tfb-daterange{
+  gap:6px;padding:0 4px 0 10px;height:36px;
+  border:1px solid var(--m3-outline-var);
+  border-radius:var(--m3-r-sm);
+}
+#page-sn .tfb-daterange .filter-select,
+#page-ci .tfb-daterange .filter-select,
+#page-global .tfb-daterange .filter-select{
+  height:32px;width:132px;border:none!important;
+  background:transparent!important;padding:0 2px;
+}
+.tfb-cal-icon{color:var(--m3-on-surf-var)}
+.tfb-arrow{color:var(--m3-on-surf-var)}
+
+/* Actions : bouton texte M3 pour Export/Reset, FAB étendu pour l'action
+   principale. Trois boutons de même poids ne hiérarchisaient rien. */
+#page-sn .tfb-actions,#page-ci .tfb-actions,#page-global .tfb-actions{gap:4px}
+#page-sn .tfb-actions .btn-ghost,
+#page-ci .tfb-actions .btn-ghost,
+#page-global .tfb-actions .btn-ghost{
+  border:none!important;background:transparent!important;
+  border-radius:var(--m3-r-full)!important;
+  height:40px;padding:0 16px!important;
+  font-size:13px!important;font-weight:500;letter-spacing:.01em;
+  color:var(--m3-on-surf-var)!important;
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease);
+}
+#page-sn .tfb-actions .btn-ghost:hover,
+#page-ci .tfb-actions .btn-ghost:hover,
+#page-global .tfb-actions .btn-ghost:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)!important;
+  color:var(--m3-on-surface)!important;
+}
+.tfb-reset{color:var(--m3-primary)!important;border-color:transparent!important}
+#page-sn .tfb-actions .tfb-reset:hover,
+#page-ci .tfb-actions .tfb-reset:hover,
+#page-global .tfb-actions .tfb-reset:hover{
+  background:color-mix(in srgb,var(--m3-primary) 10%,transparent)!important;
+  color:var(--m3-primary)!important;
+}
+/* FAB étendu : l'unique surface pleine de la page. */
+.tfb-new{
+  border-radius:var(--m3-r-full)!important;
+  height:40px;padding:0 20px!important;
+  font-size:14px!important;font-weight:500;letter-spacing:.01em;
+  background:var(--m3-primary)!important;color:#fff!important;
+  box-shadow:none!important;
+  transition:box-shadow .2s var(--m3-ease),filter .2s var(--m3-ease);
+}
+.tfb-new:hover{
+  box-shadow:0 1px 3px rgba(0,0,0,.2),0 4px 8px rgba(0,0,0,.12)!important;
+  filter:saturate(1.08);
+}
+
+/* Compteur de résultats */
+.tk-count{
+  font-size:13px;color:var(--m3-on-surf-var);
+  white-space:nowrap;margin-right:8px;letter-spacing:.01em;
+}
+.tk-count.filtered{color:var(--m3-primary);font-weight:500}
+
+/* Chips de filtres actifs : container tonal neutre, pas rouge —
+   un filtre posé n'est pas une erreur. */
+#page-sn .tfb-chips,#page-ci .tfb-chips,#page-global .tfb-chips{gap:8px}
+#page-sn .filter-chip,#page-ci .filter-chip,#page-global .filter-chip{
+  background:var(--m3-secondary-cont);
+  border:none;
+  border-radius:var(--m3-r-full);
+  padding:0 6px 0 12px;height:32px;
+  font-size:13px;font-weight:400;letter-spacing:.01em;
+  color:var(--m3-on-surface);
+  gap:4px;
+}
+#page-sn .filter-chip strong,#page-ci .filter-chip strong,#page-global .filter-chip strong{font-weight:500}
+#page-sn .filter-chip button,#page-ci .filter-chip button,#page-global .filter-chip button{
+  color:var(--m3-on-surf-var);opacity:1;
+  width:24px;height:24px;border-radius:var(--m3-r-full);
+  font-size:11px;flex-shrink:0;
+  transition:background .15s var(--m3-ease);
+}
+#page-sn .filter-chip button:hover,#page-ci .filter-chip button:hover,#page-global .filter-chip button:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 12%,transparent);
+  color:var(--m3-on-surface);
+}
+
+/* ── Tableau : surface unique aux coins XL, séparé par le fond ── */
+#page-sn .table-wrap,#page-ci .table-wrap,#page-global .table-wrap{
+  border:none;
+  background:var(--m3-surf-1);
+  border-radius:var(--m3-r-xl);
+  box-shadow:none;
+  padding:0;
+  max-height:calc(100vh - 268px);
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+[data-theme="dark"] #page-sn .table-wrap,
+[data-theme="dark"] #page-ci .table-wrap,
+[data-theme="dark"] #page-global .table-wrap{background:var(--m3-surf-1)}
+#page-global .table-wrap{max-height:calc(100vh - 268px);overflow:auto}
+
+#page-sn table,#page-ci table,#page-global table{font-size:13px}
+
+/* En-tête collant : même surface que le conteneur, séparé par un
+   trait fin uniquement — un bandeau gris coupait la carte en deux. */
+#page-sn thead tr,#page-ci thead tr,#page-global thead tr{background:transparent;border:none}
+#page-sn .table-wrap thead th,
+#page-ci .table-wrap thead th,
+#page-global .table-wrap thead th{
+  position:sticky;top:0;z-index:2;
+  background:var(--m3-surf-1);
+  box-shadow:inset 0 -1px 0 var(--m3-outline-var);
+  padding:0 var(--tk-gutter);height:48px;
+  font-size:12px;font-weight:500;letter-spacing:.02em;
+  text-transform:none;color:var(--m3-on-surf-var);
+  white-space:nowrap;vertical-align:middle;
+}
+/* Ombre de défilement : l'en-tête se détache dès que le corps glisse
+   dessous, plutôt que de rester un bandeau plat. */
+#page-sn .table-wrap.is-scrolled thead th,
+#page-ci .table-wrap.is-scrolled thead th,
+#page-global .table-wrap.is-scrolled thead th{
+  box-shadow:inset 0 -1px 0 var(--m3-outline-var),0 4px 8px -4px rgba(0,0,0,.18);
+}
+
+/* Le chevron de filtre colonne ne se révèle qu'au survol ou s'il est
+   actif : 30 flèches grises en permanence, c'était le bruit dominant. */
+#page-sn thead th button,#page-ci thead th button,#page-global thead th button{
+  opacity:0;transition:opacity .15s var(--m3-ease),background .15s var(--m3-ease);
+  border-radius:var(--m3-r-full);width:20px;height:20px;
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:0!important;margin-left:4px;
+}
+#page-sn thead th:hover button,#page-ci thead th:hover button,#page-global thead th:hover button{opacity:1}
+#page-sn thead th button:hover,#page-ci thead th button:hover,#page-global thead th button:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 10%,transparent);
+}
+/* colonne filtrée : le chevron reste visible en permanence */
+#page-sn thead th[data-colf] button,
+#page-ci thead th[data-colf] button,
+#page-global thead th[data-colf] button{opacity:1}
+#page-sn thead th[data-colf],
+#page-ci thead th[data-colf],
+#page-global thead th[data-colf]{color:var(--m3-primary)}
+
+/* Lignes : hauteur confortable, séparateur discret, state layer M3. */
+#page-sn tbody tr,#page-ci tbody tr,#page-global tbody tr{
+  position:relative;
+  border-bottom:1px solid var(--m3-outline-var);
+  transition:background .15s var(--m3-ease);
+}
+#page-sn tbody tr:last-child,#page-ci tbody tr:last-child,#page-global tbody tr:last-child{border-bottom:none}
+#page-sn tbody tr:hover,#page-ci tbody tr:hover,#page-global tbody tr:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent);
+}
+#page-sn td,#page-ci td,#page-global td{
+  padding:0 var(--tk-gutter);height:var(--tk-row-h);
+  vertical-align:middle;color:var(--m3-on-surface);
+}
+/* Première colonne : l'identifiant porte le poids. */
+#page-sn td:first-child .td-mono,
+#page-ci td:first-child .td-mono,
+#page-global td:nth-child(2) .td-mono{font-weight:500;color:var(--m3-on-surface)}
+#page-sn .td-title,#page-ci .td-title,#page-global .td-title{font-weight:400;color:var(--m3-on-surface)}
+
+/* Ligne en rupture SLA : liseré à gauche plutôt qu'un fond teinté
+   sur toute la largeur (qui saturait le tableau). */
+#page-sn  tbody tr[data-sla] td:first-child,
+#page-ci  tbody tr[data-sla] td:first-child,
+#page-global tbody tr[data-sla] td:first-child{position:relative}
+#page-sn  tbody tr[data-sla] td:first-child::before,
+#page-ci  tbody tr[data-sla] td:first-child::before,
+#page-global tbody tr[data-sla] td:first-child::before{
+  content:'';position:absolute;left:10px;top:12px;bottom:12px;width:3px;
+  border-radius:var(--m3-r-full);
+}
+/* La 1re colonne cède la place au liseré pour qu'il ne touche jamais
+   le bord arrondi de la carte. */
+#page-sn td:first-child,#page-ci td:first-child,#page-global td:first-child,
+#page-sn th:first-child,#page-ci th:first-child,#page-global th:first-child{
+  padding-left:calc(var(--tk-gutter) + 4px);
+}
+#page-sn  tbody tr[data-sla="breach"] td:first-child::before,
+#page-ci  tbody tr[data-sla="breach"] td:first-child::before,
+#page-global tbody tr[data-sla="breach"] td:first-child::before{background:#D93025}
+#page-sn  tbody tr[data-sla="near"] td:first-child::before,
+#page-ci  tbody tr[data-sla="near"] td:first-child::before,
+#page-global tbody tr[data-sla="near"] td:first-child::before{background:#F9AB00}
+
+/* Badges : capsules M3 uniformes */
+#page-sn .badge,#page-ci .badge,#page-global .badge,
+#page-sn .timeleft,#page-ci .timeleft,#page-global .timeleft{
+  border-radius:var(--m3-r-full);
+  font-size:11.5px;font-weight:500;letter-spacing:.01em;
+  text-transform:none;padding:4px 10px;
+  display:inline-flex;align-items:center;white-space:nowrap;
+}
+
+/* Badge Site (Tracker Global) : distinguer les deux pays sans
+   introduire de couleur porteuse de sens — deux gris tonals. */
+#page-global .badge-site{
+  background:var(--m3-surf-3);color:var(--m3-on-surf-var);
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;
+  font-weight:500;letter-spacing:.04em;padding:4px 9px;
+}
+#page-global .badge-site-sn{
+  background:color-mix(in srgb,var(--m3-primary) 12%,transparent);
+  color:var(--m3-on-primary-cont);
+}
+[data-theme="dark"] #page-global .badge-site-sn{color:var(--m3-primary)}
+
+/* État vide exploitable */
+.tk-empty{text-align:center;padding:72px 20px;color:var(--m3-on-surf-var)}
+.tk-empty svg{
+  width:36px;height:36px;opacity:1;display:block;margin:0 auto 16px;
+  color:var(--m3-on-surf-var);
+}
+.tk-empty-title{font-size:16px;font-weight:500;color:var(--m3-on-surface);letter-spacing:0}
+.tk-empty-sub{font-size:14px;color:var(--m3-on-surf-var);margin:8px 0 20px}
+.tk-empty .btn{
+  border-radius:var(--m3-r-full)!important;height:40px;padding:0 20px!important;
+  font-size:14px!important;font-weight:500;
+  border:1px solid var(--m3-outline)!important;background:transparent!important;
+  color:var(--m3-primary)!important;
+}
+.tk-empty .btn:hover{background:color-mix(in srgb,var(--m3-primary) 8%,transparent)!important}
+/* la cellule d'état vide ne doit pas hériter de la hauteur de ligne */
+#page-sn tbody tr:has(.tk-empty),
+#page-ci tbody tr:has(.tk-empty),
+#page-global tbody tr:has(.tk-empty){border-bottom:none;background:transparent!important}
+/* Le tableau reste large (30 colonnes) même sans lignes : la cellule
+   colspan héritait de cette largeur, et un message centré dedans
+   atterrissait à ~2000px hors de l'écran. On sort le bloc du flux
+   horizontal en le collant au bord gauche du conteneur de scroll. */
+#page-sn td:has(.tk-empty),
+#page-ci td:has(.tk-empty),
+#page-global td:has(.tk-empty){height:auto;padding:0;position:relative}
+#page-sn .tk-empty,#page-ci .tk-empty,#page-global .tk-empty{
+  position:sticky;left:0;
+  /* la largeur du conteneur de scroll, pas celle du tableau */
+  width:var(--tk-vw,100%);
+}
+/* plus de scroll vertical réservé quand il n'y a rien à faire défiler */
+#page-sn .table-wrap:has(.tk-empty),
+#page-ci .table-wrap:has(.tk-empty),
+#page-global .table-wrap:has(.tk-empty){max-height:none}
+
+/* Menu de filtre colonne : surface M3 élevée plutôt que la popup grise. */
+.col-filter-menu{
+  background:var(--m3-surface)!important;
+  border:none!important;
+  border-radius:var(--m3-r-sm)!important;
+  box-shadow:0 2px 6px 2px rgba(0,0,0,.15),0 1px 2px rgba(0,0,0,.3)!important;
+  padding:8px!important;
+  color:var(--m3-on-surface);
+}
+.col-filter-menu input[type=text]{
+  border-radius:var(--m3-r-full)!important;
+  border:1px solid var(--m3-outline-var)!important;
+  background:var(--m3-surf-2)!important;
+  color:var(--m3-on-surface);
+  padding:7px 12px!important;
+}
+.col-filter-menu label{border-radius:var(--m3-r-sm);padding:5px 6px!important}
+.col-filter-menu label:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+.col-filter-menu accent-color{accent-color:var(--m3-primary)}
+.col-filter-menu input[type=checkbox]{accent-color:var(--m3-primary)}
+
+/* Responsive : sous 900px la barre d'outils se replie proprement. */
+@media(max-width:900px){
+  #page-sn,#page-ci,#page-global{--tk-gutter:16px}
+  #page-sn .tfb-row1,#page-ci .tfb-row1,#page-global .tfb-row1{flex-wrap:wrap}
+  #page-sn .tfb-search-wrap,#page-ci .tfb-search-wrap,#page-global .tfb-search-wrap{max-width:none;flex:1 1 100%}
+  #page-sn .tfb-actions,#page-ci .tfb-actions,#page-global .tfb-actions{margin-left:0;flex-wrap:wrap}
+  #page-sn .table-wrap,#page-ci .table-wrap,#page-global .table-wrap{max-height:calc(100vh - 300px)}
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   TRACKERS SN / CI / GLOBAL — refonte alignée sur le dashboard
+   · un bloc en verre porte les vues rapides, les filtres et le tableau ;
+   · le tableau est une seule carte blanche (noire en sombre) ;
+   · badges neutres : la couleur ne reste que là où elle porte une
+     information — P1, Critical, rupture SLA, et un point par statut.
+   ══════════════════════════════════════════════════════════ */
+:is(#page-sn,#page-ci,#page-global) .tr-shell{padding:18px 18px 16px}
+.main:has(:is(#page-sn,#page-ci,#page-global).active){background:transparent!important}
+
+/* Vues rapides */
+.tr-views{display:flex;gap:4px;flex-wrap:wrap;padding:4px;margin-bottom:14px;border-radius:999px;width:fit-content;max-width:100%;
+  background:rgba(38,37,31,.06)}
+[data-theme="dark"] .tr-views{background:rgba(255,255,255,.07)}
+.tr-view{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border:none;border-radius:999px;background:transparent;
+  font:500 13px 'Inter',sans-serif;color:var(--m3-on-surf-var);cursor:pointer;white-space:nowrap}
+.tr-view:hover{color:var(--m3-on-surface)}
+.tr-view.on{background:#FFFFFF;color:var(--m3-on-surface);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+[data-theme="dark"] .tr-view.on{background:#1F1F23;box-shadow:none}
+.tr-view-n{font-size:11.5px;font-weight:600;min-width:20px;height:20px;padding:0 6px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(38,37,31,.07);color:var(--m3-on-surf-var);font-variant-numeric:tabular-nums}
+[data-theme="dark"] .tr-view-n{background:rgba(255,255,255,.09)}
+.tr-view.on .tr-view-n{background:var(--m3-primary);color:#fff}
+.tr-view.is-alert .tr-view-n{background:var(--m3-error);color:#fff}
+
+/* Barre de filtres : sans fond propre, contrôles blancs */
+:is(#page-sn,#page-ci,#page-global) .tracker-filter-bar{background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important;margin-bottom:14px}
+:is(#page-sn,#page-ci,#page-global) .tfb-row1{margin-bottom:10px}
+:is(#page-sn,#page-ci,#page-global) .tfb-search{height:42px!important;border-radius:14px!important;background:#FFFFFF!important;border:1px solid rgba(20,24,32,.10)!important}
+:is(#page-sn,#page-ci,#page-global) .filter-select,
+:is(#page-sn,#page-ci,#page-global) .tfb-daterange{height:36px;border-radius:12px!important;background:#FFFFFF!important;border:1px solid rgba(20,24,32,.10)!important;box-shadow:none!important}
+:is(#page-sn,#page-ci,#page-global) .tfb-daterange .filter-select{border:none!important;height:auto;background:transparent!important}
+[data-theme="dark"] :is(#page-sn,#page-ci,#page-global) :is(.tfb-search,.filter-select,.tfb-daterange){background:#0B0B0D!important;border-color:rgba(255,255,255,.12)!important}
+[data-theme="dark"] :is(#page-sn,#page-ci,#page-global) .tfb-daterange .filter-select{background:transparent!important}
+:is(#page-sn,#page-ci,#page-global) .filter-select[data-active="1"],
+:is(#page-sn,#page-ci,#page-global) .filter-select.is-active{border-color:var(--m3-primary)!important;color:var(--m3-primary)}
+:is(#page-sn,#page-ci,#page-global) .tk-count{font-size:12.5px;color:var(--m3-on-surf-var)}
+
+/* Tableau : une seule carte */
+:is(#page-sn,#page-ci,#page-global) .table-wrap{background:#FFFFFF!important;border:1px solid rgba(20,24,32,.07)!important;border-radius:20px!important;box-shadow:none!important;overflow:auto}
+[data-theme="dark"] :is(#page-sn,#page-ci,#page-global) .table-wrap{background:#000!important;border-color:rgba(255,255,255,.09)!important}
+:is(#page-sn,#page-ci,#page-global) thead th{background:#FFFFFF!important;font-size:11.5px!important;font-weight:600!important;letter-spacing:.02em;color:var(--m3-on-surf-var)!important;
+  border-bottom:1px solid rgba(20,24,32,.08)!important}
+[data-theme="dark"] :is(#page-sn,#page-ci,#page-global) thead th{background:#000!important;border-bottom-color:rgba(255,255,255,.09)!important}
+:is(#page-sn,#page-ci,#page-global) tbody tr{background:transparent!important}
+:is(#page-sn,#page-ci,#page-global) tbody td{border-bottom:1px solid rgba(20,24,32,.05)!important}
+[data-theme="dark"] :is(#page-sn,#page-ci,#page-global) tbody td{border-bottom-color:rgba(255,255,255,.06)!important}
+:is(#page-sn,#page-ci,#page-global) tbody tr:hover td{background:rgba(38,37,31,.035)!important}
+[data-theme="dark"] :is(#page-sn,#page-ci,#page-global) tbody tr:hover td{background:rgba(255,255,255,.04)!important}
+:is(#page-sn,#page-ci,#page-global) tbody tr:last-child td{border-bottom:none!important}
+
+/* Badges neutres */
+:is(#page-sn,#page-ci,#page-global) td .badge{background:transparent!important;padding:0!important;border:none!important;
+  font-size:12.5px!important;font-weight:500!important;color:var(--m3-on-surface)!important;box-shadow:none!important}
+/* Type : simple texte gris */
+:is(#page-sn,#page-ci,#page-global) td .badge[class*="badge-type-"]{color:var(--m3-on-surf-var)!important;font-weight:400!important}
+/* Priorité : pastille neutre, P1 en rouge plein */
+:is(#page-sn,#page-ci,#page-global) td .badge:is(.badge-p1,.badge-p2,.badge-p3,.badge-p4){display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:22px;
+  padding:0 7px!important;border-radius:7px;background:rgba(38,37,31,.07)!important;font-weight:700!important;font-size:11.5px!important}
+[data-theme="dark"] :is(#page-sn,#page-ci,#page-global) td .badge:is(.badge-p2,.badge-p3,.badge-p4){background:rgba(255,255,255,.09)!important}
+:is(#page-sn,#page-ci,#page-global) td .badge.badge-p1{background:var(--m3-error)!important;color:#fff!important}
+/* Sévérité : texte, Critical en rouge */
+:is(#page-sn,#page-ci,#page-global) td .badge.badge-sev-critical{color:var(--m3-error)!important;font-weight:600!important}
+:is(#page-sn,#page-ci,#page-global) td .badge:is(.badge-sev-minor,.badge-sev-warning){color:var(--m3-on-surf-var)!important}
+/* Statut : un point de couleur + texte */
+:is(#page-sn,#page-ci,#page-global) td .badge:is(.badge-open,.badge-inprogress,.badge-onhold,.badge-resolved,.badge-closed,.badge-breach,.badge-insla,.badge-nearbreach,.badge-na)::before{
+  content:'';display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:1px;background:currentColor}
+:is(#page-sn,#page-ci,#page-global) td .badge.badge-open::before{background:var(--m3-primary)}
+:is(#page-sn,#page-ci,#page-global) td .badge.badge-inprogress::before{background:#E0A43B}
+:is(#page-sn,#page-ci,#page-global) td .badge:is(.badge-onhold,.badge-na)::before{background:#A3A6AD}
+:is(#page-sn,#page-ci,#page-global) td .badge:is(.badge-resolved,.badge-closed,.badge-insla)::before{background:#3FB7A0}
+:is(#page-sn,#page-ci,#page-global) td .badge:is(.badge-resolved,.badge-closed){color:var(--m3-on-surf-var)!important}
+:is(#page-sn,#page-ci,#page-global) td .badge.badge-nearbreach::before{background:#E0A43B}
+:is(#page-sn,#page-ci,#page-global) td .badge.badge-breach{color:var(--m3-error)!important;font-weight:600!important}
+:is(#page-sn,#page-ci,#page-global) td .badge.badge-breach::before{background:var(--m3-error)}
+/* Site : pastille neutre */
+#page-global td .badge.badge-site{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 8px!important;border-radius:7px;
+  background:rgba(38,37,31,.07)!important;font-size:11px!important;font-weight:700!important}
+[data-theme="dark"] #page-global td .badge.badge-site{background:rgba(255,255,255,.09)!important}
+
+@media(max-width:640px){
+  :is(#page-sn,#page-ci,#page-global) .tr-shell{padding:12px 10px}
+  .tr-views{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;width:auto}
+  .tr-views::-webkit-scrollbar{display:none}
+}
+
+/* ── Filtres en pilules ──
+   Compacts, à la largeur de leur texte ; un filtre actif passe en noir
+   (on voit d'un coup d'œil ce qui restreint la liste). */
+:is(#page-sn,#page-ci,#page-global) .tfb-row2{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+:is(#page-sn,#page-ci,#page-global) .tfb-row2 .filter-select{width:auto!important;min-width:0!important;flex:0 0 auto;height:36px!important;
+  border-radius:999px!important;padding:0 32px 0 14px!important;font-size:13px!important;font-weight:600!important;color:var(--m3-on-surface)!important}
+:is(#page-sn,#page-ci,#page-global) .tfb-row2 .filter-select:has(option:checked:not([value=""])){
+  background-color:#111214!important;color:#fff!important;border-color:#111214!important;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")!important;
+  background-repeat:no-repeat!important;background-position:right 9px center!important;background-size:16px!important}
+[data-theme="dark"] :is(#page-sn,#page-ci,#page-global) .tfb-row2 .filter-select:has(option:checked:not([value=""])){
+  background-color:#F4F4F5!important;color:#111!important;border-color:#F4F4F5!important;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")!important}
+:is(#page-sn,#page-ci,#page-global) .tfb-daterange{border-radius:999px!important;padding:0 12px!important}
+:is(#page-sn,#page-ci,#page-global) .tfb-daterange[hidden]{display:none!important}
+:is(#page-sn,#page-ci,#page-global) .tfb-daterange .filter-select{padding:0 4px!important;border-radius:0!important;font-weight:500!important;background-image:none!important;
+  background-color:transparent!important;color:var(--m3-on-surface)!important;border:none!important}
+/* Recherche et filtres sur une seule ligne quand la place le permet. */
+:is(#page-sn,#page-ci,#page-global) .tracker-filter-bar{display:flex!important;flex-direction:row!important;flex-wrap:wrap;align-items:center;gap:10px 12px!important}
+:is(#page-sn,#page-ci,#page-global) .tfb-row1{display:contents}
+:is(#page-sn,#page-ci,#page-global) .tfb-search-wrap{order:1;flex:0 1 300px;min-width:220px}
+:is(#page-sn,#page-ci,#page-global) .tfb-row2{order:2;flex:1 1 auto}
+:is(#page-sn,#page-ci,#page-global) .tfb-actions{order:3;margin-left:auto}
+:is(#page-sn,#page-ci,#page-global) .tfb-chips{order:4;flex-basis:100%}
+:is(#page-sn,#page-ci,#page-global) .tfb-search{height:38px!important;border-radius:999px!important}
+:is(#page-sn,#page-ci,#page-global) .tfb-row2 .filter-select{-webkit-appearance:none!important;appearance:none!important;min-width:0!important;max-width:220px}
+:is(#page-sn,#page-ci,#page-global) .tfb-row2 select.filter-select:not(:has(option:checked:not([value=""]))){
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236D695F'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")!important;
+  background-repeat:no-repeat!important;background-position:right 9px center!important;background-size:16px!important}
+:is(#page-sn,#page-ci,#page-global) .tfb-chips [class*="chip"]{background:transparent!important;border:1px solid rgba(20,24,32,.14)!important;color:var(--m3-on-surface)!important;border-radius:999px!important}
+[data-theme="dark"] :is(#page-sn,#page-ci,#page-global) .tfb-chips [class*="chip"]{border-color:rgba(255,255,255,.16)!important}

@@ -1,0 +1,157 @@
+/* ══════════════════════════════════════════════════════════════
+   TRUST MATRIX — grille 2×2 neutre
+   Les quatre cases étaient quatre aplats de couleur (vert, bleu,
+   ambre, rouge) : la page devenait un nuancier et le classement des
+   agents passait après. Ici la grille garde des surfaces neutres, la
+   position dit déjà le sens (haut = performance, droite = engagement)
+   et un seul quadrant — celui qu'on vise — est mis en avant.
+   ══════════════════════════════════════════════════════════════ */
+.tmx-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tmx-q{
+  display:flex;flex-direction:column;gap:12px;min-height:168px;
+  padding:16px 18px;border-radius:var(--m3-r-md,16px);
+  border:1px solid var(--m3-outline-var);background:var(--m3-surface);
+}
+[data-theme="dark"] .tmx-q{background:var(--m3-surf-2);border-color:transparent}
+/* Le quadrant cible se signale par son étiquette « Cible » seule : un
+   liseré coloré en plus disait deux fois la même chose, et rallumait
+   sur la grille la couleur qu'on venait d'en retirer. */
+.tmx-q.is-goal{border-color:var(--m3-outline)}
+[data-theme="dark"] .tmx-q.is-goal{border-color:var(--m3-outline-var)}
+.tmx-q-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tmx-q-title{display:flex;align-items:center;gap:8px;min-width:0}
+.tmx-q-name{
+  font-size:13px;font-weight:500;color:var(--m3-on-surface);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.tmx-q-tag{
+  flex-shrink:0;padding:1px 8px;border-radius:var(--m3-r-full,999px);
+  border:1px solid var(--m3-primary);color:var(--m3-primary);
+  font-size:10px;font-weight:500;letter-spacing:.02em;
+}
+/* Compteur : c'est le chiffre qu'on cherche en balayant la grille. */
+.tmx-q-count{
+  flex-shrink:0;min-width:22px;text-align:center;
+  font-size:13px;font-weight:500;color:var(--m3-on-surf-var);
+  font-variant-numeric:tabular-nums;
+}
+.tmx-q-sub{
+  margin:-6px 0 0;font-size:11px;line-height:1.4;color:var(--m3-on-surf-var);
+}
+/* La conduite à tenir pour le quadrant, reprise du plan : c'est ce qui
+   rend la matrice actionnable plutôt que descriptive. */
+.tmx-q-hint{
+  margin:2px 0 0;font-size:11px;line-height:1.45;color:var(--m3-on-surf-var);
+  opacity:.75;
+}
+.tmx-q-list{display:flex;flex-direction:column;gap:6px;margin-top:auto}
+
+/* Ligne d'agent : même pastille que le sélecteur, pour qu'on reconnaisse
+   la personne d'un écran à l'autre. */
+.tmx-fo{
+  display:flex;align-items:center;gap:10px;padding:7px 10px;
+  border-radius:var(--m3-r-sm,12px);background:var(--m3-surf-1);
+}
+[data-theme="dark"] .tmx-fo{background:var(--m3-surf-3)}
+.tmx-fo-av{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;
+}
+.tmx-fo-name{
+  flex:1;min-width:0;font-size:12.5px;color:var(--m3-on-surface);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.tmx-fo-stats{
+  display:flex;gap:10px;flex-shrink:0;
+  font-size:11.5px;color:var(--m3-on-surface);font-variant-numeric:tabular-nums;
+}
+.tmx-fo-k{color:var(--m3-on-surf-var);margin-right:4px}
+.tmx-fo-u{color:var(--m3-on-surf-var)}
+.tmx-empty{font-size:11.5px;color:var(--m3-on-surf-var);opacity:.7;padding:4px 0}
+.tmx-axes{
+  display:flex;justify-content:space-between;
+  font-size:10.5px;color:var(--m3-on-surf-var);margin-top:12px;padding:0 4px;
+}
+
+@media (max-width:720px){
+  .tmx-grid{grid-template-columns:1fr}
+  .tmx-q{min-height:0}
+  /* Sur une colonne les flèches d'axe ne décrivent plus rien. */
+  .tmx-axes{display:none}
+}
+@media (max-width:480px){
+  .tmx-fo{flex-wrap:wrap}
+  .tmx-fo-stats{width:100%;padding-left:36px}
+}
+
+/* Renvoi depuis le FO Dashboard vers la page d'encadrement */
+.fo-perf-link{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* ── Page Objectifs : mêmes lignes, avec un libellé sur deux niveaux
+   et le rappel de la cible du plan trimestriel. ── */
+.gsla .gsla-row-goal{align-items:center;gap:14px}
+.gsla .gsla-goal-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.gsla .gsla-goal-main .gsla-name{flex:none;cursor:pointer}
+.gsla .gsla-goal-hint{font-size:12px;line-height:1.4;color:var(--m3-on-surf-var)}
+/* Rappel de la mesure automatique, à la suite du texte d'aide : c'est
+   une provenance, pas une consigne — même corps, en italique. */
+.gsla .perf-src{font-style:italic}
+/* Retour à la mesure : action de service, glissée dans la phrase. Un
+   bouton plein ici ferait concurrence à la note saisie, qui est le
+   vrai objet de la ligne. On garde le soulignement du lien. */
+.gsla .perf-revert{
+  appearance:none;-webkit-appearance:none;
+  background:none;border:0;padding:0;margin-left:6px;
+  font:inherit;font-style:normal;color:var(--m3-primary);
+  text-decoration:underline;text-underline-offset:2px;cursor:pointer;
+}
+.gsla .perf-revert:hover{opacity:.75}
+.gsla .perf-revert:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px;border-radius:3px}
+/* Repère, pas une valeur modifiable : contour discret, jamais plein. */
+.gsla .gsla-plan{
+  flex-shrink:0;padding:3px 10px;border-radius:var(--m3-r-full,999px);
+  border:1px solid var(--m3-outline-var);background:var(--m3-surf-1);
+  font-size:11.5px;font-weight:500;color:var(--m3-on-surf-var);
+  white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+[data-theme="dark"] .gsla .gsla-plan{background:var(--m3-surf-2)}
+.gsla .gsla-dir{font-size:14px;color:var(--m3-on-surf-var);width:12px;text-align:center}
+.gsla .gsla-row-goal .gsla-unit{width:18px}
+
+/* ── Objectifs : familles du plan trimestriel ──────────────────
+   Les quatre familles étaient quatre intitulés en capitales posés sur
+   une liste continue : rien ne disait où un groupe finissait. On leur
+   donne un en-tête tenu par une ligne, et les lignes du groupe sont
+   rentrées sous lui — la hiérarchie se voit sans ajouter de cadre. */
+.gsla-goals .gsla-group{border-top:none;padding:0;margin-bottom:26px}
+.gsla-goals .gsla-group:last-child{margin-bottom:0}
+.gsla-goals .gsla-group-t{
+  display:flex;align-items:center;gap:12px;
+  font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);padding:0 0 12px;
+}
+/* Filet de continuation : prolonge le titre jusqu'au bord de la carte
+   et matérialise le bloc auquel les lignes suivantes appartiennent. */
+.gsla-goals .gsla-group-t::after{
+  content:"";flex:1;height:1px;background:var(--m3-outline-var);
+}
+.gsla-goals .gsla-group-count{
+  letter-spacing:0;text-transform:none;font-weight:400;opacity:.8;
+}
+.gsla-goals .gsla-row{margin-bottom:8px}
+.gsla-goals .gsla-row:last-child{margin-bottom:0}
+
+/* Ligne non renseignée : l'objectif est retiré de l'affichage FO. On le
+   marque en repliant la ligne sur elle-même plutôt qu'en la colorant. */
+.gsla-goals .gsla-row.is-unset{border-style:dashed}
+.gsla-goals .gsla-row.is-unset .gsla-plan{opacity:.55}
+
+@media (max-width:640px){
+  .gsla .gsla-row{flex-wrap:wrap;gap:10px}
+  .gsla .gsla-name{flex-basis:100%}
+  .gsla .gsla-eq{width:auto;flex:1}
+  .gsla .gsla-row-goal .gsla-goal-main{flex-basis:100%}
+  .gsla .gsla-plan{order:3}
+}
+

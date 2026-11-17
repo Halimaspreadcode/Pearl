@@ -1,0 +1,513 @@
+/* ══════════════════════════════════════════════
+   RÉCAP — Weekly / Monthly
+   Reprend le langage bento du dashboard : cartes larges à coins très
+   arrondis, une carte sombre qui porte le chiffre clé, surfaces
+   tonales pour le reste. Les listings de tickets ont disparu, ces
+   pages sont désormais des récapitulatifs.
+══════════════════════════════════════════════ */
+.rc{
+  /* Ces tokens reprennent exactement le bento expressif du dashboard
+     (les cartes `.bx` de #page-dashboard) : formes très arrondies, aplats
+     pleins, une carte sombre qui porte le chiffre clé, ronds d'icône.
+     C'est ce langage-là que le dashboard utilise réellement — pas les
+     `.d-card` à filet, qui sont l'ancienne génération de cartes. */
+  --rc-r:var(--m3-r-xl,28px);        /* = .bx */
+  --rc-r-in:var(--m3-r-lg,16px);     /* = .bx-tile */
+  --rc-gap:14px;
+  --rc-pad:26px 28px;                /* = .bx */
+  --rc-surf:var(--m3-surface,#fff);
+  --rc-surf2:var(--m3-surf-2,#F1F3F4);
+  --rc-ink:var(--m3-on-surface,#1F1F1F);
+  --rc-mute:var(--m3-on-surf-var,#5F6368);
+  --rc-line:var(--m3-outline-var,#E3E3E3);
+  --rc-good:#1E8E3E;
+  --rc-bad:var(--m3-error,#C7000B);
+  /* Filet et voile dérivés de l'encre courante : une même règle marche sur
+     surface claire, tonale et sombre — c'est ce qui permet aux mêmes
+     composants internes de vivre dans une carte blanche ou sombre. */
+  --rc-hair:color-mix(in srgb,currentColor 12%,transparent);
+  --rc-fill:color-mix(in srgb,currentColor 6%,transparent);
+  color:var(--rc-ink);
+}
+[data-theme="dark"] .rc{--rc-good:#7BD396}
+
+/* Grille bento : 4 colonnes, les cartes s'étendent sur 1, 2 ou 4. */
+.rc-bento{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:var(--rc-gap);margin-bottom:var(--rc-gap);align-items:stretch;
+}
+.rc-span2{grid-column:span 2}
+.rc-span4{grid-column:span 4}
+
+/* Carte : aplat plein très arrondi, sans bordure ni ombre — comme `.bx`.
+   Le contraste entre les aplats porte la séparation, pas un contour. */
+.rc-card{
+  border-radius:var(--rc-r);padding:var(--rc-pad);
+  display:flex;flex-direction:column;min-width:0;
+  background:var(--rc-surf2);color:var(--rc-ink);
+}
+/* = .bx-dark : inverse le contraste pour porter le chiffre clé. */
+.rc-card.dark{background:#1F2023;color:#FFFFFF}
+[data-theme="dark"] .rc-card.dark{background:#0E0E0F}
+/* = .bx-soft : l'aplat tonal, surface par défaut du bento. */
+.rc-card.soft,.rc-card.tonal{background:var(--rc-surf2)}
+/* = .bx-plain : surface propre à filet, pour les cartes denses. */
+.rc-card.plain{background:var(--rc-surf);border:1px solid var(--rc-line)}
+[data-theme="dark"] .rc-card.plain{background:var(--m3-surf-1);border-color:transparent}
+
+.rc-card-h{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:14px;margin-bottom:16px;
+}
+/* Titres à l'échelle du bento (21px), pas les 14px d'une carte de widget :
+   c'est ce qui donnait un air de tableau d'administration. */
+.rc-card-t{font-size:21px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.rc-card-s{font-size:12.5px;margin-top:5px;opacity:.62;font-weight:400}
+
+/* Rond d'icône, comme .bx-ico. Donne à chaque carte son point d'entrée
+   visuel — c'est un marqueur fort du bento du dashboard. */
+.rc-ico{
+  width:44px;height:44px;border-radius:var(--m3-r-full,999px);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.rc-ico.dark{background:#1F2023;color:#fff}
+[data-theme="dark"] .rc-ico.dark{background:#000}
+.rc-ico.accent{background:var(--m3-primary,#C7000B);color:#fff}
+/* Dans une carte sombre, le rond doit ressortir en clair. */
+.rc-card.dark .rc-ico.dark{background:rgba(255,255,255,.13);color:#fff}
+
+/* Chiffre clé — échelle de .bx-figure (44px / 600 / -.04em), avec son
+   libellé en casse normale au-dessus, comme "Tickets ↗ / 56". */
+.rc-figure{font-size:44px;font-weight:600;letter-spacing:-.04em;line-height:1;
+  font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.rc-figure-lbl{display:flex;align-items:center;gap:7px;
+  font-size:12.5px;opacity:.7;margin-bottom:10px}
+/* Pastille fléchée du dashboard (= .bx-arrow) : marque le chiffre comme
+   une valeur en évolution, pas un simple total. */
+.rc-arrow{
+  width:19px;height:19px;border-radius:var(--m3-r-full,999px);
+  background:var(--m3-primary,#C7000B);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.rc-figure-note{font-size:12.5px;opacity:.62;margin-top:10px}
+
+/* Tuiles internes, à la façon de .bx-tile : aplat tonal, coins largement
+   arrondis, libellé discret puis grand chiffre. */
+.rc-kpis{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));
+  gap:10px;margin-top:auto;
+}
+/* Le fond dérive de l'encre courante (--rc-fill) : la même tuile
+   fonctionne donc dans une carte claire comme dans la carte sombre, sans
+   règle dédiée par thème. */
+.rc-kpi{
+  border-radius:var(--rc-r-in);padding:18px 20px;
+  background:var(--rc-fill);min-width:0;
+}
+.rc-kpi-l{font-size:12px;opacity:.7}
+.rc-kpi-v{font-size:32px;font-weight:600;letter-spacing:-.03em;line-height:1;margin-top:8px;
+  font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.rc-kpi-n{font-size:11.5px;opacity:.6;margin-top:5px}
+.rc-kpi.alert .rc-kpi-v{color:var(--rc-bad)}
+.rc-kpi.good  .rc-kpi-v{color:var(--rc-good)}
+[data-theme="dark"] .rc-kpi.good .rc-kpi-v{color:#7BD396}
+/* Sur l'aplat sombre, le rouge de marque (#C7000B) et le vert foncé
+   descendent sous le seuil de lisibilité : on repasse aux teintes
+   éclaircies, comme le fait le dashboard dans sa carte sombre. */
+.rc-card.dark .rc-kpi.alert .rc-kpi-v{color:#FF8A80}
+.rc-card.dark .rc-kpi.good  .rc-kpi-v{color:#7BD396}
+
+/* Variation : chiffre tabulaire, pas de pilule criarde. */
+.rc-delta{
+  font-size:11px;font-weight:600;padding:1px 7px;border-radius:7px;
+  font-variant-numeric:tabular-nums;background:var(--rc-fill);
+}
+.rc-delta.good{background:color-mix(in srgb,var(--rc-good) 13%,transparent);color:var(--rc-good)}
+.rc-delta.alert{background:color-mix(in srgb,var(--rc-bad) 13%,transparent);color:var(--rc-bad)}
+.rc-card.dark .rc-delta.good{background:rgba(123,211,150,.18);color:#7BD396}
+.rc-card.dark .rc-delta.alert{background:rgba(255,138,128,.18);color:#FF8A80}
+
+/* ══════════════════════════════════════════════
+   SAISIE — Operational Highlights / Risks & Issues
+   Les tableaux larges obligeaient à défiler horizontalement, cachaient
+   priorité et statut dans des menus déroulants, et ne permettaient pas de
+   supprimer une ligne. Chaque entrée devient une fiche : le texte occupe
+   toute la largeur, les attributs sont des puces cliquables visibles, et
+   la fiche porte sa couleur de priorité sur son bord gauche.
+══════════════════════════════════════════════ */
+.rf{display:flex;flex-direction:column;gap:10px}
+.rf-card{
+  position:relative;
+  border-radius:var(--m3-r-lg,16px);
+  background:var(--m3-surface,#fff);
+  border:1px solid var(--m3-outline-var,#E3E3E3);
+  padding:16px 18px 14px 20px;
+  transition:border-color .15s,box-shadow .15s;
+}
+[data-theme="dark"] .rf-card{background:var(--m3-surf-1);border-color:transparent}
+.rf-card:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+/* Priorité : portée par le numéro de la carte, sans liseré. */
+.rf-card[class*="p-"] .rf-num{background:var(--rf-accent);color:#fff}
+.rf-card.p-critical{--rf-accent:#C7000B}
+.rf-card.p-high{--rf-accent:#E8710A}
+.rf-card.p-medium{--rf-accent:#E5B800}
+.rf-card.p-low{--rf-accent:#8A9099}
+/* Fiche déduite automatiquement : fond teinté pour la distinguer d'une
+   saisie manuelle, comme dans l'ancien tableau. */
+.rf-card.auto{background:color-mix(in srgb,var(--accent) 5%,var(--m3-surface,#fff))}
+[data-theme="dark"] .rf-card.auto{background:color-mix(in srgb,var(--accent) 12%,var(--m3-surf-1))}
+
+.rf-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.rf-num{
+  font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--m3-on-surf-var,var(--mute));min-width:16px;
+}
+.rf-badge{
+  font-size:9px;font-weight:700;letter-spacing:.03em;
+  border-radius:4px;padding:2px 7px;white-space:nowrap;
+}
+.rf-time{font-size:10px;font-weight:600;font-family:'DM Mono',monospace;white-space:nowrap}
+/* Supprimer : discret au repos, rouge au survol. Toujours à la même place. */
+.rf-del{
+  margin-left:auto;cursor:pointer;border:none;background:none;
+  color:var(--m3-on-surf-var,var(--mute));opacity:.5;
+  padding:4px;border-radius:6px;display:flex;line-height:0;
+  transition:opacity .12s,color .12s,background .12s;
+}
+.rf-del:hover{opacity:1;color:var(--red);background:var(--red-l,rgba(199,0,11,.09))}
+.rf-del[disabled]{visibility:hidden}
+
+.rf-body textarea{
+  width:100%;border:none;background:transparent;resize:none;overflow:hidden;
+  font-family:'Inter',sans-serif;font-size:13.5px;line-height:1.5;
+  color:var(--m3-on-surface,var(--dark));padding:0;outline:none;
+}
+.rf-body textarea::placeholder{color:var(--m3-on-surf-var,var(--mute));opacity:.7}
+
+/* Pied de fiche : les attributs, en ligne, tous visibles. */
+.rf-foot{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-top:12px;padding-top:11px;border-top:1px solid var(--m3-outline-var,var(--line));
+}
+.rf-field{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.rf-lbl{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--m3-on-surf-var,var(--mute));white-space:nowrap}
+/* Groupe de puces exclusives : remplace un <select>. On voit les options
+   et la sélection sans ouvrir de menu. */
+.rf-chips{display:inline-flex;gap:3px;background:var(--m3-surf-2,var(--bg2));
+  border-radius:99px;padding:3px}
+.rf-chip{
+  border:none;background:none;cursor:pointer;font-family:'Inter',sans-serif;
+  font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;
+  color:var(--m3-on-surf-var,var(--mute));white-space:nowrap;
+  transition:background .12s,color .12s;
+}
+.rf-chip:hover{color:var(--m3-on-surface,var(--dark))}
+.rf-chip.on{background:var(--m3-surface,#fff);color:var(--m3-on-surface,var(--dark));
+  box-shadow:var(--sh-xs)}
+.rf-chip.on.c-critical{background:#C7000B;color:#fff}
+.rf-chip.on.c-high{background:#E8710A;color:#fff}
+.rf-chip.on.c-medium{background:#E5B800;color:#1A1C1E}
+.rf-chip.on.c-low{background:#6B7280;color:#fff}
+.rf-chip.on.s-open{background:#1A73E8;color:#fff}
+.rf-chip.on.s-progress{background:#E8710A;color:#fff}
+.rf-chip.on.s-closed{background:#1E8E3E;color:#fff}
+/* Champ court (FO / BO / colonne libre) : souligné plutôt qu'encadré. */
+.rf-inp{
+  border:none;background:none;border-bottom:1px solid var(--m3-outline-var,var(--line));
+  font-family:'Inter',sans-serif;font-size:12px;padding:3px 2px;outline:none;
+  color:var(--m3-on-surface,var(--dark));min-width:0;width:100px;
+  transition:border-color .15s;
+}
+.rf-inp:focus{border-bottom-color:var(--accent)}
+.rf-inp::placeholder{color:var(--m3-on-surf-var,var(--mute));opacity:.6}
+.rf-sep{margin-left:auto}
+
+.rf-empty{
+  border:1px dashed var(--m3-outline-var,var(--line));border-radius:var(--m3-r-lg,16px);
+  padding:26px 20px;text-align:center;font-size:12.5px;
+  color:var(--m3-on-surf-var,var(--mute));
+}
+.rf-tools{display:flex;gap:12px;align-items:center;padding:4px 0 2px;flex-wrap:wrap}
+.rf-count{font-size:11.5px;color:var(--m3-on-surf-var,var(--mute));margin-left:auto}
+
+@media(max-width:640px){
+  .rf-foot{gap:10px}
+  .rf-field{width:100%}
+  .rf-sep{margin-left:0}
+}
+
+/* Grande statistique, sur le modèle de .bx-tile du dashboard ("CONFORMITÉ
+   SLA / 88% / 49/56 dans les délais" + barre). Remplace les jauges en
+   bandes empilées, qui donnaient trois lignes grises indistinctes. */
+.rc-stat + .rc-stat{margin-top:20px;padding-top:20px;border-top:1px solid var(--rc-hair)}
+.rc-stat-l{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+.rc-stat-v{font-size:38px;font-weight:600;letter-spacing:-.035em;line-height:1;
+  margin-top:10px;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:2px}
+.rc-stat-v u{font-size:20px;font-weight:500;text-decoration:none;opacity:.75}
+.rc-stat-n{font-size:12px;opacity:.62;margin-top:10px}
+.rc-stat-bar{margin-top:12px;height:10px;border-radius:99px;overflow:hidden;background:var(--rc-fill)}
+.rc-stat-bar i{display:block;height:100%;border-radius:99px;transition:width .6s var(--m3-ease,ease)}
+
+/* Répartitions en colonnes verticales (= .bx-col du dashboard). Les
+   anciennes bandes horizontales empilaient une ligne par catégorie : sur
+   six domaines, ça donnait une liste de jauges, pas un graphique. Des
+   colonnes trapues se comparent d'un coup d'œil et occupent la carte. */
+.rc-cols{
+  display:flex;align-items:flex-end;gap:14px;
+  min-height:190px;margin-top:8px;
+}
+.rc-col{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;justify-content:flex-end;gap:8px;
+}
+/* Piste hachurée = le reste du maximum. Donne l'échelle sans écrire d'axe. */
+.rc-col-track{
+  border-radius:var(--m3-r-md,12px);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  overflow:hidden;
+  background:repeating-linear-gradient(-45deg,
+    color-mix(in srgb,currentColor 13%,transparent) 0 1px,
+    transparent 1px 6px);
+}
+.rc-col-fill{
+  border-radius:var(--m3-r-md,12px);
+  transition:height .6s var(--m3-ease,ease);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding-top:8px;min-height:0;
+}
+.rc-col-v{
+  font-size:13px;font-weight:600;color:#fff;
+  font-variant-numeric:tabular-nums;
+}
+/* Sous la colonne : le nom puis l'effectif, comme "juillet / août". */
+.rc-col-cap{
+  font-size:12px;font-weight:500;opacity:.85;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.rc-col-pct{font-size:11px;opacity:.55;text-align:center;font-variant-numeric:tabular-nums}
+
+/* ── Répartition classée (cartes Breakdown des rapports) ──────
+   Reprise du bloc « Breakdown by … » de la carte Ticket volume du
+   dashboard (.bx-break), dont le CSS est verrouillé sous
+   #page-dashboard. Les colonnes seules donnaient la forme mais pas le
+   décompte : il fallait survoler chaque barre pour lire une valeur.
+   Ici chaque catégorie porte son nom, sa jauge, son effectif et sa
+   part, lisibles d'un trait et sans interaction. */
+.rc-break{
+  display:flex;flex-direction:column;gap:9px;
+  margin-top:10px;
+}
+.rc-break-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(56px,1.1fr) 34px 40px;
+  align-items:center;gap:10px;font-size:12.5px;
+}
+.rc-break-k{
+  display:flex;align-items:center;gap:8px;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.9;
+}
+/* Pastille de rappel : relie la ligne à sa couleur de catégorie. */
+.rc-break-dot{width:8px;height:8px;border-radius:var(--m3-r-full,999px);flex-shrink:0}
+.rc-break-t{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.rc-break-bar{
+  height:6px;border-radius:var(--m3-r-full,999px);
+  background:color-mix(in srgb,currentColor 12%,transparent);
+  overflow:hidden;
+}
+.rc-break-bar i{
+  display:block;height:100%;border-radius:var(--m3-r-full,999px);
+  transition:width .5s var(--m3-ease,ease);
+}
+.rc-break-v{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.rc-break-p{text-align:right;font-size:11.5px;opacity:.5;font-variant-numeric:tabular-nums}
+.rc-break-more{font-size:11.5px;opacity:.45;margin-top:2px}
+/* Au serré, la jauge disparaît avant le chiffre : c'est la valeur qui
+   porte l'information, la barre n'en est que la mise en forme. */
+@media(max-width:640px){
+  .rc-break-row{grid-template-columns:minmax(0,1fr) 34px 40px}
+  .rc-break-bar{display:none}
+}
+
+/* Constats déduits */
+/* Constats : une carte par item, icône teintée + valeur détachée.
+   La liste à puces obligeait à lire chaque phrase en entier pour savoir
+   si elle portait une alerte ; ici la couleur et le chiffre le disent
+   avant le texte. Grille auto-fit : 2 colonnes au large, 1 au serré. */
+.rc-insights{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  gap:10px;
+}
+.rc-insight{
+  display:flex;gap:13px;align-items:flex-start;
+  padding:14px 16px;border-radius:16px;
+  background:color-mix(in srgb,currentColor 4%,transparent);
+  border:1px solid color-mix(in srgb,currentColor 8%,transparent);
+  transition:background .18s var(--m3-ease,ease),transform .18s var(--m3-ease,ease);
+}
+.rc-insight:hover{
+  background:color-mix(in srgb,currentColor 7%,transparent);
+  transform:translateY(-1px);
+}
+/* Pastille d'icône : surface tonale à la couleur du ton, comme les
+   pastilles de section du dashboard. */
+.rc-ins-ico{
+  width:34px;height:34px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb,var(--rc-t,#1A73E8) 14%,transparent);
+  color:var(--rc-t,#1A73E8);
+}
+.rc-ins-ico svg{width:17px;height:17px}
+.rc-insight.t-good  {--rc-t:#1E8E3E}
+.rc-insight.t-warn  {--rc-t:#E8710A}
+.rc-insight.t-alert {--rc-t:var(--m3-error,#C7000B)}
+.rc-insight.t-info  {--rc-t:#1A73E8}
+
+.rc-ins-body{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.rc-ins-top{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:10px;min-width:0;
+}
+.rc-ins-lbl{
+  font-size:11.5px;font-weight:600;letter-spacing:.01em;opacity:.7;
+  line-height:1.3;min-width:0;
+}
+/* La valeur ne se comprime jamais : c'est elle qu'on lit en premier. */
+.rc-ins-top{align-items:flex-start}
+/* La valeur porte la couleur du ton : c'est le seul élément coloré de
+   la carte, donc le point d'entrée du regard. */
+.rc-ins-val{
+  font-size:19px;font-weight:600;letter-spacing:-.02em;line-height:1.1;
+  color:var(--rc-t,#1A73E8);flex-shrink:0;font-variant-numeric:tabular-nums;
+}
+.rc-ins-txt{font-size:12px;line-height:1.45;opacity:.62}
+
+/* Performance par FO : pilules à avatar, comme les lignes "Derniers
+   tickets" du dashboard. Deux colonnes en grille sur écran large, pour que
+   dix agents tiennent sans faire défiler la page. */
+.rc-fo{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
+  gap:8px;
+}
+.rc-fo-row{
+  display:flex;align-items:center;gap:13px;
+  padding:12px 16px;border-radius:var(--m3-r-full,999px);
+  background:var(--rc-fill);min-width:0;
+}
+.rc-fo-av{
+  width:36px;height:36px;border-radius:var(--m3-r-full,999px);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:#fff;
+}
+.rc-fo-main{flex:1;min-width:0;display:block}
+.rc-fo-name{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-fo-meta{display:block;font-size:11.5px;opacity:.62;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* La rupture SLA est le seul élément qui doit accrocher l'œil dans la
+   ligne : elle garde sa couleur pleine, le reste reste en gris de lecture. */
+.rc-fo-breach{color:var(--rc-bad);font-weight:600;opacity:1}
+.rc-card.dark .rc-fo-breach{color:#FF8A80}
+.rc-fo-v{
+  flex-shrink:0;text-align:right;font-variant-numeric:tabular-nums;
+  font-size:15px;font-weight:600;line-height:1.15;
+}
+.rc-fo-v span{display:block;font-size:10.5px;font-weight:400;opacity:.55;margin-top:1px}
+.rc-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;padding-top:12px;
+  border-top:1px solid var(--rc-hair);
+  font-size:11px;opacity:.62}
+.rc-legend span{display:inline-flex;align-items:center;gap:6px}
+.rc-legend i{width:8px;height:8px;border-radius:99px;display:block}
+
+.rc-empty{font-size:12px;opacity:.6;padding:20px 0;text-align:center}
+.rc-card-foot{font-size:11px;opacity:.58;margin-top:auto;padding-top:14px;
+  border-top:1px solid var(--rc-hair)}
+
+@media(max-width:1100px){
+  .rc-bento{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rc-span4{grid-column:span 2}
+}
+@media(max-width:640px){
+  .rc{--rc-pad:22px 20px;--rc-r:22px}
+  .rc-bento{grid-template-columns:1fr}
+  .rc-span2,.rc-span4{grid-column:span 1}
+  .rc-figure{font-size:38px}
+}
+.rpt-side-panel{flex-shrink:0;width:230px;position:sticky;top:16px;border:1px solid var(--line);border-radius:10px;padding:0;background:var(--white);box-shadow:0 1px 4px rgba(0,0,0,.04);overflow:hidden}
+.rpt-side-panel-group{padding:14px 16px}
+.rpt-side-panel-group + .rpt-side-panel-group{border-top:1px solid var(--line)}
+.rpt-side-panel-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.rpt-side-panel-title svg{flex-shrink:0;opacity:.7}
+.rpt-side-panel label{display:flex;align-items:center;gap:9px;font-size:12.5px;padding:6px 8px;margin:0 -8px;border-radius:6px;cursor:pointer;transition:background .12s}
+.rpt-side-panel label:hover{background:var(--bg2)}
+.rpt-side-panel input[type=checkbox],.rpt-side-panel input[type=radio]{width:14px;height:14px;accent-color:var(--red);cursor:pointer;flex-shrink:0}
+@media(max-width:900px){
+  /* stretch et non flex-start : en colonne, flex-start donnait au
+     contenu sa largeur naturelle (≈ 725 px sur le Daily), et la page
+     débordait d'autant sur un téléphone. Les tableaux défilent dans
+     leur propre cadre (.table-wrap). */
+  .rpt-layout{flex-direction:column;align-items:stretch}
+  .rpt-main{width:100%}
+  .rpt-side-panel{width:100%;position:static}
+}
+.toc-link{display:block;font-size:13px;color:var(--mute);padding:8px 10px;margin:0 -10px;border-radius:7px;cursor:pointer;transition:background .12s,color .12s;text-decoration:none}
+.toc-link:hover{background:var(--bg2);color:var(--dark)}
+.toc-link.active{background:var(--red);color:#fff;font-weight:600}
+
+.filter-select,.search-input{
+  padding:8px 12px;border:1px solid var(--line);
+  border-radius:var(--r);font-size:12.5px;
+  font-family:'Inter',sans-serif;color:var(--dark);
+  background:var(--input-bg);outline:none;transition:border .1s,box-shadow .1s;
+  height:36px;
+}
+.filter-select:focus,.search-input:focus{border-color:var(--dark);box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+.search-input{width:200px}
+
+.table-wrap{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:var(--r-lg);overflow-x:auto;box-shadow:var(--sh-xs);
+}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead tr{background:var(--bg);border-bottom:1px solid var(--line)}
+th{padding:11px 16px;text-align:left;font-weight:600;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);white-space:nowrap}
+
+/* Tracker — le scroll + l'en-tête figé sont définis dans le bloc
+   « 1-3. TRACKERS » (refonte M3) plus bas, qui porte aussi les
+   surfaces et la densité. Rien ici pour éviter deux sources de vérité. */
+tbody tr{border-bottom:1px solid var(--line);cursor:pointer;transition:background .1s}
+tbody tr:hover{background:var(--bg)}
+tbody tr:last-child{border-bottom:none}
+td{padding:12px 16px;vertical-align:middle;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-mono{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:500}
+.td-title{max-width:260px;font-weight:500}
+
+
+/* ── Weekly Performance — Dakar × Abidjan (weekly-combined.js) ──
+   Saisie des explications avant génération du deck. Ce qui est requis
+   et encore vide se signale en rouge, comme sur la slide. */
+.wkc-modal{max-width:760px;width:100%}
+.wkc-modal .modal-body{max-height:70vh;overflow-y:auto}
+.wkc-loading,.wkc-none{padding:18px;color:var(--mute);font-size:13px}
+.wkc-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:18px}
+.wkc-site{background:var(--m3-surf-2,#F1F3F4);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.wkc-site b{font-size:13px}
+.wkc-site span{font-size:12px;color:var(--mute)}
+.wkc-sec-t{font-size:13px;font-weight:700;margin:16px 0 4px;display:flex;align-items:center;gap:8px}
+.wkc-sec-t span{font-size:11px;font-weight:500;color:var(--mute)}
+.wkc-sec-d{font-size:12px;color:var(--mute);margin-bottom:10px}
+.wkc-item{border:1px solid var(--border,#E4E7EA);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.wkc-item.is-missing{border-color:#D93025;background:rgba(217,48,37,.05)}
+.wkc-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.wkc-item-t{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.wkc-skip{flex:none;font-size:11.5px;padding:2px 10px}
+.wkc-item.is-skipped{opacity:.7;background:var(--m3-surf-2,#F1F3F4)}
+.wkc-item.is-skipped .wkc-req{background:var(--mute,#5F6368)}
+.wkc-item-h{font-size:11.5px;color:var(--mute);margin-bottom:6px}
+.wkc-item textarea{width:100%;min-height:52px;resize:vertical;font-size:12.5px}
+.wkc-req{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:#fff;background:#D93025;border-radius:999px;padding:1px 7px;margin-right:6px;vertical-align:1px}
+.wkc-left{margin-right:auto;font-size:12px;color:var(--mute)}
+.wkc-left.is-missing{color:#D93025;font-weight:600}

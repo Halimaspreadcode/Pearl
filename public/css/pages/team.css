@@ -1,0 +1,337 @@
+/* ══════════════════════════════════════════════════════════════
+   ÉQUIPE (Admin › Équipe)
+
+   Même vocabulaire que la Diffusion et les pages gsla : surfaces
+   blanches à trait fin, rayons de 14–16 px, pastilles arrondies,
+   onglets soulignés. L'état d'un agent se lit par une pastille et une
+   icône teintée, jamais par un liseré latéral.
+
+   Les écrans montés dans #eq-mount gardent leur propre feuille (elles
+   sont ancrées sur leur identifiant) ; on n'y retire ici que ce que
+   l'onglet rend redondant, selon le rôle posé dans data-eq.
+   ══════════════════════════════════════════════════════════════ */
+#page-equipe{
+  --eq-surf:var(--m3-surface,#fff);
+  --eq-surf-2:var(--m3-surf-1,#F8F9FA);
+  --eq-line:var(--m3-outline-var,#E3E3E3);
+  --eq-ink:var(--m3-on-surface,#1F1F1F);
+  --eq-mute:var(--m3-on-surf-var,#5F6368);
+  --eq-pri:var(--m3-primary,#C7000B);
+  --eq-pri-cont:var(--m3-primary-cont,#FDECEC);
+  --eq-on-pri-cont:var(--m3-on-primary-cont,#8C0009);
+  --eq-ok:#1E8E3E;--eq-ok-bg:#E6F4EA;
+  --eq-bad:#C5221F;--eq-bad-bg:#FCE8E6;
+  --eq-warn:#B06000;--eq-warn-bg:#FEF7E0;
+  --eq-info:#1A73E8;--eq-info-bg:#E8F0FE;
+  color:var(--eq-ink);
+  padding-bottom:40px;
+}
+[data-theme="dark"] #page-equipe{
+  --eq-surf:var(--m3-surf-1,#0E0E10);
+  --eq-surf-2:var(--m3-surf-2,#151517);
+  --eq-line:rgba(255,255,255,.08);
+  --eq-ok:#81C995;--eq-ok-bg:rgba(129,201,149,.12);
+  --eq-bad:#F28B82;--eq-bad-bg:rgba(242,139,130,.12);
+  --eq-warn:#FDD663;--eq-warn-bg:rgba(253,214,99,.12);
+  --eq-info:#8AB4F8;--eq-info-bg:rgba(138,180,248,.12);
+}
+#page-equipe h1.page-title{margin:0}
+#page-equipe .eq-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#page-equipe .eq-muted{color:var(--eq-mute);font-size:13px}
+
+/* ── En-tête ── */
+#page-equipe .eq-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+#page-equipe .eq-head .page-sub{margin-bottom:16px}
+
+#page-equipe .eq-fiche-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-4px 0 12px}
+#page-equipe .eq-link{
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 8px;margin-left:-8px;
+  border:none;border-radius:999px;background:transparent;color:var(--eq-pri);
+  font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;
+}
+#page-equipe .eq-link:hover{background:var(--eq-pri-cont)}
+#page-equipe .eq-fiche-step{display:inline-flex;align-items:center;gap:2px;color:var(--eq-mute);font-size:12px}
+#page-equipe .eq-fiche-pos{min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
+#page-equipe .eq-icon-btn{
+  width:34px;height:34px;display:inline-grid;place-items:center;border:none;border-radius:50%;
+  background:transparent;color:var(--eq-mute);cursor:pointer;
+}
+#page-equipe .eq-icon-btn:hover:not(:disabled){background:var(--eq-surf-2);color:var(--eq-ink)}
+#page-equipe .eq-icon-btn:disabled{opacity:.35;cursor:default}
+
+#page-equipe .eq-fiche{
+  display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;
+  padding:18px 20px;margin-bottom:16px;border-radius:16px;
+  background:var(--eq-surf);border:1px solid var(--eq-line);
+}
+#page-equipe .eq-fiche-id{flex:1 1 260px;min-width:0}
+#page-equipe .eq-fiche-role{font-size:13px;color:var(--eq-mute);margin-top:4px}
+#page-equipe .eq-fiche-sig{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+#page-equipe .eq-stats{
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;flex:1 1 520px;
+}
+#page-equipe .eq-stat{padding:10px 12px;border-radius:12px;background:var(--eq-surf-2);min-width:0}
+#page-equipe .eq-stat-v{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+#page-equipe .eq-stat-v small{font-size:12px;font-weight:500;color:var(--eq-bad)}
+#page-equipe .eq-stat-l{font-size:11.5px;color:var(--eq-mute);margin-top:2px;line-height:1.3}
+
+/* ── Avatars, pastilles ── */
+#page-equipe .eq-av{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+  color:#fff;font-size:13px;font-weight:600;letter-spacing:.3px;
+}
+#page-equipe .eq-av-lg{width:56px;height:56px;font-size:18px}
+#page-equipe .eq-chip{
+  display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:8px;
+  border:1px solid var(--eq-line);background:var(--eq-surf);color:var(--eq-ink);
+  font:inherit;font-size:12.5px;font-weight:500;cursor:pointer;
+}
+#page-equipe button.eq-chip:hover{background:var(--eq-surf-2)}
+#page-equipe .eq-chip.is-urgent{background:var(--eq-bad-bg);border-color:transparent;color:var(--eq-bad)}
+#page-equipe .eq-chip.is-todo{background:var(--eq-warn-bg);border-color:transparent;color:var(--eq-warn)}
+#page-equipe .eq-chip.is-ok{background:var(--eq-ok-bg);border-color:transparent;color:var(--eq-ok);cursor:default}
+#page-equipe .eq-tag{
+  display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:500;
+  background:var(--eq-surf-2);color:var(--eq-mute);
+}
+#page-equipe .eq-tag.is-pri{background:var(--eq-pri-cont);color:var(--eq-on-pri-cont)}
+#page-equipe .eq-btn{
+  display:inline-flex;align-items:center;height:34px;padding:0 14px;border-radius:999px;border:none;
+  background:var(--eq-pri-cont);color:var(--eq-on-pri-cont);font:inherit;font-size:13px;font-weight:600;
+  cursor:pointer;white-space:nowrap;
+}
+#page-equipe .eq-btn:hover{filter:brightness(.97)}
+#page-equipe button:focus-visible{outline:2px solid var(--eq-pri);outline-offset:2px}
+
+/* ── Onglets ── */
+#page-equipe .eq-tabs{
+  display:flex;gap:2px;margin-bottom:16px;border-bottom:1px solid var(--eq-line);
+  overflow-x:auto;scrollbar-width:none;
+}
+#page-equipe .eq-tabs::-webkit-scrollbar{display:none}
+#page-equipe .eq-tab{
+  position:relative;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;
+  padding:11px 14px;border:none;background:none;cursor:pointer;white-space:nowrap;
+  font:inherit;font-size:13.5px;color:var(--eq-mute);
+  border-radius:12px 12px 0 0;
+}
+#page-equipe .eq-tab:hover{background:var(--eq-surf-2);color:var(--eq-ink)}
+#page-equipe .eq-tab.is-on{color:var(--eq-pri);font-weight:600}
+#page-equipe .eq-tab.is-on::after{
+  content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:3px;
+  border-radius:3px 3px 0 0;background:var(--eq-pri);
+}
+#page-equipe .eq-tab:focus-visible{outline:2px solid var(--eq-pri);outline-offset:-2px}
+#page-equipe .eq-badge{
+  min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:inline-grid;place-items:center;
+  font-size:11px;font-weight:600;background:var(--eq-pri-cont);color:var(--eq-on-pri-cont);
+}
+
+/* Segments (sous-onglets, filtre de la grille) : même dessin que les
+   segments de la page Assigner des tâches. */
+#page-equipe .eq-seg{
+  display:inline-flex;flex-wrap:wrap;border:1px solid var(--eq-line);border-radius:999px;
+  overflow:hidden;background:var(--eq-surf);
+}
+#page-equipe .eq-seg button{
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border:none;
+  background:transparent;color:var(--eq-ink);font:inherit;font-size:13px;cursor:pointer;
+}
+#page-equipe .eq-seg button + button{border-left:1px solid var(--eq-line)}
+#page-equipe .eq-seg button:hover{background:var(--eq-surf-2)}
+#page-equipe .eq-seg button.is-on{background:var(--eq-pri-cont);color:var(--eq-on-pri-cont);font-weight:600}
+#page-equipe .eq-seg button span{font-size:11.5px;color:var(--eq-mute);font-variant-numeric:tabular-nums}
+#page-equipe .eq-seg button.is-on span{color:inherit;opacity:.8}
+#page-equipe .eq-seg button:focus-visible{outline:2px solid var(--eq-pri);outline-offset:-2px}
+#page-equipe .eq-subtabs{margin-bottom:16px}
+
+/* ── Grille des agents ── */
+#page-equipe .eq-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+#page-equipe .eq-search{
+  display:flex;align-items:center;gap:8px;flex:0 1 320px;min-width:200px;height:38px;padding:0 12px;
+  border:1px solid var(--eq-line);border-radius:999px;background:var(--input-bg,var(--eq-surf));color:var(--eq-mute);
+}
+#page-equipe .eq-search:focus-within{border-color:var(--eq-pri);box-shadow:0 0 0 3px rgba(199,0,11,.12)}
+#page-equipe .eq-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:13px;color:var(--eq-ink)}
+#page-equipe .eq-summary{margin:0 0 14px;font-size:13px;color:var(--eq-mute)}
+#page-equipe .eq-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;max-width:1360px;
+}
+#page-equipe .eq-card{
+  display:flex;flex-direction:column;align-items:stretch;gap:10px;text-align:left;min-width:0;
+  padding:14px 16px 16px;border-radius:16px;border:1px solid var(--eq-line);
+  background:var(--eq-surf);color:var(--eq-ink);font:inherit;cursor:pointer;
+  transition:box-shadow .15s,border-color .15s;
+}
+#page-equipe .eq-card:hover{box-shadow:0 1px 2px rgba(60,64,67,.3),0 2px 6px 2px rgba(60,64,67,.15)}
+[data-theme="dark"] #page-equipe .eq-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.5);border-color:var(--m3-outline,#8E918F)}
+#page-equipe .eq-card-top{display:flex;align-items:center;gap:12px;min-width:0}
+#page-equipe .eq-card-id{flex:1;min-width:0;display:flex;flex-direction:column}
+#page-equipe .eq-card-n{font-size:14.5px;font-weight:600;overflow-wrap:anywhere}
+#page-equipe .eq-card-m{font-size:12px;color:var(--eq-mute);margin-top:1px}
+#page-equipe .eq-state{
+  flex-shrink:0;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap;
+}
+#page-equipe .eq-state.is-urgent{background:var(--eq-bad-bg);color:var(--eq-bad)}
+#page-equipe .eq-state.is-todo{background:var(--eq-warn-bg);color:var(--eq-warn)}
+#page-equipe .eq-state.is-ok{background:var(--eq-ok-bg);color:var(--eq-ok)}
+#page-equipe .eq-sigs{display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--eq-line)}
+#page-equipe .eq-sig{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.35}
+#page-equipe .eq-sig-i{flex-shrink:0;display:inline-flex;margin-top:1px}
+#page-equipe .eq-sig.is-urgent .eq-sig-i{color:var(--eq-bad)}
+#page-equipe .eq-sig.is-todo .eq-sig-i{color:var(--eq-warn)}
+#page-equipe .eq-sig.is-info .eq-sig-i{color:var(--eq-info)}
+#page-equipe .eq-sig.is-info .eq-sig-t{color:var(--eq-mute)}
+#page-equipe .eq-sig-more{font-size:12px;color:var(--eq-mute);padding-left:24px}
+#page-equipe .eq-empty,#page-equipe .eq-note{
+  grid-column:1/-1;padding:24px;border-radius:16px;text-align:center;font-size:13px;
+  color:var(--eq-mute);background:var(--eq-surf-2);
+}
+#page-equipe .eq-note{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+
+/* ── Sections propres à la fiche (Absences, Formation) ── */
+#page-equipe .eq-card-sec{
+  max-width:1360px;padding:18px 20px;margin-bottom:16px;border-radius:16px;
+  background:var(--eq-surf);border:1px solid var(--eq-line);
+}
+#page-equipe .eq-sec-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+#page-equipe .eq-sec-t{font-size:15px;font-weight:600;margin:0 0 10px;border:none;padding:0}
+#page-equipe .eq-sec-h .eq-sec-t{margin:0}
+#page-equipe .eq-sec-d{margin:3px 0 0;font-size:12px;color:var(--eq-mute);line-height:1.45}
+#page-equipe .eq-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+#page-equipe .eq-tile{padding:12px 14px;border-radius:12px;background:var(--eq-surf-2)}
+#page-equipe .eq-tile-v{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+#page-equipe .eq-tile-l{font-size:12px;color:var(--eq-mute);margin-top:2px}
+#page-equipe .eq-tile.is-todo .eq-tile-v{color:var(--eq-warn)}
+#page-equipe .eq-tile.is-urgent .eq-tile-v{color:var(--eq-bad)}
+#page-equipe .eq-table{border:none;background:transparent}
+#page-equipe .eq-table table{width:100%;border-collapse:collapse}
+#page-equipe .eq-table th{font-size:11.5px;font-weight:600;color:var(--eq-mute);text-align:left;padding:8px 10px;border-bottom:1px solid var(--eq-line)}
+#page-equipe .eq-table td{font-size:13px;padding:9px 10px;border-bottom:1px solid var(--eq-line)}
+#page-equipe .eq-table tr:last-child td{border-bottom:none}
+#page-equipe .eq-table tr.is-now td{background:var(--eq-surf-2)}
+#page-equipe .eq-status{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:500}
+#page-equipe .eq-status.is-ok{background:var(--eq-ok-bg);color:var(--eq-ok)}
+#page-equipe .eq-status.is-todo{background:var(--eq-warn-bg);color:var(--eq-warn)}
+#page-equipe .eq-status.is-off{background:var(--eq-surf-2);color:var(--eq-mute)}
+#page-equipe .eq-trns{display:flex;flex-direction:column}
+#page-equipe .eq-trn{display:flex;gap:14px;padding:10px 0;border-top:1px solid var(--eq-line)}
+#page-equipe .eq-trn:first-child{border-top:none;padding-top:0}
+#page-equipe .eq-trn-d{width:86px;flex-shrink:0;display:flex;flex-direction:column}
+#page-equipe .eq-trn-d b{font-size:15px;font-weight:600}
+#page-equipe .eq-trn-d small{font-size:11.5px;color:var(--eq-mute)}
+#page-equipe .eq-trn-b{min-width:0}
+#page-equipe .eq-trn-t{font-size:13.5px;font-weight:500}
+#page-equipe .eq-trn-m{font-size:12px;color:var(--eq-mute);margin-top:2px}
+
+/* ── Écrans montés ──
+   Ils n'ont plus de titre ni d'onglets propres : ceux de la page Équipe
+   les remplacent. Leur en-tête ne garde que ses commandes, à droite. */
+#eq-mount > .page > .gsla-head{margin-bottom:12px;justify-content:flex-end}
+#eq-mount > #page-cfg-perf:not([data-eq="agent-note"]) .perf-bar{display:none}
+#eq-mount > #page-cfg-perf:not([data-eq="agent-note"]) > .gsla-head{display:none}
+/* Notation : le mois et « Save » sur une même ligne, la fiche dessous. */
+#eq-mount > #page-cfg-perf[data-eq="agent-note"] > .gsla-head{float:right;margin:14px 0 0 16px}
+#eq-mount > #page-cfg-perf[data-eq="agent-note"] > .perf-view{clear:both}
+/* Fiche : les vues d'équipe d'un écran partagé ne concernent pas l'agent. */
+#eq-mount > #page-cfg-perf[data-eq="agent-review"] .or-sess{display:none}
+#eq-mount > #page-cfg-objectifs[data-eq="agent"] #obt-alert,
+#eq-mount > #page-cfg-objectifs[data-eq="agent"] #obt-kpis{display:none}
+#eq-mount > #page-cfg-o2o[data-eq="agent"] .o2os-toolbar{display:none}
+
+@media (max-width:900px){
+  #page-equipe .eq-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  #page-equipe .eq-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #page-equipe .eq-grid{grid-template-columns:1fr}
+  #page-equipe .eq-search{flex:1 1 100%}
+  #page-equipe .eq-fiche{padding:14px}
+  #page-equipe .eq-av-lg{width:44px;height:44px;font-size:15px}
+}
+
+/* ── Performance à mettre à jour (onglet Agents, fiche agent) ── */
+#page-equipe .perf-maj{margin:22px 0 16px;padding:14px 16px;border-radius:16px;background:var(--eq-warn-bg);color:var(--eq-ink)}
+#page-equipe .perf-maj-h{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#page-equipe .perf-maj-h b{display:block;font-size:14px}
+#page-equipe .perf-maj-h span{font-size:12.5px;color:var(--eq-mute)}
+#page-equipe .perf-maj ul{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+#page-equipe .perf-maj li{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 10px;border-radius:12px;background:var(--eq-surf)}
+#page-equipe .perf-maj-n{font-weight:600;min-width:150px}
+#page-equipe .perf-maj-c{flex:1;display:flex;flex-wrap:wrap;gap:6px}
+#page-equipe .perf-maj-c em{font-style:normal;font-size:12px;padding:2px 9px;border-radius:999px;background:var(--eq-surf-2)}
+#page-equipe .perf-maj-c em.is-man{color:var(--eq-warn)}
+#page-equipe .perf-maj-a{display:flex;gap:6px}
+#page-equipe .eq-btn.is-pri{background:var(--eq-pri);color:#fff}
+#page-equipe .eq-btn.is-ghost{background:transparent;color:var(--eq-ink);box-shadow:inset 0 0 0 1px var(--eq-line)}
+[data-theme="dark"] #page-equipe .perf-maj{background:rgba(253,214,99,.08)}
+
+/* ══ Refonte : liste à gauche, fil d'Ariane, onglets sur une ligne ══
+   On se perdait entre la vue d'équipe et la fiche d'un agent (mêmes
+   onglets, rien pour dire où l'on était). La liste de gauche porte la
+   sélection, le fil d'Ariane la redit, les sous-onglets rejoignent la
+   ligne des onglets au lieu de s'empiler dessous. */
+#page-equipe{--eq-pri:var(--m3-on-surface,#141518);--eq-pri-cont:var(--m3-surf-2,#F4F5F7);--eq-on-pri-cont:var(--m3-on-surface,#141518)}
+#page-equipe .eq-shell{display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px;align-items:start}
+#page-equipe .eq-rail{position:sticky;top:0;max-height:calc(100vh - 68px - 40px);overflow-y:auto;scrollbar-width:none;
+  background:var(--adm-card,#fff);border:1px solid var(--eq-line);border-radius:22px;padding:10px}
+#page-equipe .eq-rail-search{display:flex;align-items:center;gap:8px;height:38px;padding:0 12px;border-radius:12px;background:var(--eq-surf-2);color:var(--eq-mute);margin-bottom:8px}
+#page-equipe .eq-rail-search input{flex:1;min-width:0;border:0!important;background:transparent!important;box-shadow:none!important;padding:0!important;height:auto;font:inherit;font-size:13px;color:var(--eq-ink)!important;outline:none}
+#page-equipe .eq-rail-h{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--eq-mute);padding:12px 10px 4px}
+#page-equipe .eq-rail-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:0;border-radius:12px;background:none;color:var(--eq-ink);font:inherit;text-align:left;cursor:pointer}
+#page-equipe .eq-rail-item:hover{background:var(--eq-surf-2)}
+#page-equipe .eq-rail-item.is-on{background:var(--eq-ink);color:var(--adm-card,#fff)}
+#page-equipe .eq-rail-item.is-on small{color:inherit;opacity:.7}
+#page-equipe .eq-rail-item .eq-av{width:30px;height:30px;font-size:11px;flex:none}
+#page-equipe .eq-rail-ic{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--eq-surf-2);color:var(--eq-ink);flex:none}
+#page-equipe .eq-rail-item.is-on .eq-rail-ic{background:rgba(255,255,255,.15);color:inherit}
+#page-equipe .eq-rail-ic svg{width:16px;height:16px}
+#page-equipe .eq-rail-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+#page-equipe .eq-rail-t b{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#page-equipe .eq-rail-t small{font-size:11.5px;color:var(--eq-mute)}
+#page-equipe .eq-rail-n{flex:none;min-width:20px;height:20px;padding:0 6px;border-radius:999px;display:grid;place-items:center;font-size:11px;font-weight:700;background:#E8833A;color:#fff}
+#page-equipe .eq-rail-n.is-urgent{background:#D64545}
+#page-equipe .eq-rail-ok{flex:none;font-size:12px;color:#2E9E5B;font-weight:700;width:20px;text-align:center}
+#page-equipe .eq-rail-item.is-on .eq-rail-ok{color:inherit}
+#page-equipe .eq-rail-e{font-size:12.5px;color:var(--eq-mute);padding:8px 10px;margin:0}
+#page-equipe .eq-main{min-width:0}
+#page-equipe .eq-crumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--eq-mute);margin:0 0 10px}
+#page-equipe .eq-crumb button{border:0;background:none;padding:0;font:inherit;color:var(--eq-mute);cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:transparent}
+#page-equipe .eq-crumb button:hover{color:var(--eq-ink);text-decoration-color:currentColor}
+#page-equipe .eq-crumb span{color:var(--eq-ink);font-weight:600}
+#page-equipe .eq-crumb i{font-style:normal;opacity:.5}
+#page-equipe .eq-head-team{justify-content:flex-start;align-items:center;gap:14px;margin-bottom:6px}
+#page-equipe .eq-team-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:var(--eq-ink);color:var(--adm-card,#fff);flex:none}
+#page-equipe .eq-team-ic svg{width:24px;height:24px}
+#page-equipe .eq-head-team .page-sub{margin:2px 0 0!important}
+#page-equipe .eq-fiche-nav{margin:0 0 10px}
+#page-equipe .eq-tabbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--eq-line);margin:14px 0 18px}
+#page-equipe .eq-tabbar .eq-tabs{border-bottom:0;margin:0}
+#page-equipe #eq-sub:empty{display:none}
+#page-equipe #eq-sub{padding-bottom:6px}
+#page-equipe .eq-tabbar .eq-subtabs{margin:0}
+#page-equipe .eq-tab.is-on{color:var(--eq-ink)}
+#page-equipe .eq-tab.is-on::after{background:var(--eq-ink)}
+#page-equipe .eq-badge{background:#E8833A;color:#fff}
+#page-equipe .eq-seg button.is-on{background:var(--eq-ink);color:var(--adm-card,#fff)}
+/* La grille garde son filtre ; la recherche est dans la liste de gauche. */
+#page-equipe #eq-agents .eq-search{display:none}
+/* One-to-One vu de l'équipe : le profil d'un agent est dans sa fiche. */
+#eq-mount > #page-cfg-o2o[data-eq="team"] .o2os-tab[data-tab="profil"],
+#eq-mount > #page-cfg-o2o[data-eq="team"] .o2os-agent{display:none}
+@media (max-width:1000px){
+  #page-equipe .eq-shell{grid-template-columns:1fr}
+  #page-equipe .eq-rail{position:static;max-height:none;display:flex;gap:6px;overflow-x:auto;padding:8px}
+  #page-equipe .eq-rail-search,#page-equipe .eq-rail-h{display:none}
+  #page-equipe #eq-rail-list{display:flex;gap:6px}
+  #page-equipe .eq-rail-item{width:auto;flex:none}
+}
+#eq-mount > #page-cfg-o2o[data-eq="team"] .o2os-toolbar{display:none}
+/* Tâches dans la fiche d'un agent : l'agent est déjà choisi à gauche. */
+#eq-mount > #page-cfg-assign[data-eq="agent"] .asg-who,
+#eq-mount > #page-cfg-assign[data-eq="agent"] #asg-filter-fo{display:none}
+
+/* Pas de barre de défilement visible dans l'espace Équipe (liste des
+   agents, onglets, tableaux) : on défile à la molette ou au doigt. */
+#page-equipe, #page-equipe *{scrollbar-width:none}
+#page-equipe::-webkit-scrollbar, #page-equipe *::-webkit-scrollbar{display:none;width:0;height:0}

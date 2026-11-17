@@ -1,0 +1,278 @@
+/* ══════════════════════════════════════════════════════════════
+   SUIVI DES OBJECTIFS (Admin › Suivi des objectifs)
+
+   Pas de filet de couleur à gauche des cartes : répété sur cinq
+   compteurs et dix objectifs, le procédé transforme la page en code
+   couleur qu'il faut déchiffrer, et le rouge y perd le sens d'alerte
+   qu'on veut justement lui garder pour les dépassements.
+
+   L'état passe donc par la valeur elle-même — un chiffre en rouge se
+   lit sans légende — et par une pastille devant l'intitulé quand il
+   faut distinguer deux cartes voisines.
+   ══════════════════════════════════════════════════════════════ */
+#page-cfg-objectifs .gsla-card{max-width:1360px}
+.obt-headctl{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.obt-sess{
+  display:inline-flex;align-items:baseline;gap:8px;padding:6px 13px;
+  border-radius:var(--m3-r-full,999px);background:var(--m3-surf-2,#F1F3F4);
+  color:var(--m3-on-surface,var(--dark));font-size:12.5px;
+}
+[data-theme="dark"] .obt-sess{background:var(--m3-surf-2)}
+.obt-sess small{font-size:11px;color:var(--m3-on-surf-var,var(--mute))}
+.obt-sess.is-off{color:var(--m3-on-surf-var,var(--mute))}
+
+/* Sélecteur de session d'objectifs ‹ T3 2026 › — partagé avec le Profil
+   One-to-One (objSessionPicker, perf.js). */
+.objsess{display:inline-flex;align-items:center;gap:4px}
+.objsess .objsess-sel{width:auto;min-width:150px;max-width:240px;height:32px;padding:4px 10px;font-size:12.5px}
+.objsess .objsess-nav{
+  width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
+  border:0;border-radius:var(--m3-r-full,999px);background:transparent;cursor:pointer;
+  color:var(--m3-on-surf-var,var(--mute));font-size:18px;line-height:1;
+}
+.objsess .objsess-nav:hover:not(:disabled){background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surface,var(--dark))}
+.objsess .objsess-nav:disabled{opacity:.35;cursor:default}
+.o2os-obj-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.o2os-obj-head h3{margin:0}
+
+/* ── Le rappel en exergue ──
+   Le seul endroit de la page où la couleur est pleine : c'est ce qui
+   lui rend sa valeur de signal. */
+.obt-alert{
+  display:flex;gap:13px;align-items:flex-start;max-width:1360px;
+  padding:15px 17px;margin-bottom:10px;border-radius:14px;
+  background:var(--red-l,#FCE8E6);border:1px solid rgba(199,0,11,.22);
+}
+[data-theme="dark"] .obt-alert{background:#2A1113;border-color:rgba(255,120,120,.22)}
+.obt-alert.is-warn{background:#FEF7E0;border-color:rgba(230,81,0,.22)}
+[data-theme="dark"] .obt-alert.is-warn{background:#2A1F08;border-color:rgba(251,188,4,.22)}
+.obt-alert-ico{color:var(--red);flex-shrink:0;margin-top:1px}
+.obt-alert.is-warn .obt-alert-ico{color:#E65100}
+.obt-alert-body{min-width:0;flex:1}
+.obt-alert-t{font-size:14.5px;font-weight:700;color:var(--dark);margin-bottom:3px}
+[data-theme="dark"] .obt-alert-t{color:#fff}
+.obt-alert-d{font-size:12.5px;line-height:1.55;color:var(--dark);opacity:.85}
+[data-theme="dark"] .obt-alert-d{color:#EDEDED}
+.obt-alert-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.obt-chip{
+  display:inline-flex;align-items:center;gap:7px;padding:4px 11px;cursor:pointer;
+  border-radius:var(--m3-r-full,999px);border:1px solid rgba(199,0,11,.3);
+  background:var(--white,#fff);font:inherit;font-size:12px;color:var(--dark);
+}
+[data-theme="dark"] .obt-chip{background:rgba(255,255,255,.07);color:#fff}
+.obt-chip:hover{filter:brightness(.97)}
+.obt-chip span{
+  background:var(--red);color:#fff;border-radius:999px;
+  padding:0 6px;font-size:10.5px;font-weight:700;
+}
+.obt-ok{
+  display:flex;align-items:center;gap:9px;max-width:1360px;
+  padding:11px 15px;margin-bottom:10px;border-radius:12px;
+  background:var(--ok-bg);color:var(--ok-fg);font-size:12.5px;font-weight:500;
+}
+
+/* ── Compteurs ──
+   Une ligne de chiffres, pas cinq encadrés : la couleur est portée par
+   la valeur, l'encadré disparaît. */
+.obt-kpis{
+  display:flex;flex-wrap:wrap;gap:0 28px;align-items:baseline;
+  padding:2px 2px 14px;margin-bottom:16px;max-width:1360px;
+  border-bottom:1px solid var(--m3-outline-var,#E3E3E3);
+}
+.obt-kpi{display:inline-flex;align-items:baseline;gap:7px}
+.obt-kpi-v{
+  font-size:19px;font-weight:600;letter-spacing:-.01em;line-height:1.1;
+  color:var(--m3-on-surface,var(--dark));font-variant-numeric:tabular-nums;
+}
+.obt-kpi.is-ok .obt-kpi-v{color:var(--ok-fg)}
+.obt-kpi.is-warn .obt-kpi-v{color:#E65100}
+.obt-kpi.is-bad .obt-kpi-v{color:var(--red)}
+.obt-kpi-l{font-size:12px;color:var(--m3-on-surf-var,var(--mute))}
+
+/* ── Barre de vues ── */
+.obt-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;margin-bottom:14px;max-width:1360px;
+}
+.obt-tabs{display:flex;gap:2px;flex-wrap:wrap}
+.obt-tab{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 2px;margin-right:20px;
+  cursor:pointer;border:none;background:transparent;font:inherit;font-size:13px;
+  color:var(--m3-on-surf-var,var(--mute));border-bottom:2px solid transparent;
+}
+.obt-tab:hover{color:var(--m3-on-surface,var(--dark))}
+.obt-tab.is-on{color:var(--m3-primary);border-bottom-color:var(--m3-primary);font-weight:600}
+.obt-tab span{
+  font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:999px;
+  background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surf-var,var(--mute));
+}
+.obt-tab.is-on span{background:var(--m3-primary);color:#fff}
+.obt-sel{max-width:230px}
+
+/* ── Cartes d'objectif ──
+   Encadré neutre pour tout le monde ; l'état se lit à la pastille
+   devant le titre, à la couleur de l'échéance et à celle de la barre. */
+.obt-list{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));
+  gap:12px;max-width:1360px;
+}
+.obt-card{
+  padding:15px 17px;border-radius:14px;
+  background:var(--m3-surface,#fff);border:1px solid var(--m3-outline-var,#E3E3E3);
+}
+[data-theme="dark"] .obt-card{background:var(--m3-surf-1);border-color:transparent}
+.obt-card-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:11px}
+.obt-av{
+  width:29px;height:29px;border-radius:50%;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;color:#fff;font-size:10.5px;font-weight:600;
+}
+.obt-card-id{flex:1;min-width:0}
+.obt-card-t{
+  font-size:13.5px;font-weight:600;color:var(--m3-on-surface,var(--dark));line-height:1.4;
+}
+/* Pastille d'état devant le titre : trois pixels de couleur suffisent à
+   ranger une carte, là où un filet pleine hauteur colorait tout l'écran. */
+.obt-card.is-bad .obt-card-t::before,
+.obt-card.is-warn .obt-card-t::before,
+.obt-card.is-ok .obt-card-t::before{
+  content:'';display:inline-block;width:7px;height:7px;border-radius:50%;
+  margin-right:8px;vertical-align:middle;
+}
+.obt-card.is-bad .obt-card-t::before{background:var(--red)}
+.obt-card.is-warn .obt-card-t::before{background:#E65100}
+.obt-card.is-ok .obt-card-t::before{background:var(--ok-fg)}
+.obt-card-fo{font-size:11.5px;color:var(--m3-on-surf-var,var(--mute));margin-top:2px}
+.obt-card-due{
+  text-align:right;flex-shrink:0;font-size:11.5px;
+  color:var(--m3-on-surf-var,var(--mute));font-variant-numeric:tabular-nums;
+}
+.obt-card-due b{display:block;font-size:12px;color:var(--red);margin-top:2px}
+.obt-late{color:var(--red);font-weight:600}
+.obt-prog{display:flex;align-items:center;gap:10px}
+.obt-prog-bar{
+  flex:1;height:6px;border-radius:999px;overflow:hidden;
+  background:var(--m3-surf-2,#F1F3F4);
+}
+[data-theme="dark"] .obt-prog-bar{background:var(--m3-surf-3)}
+.obt-prog-bar i{display:block;height:100%;border-radius:999px;background:var(--m3-primary);opacity:.8}
+.obt-card.is-bad .obt-prog-bar i{background:var(--red)}
+.obt-card.is-warn .obt-prog-bar i{background:#E65100}
+.obt-card.is-ok .obt-prog-bar i{background:var(--ok-fg)}
+.obt-prog-v{
+  font-size:12.5px;font-weight:600;min-width:38px;text-align:right;
+  font-variant-numeric:tabular-nums;color:var(--m3-on-surface,var(--dark));
+}
+.obt-note{margin-top:9px;font-size:11.5px;color:#E65100;line-height:1.45}
+.obt-steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+.obt-step{
+  font-size:11px;padding:3px 9px;border-radius:999px;cursor:help;
+  background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surf-var,var(--mute));
+}
+[data-theme="dark"] .obt-step{background:var(--m3-surf-3)}
+.obt-step.is-done{background:var(--ok-bg);color:var(--ok-fg)}
+.obt-step.is-late{background:#FEF7E0;color:#E65100}
+[data-theme="dark"] .obt-step.is-late{background:#2A1F08;color:#FBBC04}
+.obt-step.is-over{background:var(--red-l,#FCE8E6);color:var(--red)}
+[data-theme="dark"] .obt-step.is-over{background:#2A1113;color:#FF8A80}
+.obt-nosteps{
+  margin-top:10px;font-size:11.5px;color:var(--m3-on-surf-var,var(--mute));opacity:.8;
+}
+.or-btn.is-ghost{background:transparent;border:1px solid var(--m3-outline-var,#E3E3E3)}
+
+@media (max-width:760px){
+  .obt-list{grid-template-columns:1fr}
+  .obt-bar{flex-direction:column;align-items:stretch}
+  .obt-sel{max-width:none}
+  .obt-kpis{gap:0 18px}
+  .obt-kpi-v{font-size:16px}
+}
+
+
+/* ── Carte cliquable et fiche d'un objectif ── */
+.obt-card-click{cursor:pointer;transition:box-shadow .15s ease,transform .15s ease}
+.obt-card-click:hover{box-shadow:0 0 0 1px var(--m3-outline);transform:translateY(-1px)}
+.obt-card-click:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+.obt-modal{position:fixed;inset:0;z-index:900;display:none;align-items:flex-start;justify-content:center;
+  padding:6vh 16px;background:rgba(20,20,24,.45);overflow-y:auto}
+.obt-modal.open{display:flex}
+.obt-dlg{width:100%;max-width:680px;background:var(--m3-surface);color:var(--m3-on-surface);
+  border-radius:var(--m3-r-xl,20px);padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+[data-theme="dark"] .obt-dlg{background:var(--m3-surf-1)}
+.obt-dlg-h{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.obt-dlg-id{flex:1;min-width:0}
+.obt-dlg-t{font-size:17px;font-weight:600;line-height:1.3}
+.obt-dlg-fo{font-size:12.5px;color:var(--m3-on-surf-var);margin-top:2px}
+.obt-dlg-x{border:none;background:none;font-size:24px;line-height:1;cursor:pointer;color:var(--m3-on-surf-var);padding:4px 8px;border-radius:999px}
+.obt-dlg-x:hover{background:var(--m3-surf-2)}
+.obt-dlg-sec{padding:12px 0;border-top:1px solid var(--m3-outline-var);font-size:13px}
+.obt-dlg-k{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--m3-on-surf-var);margin-bottom:8px}
+.obt-dlg-kpi{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:4px 0}
+.obt-dlg-target{padding:1px 8px;border-radius:999px;background:var(--m3-surf-2);font-weight:600}
+.obt-dlg-src{color:var(--m3-on-surf-var);font-size:12px}
+.obt-dlg-step{display:grid;grid-template-columns:18px 1fr auto;gap:4px 10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--m3-outline-var)}
+.obt-dlg-step:last-of-type{border-bottom:none}
+.obt-dlg-lbl{font-weight:500}
+.obt-dlg-due{color:var(--m3-on-surf-var);font-size:12px;text-align:right}
+.obt-dlg-st{grid-column:2;font-size:12px;color:var(--m3-on-surf-var)}
+.obt-dlg-step.is-done .obt-dlg-st{color:#1E8E3E}
+.obt-dlg-step.is-late .obt-dlg-st,.obt-dlg-step.is-over .obt-dlg-st{color:#C5221F}
+[data-theme="dark"] .obt-dlg-step.is-done .obt-dlg-st{color:#81C995}
+[data-theme="dark"] .obt-dlg-step.is-late .obt-dlg-st,[data-theme="dark"] .obt-dlg-step.is-over .obt-dlg-st{color:#F28B82}
+.obt-dlg-when{grid-column:3;grid-row:2;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--m3-on-surf-var)}
+.obt-dlg-when input{height:30px;padding:2px 6px;border-radius:8px;border:1px solid var(--m3-outline-var);background:transparent;color:inherit;font:inherit}
+.obt-dlg-none{color:var(--m3-on-surf-var)}
+.obt-dlg-hint{margin-top:10px;font-size:12px;color:var(--m3-on-surf-var)}
+@media(max-width:560px){.obt-dlg-step{grid-template-columns:18px 1fr}.obt-dlg-due,.obt-dlg-when{grid-column:2;grid-row:auto;text-align:left}}
+
+/* ── Correction groupée des dates de jalons ── */
+.obt-fix-btn{margin-left:10px;border:1px solid var(--m3-outline-var);background:transparent;color:var(--m3-on-surf-var);
+  border-radius:999px;padding:5px 12px;font:inherit;font-size:12px;font-weight:500;cursor:pointer}
+.obt-fix-btn:hover{background:var(--m3-surf-2)}
+.obt-fix-btn.is-on{color:#B06000;border-color:#F9AB00}
+.obt-fix-btn b{margin-left:4px}
+.obt-dlg-wide{max-width:900px}
+.obt-fix-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--m3-outline-var);font-size:13px}
+.obt-fix-list{max-height:60vh;overflow-y:auto}
+.obt-fix-row{display:grid;grid-template-columns:150px 1fr 96px 150px 120px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--m3-outline-var);font-size:13px}
+.obt-fix-row.is-h{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--m3-on-surf-var);position:sticky;top:0;background:inherit}
+.obt-fix-row.is-late .obt-fix-due{color:#C5221F;font-weight:600}
+[data-theme="dark"] .obt-fix-row.is-late .obt-fix-due{color:#F28B82}
+.obt-fix-what small{display:block;font-size:11.5px;color:var(--m3-on-surf-var)}
+.obt-fix-row input{height:32px;padding:2px 6px;border-radius:8px;border:1px solid var(--m3-outline-var);background:transparent;color:inherit;font:inherit;width:100%}
+.obt-fix-due-btn{border:none;background:var(--m3-surf-2);color:var(--m3-on-surface);border-radius:999px;padding:6px 10px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap}
+.obt-fix-due-btn:hover{background:var(--m3-surf-3)}
+.obt-fix-ok{font-size:12px;color:#1E8E3E}
+@media(max-width:720px){.obt-fix-row{grid-template-columns:1fr 1fr}.obt-fix-row.is-h{display:none}}
+.obt-fix-sub{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--m3-on-surf-var);padding:14px 0 4px}
+
+/* ── Carte du Suivi : objectif, KPI, jalons avec deadline ── */
+.obt-sec-k{display:flex;justify-content:space-between;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--m3-on-surf-var);margin:12px 0 5px}
+.obt-sec-k span{font-weight:600;letter-spacing:.3px}
+.obt-kpis{display:flex;flex-wrap:wrap;gap:6px}
+.obt-kpi{display:inline-flex;align-items:baseline;gap:6px;padding:4px 10px;border-radius:999px;background:var(--m3-surf-2);font-size:12px}
+[data-theme="dark"] .obt-kpi{background:var(--m3-surf-3)}
+.obt-kpi b{font-weight:600}
+.obt-kpi i{font-style:normal;color:var(--m3-on-surf-var)}
+.obt-nokpi{font-size:12px;color:var(--m3-on-surf-var)}
+.obt-ms{display:flex;flex-direction:column}
+.obt-ms-row{display:grid;grid-template-columns:18px 1fr auto auto;gap:8px;align-items:center;padding:5px 0;font-size:12.5px;border-top:1px dashed var(--m3-outline-var)}
+.obt-ms-row:first-child{border-top:none}
+.obt-ms-mark{text-align:center;font-weight:700;color:var(--m3-on-surf-var)}
+.obt-ms-l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.obt-ms-due{font-variant-numeric:tabular-nums;font-weight:600}
+.obt-ms-st{font-size:11.5px;color:var(--m3-on-surf-var);min-width:0;white-space:nowrap}
+.obt-ms-row.is-done .obt-ms-mark,.obt-ms-row.is-done .obt-ms-st{color:#1E8E3E}
+.obt-ms-row.is-done .obt-ms-l{color:var(--m3-on-surf-var)}
+.obt-ms-row.is-late .obt-ms-mark,.obt-ms-row.is-late .obt-ms-st{color:#B06000}
+.obt-ms-row.is-over .obt-ms-mark,.obt-ms-row.is-over .obt-ms-due,.obt-ms-row.is-over .obt-ms-st{color:#C5221F}
+[data-theme="dark"] .obt-ms-row.is-done .obt-ms-mark,[data-theme="dark"] .obt-ms-row.is-done .obt-ms-st{color:#81C995}
+[data-theme="dark"] .obt-ms-row.is-late .obt-ms-mark,[data-theme="dark"] .obt-ms-row.is-late .obt-ms-st{color:#FDD663}
+[data-theme="dark"] .obt-ms-row.is-over .obt-ms-mark,[data-theme="dark"] .obt-ms-row.is-over .obt-ms-due,[data-theme="dark"] .obt-ms-row.is-over .obt-ms-st{color:#F28B82}
+
+/* Sélecteur d'équipe SN / CI / toutes (Suivi, approbations, exports) */
+.obj-team{display:inline-flex;border:1px solid var(--m3-outline-var);border-radius:999px;overflow:hidden;flex-shrink:0}
+.obj-team button{border:none;background:transparent;color:var(--m3-on-surf-var);font:inherit;font-size:12.5px;font-weight:500;padding:7px 12px;cursor:pointer}
+.obj-team button + button{border-left:1px solid var(--m3-outline-var)}
+.obj-team button:hover{background:var(--m3-surf-2)}
+.obj-team button.is-on{background:var(--m3-secondary-cont,#E8DEF8);color:var(--m3-on-primary-cont,#1D192B)}

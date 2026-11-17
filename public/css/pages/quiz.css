@@ -1,0 +1,658 @@
+/* ══════════════════════════════════════════════════════════
+   QUIZ — refonte Material 3
+   Un quiz est un moment d'apprentissage, pas un examen : la page
+   doit rassurer avant de mesurer. D'où des surfaces calmes, une
+   seule couleur d'accent par état, et zéro rouge tant que rien
+   n'est raté. Le lecteur plein écran retire tout le châssis de
+   l'app pour qu'il ne reste que la question.
+   ══════════════════════════════════════════════════════════ */
+#page-quiz{
+  --m3-primary:        #4F6A85;
+  --m3-on-primary:     #FFFFFF;
+  --m3-primary-cont:   #E4EAF0;
+  --m3-on-primary-cont:#2F4A66;
+
+  --m3-surface:        #FCFBF8;
+  --m3-surf-1:         #F7F5F0;
+  --m3-surf-2:         #F0ECE5;
+  --m3-surf-3:         #E8E3DA;
+  --m3-on-surface:     #26251F;
+  --m3-on-surf-var:    #6D695F;
+  --m3-outline:        #CEC8BC;
+  --m3-outline-var:    #E6E1D7;
+
+  /* Sémantique de résultat, identique partout sur la page. */
+  --qz-ok:   #1E7B34;  --qz-ok-c:   #E6F4EA;
+  --qz-mid:  #B06000;  --qz-mid-c:  #FEF7E0;
+  --qz-no:   #C7000B;  --qz-no-c:   #FCE8E6;
+  --qz-info: #1A73E8;  --qz-info-c: #E8F0FE;
+
+  /* ── Palette gamifiée ────────────────────────────────────
+     Un parcours de formation se lit mieux avec un code couleur
+     par état (fait / en cours / verrouillé) qu'avec des nuances
+     de gris. Ces teintes servent aussi de "matière" aux boutons
+     à relief : chaque -sh est la même couleur assombrie, posée
+     en bordure basse pour donner l'épaisseur. */
+  --g-green:  #58CC02;  --g-green-sh:  #46A302;  --g-green-c:  #E8F8DC;
+  --g-blue:   #1CB0F6;  --g-blue-sh:   #1899D6;  --g-blue-c:   #DDF4FE;
+  --g-gold:   #FFC800;  --g-gold-sh:   #E0AC00;  --g-gold-c:   #FFF6D9;
+  --g-purple: #CE82FF;  --g-purple-sh: #A855D9;  --g-purple-c: #F6EBFF;
+  --g-red:    #FF4B4B;  --g-red-sh:    #E03D3D;  --g-red-c:    #FFE5E5;
+  --g-lock:   #AFAFAF;  --g-lock-sh:   #949494;  --g-lock-c:   #F0F1F2;
+  --g-fire:   #FF9600;  --g-fire-sh:   #E08600;  --g-fire-c:   #FFF0DC;
+
+  --m3-r-xl:  28px;
+  --m3-r-lg:  20px;
+  --m3-r-md:  16px;
+  --m3-r-sm:  12px;
+  --m3-r-full:999px;
+  --m3-ease: cubic-bezier(.2,0,0,1);
+
+  color:var(--m3-on-surface);
+  font-feature-settings:"ss01" on,"cv05" on;
+}
+.main:has(#page-quiz.active){background:var(--canvas,#F7F5F0)}
+[data-theme="dark"] .main:has(#page-quiz.active){background:#000000}
+
+[data-theme="dark"] #page-quiz{
+  --m3-primary:        #FF5C5C;
+  --m3-on-primary:     #1A1A1A;
+  --m3-primary-cont:   #2A1618;
+  --m3-on-primary-cont:#FF9A9A;
+
+  --m3-surface:        #000000;
+  --m3-surf-1:         #0E0E10;
+  --m3-surf-2:         #151517;
+  --m3-surf-3:         #1F1F22;
+  --m3-on-surface:     #E3E3E3;
+  --m3-on-surf-var:    #9AA0A6;
+  --m3-outline:        #8E918F;
+  --m3-outline-var:    #333537;
+
+  --qz-ok:   #81C995;  --qz-ok-c:   #0F2417;
+  --qz-mid:  #FDD663;  --qz-mid-c:  #2E2510;
+  --qz-no:   #F28B82;  --qz-no-c:   #2C1614;
+  --qz-info: #8AB4F8;  --qz-info-c: #101F35;
+
+  /* Les teintes vives restent vives en sombre — c'est leur rôle.
+     Seuls les fonds "-c" descendent, sinon ils éblouissent. */
+  --g-green:  #61D308;  --g-green-sh:  #3F8F04;  --g-green-c:  #16260B;
+  --g-blue:   #35BDFA;  --g-blue-sh:   #1789C0;  --g-blue-c:   #0C2331;
+  --g-gold:   #FFD028;  --g-gold-sh:   #C79700;  --g-gold-c:   #2B2308;
+  --g-purple: #D699FF;  --g-purple-sh: #9B4CD1;  --g-purple-c: #24152F;
+  --g-red:    #FF6161;  --g-red-sh:    #C93636;  --g-red-c:    #2E1414;
+  --g-lock:   #6B6E70;  --g-lock-sh:   #4A4D4F;  --g-lock-c:   #212223;
+  --g-fire:   #FFA426;  --g-fire-sh:   #C77800;  --g-fire-c:   #2E1F08;
+}
+
+/* ── En-tête ─────────────────────────────────────────────── */
+#page-quiz .qz-header{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;margin-bottom:18px;
+}
+#page-quiz .qz-title{
+  font-size:28px;font-weight:800;letter-spacing:-.6px;
+  color:var(--m3-on-surface);line-height:1.15;
+}
+#page-quiz .qz-sub{font-size:13px;color:var(--m3-on-surf-var);margin-top:3px}
+#page-quiz .qz-header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+#page-quiz .qz-search{
+  display:flex;align-items:center;gap:9px;
+  height:44px;padding:0 16px;min-width:250px;
+  background:var(--m3-surf-2);border-radius:var(--m3-r-full);
+  color:var(--m3-on-surf-var);
+  transition:background .18s var(--m3-ease),box-shadow .18s var(--m3-ease);
+}
+#page-quiz .qz-search:focus-within{
+  background:var(--m3-surface);
+  box-shadow:0 1px 3px rgba(0,0,0,.14),0 4px 12px rgba(0,0,0,.08),
+             inset 0 0 0 1px var(--m3-outline-var);
+}
+#page-quiz .qz-search svg{flex-shrink:0;opacity:.8}
+#page-quiz .qz-search input{
+  border:none;background:none;outline:none;flex:1;min-width:0;
+  font:inherit;font-size:13.5px;color:var(--m3-on-surface);
+}
+#page-quiz .qz-search input::-webkit-search-cancel-button{display:none}
+
+/* ── Onglets ─────────────────────────────────────────────── */
+#page-quiz .qz-tabs{
+  display:inline-flex;gap:3px;padding:3px;margin-bottom:20px;
+  background:var(--m3-surf-2);border-radius:var(--m3-r-full);
+}
+#page-quiz .qz-tab{
+  display:inline-flex;align-items:center;gap:7px;
+  height:36px;padding:0 18px;border:none;border-radius:var(--m3-r-full);
+  background:none;cursor:pointer;font:inherit;
+  font-size:12.5px;font-weight:600;color:var(--m3-on-surf-var);
+  transition:background .18s var(--m3-ease),color .18s var(--m3-ease),box-shadow .18s var(--m3-ease);
+}
+#page-quiz .qz-tab svg{opacity:.85;flex-shrink:0}
+#page-quiz .qz-tab:hover{color:var(--m3-on-surface)}
+#page-quiz .qz-tab.active{
+  background:var(--m3-surface);color:var(--m3-on-surface);
+  box-shadow:0 1px 2px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.06);
+}
+[data-theme="dark"] #page-quiz .qz-tab.active{background:var(--m3-surf-3)}
+
+/* ══════════════════════════════════════════════════════════
+   PARCOURS GAMIFIÉ
+   Le parcours serpente autour d'un axe central : chaque cours
+   est un rond décalé à gauche ou à droite, et une courbe relie
+   chaque rond au suivant. Un chemin qui tourne se lit comme une
+   progression, là où une colonne se lit comme une liste.
+   Le reste reste sobre (surfaces Material, un seul accent par
+   état, ombres douces) : c'est le tracé qui gamifie, pas la
+   saturation des couleurs.
+   ══════════════════════════════════════════════════════════ */
+
+/* Bandeau de statut : série, XP, niveau. Il vit tout en haut
+   parce que c'est le score de la personne, pas celui d'un cours. */
+#page-quiz .g-bar{
+  display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin-bottom:26px;
+}
+#page-quiz .g-stat{
+  display:flex;align-items:center;gap:11px;
+  padding:13px 18px;border-radius:var(--m3-r-md);
+  background:var(--m3-surface);border:1px solid var(--m3-outline-var);
+}
+[data-theme="dark"] #page-quiz .g-stat{background:var(--m3-surf-1);border-color:transparent}
+#page-quiz .g-stat-ico{
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:32px;height:32px;border-radius:50%;
+}
+#page-quiz .g-stat-v{
+  display:block;
+  font-size:18px;font-weight:600;line-height:1.1;letter-spacing:-.2px;
+  color:var(--m3-on-surface);font-variant-numeric:tabular-nums;
+}
+#page-quiz .g-stat-k{
+  display:block;
+  font-size:11px;font-weight:500;color:var(--m3-on-surf-var);margin-top:2px;
+}
+/* La carte de niveau porte sa propre barre : le niveau seul ne dit
+   pas à quelle distance est le suivant, et c'est ça qui motive. */
+#page-quiz .g-stat.g-stat-wide{flex:1;min-width:230px}
+#page-quiz .g-stat-grow{flex:1;min-width:0}
+#page-quiz .g-xpbar{
+  display:block;height:6px;border-radius:999px;
+  background:var(--m3-surf-3);overflow:hidden;margin-top:7px;
+}
+#page-quiz .g-xpbar i{
+  display:block;height:100%;border-radius:999px;
+  background:var(--g-gold);transition:width .7s var(--m3-ease);
+}
+#page-quiz .g-stat-hint{display:block;font-size:11px;color:var(--m3-on-surf-var);margin-top:6px}
+
+/* ── Paliers ─────────────────────────────────────────────── */
+#page-quiz .g-path{max-width:700px;margin:0 auto}
+
+/* Le titre de palier est une simple ligne d'en-tête : dans un
+   parcours qui serpente, une bannière pleine couperait le tracé
+   en deux au lieu de le ponctuer. */
+#page-quiz .g-tier{
+  display:flex;align-items:center;gap:13px;
+  padding:13px 0 11px;margin:26px 0 6px;
+  border-bottom:1px solid var(--m3-outline-var);
+}
+#page-quiz .g-path > .g-tier:first-child{margin-top:0}
+#page-quiz .g-tier-n{
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--g-tier-c,var(--g-green-c));color:var(--g-tier,var(--g-green));
+  font-size:12.5px;font-weight:700;
+}
+#page-quiz .g-tier-t{font-size:13.5px;font-weight:600;color:var(--m3-on-surface);letter-spacing:-.1px}
+#page-quiz .g-tier-d{font-size:11.5px;color:var(--m3-on-surf-var);margin-top:2px}
+#page-quiz .g-tier-stars{
+  margin-left:auto;display:flex;gap:2px;flex-shrink:0;
+  color:var(--g-tier,var(--g-green));
+}
+#page-quiz .g-tier-stars svg{opacity:.18}
+#page-quiz .g-tier-stars svg.on{opacity:1}
+
+/* ── Le tracé qui serpente ───────────────────────────────── */
+/* Un maillon = une rangée : la voie du rond à gauche, le texte à
+   droite. Tous les ronds restent dans cette voie ; c'est `--g-x`,
+   leur décalage à l'intérieur, qui fait onduler le tracé. Le texte
+   garde ainsi une marge gauche constante et rien ne le traverse. */
+#page-quiz .g-node{
+  position:relative;
+  display:grid;grid-template-columns:var(--g-lane,132px) 1fr;
+  align-items:center;gap:16px;
+  padding:10px 0;
+}
+
+#page-quiz .g-orb-slot{
+  position:relative;
+  display:flex;align-items:center;
+  padding-left:var(--g-x,0px);
+}
+
+/* La courbe de liaison vers le maillon suivant. En SVG parce qu'un
+   quart de cercle en bordure ne sait pas relier deux points dont le
+   décalage varie d'un maillon à l'autre. Elle reste dans la voie. */
+/* La liaison verticale. Chaque maillon dessine le segment qui va de
+   son propre rond jusqu'au bas de sa rangée, et le maillon suivant
+   reprend du haut de la sienne : les deux se rejoignent donc pile à
+   la frontière, quelle que soit la hauteur des rangées (description,
+   message de verrouillage). Une courbe de Bézier qui devrait relier
+   deux centres de rangées différentes ne pourrait pas, elle, tenir
+   cette promesse en CSS pur.
+   Le décalage latéral d'un maillon à l'autre est absorbé par la
+   partie basse du segment, ce qui donne l'ondulation. */
+#page-quiz .g-link{
+  position:absolute;left:0;top:0;
+  width:var(--g-lane,132px);height:100%;
+  pointer-events:none;z-index:0;
+}
+#page-quiz .g-link path{
+  fill:none;stroke:var(--m3-surf-3);stroke-width:3;stroke-linecap:round;
+}
+/* Le tracé se colore jusqu'au dernier cours réussi : on voit d'un
+   coup d'œil où on en est sans lire un seul chiffre. */
+#page-quiz .g-node.done .g-link path{stroke:var(--g-green)}
+/* Les demi-segments absents en bord de palier sont simplement omis par
+   le JS : `hasLead` / `hasTail`. Rien à neutraliser ici. */
+
+/* Le rond. Relief léger : une ombre portée douce plutôt qu'une
+   bordure basse épaisse, pour rester dans le registre Material. */
+#page-quiz .g-orb{
+  position:relative;z-index:1;flex-shrink:0;
+  width:60px;height:60px;border:none;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--g-c,var(--g-blue));color:#fff;cursor:pointer;
+  box-shadow:0 1px 2px rgba(0,0,0,.16),0 4px 12px color-mix(in srgb,var(--g-c,var(--g-blue)) 30%,transparent);
+  transition:transform .16s var(--m3-ease),box-shadow .2s var(--m3-ease),filter .16s var(--m3-ease);
+}
+#page-quiz .g-orb svg{width:24px;height:24px}
+#page-quiz .g-orb:hover:not(:disabled){
+  filter:brightness(1.04);transform:translateY(-2px);
+  box-shadow:0 2px 4px rgba(0,0,0,.18),0 8px 20px color-mix(in srgb,var(--g-c,var(--g-blue)) 38%,transparent);
+}
+#page-quiz .g-orb:active:not(:disabled){transform:translateY(1px);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+#page-quiz .g-orb:disabled{cursor:not-allowed}
+#page-quiz .g-orb.locked{
+  background:var(--m3-surf-2);color:var(--m3-on-surf-var);
+  box-shadow:none;border:1px solid var(--m3-outline-var);
+}
+
+/* Le cours à faire maintenant respire doucement : la seule chose de
+   la page qui bouge, donc l'œil y va sans qu'on ait à crier. */
+#page-quiz .g-orb.current{animation:g-halo 2.4s var(--m3-ease) infinite}
+@keyframes g-halo{
+  0%,100%{box-shadow:0 1px 2px rgba(0,0,0,.16),0 0 0 0 color-mix(in srgb,var(--g-c) 42%,transparent)}
+  70%    {box-shadow:0 1px 2px rgba(0,0,0,.16),0 0 0 12px transparent}
+}
+@media (prefers-reduced-motion:reduce){
+  #page-quiz .g-orb.current{animation:none}
+}
+/* Étiquette du cours en cours : repère lisible même sans animation. */
+#page-quiz .g-orb-crown{
+  position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+  padding:2px 8px;border-radius:999px;white-space:nowrap;
+  background:var(--m3-on-surface);color:var(--m3-surface);
+  font-size:9px;font-weight:700;letter-spacing:.3px;
+}
+/* Anneau de maîtrise autour du rond : la part du seuil atteinte. */
+/* Anneau de maîtrise : la part du seuil déjà atteinte, tracée autour
+   du rond. `inset` négatif l'écarte du rond ; width/height explicites
+   sont nécessaires car un SVG en position absolue sans dimensions
+   s'effondre et ne laisse qu'un arc. La rotation met le départ en
+   haut plutôt qu'à 3 heures. */
+/* Le rond et son anneau vivent dans une boîte à leur taille : c'est
+   elle qui sert de repère au positionnement. Placer l'anneau dans le
+   bouton lui-même ne marche pas, un conteneur flex ne donnant pas de
+   repère fiable à un enfant absolu. */
+#page-quiz .g-orb-wrap{
+  position:relative;flex-shrink:0;
+  width:60px;height:60px;
+}
+#page-quiz .g-orb-ring{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) rotate(-90deg);
+  pointer-events:none;overflow:visible;
+}
+#page-quiz .g-orb-ring circle{fill:none;stroke-width:3;stroke-linecap:round}
+#page-quiz .g-orb-ring .bg{stroke:var(--m3-surf-3)}
+#page-quiz .g-orb-ring .fg{stroke:var(--g-gold);transition:stroke-dashoffset .8s var(--m3-ease)}
+
+/* Corps du maillon : ce qui explique le cours. */
+#page-quiz .g-node-body{min-width:0}
+#page-quiz .g-node-name{
+  font-size:14.5px;font-weight:600;color:var(--m3-on-surface);
+  line-height:1.3;letter-spacing:-.1px;
+}
+#page-quiz .g-node.locked .g-node-name{color:var(--m3-on-surf-var)}
+#page-quiz .g-node-desc{
+  font-size:12px;color:var(--m3-on-surf-var);line-height:1.45;margin-top:3px;
+}
+#page-quiz .g-node-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+#page-quiz .g-node-cta{display:flex;margin-top:11px}
+
+/* Le badge XP se lit comme une récompense, pas comme une donnée. */
+#page-quiz .g-xp{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:999px;
+  background:var(--g-gold-c);color:var(--g-gold-sh);
+  font-size:10.5px;font-weight:700;
+}
+#page-quiz .g-xp svg{width:12px;height:12px}
+[data-theme="dark"] #page-quiz .g-xp{color:var(--g-gold)}
+#page-quiz .g-lockmsg{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:7px 12px;border-radius:var(--m3-r-sm);margin-top:11px;
+  background:var(--m3-surf-1);color:var(--m3-on-surf-var);
+  font-size:11.5px;
+}
+[data-theme="dark"] #page-quiz .g-lockmsg{background:var(--m3-surf-2)}
+#page-quiz .g-lockmsg svg{flex-shrink:0;width:13px;height:13px;opacity:.7}
+
+/* Bouton d'action. Pilule Material, teintée par l'état du cours. */
+#page-quiz .g-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  height:38px;padding:0 20px;border:none;border-radius:var(--m3-r-full);
+  background:var(--g-c,var(--g-green));color:#fff;cursor:pointer;
+  font:inherit;font-size:12.5px;font-weight:600;
+  transition:box-shadow .18s var(--m3-ease),filter .16s var(--m3-ease),transform .12s var(--m3-ease);
+}
+#page-quiz .g-btn svg{width:15px;height:15px}
+#page-quiz .g-btn:hover:not(:disabled){
+  filter:brightness(1.05);
+  box-shadow:0 1px 3px rgba(0,0,0,.14),0 4px 10px color-mix(in srgb,var(--g-c,var(--g-green)) 26%,transparent);
+}
+#page-quiz .g-btn:active:not(:disabled){transform:scale(.98)}
+#page-quiz .g-btn:disabled{
+  background:var(--m3-surf-2);color:var(--m3-on-surf-var);cursor:not-allowed;
+}
+
+/* Bandeau de fin de parcours : la récompense du dernier palier. */
+#page-quiz .g-crown{
+  display:flex;align-items:center;gap:15px;margin-top:30px;
+  padding:20px 22px;border-radius:var(--m3-r-lg);
+  background:var(--g-gold-c);border:1px solid var(--g-gold);
+}
+#page-quiz .g-crown-ico{
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--g-gold);color:#fff;
+}
+#page-quiz .g-crown-t{font-size:14.5px;font-weight:600;color:var(--m3-on-surface)}
+#page-quiz .g-crown-d{font-size:12.5px;color:var(--m3-on-surf-var);margin-top:3px;line-height:1.5}
+
+/* Sur mobile le serpentin s'aplatit : à cette largeur, alterner
+   gauche/droite laisse trop peu de place au texte. */
+@media (max-width:760px){
+  #page-quiz .g-path{max-width:none}
+  /* À cette largeur l'ondulation mange la place du texte : la voie
+     se resserre et le tracé redevient une simple verticale. */
+  #page-quiz .g-node{grid-template-columns:64px 1fr;gap:12px;align-items:start}
+  #page-quiz .g-orb-slot{padding-left:0}
+  #page-quiz .g-orb{width:52px;height:52px}
+  #page-quiz .g-orb-wrap{width:52px;height:52px}
+  #page-quiz .g-link{display:none}
+  #page-quiz .g-node::after{
+    content:'';position:absolute;left:25px;top:calc(50% + 26px);
+    width:2px;height:calc(50% - 6px);
+    background:var(--m3-surf-3);
+  }
+  #page-quiz .g-node.done::after{background:var(--g-green)}
+  #page-quiz .g-node:last-child::after{display:none}
+  #page-quiz .g-stat{flex:1;min-width:140px;padding:11px 14px}
+  #page-quiz .g-btn{width:100%}
+}
+
+/* ── Chips (partagés parcours + lecteur) ─────────────────── */
+#page-quiz .qz-chips{display:flex;flex-wrap:wrap;gap:6px}
+#page-quiz .qz-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 11px;border-radius:var(--m3-r-full);
+  font-size:11px;font-weight:700;
+  background:var(--m3-surf-2);color:var(--m3-on-surf-var);
+}
+#page-quiz .qz-chip.warn{background:var(--qz-no-c);color:var(--qz-no)}
+#page-quiz .qz-chip.ok{background:var(--qz-ok-c);color:var(--qz-ok)}
+
+/* ── Filtres de l'onglet Résultats ───────────────────────── */
+#page-quiz .qz-filters{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:18px;
+}
+#page-quiz .qz-filters-spacer{flex:1;min-width:0}
+#page-quiz .qz-select{
+  height:40px;padding:0 34px 0 14px;
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-full);
+  background:var(--m3-surface);cursor:pointer;appearance:none;
+  font:inherit;font-size:12.5px;font-weight:500;color:var(--m3-on-surface);
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235F6368'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:18px;
+  transition:background-color .15s var(--m3-ease),border-color .15s var(--m3-ease);
+}
+#page-quiz .qz-select:hover{background-color:var(--m3-surf-1);border-color:var(--m3-outline)}
+[data-theme="dark"] #page-quiz .qz-select{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239AA0A6'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+}
+#page-quiz .qz-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  height:40px;padding:0 18px;border-radius:var(--m3-r-full);
+  border:1px solid var(--m3-outline);background:none;cursor:pointer;
+  font:inherit;font-size:12.5px;font-weight:600;color:var(--m3-on-surface);
+  transition:background .15s var(--m3-ease);
+}
+#page-quiz .qz-btn:hover{background:var(--m3-surf-2)}
+
+/* ── Tuiles de statistiques ──────────────────────────────── */
+#page-quiz .qz-stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:12px;margin-bottom:16px;
+}
+#page-quiz .qz-stat{
+  padding:16px 18px;border-radius:var(--m3-r-lg);
+  border:1px solid var(--m3-outline-var);background:var(--m3-surface);
+}
+[data-theme="dark"] #page-quiz .qz-stat{background:var(--m3-surf-1);border-color:transparent}
+#page-quiz .qz-stat-k{
+  font-size:11px;font-weight:700;letter-spacing:.55px;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+#page-quiz .qz-stat-v{
+  font-size:30px;font-weight:400;line-height:1.15;margin-top:3px;
+  color:var(--m3-on-surface);font-variant-numeric:tabular-nums;
+}
+#page-quiz .qz-stat-h{font-size:11.5px;color:var(--m3-on-surf-var);margin-top:2px}
+
+#page-quiz .qz-panels{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:14px;margin-bottom:16px;
+}
+#page-quiz .qz-panel{
+  padding:18px 20px;border-radius:var(--m3-r-lg);
+  border:1px solid var(--m3-outline-var);background:var(--m3-surface);
+}
+[data-theme="dark"] #page-quiz .qz-panel{background:var(--m3-surf-1);border-color:transparent}
+#page-quiz .qz-panel-t{
+  font-size:13.5px;font-weight:600;color:var(--m3-on-surface);margin-bottom:14px;
+}
+#page-quiz .qz-row{
+  display:flex;align-items:center;gap:11px;padding:8px 0;
+  border-bottom:1px solid var(--m3-outline-var);
+}
+#page-quiz .qz-row:last-child{border-bottom:none}
+#page-quiz .qz-row-main{flex:1;min-width:0}
+#page-quiz .qz-row-name{
+  font-size:12.5px;color:var(--m3-on-surface);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#page-quiz .qz-row-sub{font-size:11px;color:var(--m3-on-surf-var);margin-top:1px}
+#page-quiz .qz-row-v{
+  flex-shrink:0;font-size:11.5px;font-weight:700;
+  padding:3px 10px;border-radius:var(--m3-r-full);
+}
+#page-quiz .qz-empty-s{font-size:12.5px;color:var(--m3-on-surf-var);font-style:italic;padding:8px 0}
+
+/* Liste des tentatives */
+#page-quiz .qz-hist{display:flex;flex-direction:column;gap:9px}
+#page-quiz .qz-att{
+  display:flex;align-items:center;gap:15px;padding:13px 16px;
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-md);
+  background:var(--m3-surface);
+  transition:border-color .16s var(--m3-ease),box-shadow .16s var(--m3-ease);
+}
+[data-theme="dark"] #page-quiz .qz-att{background:var(--m3-surf-1);border-color:transparent}
+#page-quiz .qz-att:hover{
+  border-color:var(--m3-outline);
+  box-shadow:0 1px 3px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.06);
+}
+#page-quiz .qz-att-score{
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:50px;height:50px;border-radius:50%;
+  font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+#page-quiz .qz-att-main{flex:1;min-width:0}
+#page-quiz .qz-att-name{font-size:13.5px;font-weight:600;color:var(--m3-on-surface)}
+#page-quiz .qz-att-meta{
+  font-size:11.5px;color:var(--m3-on-surf-var);margin-top:3px;
+  display:flex;gap:7px;flex-wrap:wrap;align-items:center;
+}
+#page-quiz .qz-att-right{text-align:right;flex-shrink:0}
+#page-quiz .qz-att-raw{
+  font-size:14px;font-weight:600;color:var(--m3-on-surface);
+  font-variant-numeric:tabular-nums;
+}
+#page-quiz .qz-att-tag{
+  font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:2px;
+}
+
+/* ── État vide ───────────────────────────────────────────── */
+#page-quiz .qz-empty{
+  grid-column:1/-1;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:64px 24px;text-align:center;
+  border:1px dashed var(--m3-outline-var);border-radius:var(--m3-r-xl);
+  background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-quiz .qz-empty{background:transparent}
+#page-quiz .qz-empty-ico{
+  width:56px;height:56px;border-radius:50%;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--m3-surf-3);color:var(--m3-on-surf-var);
+}
+#page-quiz .qz-empty-t{font-size:15px;font-weight:600;color:var(--m3-on-surface)}
+#page-quiz .qz-empty-d{font-size:13px;color:var(--m3-on-surf-var);max-width:400px;line-height:1.5}
+
+@media (max-width:700px){
+  #page-quiz .qz-header{align-items:stretch}
+  #page-quiz .qz-header-actions,#page-quiz .qz-search{width:100%;min-width:0}
+  #page-quiz .qz-title{font-size:23px}
+  #page-quiz .qz-filters-spacer{display:none}
+  #page-quiz .qz-select{flex:1;min-width:140px}
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   QUIZ — alignement sur le reste de l'application
+   · une seule couleur d'accent : tous les paliers prennent l'ardoise ;
+     le rouge reste pour l'échec ;
+   · surfaces blanches (noires en sombre), champs blancs à filet fin,
+     plus de fonds gris ni beiges ;
+   · l'action principale en pilule noire, comme l'onglet actif ;
+   · le parcours posé dans un panneau, les onglets et la recherche
+     sur une même ligne.
+   ══════════════════════════════════════════════════════════ */
+#page-quiz{
+  --g-green:var(--m3-primary);--g-blue:var(--m3-primary);--g-purple:var(--m3-primary);--g-gold:var(--m3-primary);--g-fire:var(--m3-primary);
+  --g-green-c:color-mix(in srgb,var(--m3-primary) 12%,transparent);--g-blue-c:var(--g-green-c);--g-purple-c:var(--g-green-c);--g-gold-c:var(--g-green-c);--g-fire-c:var(--g-green-c);
+  --g-green-sh:var(--m3-primary);--g-blue-sh:var(--m3-primary);--g-purple-sh:var(--m3-primary);--g-gold-sh:var(--m3-primary);--g-fire-sh:var(--m3-primary);
+  --m3-surface:#FFFFFF;--m3-surf-1:#FFFFFF;--m3-surf-2:#F2F3F5;--m3-surf-3:#E6E8EB;--m3-outline-var:#E5E7EA;
+  --qz-ink:#111214;
+}
+[data-theme="dark"] #page-quiz{
+  --m3-primary:#93AFCB;--m3-primary-cont:#1C2734;
+  --m3-surface:#000000;--m3-surf-1:#0A0A0C;--m3-surf-2:#141518;--m3-surf-3:#22242A;--m3-outline-var:rgba(255,255,255,.10);
+  --qz-ink:#F4F4F5;
+}
+
+/* En-tête : onglets à gauche, recherche à droite, sur une ligne */
+#page-quiz.active{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:16px}
+#page-quiz > *{grid-column:1/-1}
+#page-quiz > .qz-tabs{grid-column:1;grid-row:1;margin:0 0 20px!important}
+#page-quiz > .qz-header{grid-column:2;grid-row:1;justify-self:end;margin:0 0 20px!important}
+#page-quiz:not([data-mes]) > .qz-header .qz-header-id{display:none}
+#page-quiz .qz-search{background:#FFFFFF!important;border:1px solid rgba(20,24,32,.12);box-shadow:none!important;height:42px;min-width:280px}
+#page-quiz .qz-search:focus-within{border-color:var(--m3-primary);box-shadow:0 0 0 4px color-mix(in srgb,var(--m3-primary) 14%,transparent)!important}
+[data-theme="dark"] #page-quiz .qz-search{background:#0A0A0C!important;border-color:rgba(255,255,255,.12)}
+#page-quiz .qz-tabs{background:rgba(38,37,31,.06)!important}
+[data-theme="dark"] #page-quiz .qz-tabs{background:rgba(255,255,255,.07)!important}
+#page-quiz .qz-tab.active{background:var(--qz-ink)!important;color:var(--m3-surface)!important;box-shadow:none!important}
+#page-quiz .qz-select{background-color:#FFFFFF;border-color:rgba(20,24,32,.12)}
+[data-theme="dark"] #page-quiz .qz-select{background-color:#0A0A0C;border-color:rgba(255,255,255,.12)}
+#page-quiz input:not([type=checkbox]):not([type=radio]),#page-quiz textarea{background:#FFFFFF}
+[data-theme="dark"] #page-quiz input:not([type=checkbox]):not([type=radio]),[data-theme="dark"] #page-quiz textarea{background:#0A0A0C}
+
+/* Bandeau de statut : tuiles blanches, la progression de niveau en noir */
+#page-quiz .g-bar{gap:12px}
+#page-quiz .g-stat{border-radius:22px!important;border:1px solid rgba(20,24,32,.07)!important;background:#FFFFFF!important;padding:16px 18px!important}
+[data-theme="dark"] #page-quiz .g-stat{background:#0A0A0C!important;border-color:rgba(255,255,255,.08)!important}
+#page-quiz .g-stat-ico{background:color-mix(in srgb,var(--m3-primary) 12%,transparent)!important;color:var(--m3-primary)!important}
+#page-quiz .g-stat-v{font-size:22px!important;font-weight:600!important;letter-spacing:-.02em}
+#page-quiz .g-stat.g-stat-wide{background:var(--qz-ink)!important;color:var(--m3-surface)!important;border-color:transparent!important}
+#page-quiz .g-stat.g-stat-wide :is(.g-stat-v,.g-stat-k,.g-stat-hint){color:inherit!important}
+#page-quiz .g-stat.g-stat-wide .g-stat-hint,#page-quiz .g-stat.g-stat-wide .g-stat-k{opacity:.7}
+#page-quiz .g-stat.g-stat-wide .g-stat-ico{background:rgba(255,255,255,.14)!important;color:inherit!important}
+[data-theme="dark"] #page-quiz .g-stat.g-stat-wide .g-stat-ico{background:rgba(0,0,0,.1)!important}
+#page-quiz .g-stat.g-stat-wide .g-xpbar{background:rgba(255,255,255,.18)!important}
+[data-theme="dark"] #page-quiz .g-stat.g-stat-wide .g-xpbar{background:rgba(0,0,0,.12)!important}
+#page-quiz .g-stat.g-stat-wide .g-xpbar i{background:currentColor!important}
+
+/* Parcours dans un panneau */
+#page-quiz .g-path{max-width:none!important;background:#FFFFFF;border-radius:28px;padding:26px 32px 30px;
+  box-shadow:0 1px 2px rgba(20,24,32,.04),0 12px 32px -20px rgba(20,24,32,.25)}
+[data-theme="dark"] #page-quiz .g-path{background:#0A0A0C;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+#page-quiz .g-tier{border-bottom-color:rgba(20,24,32,.07)!important}
+#page-quiz .g-tier-n{background:var(--qz-ink)!important;color:var(--m3-surface)!important}
+#page-quiz .g-tier-t{font-size:16px!important;letter-spacing:-.01em}
+#page-quiz .g-tier-stars{color:var(--m3-primary)!important}
+
+/* Ronds : réussi = accent, à faire maintenant = noir, verrouillé = filet */
+#page-quiz .g-orb{box-shadow:none!important;width:56px;height:56px}
+#page-quiz .g-orb-wrap{width:56px;height:56px}
+#page-quiz .g-orb.current{background:var(--qz-ink)!important;color:var(--m3-surface)!important;animation:none!important;
+  box-shadow:0 0 0 6px color-mix(in srgb,var(--m3-primary) 14%,transparent)!important}
+#page-quiz .g-orb.locked{background:transparent!important;border:1.5px dashed rgba(20,24,32,.22)!important;color:var(--m3-on-surf-var)!important}
+[data-theme="dark"] #page-quiz .g-orb.locked{border-color:rgba(255,255,255,.22)!important}
+#page-quiz .g-orb-crown{background:var(--m3-primary)!important;color:#fff!important}
+#page-quiz .g-orb:hover:not(:disabled){transform:none!important}
+#page-quiz .g-link path{stroke:rgba(20,24,32,.10)!important;stroke-dasharray:2 6}
+[data-theme="dark"] #page-quiz .g-link path{stroke:rgba(255,255,255,.14)!important}
+#page-quiz .g-node.done .g-link path{stroke:var(--m3-primary)!important;stroke-dasharray:none}
+
+/* Textes, puces, actions */
+#page-quiz .g-node-name{font-size:16px!important;letter-spacing:-.01em}
+#page-quiz .g-node-desc{font-size:13px!important}
+#page-quiz .qz-chip{background:transparent!important;border:1px solid rgba(20,24,32,.10);color:var(--m3-on-surf-var)!important;font-weight:600!important;padding:4px 10px!important}
+[data-theme="dark"] #page-quiz .qz-chip{border-color:rgba(255,255,255,.12)}
+#page-quiz .g-xp{background:color-mix(in srgb,var(--m3-primary) 12%,transparent)!important;color:var(--m3-primary)!important;border:none!important}
+#page-quiz .g-btn{background:var(--qz-ink)!important;color:var(--m3-surface)!important;box-shadow:none!important;height:42px;padding:0 22px;font-size:13.5px}
+#page-quiz .g-btn:hover{filter:none!important;transform:none!important;opacity:.88}
+#page-quiz .g-lockmsg{background:transparent!important;padding:0!important;border:none!important;font-size:12.5px}
+#page-quiz .g-crown{background:color-mix(in srgb,var(--m3-primary) 8%,transparent)!important;border:1px solid color-mix(in srgb,var(--m3-primary) 25%,transparent)!important;border-radius:22px!important}
+
+@media(max-width:760px){
+  #page-quiz.active{grid-template-columns:1fr}
+  #page-quiz > .qz-header{grid-column:1;grid-row:auto;justify-self:stretch}
+  #page-quiz .qz-search{min-width:0}
+  #page-quiz .g-path{padding:18px 14px}
+}
+/* Résultats : lignes blanches, score en pastille ronde */
+#page-quiz .qz-select[hidden],#page-quiz .qz-btn[hidden]{display:none!important}
+#page-quiz .qz-att{background:#FFFFFF!important;border:1px solid rgba(20,24,32,.07)!important;border-radius:20px!important;padding:14px 16px!important}
+[data-theme="dark"] #page-quiz .qz-att{background:#0A0A0C!important;border-color:rgba(255,255,255,.08)!important}
+#page-quiz .qz-att-score{width:52px!important;height:52px!important;border-radius:50%!important;font-weight:700!important}
+#page-quiz .qz-empty{background:#FFFFFF;border:none!important;border-radius:28px}
+[data-theme="dark"] #page-quiz .qz-empty{background:#0A0A0C}
+#page-quiz .qz-empty-act{margin-top:14px;height:40px;padding:0 20px;border:none;border-radius:999px;background:var(--qz-ink);color:var(--m3-surface);font:600 13.5px 'Quicksand',sans-serif;cursor:pointer}
+#page-quiz .qz-panel{background:#FFFFFF!important;border:1px solid rgba(20,24,32,.07)!important;border-radius:22px!important}
+[data-theme="dark"] #page-quiz .qz-panel{background:#0A0A0C!important;border-color:rgba(255,255,255,.08)!important}
+#page-quiz .qz-panels.is-one{grid-template-columns:1fr!important}
+#page-quiz .qz-stat{background:#FFFFFF!important;border:1px solid rgba(20,24,32,.07)!important;border-radius:22px!important}
+[data-theme="dark"] #page-quiz .qz-stat{background:#0A0A0C!important;border-color:rgba(255,255,255,.08)!important}

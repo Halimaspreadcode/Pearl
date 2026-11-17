@@ -1,0 +1,339 @@
+/* ══════════════════════════════════════════════════════════════
+   4. OBSERVATIONS — refonte Material 3 (Google)
+   Une liste qu'on parcourt et qu'on filtre. La hiérarchie suit ce
+   parcours : filtrer → repérer l'urgent → lire → agir. La priorité
+   est la seule dimension qui porte de la couleur ; tout le reste
+   est neutre, sinon plus rien ne ressort dans une liste longue.
+   Jetons redéclarés localement pour que le sombre bascule sans JS.
+   ══════════════════════════════════════════════════════════════ */
+#page-observations{
+  --m3-primary:        #4F6A85;
+  --m3-primary-cont:   #E4EAF0;
+  --m3-on-primary-cont:#2F4A66;
+  --m3-surface:        #FCFBF8;
+  --m3-surf-1:         #F7F5F0;
+  --m3-surf-2:         #F0ECE5;
+  --m3-surf-3:         #E8E3DA;
+  --m3-on-surface:     #26251F;
+  --m3-on-surf-var:    #6D695F;
+  --m3-outline:        #CEC8BC;
+  --m3-outline-var:    #E6E1D7;
+  --m3-ease: cubic-bezier(.2,0,0,1);
+
+  /* Échelle de priorité : une couleur = un niveau, partout. */
+  --gobs-crit:#C7000B; --gobs-crit-c:#FCE8E6;
+  --gobs-high:#E8710A; --gobs-high-c:#FEF0E3;
+  --gobs-med: #B06000; --gobs-med-c: #FEF7E0;
+  --gobs-low: #5F6368; --gobs-low-c: #F1F3F4;
+  color:var(--m3-on-surface);
+}
+[data-theme="dark"] #page-observations{
+  --m3-primary:        #FF5C5C;
+  --m3-primary-cont:   #2A1618;
+  --m3-on-primary-cont:#FF9A9A;
+  --m3-surface:        #000000;
+  --m3-surf-1:         #0E0E10;
+  --m3-surf-2:         #151517;
+  --m3-surf-3:         #1F1F22;
+  --m3-on-surface:     #E3E3E3;
+  --m3-on-surf-var:    #9AA0A6;
+  --m3-outline:        #8E918F;
+  --m3-outline-var:    #333537;
+
+  --gobs-crit:#F28B82; --gobs-crit-c:#2C1614;
+  --gobs-high:#FCAD70; --gobs-high-c:#2E1D0B;
+  --gobs-med: #FDD663; --gobs-med-c: #2E2510;
+  --gobs-low: #C4C7C5; --gobs-low-c: #2A2B2C;
+}
+
+/* ── En-tête ── */
+#page-observations .gobs-head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;margin-bottom:18px;
+}
+#page-observations .page-title{font-size:24px;font-weight:400;letter-spacing:0}
+#page-observations .page-sub{font-size:13.5px;color:var(--m3-on-surf-var);margin-top:4px}
+#page-observations .gobs-head-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* Recherche pilule : creusée au repos, surélevée au focus. */
+#page-observations .gobs-search{
+  display:flex;align-items:center;gap:9px;
+  height:44px;padding:0 6px 0 15px;min-width:270px;
+  background:var(--m3-surf-2);border-radius:var(--m3-r-full,999px);
+  color:var(--m3-on-surf-var);
+  transition:background .18s var(--m3-ease),box-shadow .18s var(--m3-ease);
+}
+#page-observations .gobs-search:focus-within{
+  background:var(--m3-surface);
+  box-shadow:0 1px 3px rgba(0,0,0,.14),0 4px 12px rgba(0,0,0,.08),
+             inset 0 0 0 1px var(--m3-outline-var);
+}
+#page-observations .gobs-search svg{flex-shrink:0;opacity:.8}
+#page-observations .gobs-search input{
+  border:none;background:none;outline:none;flex:1;min-width:0;
+  font:inherit;font-size:13.5px;color:var(--m3-on-surface);
+}
+#page-observations .gobs-search input::placeholder{color:var(--m3-on-surf-var);opacity:.85}
+#page-observations .gobs-search input::-webkit-search-cancel-button{display:none}
+#page-observations .gobs-search-clear{
+  display:none;align-items:center;justify-content:center;
+  width:32px;height:32px;border:none;border-radius:50%;flex-shrink:0;
+  background:none;color:var(--m3-on-surf-var);cursor:pointer;
+  transition:background .15s var(--m3-ease);
+}
+#page-observations .gobs-search-clear:hover{background:var(--m3-surf-3)}
+#page-observations .gobs-search.has-value .gobs-search-clear{display:flex}
+
+#page-observations .gobs-fab{
+  display:inline-flex;align-items:center;gap:8px;flex-shrink:0;
+  height:44px;padding:0 22px;border:none;cursor:pointer;font:inherit;
+  font-size:13.5px;font-weight:600;border-radius:var(--m3-r-full,999px);
+  background:var(--m3-primary);color:#fff;
+  box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15);
+  transition:box-shadow .2s var(--m3-ease),filter .2s var(--m3-ease);
+}
+#page-observations .gobs-fab:hover{
+  box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15);
+  filter:brightness(1.06);
+}
+[data-theme="dark"] #page-observations .gobs-fab{color:#1A1A1A}
+
+/* ── Filtres ── */
+#page-observations .gobs-filters{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;
+}
+/* Chips posées sur une surface, sans contour ni séparateurs : le cadre
+   et les trais verticaux découpaient le groupe en cases et alourdissaient
+   une barre de filtres qu'on veut discrète. La sélection se lit au
+   remplissage, pas au trait. */
+#page-observations .gobs-seg{
+  display:inline-flex;gap:4px;padding:4px;
+  border-radius:var(--m3-r-full,999px);background:var(--m3-surf-2);
+}
+#page-observations .gobs-seg-btn{
+  height:32px;padding:0 16px;border:none;background:transparent;cursor:pointer;
+  border-radius:var(--m3-r-full,999px);
+  font:inherit;font-size:13px;font-weight:500;color:var(--m3-on-surf-var);
+  transition:background .15s var(--m3-ease),color .15s var(--m3-ease);
+}
+#page-observations .gobs-seg-btn:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surface);
+}
+#page-observations .gobs-seg-btn[aria-pressed="true"]{
+  background:var(--m3-surface);color:var(--m3-on-surface);font-weight:600;
+  box-shadow:0 1px 2px rgba(0,0,0,.12);
+}
+/* En sombre, `--m3-surface` est plus foncé que la piste : la puce
+   sélectionnée s'y creuserait au lieu de ressortir, et l'ombre ne se
+   voit pas sur un fond noir. On monte donc d'un cran de surface. */
+[data-theme="dark"] #page-observations .gobs-seg-btn[aria-pressed="true"]{
+  background:var(--m3-surf-3);box-shadow:none;
+}
+#page-observations .gobs-select{
+  height:40px;padding:0 12px;cursor:pointer;font:inherit;font-size:13px;
+  color:var(--m3-on-surface);background:var(--m3-surf-2);
+  border:none;border-radius:var(--m3-r-full,999px);
+  transition:background .15s var(--m3-ease);
+}
+#page-observations .gobs-select:hover{background:var(--m3-surf-3)}
+#page-observations .gobs-select:focus{
+  outline:2px solid var(--m3-primary);outline-offset:-2px;
+}
+#page-observations .gobs-count{
+  margin-left:auto;font-size:13px;color:var(--m3-on-surf-var);white-space:nowrap;
+}
+
+/* ── Cartes ── */
+#page-observations .gobs-list{display:flex;flex-direction:column;gap:10px}
+#page-observations .gobs-card{
+  display:flex;align-items:stretch;gap:0;overflow:hidden;
+  background:var(--m3-surface);border:1px solid var(--m3-outline-var);
+  border-radius:var(--m3-r-md,16px);
+  transition:box-shadow .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+[data-theme="dark"] #page-observations .gobs-card{background:var(--m3-surf-1);border-color:transparent}
+#page-observations .gobs-card:hover{
+  box-shadow:0 1px 2px rgba(60,64,67,.3),0 2px 6px 2px rgba(60,64,67,.15);
+}
+/* Pas de bande latérale : c'est le jeton de priorité qui porte la
+   couleur. Une seule marque colorée par carte suffit à la repérer. */
+#page-observations .gobs-card-main{flex:1;min-width:0;padding:15px 20px}
+#page-observations .gobs-card-top{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px;
+}
+#page-observations .gobs-prio{
+  font-size:11px;font-weight:600;letter-spacing:.02em;
+  padding:3px 10px;border-radius:var(--m3-r-full,999px);
+  background:var(--gobs-low-c);color:var(--gobs-low);
+}
+#page-observations .t-crit .gobs-prio{background:var(--gobs-crit-c);color:var(--gobs-crit)}
+#page-observations .t-high .gobs-prio{background:var(--gobs-high-c);color:var(--gobs-high)}
+#page-observations .t-med  .gobs-prio{background:var(--gobs-med-c); color:var(--gobs-med)}
+#page-observations .gobs-src{
+  font-size:11px;font-weight:600;padding:3px 9px;
+  border-radius:var(--m3-r-full,999px);
+  border:1px solid var(--m3-outline-var);color:var(--m3-on-surf-var);
+}
+#page-observations .gobs-tt{
+  font-size:12px;color:var(--m3-on-surf-var);
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+}
+#page-observations .gobs-state{
+  font-size:11.5px;color:var(--m3-on-surf-var);
+  display:inline-flex;align-items:center;gap:5px;
+}
+#page-observations .gobs-state::before{
+  content:"";width:6px;height:6px;border-radius:50%;background:var(--m3-outline);
+}
+
+#page-observations .gobs-text{
+  font-size:14.5px;line-height:1.55;color:var(--m3-on-surface);margin:0;
+}
+#page-observations .gobs-details{
+  display:flex;flex-direction:column;gap:5px;margin-top:11px;
+  padding-left:12px;border-left:2px solid var(--m3-outline-var);
+}
+#page-observations .gobs-detail{display:flex;gap:8px;font-size:13px;line-height:1.5}
+#page-observations .gobs-detail-k{
+  flex-shrink:0;min-width:58px;color:var(--m3-on-surf-var);font-weight:500;
+}
+#page-observations .gobs-detail-v{color:var(--m3-on-surf-var)}
+
+#page-observations .gobs-card-foot{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:13px;
+  font-size:12.5px;color:var(--m3-on-surf-var);
+}
+#page-observations .gobs-author{display:inline-flex;align-items:center;gap:7px}
+#page-observations .gobs-author-av{
+  width:22px;height:22px;border-radius:50%;color:#fff;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:600;
+}
+#page-observations .gobs-date{margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* Actions : révélées au survol, toujours présentes au clavier. */
+#page-observations .gobs-actions{
+  display:flex;align-items:center;gap:4px;flex-shrink:0;padding:0 12px 0 4px;
+  opacity:0;transition:opacity .15s var(--m3-ease);
+}
+#page-observations .gobs-card:hover .gobs-actions,
+#page-observations .gobs-card:focus-within .gobs-actions{opacity:1}
+#page-observations .gobs-act{
+  display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border:none;border-radius:50%;cursor:pointer;
+  background:none;color:var(--m3-on-surf-var);
+  transition:background .15s var(--m3-ease),color .15s var(--m3-ease);
+}
+#page-observations .gobs-act:hover{background:var(--m3-surf-2);color:var(--m3-on-surface)}
+#page-observations .gobs-act.is-danger:hover{background:var(--gobs-crit-c);color:var(--gobs-crit)}
+
+/* Fermée : le contenu recule, mais reste lisible. */
+#page-observations .gobs-card.is-closed{background:var(--m3-surf-1)}
+[data-theme="dark"] #page-observations .gobs-card.is-closed{background:var(--m3-surf-2)}
+#page-observations .gobs-card.is-closed .gobs-text{color:var(--m3-on-surf-var)}
+#page-observations .gobs-card.is-closed .gobs-prio{opacity:.55}
+
+#page-observations .gobs-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;padding:64px 20px;text-align:center;color:var(--m3-on-surf-var);
+}
+#page-observations .gobs-empty svg{opacity:.35;margin-bottom:6px}
+#page-observations .gobs-empty-t{font-size:15px;font-weight:500;color:var(--m3-on-surface)}
+#page-observations .gobs-empty-d{font-size:13px}
+
+@media (max-width:720px){
+  #page-observations .gobs-head-actions{width:100%}
+  #page-observations .gobs-search{flex:1;min-width:0}
+  #page-observations .gobs-count{margin-left:0;width:100%}
+  #page-observations .gobs-actions{opacity:1}
+  #page-observations .gobs-date{margin-left:0}
+}
+
+/* ── 5. FO DASHBOARD ───────────────────────────────────── */
+/* Cette page a déjà sa propre refonte (--fo-*) : on aligne
+   simplement ses variables sur les tokens M3 plutôt que de
+   dupliquer des règles. */
+#page-fo-dashboard{
+  --fo-radius:var(--m3-r-xl);
+  --fo-radius-sm:var(--m3-r-lg);
+  --fo-soft:var(--m3-surf-2);
+  --fo-shadow:none;
+}
+#page-fo-dashboard .fo-seg{
+  background:var(--m3-surf-2);border-radius:var(--m3-r-full);
+}
+#page-fo-dashboard .fo-card{
+  border:1px solid var(--m3-outline-var);box-shadow:none;
+}
+[data-theme="dark"] #page-fo-dashboard .fo-card{border-color:transparent}
+
+/* ── 6. FO HANDOVER ────────────────────────────────────── */
+/* Contenu rendu en JS avec styles inline : on cible les
+   conteneurs génériques réellement présents. */
+#page-fo-handover .fo-card,
+#page-fo-handover .table-wrap{
+  border-radius:var(--m3-r-lg);
+  border:1px solid var(--m3-outline-var);
+  background:var(--m3-surf-1);box-shadow:none;
+}
+[data-theme="dark"] #page-fo-handover .fo-card,
+[data-theme="dark"] #page-fo-handover .table-wrap{border-color:transparent}
+
+/* ── 7-8. SHIFT PLANNING ────────────────────────────────── */
+#page-shift-planning .table-wrap{
+  border-radius:var(--m3-r-lg);overflow:hidden;
+}
+#page-shift-planning td,#page-shift-planning th{border-color:var(--m3-outline-var)}
+#page-shift-planning .filter-select{height:36px}
+
+
+/* ══ Refonte : alignée sur les trackers et My Space ══
+   Un bloc en verre, des cartes blanches avec un liseré à la couleur de
+   la priorité (rouge, orange, jaune, bleu — le code des panneaux),
+   onglets de statut avec leur nombre, actions en ronds. */
+.main:has(#page-observations.active){background:transparent!important}
+#page-observations{--lv1:#D64545;--lv2:#E8833A;--lv3:#E5B931;--lv4:#3D7FD9}
+#page-observations .gobs-shell{padding:18px!important}
+#page-observations .gobs-search{background:#FFFFFF!important;border:1px solid rgba(20,24,32,.12)!important;box-shadow:none!important}
+[data-theme="dark"] #page-observations .gobs-search{background:#0A0A0C!important;border-color:rgba(255,255,255,.12)!important}
+#page-observations .gobs-fab{background:#111214!important;color:#fff!important;box-shadow:none!important;border-radius:999px!important}
+[data-theme="dark"] #page-observations .gobs-fab{background:#F4F4F5!important;color:#111!important}
+
+#page-observations .gobs-seg{background:rgba(38,37,31,.06)!important;border:none!important}
+[data-theme="dark"] #page-observations .gobs-seg{background:rgba(255,255,255,.07)!important}
+#page-observations .gobs-seg-btn{display:inline-flex;align-items:center;gap:7px}
+#page-observations .gobs-seg-btn[aria-pressed="true"]{background:#111214!important;color:#fff!important;box-shadow:none!important}
+[data-theme="dark"] #page-observations .gobs-seg-btn[aria-pressed="true"]{background:#F4F4F5!important;color:#111!important}
+#page-observations .gobs-n{font-size:11.5px;font-weight:600;min-width:20px;height:20px;padding:0 6px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(38,37,31,.08);color:inherit}
+#page-observations .gobs-seg-btn[aria-pressed="true"] .gobs-n{background:rgba(255,255,255,.2)}
+[data-theme="dark"] #page-observations .gobs-n{background:rgba(255,255,255,.1)}
+[data-theme="dark"] #page-observations .gobs-seg-btn[aria-pressed="true"] .gobs-n{background:rgba(0,0,0,.1)}
+#page-observations .gobs-select{background-color:#FFFFFF!important;border:1px solid rgba(20,24,32,.12)!important;border-radius:999px!important}
+[data-theme="dark"] #page-observations .gobs-select{background-color:#0A0A0C!important;border-color:rgba(255,255,255,.12)!important}
+
+#page-observations .gobs-list{gap:10px!important}
+#page-observations .gobs-card{background:#FFFFFF!important;border:1px solid rgba(20,24,32,.07)!important;border-radius:22px!important;box-shadow:none!important;
+  position:relative;overflow:hidden}
+[data-theme="dark"] #page-observations .gobs-card{background:#0A0A0C!important;border-color:rgba(255,255,255,.08)!important}
+/* Niveau : porté par le point de la pastille de priorité, pas de liseré. */
+#page-observations .gobs-card.t-crit{--lvc:var(--lv1)}
+#page-observations .gobs-card.t-high{--lvc:var(--lv2)}
+#page-observations .gobs-card.t-med{--lvc:var(--lv3)}
+#page-observations .gobs-card.t-low{--lvc:var(--lv4)}
+#page-observations .gobs-card:hover{box-shadow:0 12px 30px -16px rgba(20,24,32,.3)!important}
+#page-observations .gobs-prio{display:inline-flex;align-items:center;gap:6px;background:transparent!important;color:var(--m3-on-surface)!important;
+  border:1px solid rgba(20,24,32,.12);border-radius:999px;font-weight:600}
+[data-theme="dark"] #page-observations .gobs-prio{border-color:rgba(255,255,255,.14)}
+#page-observations .gobs-prio::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--lvc)}
+#page-observations .gobs-text{font-size:15.5px!important;font-weight:600!important;letter-spacing:-.01em}
+#page-observations .gobs-state.is-wip{color:#B8860B;font-weight:600}
+#page-observations .gobs-act{width:38px!important;height:38px!important;border-radius:50%!important;border:1px solid rgba(20,24,32,.12)!important;background:transparent!important}
+[data-theme="dark"] #page-observations .gobs-act{border-color:rgba(255,255,255,.14)!important}
+#page-observations .gobs-act:hover{background:#111214!important;color:#fff!important;border-color:#111214!important}
+#page-observations .gobs-act.is-danger:hover{background:var(--m3-error,#A9493B)!important;border-color:var(--m3-error,#A9493B)!important}
+#page-observations .gobs-actions{opacity:1!important;visibility:visible!important;transform:none!important}
+/* Sans liseré : la priorité se lit sur sa pastille (point de couleur). */
+#page-observations .gobs-card::before{display:none!important}
+#page-observations .gobs-card{padding-left:18px!important}

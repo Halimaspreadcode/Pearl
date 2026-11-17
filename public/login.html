@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Connexion · FOps</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%234F6A85'/%3E%3Ctext x='16' y='17.5' dominant-baseline='middle' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='13' fill='%23FCFBF8'%3EFO%3C/text%3E%3C/svg%3E">
+<!--
+  Page de connexion de FOps. Le serveur y renvoie toute visite de l'app
+  sans session (server/http/shell.js). Trois portes, comme avant :
+    · identifiant Huawei + code personnel : la seule qui permet d'écrire ;
+    · mot de passe d'équipe : consultation seule ;
+    · sans verrou d'équipe : « continuer sans me connecter ».
+  L'administration garde sa propre entrée (/admin).
+
+  Image de gauche : /img/login.jpg si elle est présente sur le serveur,
+  sinon la photo d'origine sur Unsplash, sinon un aplat sable.
+-->
+<style>
+  :root{
+    --bg:#F4F1EB;--card:#FCFBF8;--field:#F3F0EA;--line:#E6E1D7;--ink:#26251F;--mid:#4A473F;--muted:#8A857A;
+    --acc:#4F6A85;--acc-d:#3E5670;--acc-l:#E4EAF0;--err:#A9493B;--err-l:#F5E3DF;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  /* Police du système : aucune requête vers l'extérieur avant l'affichage
+     (un proxy d'entreprise qui laisse pendre Google Fonts gardait la page blanche). */
+  body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font-family:'Segoe UI Variable','Segoe UI',system-ui,-apple-system,Roboto,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{min-height:calc(100vh - 32px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+
+  /* ── Gauche : la photo, dans une section arrondie ── */
+  .side{position:relative;border-radius:28px;overflow:hidden;background:#E3DDD1}
+  .side img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .4s}
+  .side img.ok{opacity:1}
+  .side img.ko{display:none}
+  .brand{position:absolute;left:24px;top:24px;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:16px;background:#FCFBF8}
+  .logo{width:34px;height:34px;border-radius:10px;background:var(--acc);color:#FCFBF8;display:grid;place-items:center;font-weight:600;font-size:13px}
+  .brand b{display:block;font-size:14.5px;font-weight:600;line-height:1.2}.brand small{display:block;font-size:12px;color:var(--muted)}
+  .quote{position:absolute;left:24px;right:24px;bottom:24px;padding:20px 22px;border-radius:20px;background:#FCFBF8}
+  .quote b{display:block;font-size:20px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px}
+  .quote span{display:block;font-size:14px;line-height:1.5;color:var(--mid)}
+
+  /* ── Droite : le formulaire ── */
+  .main{border-radius:28px;background:var(--card);display:flex;flex-direction:column;padding:28px 32px}
+  .top{display:flex;justify-content:flex-end;align-items:center;gap:6px;font-size:13.5px;color:var(--muted)}
+  .top a{color:var(--ink);font-weight:500;text-decoration:none;padding:8px 14px;border-radius:999px;background:var(--field)}
+  .top a:hover{background:var(--line)}
+  .center{flex:1;display:flex;align-items:center;justify-content:center;padding:32px 0}
+  form{width:100%;max-width:380px}
+  .hi{width:48px;height:48px;border-radius:14px;background:var(--acc-l);color:var(--acc);display:grid;place-items:center;margin-bottom:20px}
+  form h1{font-size:28px;font-weight:600;letter-spacing:-.02em;margin:0 0 8px}
+  .intro{font-size:14.5px;line-height:1.55;color:var(--mid);margin:0 0 24px}
+
+  /* Choix de la porte : sélecteur à deux segments. */
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:var(--field);margin-bottom:22px}
+  .seg button{border:0;border-radius:11px;padding:9px 10px;background:transparent;color:var(--muted);font:inherit;font-size:13.5px;font-weight:500;cursor:pointer;transition:background .15s,color .15s}
+  .seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(38,37,31,.08)}
+
+  label{display:block;font-size:13px;font-weight:500;color:var(--mid);margin:0 0 7px}
+  .field{margin-bottom:16px}
+  .in{position:relative}
+  .in>svg{position:absolute;left:15px;top:15px;color:var(--muted);pointer-events:none}
+  input{width:100%;height:50px;padding:0 46px 0 44px;border-radius:14px;border:1px solid transparent;background:var(--field);color:var(--ink);font:inherit;font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
+  input::placeholder{color:#B3AEA3}
+  input:focus{border-color:var(--acc);background:var(--card);box-shadow:0 0 0 4px var(--acc-l)}
+  .eye{position:absolute;top:9px;right:8px;width:32px;height:32px;border:0;border-radius:9px;background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center}
+  .eye:hover{background:var(--acc-l);color:var(--ink)}
+  .caps{display:none;font-size:12px;color:var(--err);margin-top:6px}
+  .err{display:none;background:var(--err-l);color:var(--err);border-radius:14px;padding:11px 14px;font-size:13.5px;line-height:1.45;margin:0 0 16px}
+  .err.on{display:block}
+  .go{width:100%;height:50px;margin-top:6px;border:0;border-radius:14px;background:var(--acc);color:#FCFBF8;font:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+  .go:hover{background:var(--acc-d)}.go:disabled{opacity:.6;cursor:default}
+  .guest{width:100%;height:46px;margin-top:10px;border:1px solid var(--line);border-radius:14px;background:transparent;color:var(--ink);font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+  .guest:hover{background:var(--field)}
+  .bottom{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;color:var(--muted)}
+  [hidden]{display:none!important}
+  /* Porte d'équipe ou entrée libre : décidé par le serveur à l'envoi de la
+     page (data-actif sur <html>), pour que rien ne bouge après l'affichage. */
+  html:not([data-actif="0"]) .guest{display:none}
+  html[data-actif="0"] .seg{display:none}
+
+  @media (max-width:900px){
+    body{padding:12px}
+    .wrap{grid-template-columns:1fr;grid-template-rows:200px 1fr;gap:12px;min-height:calc(100vh - 24px)}
+    .side{border-radius:24px}.quote{display:none}.brand{left:16px;top:16px}
+    .main{border-radius:24px;padding:20px 22px 22px}
+    .top{display:none}
+    .center{align-items:flex-start;padding:12px 0 24px}
+    form h1{font-size:24px}
+    .bottom span+span{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side">
+    <img id="photo" src="/img/login.jpg" alt="" decoding="async">
+    <div class="brand"><span class="logo">FO</span><span><b>FOps</b><small>Front Office · EMOC</small></span></div>
+    <div class="quote"><b>Bon retour parmi nous.</b><span>Tickets, passations, planning et formations du Front Office, au même endroit.</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="top"><span>Administrateur ?</span><a href="/admin">Administration</a></div>
+
+    <div class="center">
+      <form id="f" autocomplete="on" novalidate>
+        <div class="hi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+        <h1>Connexion</h1>
+        <p class="intro" id="intro">Entre ton identifiant Huawei et ton code personnel.</p>
+
+        <div class="seg" id="seg" role="group" aria-label="Type de connexion">
+          <button type="button" data-m="perso" aria-pressed="true">Code personnel</button>
+          <button type="button" data-m="equipe" aria-pressed="false">Équipe (lecture)</button>
+        </div>
+
+        <div class="err" id="err" role="alert"></div>
+
+        <div class="field" id="b-id">
+          <label for="id">Identifiant Huawei</label>
+          <div class="in">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+            <input id="id" name="username" autocomplete="username" placeholder="ex. a00123456" autocapitalize="none" spellcheck="false">
+          </div>
+        </div>
+        <div class="field">
+          <label for="pw" id="l-pw">Code personnel</label>
+          <div class="in">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg>
+            <input id="pw" type="password" name="password" autocomplete="current-password" required>
+            <button type="button" class="eye" id="eye" aria-label="Afficher le code">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="caps" id="caps">Majuscules activées.</div>
+        </div>
+
+        <button class="go" id="go" type="submit">Se connecter
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="guest" id="guest" type="button">Continuer sans me connecter</button>
+      </form>
+    </div>
+
+    <div class="bottom"><span>Code oublié ? Demande-le à ton responsable.</span><span>EMOC · Front Office</span></div>
+  </main>
+</div>
+<script>
+(function () {
+  'use strict';
+  var $ = function (i) { return document.getElementById(i); };
+
+  // Photo : copie locale, sinon l'originale, sinon l'aplat de la section.
+  var SOURCE = 'https://images.unsplash.com/photo-1790454906811-c12fa9488fbd?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D';
+  var photo = $('photo');
+  function repli() {
+    if (photo.dataset.essai) { photo.classList.add('ko'); return; }
+    photo.dataset.essai = '1'; photo.src = SOURCE;
+  }
+  photo.addEventListener('error', repli);
+  photo.addEventListener('load', function () { photo.classList.add('ok'); });
+  // Chargement ou échec arrivés avant ce script.
+  if (photo.complete) { if (photo.naturalWidth) photo.classList.add('ok'); else repli(); }
+  // Photo trop lente (réseau qui ne répond pas) : on la laisse, l'aplat suffit.
+
+  // Où revenir après la connexion : un chemin du site, jamais une autre adresse.
+  var next = new URLSearchParams(location.search).get('next') || '/';
+  if (!/^\/(?!\/)/.test(next) || /^\/login\b/.test(next)) next = '/';
+  var perso = true;
+
+  function erreur(t) { $('err').textContent = t || ''; $('err').classList.toggle('on', !!t); }
+  function mode() {
+    $('b-id').hidden = !perso;
+    $('l-pw').textContent = perso ? 'Code personnel' : 'Mot de passe d\'équipe';
+    $('intro').textContent = perso
+      ? 'Entre ton identifiant Huawei et ton code personnel.'
+      : 'Le mot de passe d\'équipe ouvre FOps en consultation seule.';
+    [].forEach.call($('seg').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String((b.dataset.m === 'perso') === perso)); });
+    erreur('');
+  }
+
+  // Identifiant mémorisé sur ce poste : seul le code reste à taper.
+  try { var mem = localStorage.getItem('fo-login-id'); if (mem) $('id').value = mem; } catch (e) {}
+  ($('id').value ? $('pw') : $('id')).focus();
+
+  // Déjà connecté : le serveur renvoie vers l'app avant même d'envoyer la
+  // page. Ce repli ne sert que si la page est servie comme simple fichier.
+  if (!document.documentElement.hasAttribute('data-actif'))
+    fetch('/api/team/session', { credentials: 'same-origin', cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j.ok && (j.user || j.admin || (j.actif && j.lecture))) { location.replace(next); return; }
+        document.documentElement.setAttribute('data-actif', j.actif ? '1' : '0');
+      }).catch(function () {});
+
+  [].forEach.call($('seg').querySelectorAll('button'), function (b) {
+    b.onclick = function () { perso = b.dataset.m === 'perso'; mode(); (perso ? $('id') : $('pw')).focus(); };
+  });
+  $('guest').onclick = function () {
+    document.cookie = 'fo_guest=1; path=/; SameSite=Strict';
+    location.replace(next);
+  };
+  $('eye').onclick = function () {
+    var p = $('pw'), vis = p.type === 'password';
+    p.type = vis ? 'text' : 'password';
+    $('eye').setAttribute('aria-label', vis ? 'Masquer le code' : 'Afficher le code');
+    p.focus();
+  };
+  $('pw').addEventListener('keyup', function (e) { $('caps').style.display = e.getModifierState && e.getModifierState('CapsLock') ? 'block' : 'none'; });
+
+  var label = $('go').innerHTML;
+  $('f').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var id = $('id').value.trim(), pw = $('pw').value;
+    if (perso && !id) { erreur('Entre ton identifiant Huawei.'); $('id').focus(); return; }
+    if (!pw) { erreur(perso ? 'Entre ton code personnel.' : 'Entre le mot de passe d\'équipe.'); $('pw').focus(); return; }
+    var corps = { password: pw }; if (perso) corps.huaweiId = id;
+    $('go').disabled = true; $('go').textContent = 'Connexion…'; erreur('');
+    var fin = function () { $('go').disabled = false; $('go').innerHTML = label; };
+    fetch('/api/team/auth', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corps) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { r: r, j: j }; }); })
+      .then(function (x) {
+        if (x.r.ok && x.j.ok) {
+          try { if (perso) localStorage.setItem('fo-login-id', id); } catch (e) {}
+          location.replace(next); return;
+        }
+        erreur(x.r.status === 429 ? 'Trop d\'essais : attends quelques minutes avant de réessayer.' : (x.j.error || 'Connexion impossible.'));
+        fin(); $('pw').select();
+      })
+      .catch(function () { erreur('Le serveur ne répond pas. Vérifie ta connexion et réessaie.'); fin(); });
+  });
+})();
+</script>
+</body>
+</html>

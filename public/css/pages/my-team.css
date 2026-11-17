@@ -1,0 +1,255 @@
+/* ══════════════════════════════════════════════════════════════
+   MY TEAM — classement d'équipe (Admin › My Team)
+
+   Écran de revue, pas de tableau de bord : on vient y comparer des
+   agents. Tout ce qui retarde la première ligne du classement — tuiles,
+   podium, cartes empilées — a été retiré. Reste une ligne de contexte,
+   puis le classement, dense et calme.
+   ══════════════════════════════════════════════════════════════ */
+#page-cfg-myteam .gsla-head{margin-bottom:14px}
+#page-cfg-myteam .mt-headctl .form-control{min-width:150px}
+
+/* ── Ligne de contexte ── */
+.mt-summary{
+  display:flex;flex-wrap:wrap;gap:0 26px;align-items:baseline;
+  padding:0 2px 14px;margin-bottom:16px;max-width:1360px;
+  border-bottom:1px solid var(--m3-outline-var,#E3E3E3);
+}
+.mt-sum-i{
+  font-size:12px;color:var(--m3-on-surf-var,var(--mute));
+  display:inline-flex;align-items:baseline;gap:6px;
+}
+.mt-sum-i b{
+  font-size:19px;font-weight:600;letter-spacing:-.01em;
+  color:var(--m3-on-surface,var(--dark));font-variant-numeric:tabular-nums;
+}
+.mt-sum-i.is-ok b{color:var(--ok-fg)}
+.mt-sum-i.is-warn b{color:#E65100}
+.mt-sum-i.is-bad b{color:var(--red)}
+
+/* ── Onglets ── */
+.mt-tabs{display:flex;gap:2px;margin-bottom:14px;flex-wrap:wrap}
+.mt-tab{
+  padding:7px 2px;margin-right:20px;cursor:pointer;font:inherit;
+  font-size:13px;font-weight:500;border:none;background:transparent;
+  color:var(--m3-on-surf-var,var(--mute));border-bottom:2px solid transparent;
+}
+.mt-tab:hover{color:var(--m3-on-surface,var(--dark))}
+.mt-tab.is-on{color:var(--m3-primary);border-bottom-color:var(--m3-primary);font-weight:600}
+
+/* ── Barre de tri ── */
+.mt-sortbar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.mt-sort{
+  padding:4px 10px;border-radius:6px;cursor:pointer;font:inherit;
+  font-size:11.5px;border:1px solid transparent;background:transparent;
+  color:var(--m3-on-surf-var,var(--mute));
+}
+.mt-sort:hover{background:var(--m3-surf-1)}
+.mt-sort.is-on{
+  background:var(--m3-surf-2,#F1F3F4);color:var(--m3-on-surface,var(--dark));font-weight:600;
+}
+[data-theme="dark"] .mt-sort.is-on{background:var(--m3-surf-3)}
+
+/* ── Classement ──
+   Une ligne par agent, pas une carte : dix cartes font dix objets à
+   examiner, dix lignes font une liste qu'on parcourt. */
+.mt-rank{
+  max-width:1360px;border:1px solid var(--m3-outline-var,#E3E3E3);
+  border-radius:12px;overflow:hidden;background:var(--m3-surface,#fff);
+}
+[data-theme="dark"] .mt-rank{background:var(--m3-surf-1);border-color:transparent}
+.mt-row{border-top:1px solid var(--m3-outline-var,#E3E3E3)}
+.mt-row:first-child{border-top:none}
+[data-theme="dark"] .mt-row{border-top-color:rgba(255,255,255,.06)}
+.mt-row.is-open{background:var(--m3-surf-1)}
+[data-theme="dark"] .mt-row.is-open{background:var(--m3-surf-2)}
+.mt-row-head{
+  display:grid;align-items:center;gap:14px;width:100%;
+  grid-template-columns:26px 26px minmax(130px,1.5fr) minmax(70px,1fr) 44px 54px 54px 54px 48px 48px;
+  padding:9px 16px;border:none;background:transparent;cursor:pointer;font:inherit;
+  text-align:left;position:relative;
+}
+.mt-row-head:hover{background:var(--m3-surf-1)}
+[data-theme="dark"] .mt-row-head:hover{background:var(--m3-surf-2)}
+/* Les trois premiers : c'est le numéro de rang qui les porte, en gras et
+   dans la couleur d'accent. Ni médaille, ni filet — la distinction tient
+   dans la colonne qui sert déjà à dire le rang. */
+.mt-row.is-top .mt-rank-n{color:var(--m3-primary);font-weight:700}
+.mt-row.is-top1 .mt-rank-n{font-size:13.5px}
+.mt-rank-n{
+  font-size:12px;font-weight:600;text-align:center;
+  color:var(--m3-on-surf-var,var(--mute));font-variant-numeric:tabular-nums;
+}
+.mt-av{
+  width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;color:#fff;font-size:10px;font-weight:600;flex-shrink:0;
+}
+.mt-name{
+  font-size:13px;font-weight:500;color:var(--m3-on-surface,var(--dark));
+  display:flex;align-items:center;gap:7px;min-width:0;
+}
+.mt-name>:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mt-tracker{
+  font-size:9px;font-weight:700;letter-spacing:.3px;padding:1px 5px;
+  border-radius:3px;flex-shrink:0;
+}
+.mt-tracker-sn{background:#E8F0FE;color:#1967D2}
+.mt-tracker-ci{background:#FEF7E0;color:#E65100}
+[data-theme="dark"] .mt-tracker-sn{background:#12263F;color:#8AB4F8}
+[data-theme="dark"] .mt-tracker-ci{background:#2E1F08;color:#FBBC04}
+.mt-bar{
+  height:4px;border-radius:999px;background:var(--m3-surf-2,#F1F3F4);
+  overflow:hidden;display:block;
+}
+[data-theme="dark"] .mt-bar{background:var(--m3-surf-3)}
+.mt-bar i{display:block;height:100%;border-radius:999px;background:var(--m3-primary);opacity:.75}
+.mt-score{
+  font-size:14px;font-weight:600;text-align:right;
+  color:var(--m3-on-surface,var(--dark));font-variant-numeric:tabular-nums;
+}
+.mt-cell{
+  font-size:12px;text-align:right;color:var(--m3-on-surf-var,var(--mute));
+  font-variant-numeric:tabular-nums;
+}
+.mt-cell.is-bad{color:var(--red);font-weight:600}
+.mt-na{opacity:.4}
+
+/* ── Détail d'une ligne ── */
+.mt-det{
+  display:grid;grid-template-columns:1fr 1fr;gap:28px;
+  padding:4px 16px 18px 68px;
+}
+.mt-det-col{min-width:0}
+.mt-det-t{
+  font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--m3-on-surf-var,var(--mute));margin-bottom:9px;
+  display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+}
+.mt-det-cov{font-size:10px;font-weight:500;letter-spacing:0;text-transform:none;opacity:.75}
+.mt-det-crit{
+  display:grid;grid-template-columns:minmax(100px,1fr) 1.2fr 32px;
+  align-items:center;gap:10px;padding:3px 0;
+}
+.mt-det-crit.is-na{opacity:.4}
+.mt-det-crit-l{font-size:12px;color:var(--m3-on-surface,var(--dark))}
+.mt-det-crit-l em{font-style:normal;font-size:10px;opacity:.55;margin-left:5px}
+.mt-det-crit-bar{height:4px;border-radius:999px;background:var(--m3-surf-2,#F1F3F4);overflow:hidden}
+[data-theme="dark"] .mt-det-crit-bar{background:var(--m3-surf-3)}
+.mt-det-crit-bar i{display:block;height:100%;border-radius:999px;background:var(--m3-primary);opacity:.75}
+.mt-det-crit-v{
+  font-size:12px;font-weight:600;text-align:right;
+  font-variant-numeric:tabular-nums;color:var(--m3-on-surface,var(--dark));
+}
+.mt-det-pt{
+  display:grid;grid-template-columns:1fr auto 50px;align-items:center;gap:10px;
+  padding:3px 0;font-size:12px;color:var(--m3-on-surface,var(--dark));
+}
+.mt-det-pt-d{font-size:10.5px;color:var(--m3-on-surf-var,var(--mute))}
+.mt-det-pt-v{
+  text-align:right;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ok-fg);
+}
+.mt-det-pt-v.is-bad{color:var(--red)}
+.mt-det-pt-tot{
+  border-top:1px solid var(--m3-outline-var,#E3E3E3);margin-top:5px;padding-top:7px;
+}
+.mt-det-pt-tot .mt-det-pt-v{color:var(--m3-on-surf-var,var(--mute))}
+.mt-det-link{
+  margin-top:11px;padding:0;border:none;background:transparent;cursor:pointer;
+  font:inherit;font-size:12px;font-weight:600;color:var(--m3-primary);
+}
+.mt-det-link:hover{text-decoration:underline}
+
+/* ── Forts & faibles ── */
+.mt-split{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1360px}
+.mt-split .gsla-card{max-width:none;margin-bottom:0;padding:18px 20px}
+.mt-ex-top .gsla-card-t::before,
+.mt-ex-low .gsla-card-t::before{
+  content:'';display:inline-block;width:7px;height:7px;border-radius:50%;
+  margin-right:8px;vertical-align:middle;
+}
+.mt-ex-top .gsla-card-t::before{background:var(--ok-fg)}
+.mt-ex-low .gsla-card-t::before{background:#E65100}
+.mt-ex-row{
+  display:flex;align-items:center;gap:11px;width:100%;padding:9px 4px;
+  border:none;background:transparent;cursor:pointer;font:inherit;text-align:left;
+  border-radius:7px;border-top:1px solid var(--m3-outline-var,#E3E3E3);
+}
+.mt-ex-row:first-of-type{border-top:none}
+.mt-ex-row:hover{background:var(--m3-surf-1)}
+.mt-ex-main{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.mt-ex-name{
+  font-size:13px;font-weight:500;color:var(--m3-on-surface,var(--dark));
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.mt-ex-sub{font-size:11px;color:var(--m3-on-surf-var,var(--mute));
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mt-ex-score{
+  font-size:15px;font-weight:600;flex-shrink:0;text-align:right;
+  font-variant-numeric:tabular-nums;color:var(--m3-on-surface,var(--dark));
+}
+.mt-ex-score em{display:block;font-style:normal;font-size:10.5px;font-weight:600}
+.mt-ex-score em.is-up{color:var(--ok-fg)}
+.mt-ex-score em.is-down{color:var(--red)}
+
+/* ── Par critère ── */
+#mt-criteria{
+  max-width:1360px;border:1px solid var(--m3-outline-var,#E3E3E3);
+  border-radius:12px;background:var(--m3-surface,#fff);padding:4px 20px;
+}
+[data-theme="dark"] #mt-criteria{background:var(--m3-surf-1);border-color:transparent}
+.mt-crit{padding:14px 0;border-top:1px solid var(--m3-outline-var,#E3E3E3)}
+.mt-crit:first-child{border-top:none}
+[data-theme="dark"] .mt-crit{border-top-color:rgba(255,255,255,.06)}
+.mt-crit.is-na{opacity:.45}
+.mt-crit-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.mt-crit-l{font-size:13px;font-weight:500;color:var(--m3-on-surface,var(--dark))}
+.mt-crit-l em{font-style:normal;font-size:10.5px;opacity:.55;margin-left:6px}
+.mt-crit-v{
+  font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--m3-on-surface,var(--dark));
+}
+.mt-crit-n{font-size:10.5px;font-weight:500;color:var(--m3-on-surf-var,var(--mute));margin-left:3px}
+.mt-crit-bar{
+  height:5px;border-radius:999px;background:var(--m3-surf-2,#F1F3F4);
+  overflow:hidden;margin:8px 0 7px;
+}
+[data-theme="dark"] .mt-crit-bar{background:var(--m3-surf-3)}
+.mt-crit-bar i{display:block;height:100%;border-radius:999px;background:var(--m3-primary);opacity:.8}
+.mt-crit.is-ok .mt-crit-bar i{background:var(--ok-fg)}
+.mt-crit.is-warn .mt-crit-bar i{background:#E65100}
+.mt-crit.is-bad .mt-crit-bar i{background:var(--red)}
+.mt-crit-ends{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:4px}
+.mt-crit-end{font-size:11px;color:var(--m3-on-surf-var,var(--mute))}
+.mt-crit-end b{font-weight:600;color:var(--m3-on-surface,var(--dark))}
+.mt-crit-end.is-up{color:var(--ok-fg)}
+.mt-crit-end.is-down{color:var(--red)}
+.mt-crit-hint{font-size:11px;color:var(--m3-on-surf-var,var(--mute));opacity:.8}
+
+/* Note de bas de vue : la règle du calcul, à sa place — en dessous,
+   une fois les chiffres lus, et non en préambule avant de les voir. */
+.mt-foot{
+  max-width:1360px;margin:12px 2px 0;font-size:11.5px;line-height:1.6;
+  color:var(--m3-on-surf-var,var(--mute));opacity:.85;
+}
+.mt-empty{
+  padding:26px;text-align:center;font-size:13px;
+  color:var(--m3-on-surf-var,var(--mute));
+}
+
+@media (max-width:1180px){
+  .mt-row-head{grid-template-columns:24px 26px minmax(110px,1.5fr) minmax(60px,1fr) 42px 46px 46px 46px}
+  .mt-row-head > .mt-cell:nth-last-child(-n+2){display:none}
+  .mt-det{padding-left:16px}
+}
+@media (max-width:900px){
+  .mt-split{grid-template-columns:1fr}
+  .mt-det{grid-template-columns:1fr;gap:20px}
+}
+@media (max-width:760px){
+  .mt-row-head{grid-template-columns:22px 26px 1fr 40px;gap:10px}
+  .mt-row-head > .mt-bar,
+  .mt-row-head > .mt-cell{display:none}
+  .mt-summary{gap:0 18px}
+  .mt-sum-i b{font-size:16px}
+}
+

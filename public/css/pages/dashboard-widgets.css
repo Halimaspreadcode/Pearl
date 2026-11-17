@@ -1,0 +1,625 @@
+/* ══════════════════════════════════════════════
+   DASHBOARD — passe "widget" épurée
+   Une seule surface, des rayons larges, un chiffre par widget et
+   beaucoup de vide. La couleur reste un signal (rouge = SLA), elle
+   ne sert jamais de décor : c'est ce qui distingue ce dashboard
+   d'une maquette où tous les blocs sont colorés.
+   Ce bloc vient après les règles #page-dashboard ci-dessus et les
+   corrige à spécificité égale — d'où sa position en fin de section.
+══════════════════════════════════════════════ */
+
+/* ── Respiration générale ── */
+#page-dashboard .dash-grid{gap:16px;margin-bottom:28px}
+#page-dashboard .d-kpibar{gap:16px;margin-bottom:16px}
+
+/* ── Widget KPI : le chiffre porte tout ──
+   L'ancienne carte alignait label/valeur/sous-titre/sparkline à
+   intervalle constant : quatre niveaux de lecture, aucun dominant.
+   Ici la valeur écrase le reste et la sparkline est repoussée en
+   pied de widget par le margin-top:auto. */
+#page-dashboard .d-kpi{
+  gap:0;
+  padding:24px 24px 20px;
+  border-radius:var(--m3-r-xl);
+  min-height:148px;
+  justify-content:flex-start;
+}
+#page-dashboard .d-kpi-label{
+  font-size:12.5px;font-weight:500;letter-spacing:.02em;
+  color:var(--m3-on-surf-var);
+}
+#page-dashboard .d-kpi-value{
+  font-size:40px;font-weight:600;line-height:1.05;letter-spacing:-.03em;
+  margin-top:10px;
+}
+#page-dashboard .d-kpi-sub{
+  font-size:11.5px;color:var(--m3-on-surf-var);margin-top:5px;
+}
+/* Rappel après la règle ci-dessus, qui remettait le sous-titre en
+   gris et effaçait le signal de rupture. --m3-error suit le thème :
+   #C7000B en clair, #FF5C5C en sombre (le rouge foncé était
+   illisible sur fond noir). */
+#page-dashboard .d-kpi.has-breach .d-kpi-label,
+#page-dashboard .d-kpi.has-breach .d-kpi-sub{color:var(--m3-error)}
+/* .down hérite sinon de --red (#C7000B), un rouge foncé fixe qui ne
+   ressort pas sur le fond sombre des widgets. */
+#page-dashboard .d-kpi-sub.down{color:var(--m3-error)}
+#page-dashboard .d-kpi-sub.neu{color:var(--m3-on-surf-var)}
+/* pousse la sparkline en bas : tous les widgets l'alignent, quelle
+   que soit la longueur du sous-titre */
+#page-dashboard .d-kpi-spark{margin-top:auto;padding-top:16px;height:28px}
+
+/* ── Widget SLA : l'anneau est la valeur, pas un ornement ── */
+#page-dashboard .d-kpi-sla{justify-content:flex-start}
+#page-dashboard .d-kpi-sla-row{margin-top:auto;gap:14px}
+#page-dashboard .d-kpi-sla .d-kpi-value{margin-top:0}
+
+/* ── Cartes de contenu : même surface que les KPI ──
+   Deux tons de gris différents pour deux blocs voisins se lisaient
+   comme une hiérarchie qui n'existe pas. Un seul ton partout. */
+#page-dashboard .d-card{
+  background:var(--m3-kpi-surf);
+  border:none;
+  border-radius:var(--m3-r-xl);
+  padding:24px 26px;
+  box-shadow:none;
+}
+#page-dashboard .d-card:hover{background:var(--m3-kpi-surf);}
+[data-theme="dark"] #page-dashboard .d-card{background:var(--m3-kpi-surf)}
+[data-theme="dark"] #page-dashboard .d-card:hover{background:var(--m3-kpi-surf)}
+
+/* ── Titre de carte : discret, la donnée passe devant ── */
+#page-dashboard .d-card-head{
+  margin-bottom:20px;align-items:center;
+}
+#page-dashboard .d-card-head > span[style]{
+  font-size:12.5px!important;font-weight:500!important;
+  letter-spacing:.02em!important;
+  color:var(--m3-on-surf-var)!important;
+}
+#page-dashboard .d-card-action{
+  font-size:12px;font-weight:500;
+  color:var(--m3-on-surf-var);
+  border:none;background:transparent;padding:6px 12px;
+  border-radius:var(--m3-r-full);
+}
+#page-dashboard .d-card-action:hover{
+  background:var(--m3-kpi-surf-hov);color:var(--m3-on-surface);
+}
+
+/* ── Insights : puces sans fond, séparées par le vide ──
+   Sauf les critiques, qui gardent leur conteneur d'erreur. */
+#page-dashboard .d-insights{gap:10px;margin-bottom:20px}
+#page-dashboard .d-insight{
+  background:var(--m3-kpi-surf);
+  padding:10px 18px;font-size:12.5px;
+}
+
+/* ── Alertes : plus calmes, alignées sur le rayon des widgets ── */
+#page-dashboard .breach-alert,
+#page-dashboard .near-breach-alert{
+  border-radius:var(--m3-r-xl);padding:20px 24px;margin-bottom:16px;
+}
+
+/* ── Toolbar : contrôles fantômes, pas de boîtes empilées ── */
+#page-dashboard #dash-period-bar > div:first-child{
+  background:var(--m3-kpi-surf)!important;
+  border:none!important;border-radius:var(--m3-r-full)!important;
+  padding:3px!important;
+}
+#page-dashboard #heatmap-period-tabs{
+  background:var(--m3-kpi-surf-hov)!important;
+  border:none!important;border-radius:var(--m3-r-full)!important;
+  padding:3px!important;
+}
+#page-dashboard .hm-tab{
+  border-radius:var(--m3-r-full)!important;
+  font-size:12px;padding:6px 14px;border:none;
+  color:var(--m3-on-surf-var);background:transparent;
+}
+#page-dashboard .hm-tab.active{
+  background:var(--m3-surface);color:var(--m3-on-surface);
+}
+
+/* ── Heatmap : le panneau de survol suit la même surface ── */
+#page-dashboard #hm-hover-panel{
+  background:var(--m3-kpi-surf-hov)!important;
+  border:none!important;border-radius:var(--m3-r-lg)!important;
+}
+
+/* ══════════════════════════════════════════════
+   WORKLOAD BY FRONT OFFICE — refonte
+   La grille de cases répondait mal à la question qu'on lui pose.
+   "Qui est chargé ?" se lit sur une barre triée, pas en comparant
+   l'opacité de 120 carrés. On garde donc la trame temporelle (elle
+   dit *quand*), mais réduite à une sparkline en fin de ligne, et on
+   met la charge relative au premier plan.
+══════════════════════════════════════════════ */
+#page-dashboard #dc-heatmap .hm-grid{gap:2px}
+
+/* Une ligne = un FO. Grille explicite : nom | trame | barre | total,
+   pour que les 4 colonnes s'alignent d'une ligne à l'autre sans
+   dépendre du flex-grow des cases. */
+#page-dashboard #dc-heatmap .hm-row{
+  display:grid;
+  grid-template-columns:104px minmax(120px,1.1fr) minmax(90px,1fr) 44px;
+  align-items:center;gap:14px;
+  padding:9px 10px;border-radius:var(--m3-r-md);
+  transition:background .15s var(--m3-ease);
+}
+#page-dashboard #dc-heatmap .hm-row:hover{background:var(--m3-kpi-surf-hov)}
+
+#page-dashboard #dc-heatmap .hm-label{
+  width:auto;text-align:left;padding-right:0;
+  font-size:13px;font-weight:500;color:var(--m3-on-surface);
+}
+
+/* Les cases deviennent une trame fine : elles gardent le *quand*
+   sans réclamer l'attention que prenait un carré de 26px. */
+#page-dashboard #dc-heatmap .hm-cell{
+  height:22px;min-width:0;border-radius:3px;
+  align-self:center;
+}
+/* Aucun mouvement au survol : une case qui grossit décale ses
+   voisines et fait "respirer" la grille. Le retour visuel passe par
+   un contour, qui ne déplace rien. */
+#page-dashboard #dc-heatmap .hm-cell{transition:box-shadow .12s var(--m3-ease)}
+#page-dashboard #dc-heatmap .hm-cell:hover{
+  transform:none;
+  box-shadow:0 0 0 2px var(--m3-on-surface);
+}
+#page-dashboard #dc-heatmap .hm-cell[data-v="0"]{
+  background:color-mix(in srgb,var(--m3-on-surface) 7%,transparent);
+}
+#page-dashboard #dc-heatmap .hm-cell[data-v="1"]{
+  background:color-mix(in srgb,var(--m3-on-surface) 16%,transparent);
+}
+#page-dashboard #dc-heatmap .hm-cell[data-v="2"]{
+  background:color-mix(in srgb,var(--m3-on-surface) 30%,transparent);
+}
+/* Le rouge n'apparaît qu'aux deux paliers hauts : c'est là qu'il
+   signale quelque chose. Aux paliers bas il était décoratif. */
+#page-dashboard #dc-heatmap .hm-cell[data-v="3"]{
+  background:color-mix(in srgb,var(--m3-primary) 55%,transparent);
+}
+#page-dashboard #dc-heatmap .hm-cell[data-v="4"]{background:var(--m3-primary)}
+
+/* La trame reste un flex interne à sa colonne de grille */
+#page-dashboard #dc-heatmap .hm-cells{
+  display:flex;gap:3px;align-items:center;min-width:0;
+}
+
+/* Barre de charge : la réponse à "qui est chargé", au premier plan */
+#page-dashboard #dc-heatmap .hm-bar{
+  height:8px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 9%,transparent);
+  overflow:hidden;
+}
+#page-dashboard #dc-heatmap .hm-bar-fill{
+  display:block;height:100%;border-radius:var(--m3-r-full);
+  background:var(--m3-on-surface);opacity:.55;
+  transition:width .5s var(--m3-ease);
+}
+/* Le FO le plus chargé porte le seul accent coloré de la carte */
+#page-dashboard #dc-heatmap .hm-row[data-top] .hm-bar-fill{
+  background:var(--m3-primary);opacity:1;
+}
+#page-dashboard #dc-heatmap .hm-row[data-top] .hm-total{color:var(--m3-primary)}
+
+#page-dashboard #dc-heatmap .hm-total{
+  width:auto;font-size:14px;font-weight:600;
+  color:var(--m3-on-surface);padding-left:0;
+  font-variant-numeric:tabular-nums;
+}
+
+/* En-tête de colonnes : aligné sur la même grille que les lignes */
+#page-dashboard #dc-heatmap .hm-col-labels{
+  display:grid;
+  grid-template-columns:104px minmax(120px,1.1fr) minmax(90px,1fr) 44px;
+  gap:14px;padding:0 10px 8px;margin-bottom:2px;
+}
+#page-dashboard #dc-heatmap .hm-col-head{
+  font-size:10.5px;font-weight:500;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--m3-on-surf-var);
+}
+#page-dashboard #dc-heatmap .hm-col-head.num{text-align:right}
+#page-dashboard #dc-heatmap .hm-total-label{
+  width:auto;padding-left:0;text-align:right;
+  font-size:10.5px;font-weight:500;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--m3-on-surf-var);
+}
+#page-dashboard #dc-heatmap .hm-foot{
+  border-top:none;margin-top:14px;padding-top:0;font-size:11.5px;
+}
+
+/* ── Sparklines KPI : contraste porté par le thème ──
+   Sur fond sombre il faut plus d'écart que sur fond clair : un même
+   pourcentage d'opacité ne donne pas la même lisibilité selon qu'on
+   éclaircit ou qu'on assombrit. D'où deux valeurs, pas une. */
+#page-dashboard .hm-spark-bar{
+  flex:1;min-width:0;border-radius:2px 2px 0 0;
+  background:color-mix(in srgb,var(--m3-on-surface) 26%,transparent);
+  transition:background .2s var(--m3-ease);
+}
+[data-theme="dark"] #page-dashboard .hm-spark-bar{
+  background:color-mix(in srgb,var(--m3-on-surface) 34%,transparent);
+}
+/* barre courante : c'est la valeur du jour, elle doit se détacher */
+#page-dashboard .hm-spark-bar.active{
+  background:var(--m3-on-surface);
+}
+/* série en rupture SLA : rouge, seul accent coloré du bandeau */
+#page-dashboard .hm-spark-bar.hot{
+  background:color-mix(in srgb,var(--m3-primary) 45%,transparent);
+}
+[data-theme="dark"] #page-dashboard .hm-spark-bar.hot{
+  background:color-mix(in srgb,var(--m3-primary) 55%,transparent);
+}
+#page-dashboard .hm-spark-bar.hot.active{background:var(--m3-primary)}
+
+/* État d'attente du panneau : discret, il ne doit pas se lire
+   comme une donnée */
+#page-dashboard .hm-hover-idle{
+  font-size:11.5px;line-height:1.5;color:var(--m3-on-surf-var);
+  opacity:.65;
+}
+
+/* ── Aucun mouvement au survol sur tout le dashboard ──
+   Les décalages (translateY, scale) donnaient l'impression que la
+   page se rétracte quand la souris la traverse. */
+#page-dashboard .d-kpi:hover,
+#page-dashboard .d-card:hover,
+#page-dashboard .hm-row:hover,
+#page-dashboard .d-heatmap-cell:hover,
+#page-dashboard .d-insight:hover{
+  transform:none;
+}
+#page-dashboard .d-heatmap-cell{transition:background .12s var(--m3-ease)}
+
+/* Légende continue — mêmes valeurs que les cases via data-v */
+#page-dashboard .hm-legend{
+  display:flex;align-items:center;gap:4px;
+  font-size:10.5px;color:var(--m3-on-surf-var);
+}
+#page-dashboard .hm-legend-cell{
+  width:11px;height:11px;border-radius:3px;display:inline-block;
+}
+#page-dashboard .hm-legend-cell[data-v="0"]{background:color-mix(in srgb,var(--m3-on-surface) 7%,transparent)}
+#page-dashboard .hm-legend-cell[data-v="1"]{background:color-mix(in srgb,var(--m3-on-surface) 16%,transparent)}
+#page-dashboard .hm-legend-cell[data-v="2"]{background:color-mix(in srgb,var(--m3-on-surface) 30%,transparent)}
+#page-dashboard .hm-legend-cell[data-v="3"]{background:color-mix(in srgb,var(--m3-primary) 55%,transparent)}
+#page-dashboard .hm-legend-cell[data-v="4"]{background:var(--m3-primary)}
+
+@media(max-width:900px){
+  /* la trame temporelle saute avant la barre de charge : c'est le
+     détail, pas le message */
+  #page-dashboard #dc-heatmap .hm-row,
+  #page-dashboard #dc-heatmap .hm-col-labels{
+    grid-template-columns:96px minmax(80px,1fr) 40px;
+  }
+  #page-dashboard #dc-heatmap .hm-cells,
+  #page-dashboard #dc-heatmap .hm-col-head.trend{display:none}
+}
+
+/* ── Densité mobile : les widgets gardent leur air, pas leur taille ── */
+@media(max-width:720px){
+  #page-dashboard .d-kpi{min-height:120px;padding:20px}
+  #page-dashboard .d-kpi-value{font-size:32px}
+  #page-dashboard .d-card{padding:20px}
+}
+
+
+/* ══ Palette ══════════════════════════════════════════════════
+   Une teinte par indicateur, pour qu'on les reconnaisse d'un coup
+   d'œil. Le rouge ne sert plus qu'à ce qui va mal : rupture de SLA,
+   conformité sous 75 %, absences au-delà de 15 %. */
+#page-dashboard{
+  --c-blue:#2563EB;--c-violet:#7C3AED;--c-green:#059669;--c-amber:#D97706;
+  --c-teal:#0D9488;--c-pink:#DB2777;--c-sn:#059669;--c-ci:#F97316;
+}
+[data-theme="dark"] #page-dashboard{
+  --c-blue:#60A5FA;--c-violet:#A78BFA;--c-green:#34D399;--c-amber:#FBBF24;
+  --c-teal:#2DD4BF;--c-pink:#F472B6;--c-sn:#34D399;--c-ci:#FB923C;
+}
+/* KPI : fond légèrement teinté, pastille de couleur, mini-barres dans
+   la teinte de l'indicateur. */
+#page-dashboard #dc-total   {--kpi:var(--c-blue)}
+#page-dashboard #dc-open    {--kpi:var(--c-violet)}
+#page-dashboard #dc-breach  {--kpi:var(--c-green)}
+#page-dashboard #dc-breach.has-breach{--kpi:var(--m3-error)}
+#page-dashboard #dc-resolved{--kpi:var(--c-teal)}
+#page-dashboard #dc-today   {--kpi:var(--c-amber)}
+#page-dashboard #dc-sla     {--kpi:var(--c-pink)}
+#page-dashboard .d-kpi[id]{
+  background:linear-gradient(160deg,color-mix(in srgb,var(--kpi) 11%,var(--m3-surface)) 0%,color-mix(in srgb,var(--kpi) 4%,var(--m3-surface)) 100%);
+}
+#page-dashboard button.d-kpi[id]:hover{background:color-mix(in srgb,var(--kpi) 15%,var(--m3-surface))}
+#page-dashboard .d-kpi[id] .d-kpi-label{display:inline-flex;align-items:center;gap:7px;color:color-mix(in srgb,var(--kpi) 70%,var(--m3-on-surface))}
+#page-dashboard .d-kpi[id] .d-kpi-label::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--kpi)}
+#page-dashboard .d-kpi[id] .hm-spark-bar{background:color-mix(in srgb,var(--kpi) 30%,transparent)}
+#page-dashboard .d-kpi[id] .hm-spark-bar.active{background:var(--kpi)}
+/* « 0 rupture » est une bonne nouvelle : le sous-titre passe au vert. */
+#page-dashboard #dc-breach:not(.has-breach) .d-kpi-sub{color:var(--c-green)}
+/* Volume : légende et colonnes dans les couleurs des pays. */
+#page-dashboard .bx-seg-a{background:var(--c-sn)}
+#page-dashboard .bx-seg-b{background:var(--c-ci)}
+/* Heatmap de charge : dégradé bleu → indigo → violet au lieu d'un
+   seul ton, plus lisible et sans connotation d'alerte. */
+#page-dashboard .hm-cell[data-v="1"],#page-dashboard #dc-heatmap .hm-cell[data-v="1"],#page-dashboard .hm-legend-cell[data-v="1"]{background:color-mix(in srgb,var(--c-blue) 22%,transparent)}
+#page-dashboard .hm-cell[data-v="2"],#page-dashboard #dc-heatmap .hm-cell[data-v="2"],#page-dashboard .hm-legend-cell[data-v="2"]{background:color-mix(in srgb,var(--c-blue) 50%,transparent)}
+#page-dashboard .hm-cell[data-v="3"],#page-dashboard #dc-heatmap .hm-cell[data-v="3"],#page-dashboard .hm-legend-cell[data-v="3"]{background:var(--m3-primary)}
+#page-dashboard .hm-cell[data-v="4"],#page-dashboard #dc-heatmap .hm-cell[data-v="4"],#page-dashboard .hm-legend-cell[data-v="4"]{background:var(--c-violet)}
+/* Carte absences : sarcelle plutôt que la teinte d'activité. */
+#page-dashboard .bx-tile-abs{
+  background:linear-gradient(160deg,color-mix(in srgb,var(--c-teal) 12%,var(--m3-surface)),color-mix(in srgb,var(--c-blue) 6%,var(--m3-surface)));
+  border-color:color-mix(in srgb,var(--c-teal) 20%,transparent);
+}
+#page-dashboard .bx-tile-abs:hover{background:color-mix(in srgb,var(--c-teal) 15%,var(--m3-surface))}
+#page-dashboard .bx-tile-abs .bx-abs-bar i{background:var(--c-teal)}
+#page-dashboard .bx-tile-abs .bx-tile-lbl{color:var(--c-teal);font-weight:600}
+/* Icône d'en-tête de l'activité récente. */
+#page-dashboard .bx-ico-accent{background:linear-gradient(135deg,var(--c-blue),var(--c-violet));color:#fff}
+/* Bandeaux de rupture : plus compacts et sur fond clair. La couleur
+   reste sur l'icône, le titre et le compteur ; le grand aplat rose
+   répétait ce que la carte KPI dit déjà. */
+#page-dashboard .breach-alert,
+#page-dashboard .near-breach-alert{
+  padding:12px 20px;margin-bottom:10px;
+  background:var(--m3-kpi-surf);
+}
+#page-dashboard .breach-alert-title{color:var(--m3-error)}
+#page-dashboard .near-breach-alert .breach-alert-title{color:var(--c-amber)}
+#page-dashboard .near-breach-alert .breach-alert-count{background:var(--c-amber)}
+[data-theme="dark"] #page-dashboard .near-breach-alert{background:var(--m3-kpi-surf)}
+[data-theme="dark"] #page-dashboard .near-breach-alert .breach-alert-title{color:var(--c-amber)}
+
+/* ══ Allègement : 4 indicateurs, un en-tête compact ══
+   Six cartes plus quatre boutons de période se disputaient la même ligne.
+   On garde ce qui appelle une action (ouverts, en dépassement, résolus,
+   conformité) ; le total et les ouvertures du jour passent en sous-titre
+   de la carte « ouverts ». Les cartes masquées restent dans le DOM : le
+   code qui les remplit n'a pas à changer. */
+#page-dashboard #dc-total,#page-dashboard #dc-today{display:none!important}
+#page-dashboard .d-kpibar{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+@media(max-width:900px){#page-dashboard .d-kpibar{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+.dash-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 4px 16px}
+.dash-head-l{display:flex;align-items:baseline;gap:10px;min-width:0;flex-wrap:wrap}
+.dash-head-t{font-size:17px;font-weight:600;color:var(--dark);letter-spacing:-.01em}
+.dash-head-sub{font-size:12.5px;color:var(--mute)}
+.dash-head-r{display:flex;align-items:center;gap:8px}
+.dash-period-sel{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 6px 0 11px;border-radius:10px;
+  border:1px solid var(--line);background:var(--white);color:var(--mute);cursor:pointer}
+.dash-period-sel select{border:none;outline:none;background:transparent;font:500 12.5px 'Inter',sans-serif;color:var(--dark);cursor:pointer;padding-right:2px}
+.dash-icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--white);color:var(--mute);
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.dash-icon-btn:hover,.dash-period-sel:hover{color:var(--dark);border-color:color-mix(in srgb,var(--dark) 25%,transparent)}
+[data-theme="dark"] .dash-period-sel,[data-theme="dark"] .dash-icon-btn{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.10)}
+[data-theme="dark"] .dash-period-sel select option{background:#16171d;color:#eee}
+#page-dashboard .dash-period-sel select{border:none!important;box-shadow:none!important;background:transparent!important;height:auto!important;padding:0 2px 0 0!important;min-width:0}
+
+/* ══ Ligne « à surveiller » ══
+   Les deux bandeaux SLA et les quatre constats occupaient chacun une ligne.
+   Tout tient désormais sur une : pastilles SLA cliquables, puis constats en
+   texte discret. Les listes de tickets ne s'ouvrent qu'à la demande. */
+#page-dashboard .d-insights{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin:0 4px 14px}
+.d-chip{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 10px 0 11px;border-radius:999px;
+  border:1px solid transparent;font:500 12.5px 'Inter',sans-serif;cursor:pointer}
+.d-chip svg{width:14px;height:14px;flex-shrink:0}
+.d-chip b{font-weight:700}
+.d-chip-chev{width:12px!important;height:12px!important;opacity:.7;transition:transform .2s}
+.d-chip.open .d-chip-chev{transform:rotate(180deg)}
+.d-chip.crit{background:#F6E3DF;color:#8E3A2E;border-color:#EDCBC4}
+.d-chip.warn{background:#FBF0DC;color:#7A5900;border-color:#F1DFB7}
+[data-theme="dark"] .d-chip.crit{background:rgba(169,73,59,.18);color:#F0A99D;border-color:rgba(240,169,157,.2)}
+[data-theme="dark"] .d-chip.warn{background:rgba(240,194,75,.12);color:#F0C24B;border-color:rgba(240,194,75,.2)}
+.d-infos{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;font-size:12.5px;color:var(--mute);min-width:0}
+.d-infos b{color:var(--dark);font-weight:600}
+.d-infos i{font-style:normal;opacity:.5}
+/* Les bandeaux perdent leur titre (la pastille le remplace) et ne
+   s'affichent que dépliés. */
+#page-dashboard .breach-alert .breach-alert-title{display:none}
+#page-dashboard .breach-alert.collapsed{display:none!important}
+#page-dashboard .breach-alert.visible:not(.collapsed){padding:6px 8px;margin:0 0 14px}
+#page-dashboard .near-breach-alert .breach-alert-title{display:none}
+#page-dashboard .near-breach-alert.collapsed{display:none!important}
+#page-dashboard .near-breach-alert.visible:not(.collapsed){padding:6px 8px;margin:0 0 14px}
+
+/* ══ Cartes neutres : vrai blanc ou vrai noir ══
+   Les fonds pastel (violet, vert, rose, beige, sarcelle) sont retirés.
+   Toutes les cartes du dashboard prennent le blanc pur en clair et le
+   noir pur en sombre, détachées par un filet fin. La couleur ne reste
+   que là où elle porte une information : la pastille de chaque
+   indicateur, les mini-barres, et le rouge en cas de rupture SLA. */
+#page-dashboard .d-kpi[id],
+#page-dashboard button.d-kpi[id]:hover,
+#page-dashboard .bx-soft,
+#page-dashboard .bx-plain,
+#page-dashboard .bx-tile,
+#page-dashboard .bx-tile-abs,
+#page-dashboard .bx-tile-abs:hover,
+#page-dashboard .d-card,
+#page-dashboard .d-card:hover,
+#page-dashboard .bento-card{
+  background:#FFFFFF!important;
+  border:1px solid rgba(38,37,31,.09)!important;
+  box-shadow:none!important;
+}
+[data-theme="dark"] #page-dashboard .d-kpi[id],
+[data-theme="dark"] #page-dashboard button.d-kpi[id]:hover,
+[data-theme="dark"] #page-dashboard .bx-soft,
+[data-theme="dark"] #page-dashboard .bx-plain,
+[data-theme="dark"] #page-dashboard .bx-tile,
+[data-theme="dark"] #page-dashboard .bx-tile-abs,
+[data-theme="dark"] #page-dashboard .bx-tile-abs:hover,
+[data-theme="dark"] #page-dashboard .d-card,
+[data-theme="dark"] #page-dashboard .d-card:hover,
+[data-theme="dark"] #page-dashboard .bento-card,
+[data-theme="dark"] #page-dashboard .bx-dark{
+  background:#000000!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+}
+/* Survol : un filet plus marqué au lieu d'un changement de teinte. */
+#page-dashboard button.d-kpi[id]:hover{border-color:rgba(38,37,31,.22)!important}
+[data-theme="dark"] #page-dashboard button.d-kpi[id]:hover{border-color:rgba(255,255,255,.22)!important}
+/* Libellés en gris neutre ; la pastille garde la couleur. */
+#page-dashboard .d-kpi[id] .d-kpi-label{color:var(--m3-on-surf-var)!important}
+#page-dashboard .bx-tile-abs .bx-tile-lbl{color:var(--m3-on-surf-var)!important}
+/* Le panneau qui les contient : blanc légèrement cassé en clair pour que
+   les cartes blanches s'en détachent ; quasi noir en sombre. */
+:root:not(.sky-on)[data-theme="light"] .dash-panel{background:#FBFAF7}
+:root:not(.sky-on)[data-theme="dark"] .dash-panel{background:#0A0A0B}
+
+/* ══════════════════════════════════════════════════════════
+   UN SEUL MODÈLE DE CARTE — celui de « Ticket volume »
+   Même rayon, même marge intérieure, même en-tête (titre 21 px,
+   sous-titre discret), mêmes pilules ; fond du thème : blanc en
+   clair, noir en sombre.
+   Une seule teinte d'accent (ardoise) pour toutes les données ; le
+   rouge et l'ambre restent réservés aux alertes SLA.
+   ══════════════════════════════════════════════════════════ */
+#page-dashboard{
+  --c-blue:var(--m3-primary);--c-violet:var(--m3-primary);--c-green:var(--m3-primary);
+  --c-amber:var(--m3-primary);--c-teal:var(--m3-primary);--c-pink:var(--m3-primary);
+  --c-sn:var(--m3-primary);--c-ci:color-mix(in srgb,var(--m3-primary) 45%,transparent);
+}
+[data-theme="dark"] #page-dashboard{
+  --c-blue:var(--m3-primary);--c-violet:var(--m3-primary);--c-green:var(--m3-primary);
+  --c-amber:var(--m3-primary);--c-teal:var(--m3-primary);--c-pink:var(--m3-primary);
+  --c-sn:var(--m3-primary);--c-ci:color-mix(in srgb,var(--m3-primary) 45%,transparent);
+}
+/* Forme commune */
+#page-dashboard .d-kpi[id],
+#page-dashboard .bx,
+#page-dashboard .bx-tile,
+#page-dashboard .d-card,
+#page-dashboard .bento-card{border-radius:var(--m3-r-xl)!important}
+#page-dashboard .d-kpi[id]{padding:24px 26px 20px!important}
+/* « Ticket volume » suit le thème comme les autres. */
+#page-dashboard .bx-dark{background:#FFFFFF!important;color:var(--m3-on-surface)!important;border:1px solid rgba(38,37,31,.09)!important}
+[data-theme="dark"] #page-dashboard .bx-dark{color:#FFFFFF!important}
+/* Indicateurs : même typographie que le chiffre de Ticket volume. */
+#page-dashboard .d-kpi-value{font-size:40px;font-weight:600;letter-spacing:-.04em}
+#page-dashboard .d-kpi[id] .d-kpi-label{font-size:13px;font-weight:500}
+#page-dashboard .d-kpi[id] .d-kpi-sub{color:var(--m3-on-surf-var)}
+#page-dashboard #dc-breach.has-breach .d-kpi-sub{color:var(--m3-error)}
+/* Rond d'icône : un seul style (celui de « Latest tickets »). */
+#page-dashboard .bx-ico-accent,#page-dashboard #bx-forecast .bx-ico-accent{background:#1F2023!important;color:#fff!important}
+[data-theme="dark"] #page-dashboard .bx-ico-accent,
+[data-theme="dark"] #page-dashboard #bx-forecast .bx-ico-accent,
+[data-theme="dark"] #page-dashboard .bx-ico-dark{background:#1A1B1F!important;color:#fff!important}
+/* Anneau de conformité dans l'accent (rouge seulement si sous l'objectif,
+   géré par le script). */
+#page-dashboard .bx-tile-abs .bx-abs-bar i{background:var(--m3-primary)}
+/* Lignes de « Latest tickets » et panneau de survol : gris neutre très
+   léger au lieu du beige. */
+#page-dashboard .bx-row{background:rgba(38,37,31,.045)!important}
+#page-dashboard .bx-row:hover{background:rgba(38,37,31,.08)!important}
+[data-theme="dark"] #page-dashboard .bx-row{background:rgba(255,255,255,.06)!important}
+[data-theme="dark"] #page-dashboard .bx-row:hover{background:rgba(255,255,255,.10)!important}
+/* Titre du tableau de charge : même taille que les autres cartes, sans
+   le style « libellé » appliqué aux span de l'en-tête. */
+#page-dashboard .d-card-head > span.bx-title[style]{font-size:21px!important;font-weight:600!important;letter-spacing:-.02em!important;color:var(--m3-on-surface)!important}
+#page-dashboard #hm-hover-panel{background:rgba(38,37,31,.045)!important;border:none!important;border-radius:16px!important}
+[data-theme="dark"] #page-dashboard #hm-hover-panel{background:rgba(255,255,255,.06)!important}
+
+/* ══════════════════════════════════════════════════════════
+   CARTES PLUS VIVANTES (sans casser le modèle commun)
+   · un reflet très doux dans le coin haut droit, dans l'accent ;
+   · une icône par indicateur, dans un rond, en haut à droite ;
+   · au survol : ombre portée et flèche « ouvrir » qui apparaît
+     (aucun déplacement : la grille ne bouge pas) ;
+   · mini-barres plus hautes et arrondies.
+   ══════════════════════════════════════════════════════════ */
+#page-dashboard .d-kpi[id]{overflow:hidden}
+#page-dashboard .d-kpi[id],
+#page-dashboard .bx,
+#page-dashboard .d-card{position:relative;
+  transition:box-shadow .25s ease,border-color .25s ease}
+#page-dashboard .d-kpi[id]{
+  background:radial-gradient(140% 90% at 100% 0%,color-mix(in srgb,var(--kpi,var(--m3-primary)) 9%,transparent) 0%,transparent 55%),#FFFFFF!important}
+[data-theme="dark"] #page-dashboard .d-kpi[id]{
+  background:radial-gradient(140% 90% at 100% 0%,color-mix(in srgb,var(--kpi,var(--m3-primary)) 16%,transparent) 0%,transparent 55%),#000!important}
+#page-dashboard .bx{
+  background:radial-gradient(90% 70% at 100% 0%,color-mix(in srgb,var(--m3-primary) 6%,transparent) 0%,transparent 60%),#FFFFFF!important}
+[data-theme="dark"] #page-dashboard .bx{
+  background:radial-gradient(90% 70% at 100% 0%,color-mix(in srgb,var(--m3-primary) 11%,transparent) 0%,transparent 60%),#000!important}
+#page-dashboard button.d-kpi[id]:hover,#page-dashboard .bx:hover,#page-dashboard .d-card:hover{
+  box-shadow:0 12px 30px -14px rgba(20,24,32,.28)!important}
+[data-theme="dark"] #page-dashboard button.d-kpi[id]:hover,[data-theme="dark"] #page-dashboard .bx:hover,[data-theme="dark"] #page-dashboard .d-card:hover{
+  box-shadow:0 12px 30px -14px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.08)!important}
+
+/* Icône de l'indicateur */
+#page-dashboard .d-kpi[id]::after{content:'';position:absolute;top:18px;right:18px;width:38px;height:38px;border-radius:50%;
+  background:color-mix(in srgb,var(--kpi,var(--m3-primary)) 12%,transparent);pointer-events:none}
+#page-dashboard .d-kpi[id]::before{content:'';position:absolute;top:28px;right:28px;width:18px;height:18px;z-index:1;
+  background:var(--kpi,var(--m3-primary));-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;
+  pointer-events:none;transition:opacity .2s}
+#page-dashboard #dc-open{--ico:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M4%207a2%202%200%200%201%202-2h12a2%202%200%200%201%202%202v2a2%202%200%200%200%200%204v2a2%202%200%200%201-2%202H6a2%202%200%200%201-2-2v-2a2%202%200%200%200%200-4z%27/%3E%3C/svg%3E")}
+#page-dashboard #dc-breach{--ico:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M10.29%203.86L1.82%2018a2%202%200%200%200%201.71%203h16.94a2%202%200%200%200%201.71-3L13.71%203.86a2%202%200%200%200-3.42%200z%27/%3E%3Cline%20x1%3D%2712%27%20y1%3D%279%27%20x2%3D%2712%27%20y2%3D%2713%27/%3E%3Cline%20x1%3D%2712%27%20y1%3D%2717%27%20x2%3D%2712.01%27%20y2%3D%2717%27/%3E%3C/svg%3E")}
+#page-dashboard #dc-resolved{--ico:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%279%27/%3E%3Cpath%20d%3D%27M8%2012l3%203%205-6%27/%3E%3C/svg%3E")}
+#page-dashboard #dc-sla{--ico:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M12%203l8%203v6c0%205-3.5%208-8%209-4.5-1-8-4-8-9V6z%27/%3E%3C/svg%3E")}
+/* Au survol d'un indicateur cliquable, l'icône laisse place à la flèche. */
+#page-dashboard button.d-kpi[id]:hover::before{--ico:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cline%20x1%3D%277%27%20y1%3D%2717%27%20x2%3D%2717%27%20y2%3D%277%27/%3E%3Cpolyline%20points%3D%277%207%2017%207%2017%2017%27/%3E%3C/svg%3E")}
+#page-dashboard .d-kpi-sla .d-kpi-sla-row{margin-top:6px}
+/* Mini-barres : plus hautes, arrondies */
+#page-dashboard .d-kpi-spark{height:34px}
+#page-dashboard .d-kpi[id] .hm-spark-bar{border-radius:4px 4px 2px 2px}
+/* Le chiffre prend un peu plus de place, le sous-titre reste discret. */
+#page-dashboard .d-kpi-value{font-size:44px!important;margin-top:12px}
+
+/* ══════════════════════════════════════════════════════════
+   AUDIT UX DU DASHBOARD — corrections
+   ══════════════════════════════════════════════════════════ */
+/* Latest tickets : la priorité reste visible, la rupture s'y ajoute. */
+#page-dashboard .bx-row-v{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
+#page-dashboard .bx-prio{font:700 11px/1 'Inter',sans-serif;padding:4px 7px;border-radius:6px;
+  background:rgba(38,37,31,.07);color:var(--m3-on-surface)}
+[data-theme="dark"] #page-dashboard .bx-prio{background:rgba(255,255,255,.10)}
+#page-dashboard .bx-prio-p1{background:var(--m3-error);color:#fff}
+#page-dashboard .bx-row-alert{font-size:12px;font-weight:600;color:var(--m3-error)}
+
+/* Activité : « ouverts » et « clôturés » ne partagent plus la même teinte. */
+#page-dashboard #bx-forecast{--act-out:color-mix(in srgb,var(--m3-primary) 38%,transparent)}
+
+/* Charge par FO : une échelle lisible en une seule teinte (opacité
+   croissante), barres de total dans l'accent, la plus chargée en plein. */
+#page-dashboard .hm-cell[data-v="1"],#page-dashboard #dc-heatmap .hm-cell[data-v="1"],#page-dashboard .hm-legend-cell[data-v="1"]{background:color-mix(in srgb,var(--m3-primary) 22%,transparent)!important}
+#page-dashboard .hm-cell[data-v="2"],#page-dashboard #dc-heatmap .hm-cell[data-v="2"],#page-dashboard .hm-legend-cell[data-v="2"]{background:color-mix(in srgb,var(--m3-primary) 48%,transparent)!important}
+#page-dashboard .hm-cell[data-v="3"],#page-dashboard #dc-heatmap .hm-cell[data-v="3"],#page-dashboard .hm-legend-cell[data-v="3"]{background:color-mix(in srgb,var(--m3-primary) 74%,transparent)!important}
+#page-dashboard .hm-cell[data-v="4"],#page-dashboard #dc-heatmap .hm-cell[data-v="4"],#page-dashboard .hm-legend-cell[data-v="4"]{background:var(--m3-primary)!important}
+#page-dashboard #dc-heatmap .hm-bar-fill{background:color-mix(in srgb,var(--m3-primary) 45%,transparent)!important}
+#page-dashboard #dc-heatmap .hm-row[data-top] .hm-bar-fill{background:var(--m3-primary)!important}
+
+/* Absence rate : la tuile ne s'étire plus sur toute la hauteur. */
+#page-dashboard .bx-tiles{align-self:flex-start;width:100%}
+#page-dashboard .bx-tile-abs{min-height:0!important;height:auto!important}
+
+/* ── Tablette et téléphone ── */
+@media(max-width:900px){
+  /* Ticket volume : graphique au-dessus, répartition en dessous. */
+  #page-dashboard .bx-volume-body{flex-wrap:wrap!important}
+  #page-dashboard #bx-volume-break{flex:1 1 100%;border-left:none!important;padding-left:0!important}
+}
+@media(max-width:640px){
+  /* Les indicateurs gardent leur texte entier : l'icône s'efface. */
+  #page-dashboard .d-kpi[id]::before,#page-dashboard .d-kpi[id]::after{display:none}
+  #page-dashboard .d-kpi[id]{padding:18px 16px 16px!important;min-height:0}
+  #page-dashboard .d-kpi-value{font-size:34px!important}
+  #page-dashboard .d-kpi-sla-row{flex-wrap:wrap}
+  #page-dashboard #hm-hover-panel{display:none}
+  #page-dashboard .bx{padding:20px 18px!important}
+  #page-dashboard .bx-title{font-size:18px!important}
+  .dash-head-t{font-size:16px}
+  #page-dashboard .d-insights .d-infos{display:none}
+}
+@media(max-width:640px){
+  #page-dashboard .bx-volume-body{min-height:0!important;margin-top:16px!important;gap:16px!important}
+  #page-dashboard #bx-volume-break{min-width:0}
+  #page-dashboard #bx-volume{height:auto!important;max-height:none!important;overflow:visible!important}
+  #page-dashboard #bx-volume .bx-volume-body{flex:0 0 auto!important}
+  #page-dashboard #bx-volume-cols{height:190px!important}
+  #page-dashboard .dash-grid{grid-auto-rows:auto!important;grid-template-rows:none!important}
+}
+[data-theme="dark"] #page-dashboard .bx-prio-p1{background:var(--m3-error);color:#fff}

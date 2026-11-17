@@ -1,0 +1,171 @@
+/* ══════════════════════════════════════════════════════════════
+   PERFORMANCE FO — fiche et notation
+   Même vocabulaire que SLA/Objectifs : la page se lit comme les
+   autres écrans d'administration.
+   ══════════════════════════════════════════════════════════════ */
+.perf-empty{font-size:13px;color:var(--m3-on-surf-var);padding:18px 0}
+
+/* Barre du mois noté (l'agent se choisit dans la fiche de la page Équipe). */
+.perf-bar{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:24px;flex-wrap:wrap;margin-bottom:20px;
+}
+.perf-monthbar{flex-shrink:0;min-width:180px}
+.perf-monthbar .form-label{display:block;margin-bottom:6px}
+
+.perf-view[hidden]{display:none}
+
+@media (max-width:640px){
+  .perf-bar{gap:14px}
+  .perf-monthbar{min-width:0;width:100%}
+}
+
+/* En-tête de fiche : identité à gauche, score à droite. */
+.perf-sheet-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.perf-sheet-av{
+  width:46px;height:46px;border-radius:50%;flex-shrink:0;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:600;
+}
+.perf-sheet-id{flex:1;min-width:0}
+.perf-sheet-name{font-size:19px;font-weight:500;color:var(--m3-on-surface)}
+.perf-sheet-meta{font-size:12.5px;color:var(--m3-on-surf-var);margin-top:2px}
+.perf-scorebox{
+  flex-shrink:0;text-align:center;min-width:96px;
+  padding:10px 18px;border-radius:var(--m3-r-md,16px);background:var(--m3-surf-1);
+}
+[data-theme="dark"] .perf-scorebox{background:var(--m3-surf-2)}
+/* Le score reste dans l'encre du texte quel que soit son niveau : trois
+   couleurs de chiffre faisaient trois messages concurrents sur un écran
+   qui en compte déjà beaucoup. Le niveau est dit par la pastille en
+   dessous, une seule fois et en toutes lettres. */
+.perf-score-val{
+  font-size:32px;font-weight:400;line-height:1;color:var(--m3-on-surface);
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+}
+.perf-score-lbl{
+  font-size:10.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);margin-top:5px;
+}
+/* Pastille de niveau : contour seul, la teinte n'est qu'un appui. */
+.perf-score-tag{
+  display:inline-block;margin-top:8px;padding:2px 10px;
+  border-radius:var(--m3-r-full,999px);border:1px solid var(--m3-outline-var);
+  font-size:11px;font-weight:500;color:var(--m3-on-surf-var);white-space:nowrap;
+}
+.perf-score-tag.is-top{border-color:#B7DFC0;color:#1E7B34}
+.perf-score-tag.is-low{border-color:#F3C9CB;color:var(--m3-primary)}
+[data-theme="dark"] .perf-score-tag.is-top{border-color:#2C4A33;color:#81C995}
+[data-theme="dark"] .perf-score-tag.is-low{border-color:#4A2A2C;color:var(--m3-primary)}
+
+/* Mesures automatiques : ce que le Tracker sait déjà, en regard des
+   objectifs d'équipe — pour noter en connaissance de cause. */
+.perf-measures{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;
+  margin-top:20px;
+}
+.perf-measure{
+  padding:13px 16px;border-radius:var(--m3-r-sm,12px);
+  border:1px solid var(--m3-outline-var);background:var(--m3-surface);
+}
+[data-theme="dark"] .perf-measure{background:var(--m3-surf-2);border-color:transparent}
+.perf-measure-lbl{font-size:12px;color:var(--m3-on-surf-var)}
+/* La valeur garde l'encre du texte : c'est un chiffre, pas un verdict.
+   L'écart à l'objectif se lit sur la ligne du dessous, où il est écrit. */
+.perf-measure-val{
+  font-size:22px;font-weight:400;color:var(--m3-on-surface);margin-top:4px;
+  font-variant-numeric:tabular-nums;
+}
+.perf-measure-goal{
+  display:flex;align-items:center;gap:6px;
+  font-size:11.5px;color:var(--m3-on-surf-var);margin-top:5px;
+}
+/* Un point de 6 px suffit à dire tenu / non tenu — la couleur porte une
+   information unique et ne colore rien d'autre sur la tuile. */
+.perf-measure-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+  background:var(--m3-outline);
+}
+.perf-measure.is-ok  .perf-measure-dot{background:#1E7B34}
+.perf-measure.is-off .perf-measure-dot{background:var(--m3-primary)}
+[data-theme="dark"] .perf-measure.is-ok .perf-measure-dot{background:#81C995}
+.perf-measure.is-void .perf-measure-val{color:var(--m3-on-surf-var);opacity:.6}
+
+/* ══════════════════════════════════════════════════════════════
+   FIL DE COMMENTAIRES — notation mensuelle et suivi d'objectif
+   Un champ unique écrasé à chaque passage ne gardait aucune trace. Ici
+   chaque commentaire est une entrée datée, ajoutable à tout moment et
+   modifiable sur place. Les actions restent muettes tant qu'on ne
+   survole pas l'entrée : la lecture prime sur l'édition.
+   ══════════════════════════════════════════════════════════════ */
+.nt{display:flex;flex-direction:column;gap:14px}
+.nt-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.nt-item{
+  padding:11px 13px;border-radius:var(--m3-r-sm,12px);
+  transition:background .15s var(--m3-ease);
+}
+.nt-item:hover{background:var(--m3-surf-1)}
+[data-theme="dark"] .nt-item:hover{background:var(--m3-surf-2)}
+.nt-text{
+  margin:0;font-size:13.5px;line-height:1.6;color:var(--m3-on-surface);
+  white-space:normal;overflow-wrap:anywhere;
+}
+.nt-meta{display:flex;align-items:center;gap:4px;margin-top:6px}
+.nt-when{
+  font-size:11.5px;color:var(--m3-on-surf-var);margin-right:6px;
+  font-variant-numeric:tabular-nums;
+}
+/* Modifier / Supprimer : révélés au survol ou au clavier, pour ne pas
+   border chaque commentaire de deux boutons permanents. */
+.nt-act{
+  border:none;background:none;cursor:pointer;font:inherit;font-size:11.5px;
+  color:var(--m3-on-surf-var);padding:2px 7px;border-radius:var(--m3-r-full,999px);
+  opacity:0;transition:opacity .15s var(--m3-ease),background .15s var(--m3-ease);
+}
+.nt-item:hover .nt-act,.nt-act:focus-visible{opacity:1}
+.nt-act:hover{background:var(--m3-surf-2);color:var(--m3-on-surface)}
+[data-theme="dark"] .nt-act:hover{background:var(--m3-surf-3)}
+.nt-act:focus-visible{outline:2px solid var(--m3-primary);outline-offset:1px}
+/* Sur écran tactile il n'y a pas de survol : les actions restent là. */
+@media (hover:none){ .nt-act{opacity:1} }
+
+.nt-edit{display:flex;flex-direction:column;gap:8px}
+/* `hidden` est un attribut, pas une classe : sans ce rappel, le
+   `display:flex` ci-dessus l'emporte et le formulaire d'édition
+   s'affiche en même temps que le texte qu'il est censé remplacer. */
+.nt-edit[hidden],.nt-body[hidden],.o2o-edit[hidden]{display:none}
+.nt-edit-foot{display:flex;justify-content:flex-end;gap:8px}
+/* Les champs de ce bloc débordaient de leur carte : le width:100% des
+   .form-control s'ajoutait à la gouttière de la grille parente. On les
+   laisse se dimensionner sur la colonne. */
+.nt-ta{width:100%;min-width:0;resize:vertical;font:inherit;font-size:13.5px;line-height:1.55}
+.nt-add{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.nt-add .nt-ta{width:100%}
+.nt-btn{
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  height:34px;padding:0 16px;cursor:pointer;font:inherit;font-size:12.5px;
+  font-weight:500;border-radius:var(--m3-r-full,999px);
+  border:1px solid transparent;background:var(--m3-primary);color:#fff;
+  transition:filter .15s var(--m3-ease),background .15s var(--m3-ease);
+}
+[data-theme="dark"] .nt-btn{color:#1A1A1A}
+.nt-btn:hover{filter:brightness(1.06)}
+.nt-btn.is-ghost{
+  background:transparent;border-color:var(--m3-outline);color:var(--m3-on-surf-var);
+}
+.nt-btn.is-ghost:hover{background:var(--m3-surf-1);color:var(--m3-on-surface)}
+[data-theme="dark"] .nt-btn.is-ghost:hover{background:var(--m3-surf-2)}
+.nt-btn:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+/* La mention « pré-rempli » est une note de bas de page, pas une alerte :
+   même gris que le reste de l'aide, en italique. */
+.gsla .gsla-goal-hint em{font-style:italic;color:var(--m3-on-surf-var);opacity:.9}
+
+
+/* Mois neutre : pas de note pour l'agent ce mois-ci. */
+.perf-neutre{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px;padding:14px 16px;border-radius:14px;background:var(--bg2,#F1F3F4);border:1px dashed var(--line,#D0D4D9)}
+.perf-neutre b{display:block;font-size:14px}
+.perf-neutre span{font-size:12.5px;color:var(--mute,#5F6368)}
+.perf-not-head{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 12px}
+.perf-not-head .gsla-card-d{flex-basis:100%}
+.perf-not-head .eq-btn{margin-left:auto}
+.gsla-list.is-neutre{opacity:.45;pointer-events:none}

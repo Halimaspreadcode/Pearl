@@ -1,0 +1,281 @@
+/* ══════════════════════════════════════════════
+   DAILY CHECK-UP — refonte Material 3
+   La page empilait des .obs-card identiques : rien ne distinguait
+   une tâche du jour d'une tâche en retard, et l'avancement global
+   n'était visible nulle part. Trois niveaux de lecture maintenant :
+   la barre d'avancement du jour, les groupes datés, puis la tâche.
+══════════════════════════════════════════════ */
+#page-fo-tasks{
+  --dchk-ok:   #1E8E3E;
+  --dchk-warn: #E8710A;
+  --dchk-late: #D93025;
+}
+[data-theme="dark"] #page-fo-tasks{
+  --dchk-ok:   #81C995;
+  --dchk-warn: #FCAD70;
+  --dchk-late: #F28B82;
+}
+#page-fo-tasks .page-title{
+  font-size:24px;font-weight:400;letter-spacing:-.01em;color:var(--m3-on-surface);
+}
+#page-fo-tasks .page-sub{
+  font-size:14px;color:var(--m3-on-surf-var);margin:6px 0 0;
+}
+.dchk-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:20px;
+}
+
+/* ── Barre d'avancement du jour ──────────────────────────────
+   Un anneau de progression + le décompte par état. On lit en un
+   coup d'œil si la journée est tenue. */
+.dchk-hero{
+  display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  background:var(--m3-surf-1);border-radius:var(--m3-r-xl);
+  padding:20px 26px;margin-bottom:18px;
+}
+[data-theme="dark"] .dchk-hero{background:var(--m3-surf-2)}
+.dchk-ring{position:relative;width:104px;height:104px;flex-shrink:0}
+.dchk-ring svg{width:104px;height:104px;transform:rotate(-90deg)}
+.dchk-ring-track{fill:none;stroke:var(--m3-surf-3);stroke-width:10}
+.dchk-ring-fill{
+  fill:none;stroke-width:10;stroke-linecap:round;stroke:var(--dchk-ok);
+  transition:stroke-dashoffset .9s var(--m3-ease),stroke .3s var(--m3-ease);
+}
+.dchk-ring.warn .dchk-ring-fill{stroke:var(--dchk-warn)}
+.dchk-ring.late .dchk-ring-fill{stroke:var(--dchk-late)}
+.dchk-ring-mid{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;
+}
+.dchk-ring-n{font-size:26px;font-weight:400;line-height:1;color:var(--m3-on-surface)}
+.dchk-ring-n small{font-size:14px;color:var(--m3-on-surf-var)}
+.dchk-ring-l{
+  font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+.dchk-hero-main{flex:1;min-width:220px}
+.dchk-hero-verdict{
+  font-size:19px;font-weight:400;line-height:1.3;
+  color:var(--m3-on-surface);margin-bottom:5px;
+}
+.dchk-hero-sub{font-size:13.5px;color:var(--m3-on-surf-var);line-height:1.5}
+.dchk-hero-sub b{color:var(--m3-on-surface);font-weight:500}
+/* Décompte par état, cliquable : sert aussi de raccourci de filtre. */
+.dchk-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.dchk-stat{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;border-radius:var(--m3-r-full);
+  background:var(--m3-surface);border:1px solid var(--m3-outline-var);
+  font-size:12.5px;color:var(--m3-on-surf-var);cursor:pointer;
+  transition:background .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+[data-theme="dark"] .dchk-stat{background:var(--m3-surf-3);border-color:transparent}
+.dchk-stat:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,var(--m3-surface))}
+.dchk-stat b{font-size:14px;font-weight:500;color:var(--m3-on-surface);font-variant-numeric:tabular-nums}
+.dchk-stat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dchk-stat.is-late b{color:var(--dchk-late)}
+.dchk-stat.is-done b{color:var(--dchk-ok)}
+
+/* ── Filtres ─────────────────────────────────────────────────
+   Segments M3 pour le statut, select pour le FO. */
+.dchk-filters{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;
+}
+.dchk-seg{
+  display:inline-flex;padding:0;border-radius:var(--m3-r-full);
+  border:1px solid var(--m3-outline);overflow:hidden;
+}
+.dchk-seg button{
+  border:none;background:transparent;cursor:pointer;font-family:inherit;
+  height:34px;padding:0 16px;font-size:12.5px;font-weight:500;
+  color:var(--m3-on-surf-var);white-space:nowrap;
+  display:inline-flex;align-items:center;gap:7px;
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease);
+}
+.dchk-seg button + button{border-left:1px solid var(--m3-outline-var)}
+.dchk-seg button:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);color:var(--m3-on-surface)}
+.dchk-seg button.active{background:var(--m3-secondary-cont);color:var(--m3-on-surface)}
+.dchk-seg button:focus-visible{outline:2px solid var(--m3-primary);outline-offset:-2px}
+.dchk-seg-n{
+  font-size:11px;font-variant-numeric:tabular-nums;
+  padding:1px 6px;border-radius:var(--m3-r-full);
+  background:color-mix(in srgb,var(--m3-on-surface) 10%,transparent);
+}
+.dchk-seg button.active .dchk-seg-n{background:color-mix(in srgb,var(--m3-on-surface) 14%,transparent)}
+.dchk-toggle{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  font-size:12.5px;color:var(--m3-on-surf-var);user-select:none;
+}
+.dchk-toggle input{width:16px;height:16px;accent-color:var(--m3-primary);cursor:pointer}
+.dchk-toggle:hover{color:var(--m3-on-surface)}
+
+/* ── Groupes ─────────────────────────────────────────────────
+   Un intitulé par bloc temporel, avec son décompte. */
+.dchk-group{margin-bottom:26px}
+.dchk-group-head{
+  display:flex;align-items:center;gap:10px;margin-bottom:10px;
+}
+.dchk-group-title{
+  font-size:13px;font-weight:500;letter-spacing:.01em;color:var(--m3-on-surface);
+  display:flex;align-items:center;gap:8px;
+}
+.dchk-group-title svg{width:16px;height:16px;color:var(--m3-on-surf-var)}
+.dchk-group-n{
+  font-size:11.5px;font-variant-numeric:tabular-nums;
+  padding:1px 8px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2);color:var(--m3-on-surf-var);
+}
+[data-theme="dark"] .dchk-group-n{background:var(--m3-surf-3)}
+.dchk-group-rule{flex:1;height:1px;background:var(--m3-outline-var)}
+.dchk-group.is-late .dchk-group-title{color:var(--dchk-late)}
+.dchk-group.is-late .dchk-group-title svg{color:var(--dchk-late)}
+.dchk-group.is-late .dchk-group-n{
+  background:color-mix(in srgb,var(--dchk-late) 14%,transparent);color:var(--dchk-late);
+}
+
+/* ── Tâche ───────────────────────────────────────────────────
+   Surface tonale sans bordure, case à cocher ronde à gauche :
+   l'action principale (« c'est fait ») est la cible la plus large
+   de la ligne au lieu d'un bouton texte caché au survol. */
+.dchk-list{display:flex;flex-direction:column;gap:8px}
+.dchk-task{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:14px 16px;border-radius:var(--m3-r-md);
+  background:var(--m3-surf-1);
+  transition:background .2s var(--m3-ease);
+}
+[data-theme="dark"] .dchk-task{background:var(--m3-surf-2)}
+.dchk-task:hover{background:var(--m3-surf-2)}
+[data-theme="dark"] .dchk-task:hover{background:var(--m3-surf-3)}
+/* Le retard se lit sur l'échéance (« En retard de 3 j ») et sur
+   l'intitulé du groupe — pas de liseré coloré sur la carte. */
+.dchk-task.is-done{background:transparent;opacity:.6}
+.dchk-task.is-done:hover{background:var(--m3-surf-1);opacity:.85}
+
+/* Case à cocher ronde. */
+.dchk-check{
+  flex-shrink:0;width:22px;height:22px;margin-top:1px;
+  border-radius:50%;border:2px solid var(--m3-outline);
+  background:transparent;cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  color:transparent;
+  transition:background .2s var(--m3-ease),border-color .2s var(--m3-ease),
+             color .2s var(--m3-ease);
+}
+.dchk-check svg{width:13px;height:13px;stroke-width:3.2}
+.dchk-check:hover{border-color:var(--dchk-ok);color:color-mix(in srgb,var(--dchk-ok) 45%,transparent)}
+.dchk-check:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+.dchk-check.checked{background:var(--dchk-ok);border-color:var(--dchk-ok);color:#fff}
+[data-theme="dark"] .dchk-check.checked{color:#0D1F12}
+/* Une tâche récurrente parente ne se coche pas : ce sont ses
+   occurrences qui portent l'état. */
+.dchk-check.disabled{cursor:default;border-style:dashed;opacity:.5}
+.dchk-check.disabled:hover{border-color:var(--m3-outline);color:transparent}
+
+.dchk-task-main{flex:1;min-width:0}
+.dchk-task-title{
+  font-size:14px;font-weight:400;line-height:1.45;color:var(--m3-on-surface);
+  overflow-wrap:break-word;
+}
+.dchk-task.is-done .dchk-task-title{
+  text-decoration:line-through;color:var(--m3-on-surf-var);
+}
+.dchk-task-notes{
+  font-size:12.5px;color:var(--m3-on-surf-var);line-height:1.45;margin-top:4px;
+  overflow-wrap:break-word;
+}
+/* Ligne de métadonnées : avatar + nom + échéance + étiquettes. */
+.dchk-meta{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px;
+  font-size:12px;color:var(--m3-on-surf-var);
+}
+.dchk-who{display:inline-flex;align-items:center;gap:7px}
+.dchk-avatar{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:500;color:#fff;letter-spacing:.02em;
+}
+.dchk-who b{font-weight:500;color:var(--m3-on-surface)}
+.dchk-sep{color:var(--m3-outline)}
+.dchk-due.late{color:var(--dchk-late);font-weight:500}
+/* Étiquettes : priorité et récurrence en chips tonals discrets. */
+.dchk-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11.5px;font-weight:500;
+  padding:2px 9px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-3);color:var(--m3-on-surf-var);
+}
+[data-theme="dark"] .dchk-tag{background:color-mix(in srgb,var(--m3-on-surface) 12%,transparent)}
+.dchk-tag svg{width:12px;height:12px}
+.dchk-tag.prio-high{background:color-mix(in srgb,var(--dchk-late) 15%,transparent);color:var(--dchk-late)}
+.dchk-tag.prio-med{background:color-mix(in srgb,var(--dchk-warn) 16%,transparent);color:var(--dchk-warn)}
+.dchk-tag.prio-low{background:color-mix(in srgb,var(--dchk-ok) 15%,transparent);color:var(--dchk-ok)}
+
+/* Avancement d'une tâche récurrente : mini-barre au lieu d'une
+   phrase « 12 occ. · 8 done · 4 left » à décoder. */
+.dchk-recur{margin-top:10px;max-width:320px}
+.dchk-recur-bar{
+  height:5px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-3);overflow:hidden;
+}
+[data-theme="dark"] .dchk-recur-bar{background:color-mix(in srgb,var(--m3-on-surface) 12%,transparent)}
+.dchk-recur-fill{
+  height:100%;border-radius:var(--m3-r-full);background:var(--dchk-ok);
+  transition:width .6s var(--m3-ease);
+}
+.dchk-recur-txt{
+  font-size:11.5px;color:var(--m3-on-surf-var);margin-top:5px;
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+}
+.dchk-recur-txt b{color:var(--m3-on-surface);font-weight:500}
+
+/* ── Actions ─────────────────────────────────────────────────
+   Icônes seules, révélées au survol mais toujours atteignables
+   au clavier (opacity, pas display:none). */
+.dchk-actions{display:flex;gap:2px;flex-shrink:0;align-items:center}
+.dchk-icon{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  border:none;background:transparent;cursor:pointer;
+  color:var(--m3-on-surf-var);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .15s var(--m3-ease),background .2s var(--m3-ease),
+             color .2s var(--m3-ease);
+}
+.dchk-icon svg{width:16px;height:16px}
+.dchk-task:hover .dchk-icon,
+.dchk-task:focus-within .dchk-icon{opacity:1}
+.dchk-icon:focus-visible{opacity:1;outline:2px solid var(--m3-primary);outline-offset:-2px}
+.dchk-icon:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 10%,transparent);
+  color:var(--m3-on-surface);
+}
+.dchk-icon.danger:hover{
+  background:color-mix(in srgb,var(--dchk-late) 12%,transparent);color:var(--dchk-late);
+}
+/* Sur écran tactile il n'y a pas de survol : on laisse les actions
+   visibles en permanence. */
+@media(hover:none){.dchk-icon{opacity:1}}
+
+/* ── État vide ───────────────────────────────────────────────*/
+.dchk-empty{
+  text-align:center;padding:52px 24px;
+  background:var(--m3-surf-1);border-radius:var(--m3-r-xl);
+}
+[data-theme="dark"] .dchk-empty{background:var(--m3-surf-2)}
+.dchk-empty svg{width:40px;height:40px;color:var(--m3-on-surf-var);opacity:.5}
+.dchk-empty-t{font-size:16px;color:var(--m3-on-surface);margin:14px 0 6px}
+.dchk-empty-s{font-size:13.5px;color:var(--m3-on-surf-var);line-height:1.5}
+
+@media(max-width:768px){
+  .dchk-hero{padding:18px;gap:18px}
+  .dchk-head{gap:12px}
+  .dchk-filters{gap:10px}
+  .dchk-seg{width:100%;justify-content:stretch}
+  .dchk-seg button{flex:1;justify-content:center;padding:0 10px}
+  .dchk-task{padding:12px 13px;gap:11px}
+}
+@media(prefers-reduced-motion:reduce){
+  .dchk-ring-fill,.dchk-recur-fill{transition:none}
+}
+

@@ -1,0 +1,226 @@
+/* ══════════════════════════════════════════════════════════
+   Lecteur plein écran. Tout le châssis de l'app disparaît :
+   il ne doit rester que la question et les réponses. C'est la
+   seule vue de l'app qui a le droit d'être aussi vide.
+   ══════════════════════════════════════════════════════════ */
+#quiz-fullscreen{
+  --qz-ok:#1E7B34;  --qz-ok-c:#E6F4EA;
+  --qz-no:#C7000B;  --qz-no-c:#FCE8E6;
+  --qz-info:#1A73E8;--qz-info-c:#E8F0FE;
+  --qz-surf:#FFFFFF;--qz-surf1:#F8F9FA;--qz-surf2:#F1F3F4;--qz-surf3:#E8EAED;
+  --qz-ink:#1F1F1F; --qz-ink-var:#5F6368;--qz-line:#E3E3E3;
+  --qz-r:20px;--qz-r-sm:12px;--qz-r-full:999px;
+  --qz-ease:cubic-bezier(.2,0,0,1);
+  background:var(--qz-surf);color:var(--qz-ink);
+}
+[data-theme="dark"] #quiz-fullscreen{
+  --qz-ok:#81C995;  --qz-ok-c:#0F2417;
+  --qz-no:#F28B82;  --qz-no-c:#2C1614;
+  --qz-info:#8AB4F8;--qz-info-c:#101F35;
+  --qz-surf:#000000;--qz-surf1:#0E0E10;--qz-surf2:#151517;--qz-surf3:#1F1F22;
+  --qz-ink:#E3E3E3; --qz-ink-var:#9AA0A6;--qz-line:#333537;
+}
+
+#quiz-fullscreen .qp-top{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;margin-bottom:18px;
+}
+#quiz-fullscreen .qp-eyebrow{
+  font-size:11.5px;font-weight:600;color:var(--qz-ink-var);
+  letter-spacing:.2px;min-width:0;
+}
+#quiz-fullscreen .qp-exit{
+  display:inline-flex;align-items:center;gap:7px;flex-shrink:0;
+  height:34px;padding:0 15px;border-radius:var(--qz-r-full);
+  border:1px solid var(--qz-line);background:none;cursor:pointer;
+  font:inherit;font-size:12px;font-weight:600;color:var(--qz-ink-var);
+  transition:background .15s var(--qz-ease),color .15s var(--qz-ease);
+}
+#quiz-fullscreen .qp-exit:hover{background:var(--qz-surf2);color:var(--qz-ink)}
+
+/* Progression + minuterie sur une même ligne : ce sont les deux
+   seules contraintes que le joueur doit garder en tête. */
+#quiz-fullscreen .qp-meter{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+#quiz-fullscreen .qp-bar{
+  flex:1;height:6px;border-radius:var(--qz-r-full);
+  background:var(--qz-surf3);overflow:hidden;
+}
+#quiz-fullscreen .qp-bar i{
+  display:block;height:100%;border-radius:var(--qz-r-full);
+  background:var(--qz-info);transition:width .35s var(--qz-ease);
+}
+#quiz-fullscreen .qp-time{
+  display:inline-flex;align-items:center;gap:7px;flex-shrink:0;
+  font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;
+  color:var(--qz-ink-var);
+  padding:5px 13px;border-radius:var(--qz-r-full);background:var(--qz-surf2);
+  transition:background .2s var(--qz-ease),color .2s var(--qz-ease);
+}
+/* L'urgence se déclare dans les 5 dernières secondes, pas avant :
+   un compteur rouge en permanence ne veut plus rien dire. */
+#quiz-fullscreen .qp-time.urgent{
+  background:var(--qz-no-c);color:var(--qz-no);
+  animation:qpPulse 1s ease-in-out infinite;
+}
+@keyframes qpPulse{50%{opacity:.55}}
+
+#quiz-fullscreen .qp-q{
+  font-size:24px;font-weight:400;line-height:1.4;letter-spacing:-.3px;
+  margin-bottom:28px;color:var(--qz-ink);
+}
+#quiz-fullscreen .qp-opts{display:flex;flex-direction:column;gap:11px}
+#quiz-fullscreen .qp-opt{
+  display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+  padding:16px 18px;border-radius:var(--qz-r);
+  border:1px solid var(--qz-line);background:var(--qz-surf);
+  cursor:pointer;font:inherit;font-size:14.5px;color:var(--qz-ink);
+  transition:border-color .16s var(--qz-ease),background .16s var(--qz-ease),
+             transform .12s var(--qz-ease),box-shadow .16s var(--qz-ease);
+}
+[data-theme="dark"] #quiz-fullscreen .qp-opt{background:var(--qz-surf1);border-color:transparent}
+#quiz-fullscreen .qp-opt:not(:disabled):hover{
+  border-color:var(--qz-info);transform:translateX(3px);
+  box-shadow:0 1px 3px rgba(0,0,0,.1),0 6px 18px rgba(0,0,0,.07);
+}
+#quiz-fullscreen .qp-key{
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:32px;height:32px;border-radius:50%;
+  background:var(--qz-surf2);color:var(--qz-ink-var);
+  font-size:12.5px;font-weight:700;
+  transition:background .16s var(--qz-ease),color .16s var(--qz-ease);
+}
+#quiz-fullscreen .qp-opt:not(:disabled):hover .qp-key{background:var(--qz-info-c);color:var(--qz-info)}
+/* Après réponse : la bonne est verte, la mauvaise choisie est rouge,
+   les autres s'effacent pour ne pas concurrencer la correction. */
+#quiz-fullscreen .qp-opt.good{
+  border-color:var(--qz-ok);background:var(--qz-ok-c);color:var(--qz-ok);font-weight:600;
+}
+#quiz-fullscreen .qp-opt.good .qp-key{background:var(--qz-ok);color:#fff}
+#quiz-fullscreen .qp-opt.bad{
+  border-color:var(--qz-no);background:var(--qz-no-c);color:var(--qz-no);
+}
+#quiz-fullscreen .qp-opt.bad .qp-key{background:var(--qz-no);color:#fff}
+#quiz-fullscreen .qp-opt.dim{opacity:.45}
+#quiz-fullscreen .qp-opt:disabled{cursor:default}
+#quiz-fullscreen .qp-mark{margin-left:auto;flex-shrink:0;display:flex}
+
+#quiz-fullscreen .qp-expl{
+  margin-top:20px;padding:15px 18px;border-radius:var(--qz-r);
+  background:var(--qz-info-c);color:var(--qz-info);
+  font-size:13.5px;line-height:1.6;
+}
+#quiz-fullscreen .qp-expl b{font-weight:700}
+#quiz-fullscreen .qp-next{
+  margin-top:26px;display:flex;justify-content:flex-end;align-items:center;gap:14px;
+}
+#quiz-fullscreen .qp-hint{font-size:11.5px;color:var(--qz-ink-var)}
+#quiz-fullscreen .qp-hint kbd{
+  display:inline-block;padding:2px 7px;border-radius:5px;
+  border:1px solid var(--qz-line);border-bottom-width:2px;
+  background:var(--qz-surf1);font-family:'JetBrains Mono',monospace;font-size:10.5px;
+}
+#quiz-fullscreen .qp-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:44px;padding:0 26px;border:none;border-radius:var(--qz-r-full);
+  background:var(--qz-info);color:#fff;cursor:pointer;
+  font:inherit;font-size:14px;font-weight:600;
+  transition:filter .18s var(--qz-ease),transform .12s var(--qz-ease);
+}
+#quiz-fullscreen .qp-btn:hover:not(:disabled){filter:brightness(1.08)}
+#quiz-fullscreen .qp-btn:active:not(:disabled){transform:scale(.98)}
+#quiz-fullscreen .qp-btn:disabled{background:var(--qz-surf2);color:var(--qz-ink-var);cursor:not-allowed}
+#quiz-fullscreen .qp-btn.ghost{
+  background:none;border:1px solid var(--qz-line);color:var(--qz-ink);
+}
+#quiz-fullscreen .qp-btn.ghost:hover{background:var(--qz-surf2)}
+
+/* Cartes d'intro / résultat : centrées, sans bordure dure. */
+#quiz-fullscreen .qp-card{
+  border-radius:28px;background:var(--qz-surf);padding:40px 36px;
+  border:1px solid var(--qz-line);
+}
+[data-theme="dark"] #quiz-fullscreen .qp-card{background:var(--qz-surf1);border-color:transparent}
+#quiz-fullscreen .qp-card-h{text-align:center;margin-bottom:26px}
+#quiz-fullscreen .qp-card-t{font-size:24px;font-weight:400;letter-spacing:-.3px}
+#quiz-fullscreen .qp-card-d{font-size:13.5px;color:var(--qz-ink-var);margin-top:6px;line-height:1.5}
+
+#quiz-fullscreen .qp-points{display:flex;flex-direction:column;gap:2px;margin-bottom:28px}
+#quiz-fullscreen .qp-point{
+  display:flex;align-items:flex-start;gap:14px;padding:13px 4px;
+}
+#quiz-fullscreen .qp-point + .qp-point{border-top:1px solid var(--qz-line)}
+#quiz-fullscreen .qp-point-ico{
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--qz-info-c);color:var(--qz-info);
+}
+#quiz-fullscreen .qp-point-t{font-size:13.5px;font-weight:600}
+#quiz-fullscreen .qp-point-d{font-size:12.5px;color:var(--qz-ink-var);line-height:1.5;margin-top:2px}
+
+/* Anneau de score du récapitulatif */
+#quiz-fullscreen .qp-ring{position:relative;width:132px;height:132px;margin:0 auto 20px}
+#quiz-fullscreen .qp-ring svg{transform:rotate(-90deg);display:block}
+#quiz-fullscreen .qp-ring circle{fill:none;stroke-linecap:round}
+#quiz-fullscreen .qp-ring .bg{stroke:var(--qz-surf3)}
+#quiz-fullscreen .qp-ring .fg{transition:stroke-dashoffset 1s var(--qz-ease)}
+#quiz-fullscreen .qp-ring-in{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+#quiz-fullscreen .qp-ring-pct{font-size:32px;font-weight:400;font-variant-numeric:tabular-nums}
+#quiz-fullscreen .qp-ring-raw{font-size:12px;color:var(--qz-ink-var);margin-top:1px}
+#quiz-fullscreen .qp-verdict{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 20px;border-radius:var(--qz-r-full);
+  font-size:13.5px;font-weight:600;
+}
+#quiz-fullscreen .qp-recap{
+  margin:26px 0 0;display:flex;flex-direction:column;gap:1px;text-align:left;
+}
+#quiz-fullscreen .qp-recap-i{
+  display:flex;align-items:flex-start;gap:11px;padding:11px 2px;
+  font-size:13px;line-height:1.5;
+}
+#quiz-fullscreen .qp-recap-i + .qp-recap-i{border-top:1px solid var(--qz-line)}
+#quiz-fullscreen .qp-recap-i svg{flex-shrink:0;margin-top:1px}
+
+/* Bandeau d'encouragement : glisse depuis le bas, ne masque rien. */
+#quiz-fullscreen .qp-cheer{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
+  display:inline-flex;align-items:center;gap:10px;
+  padding:13px 24px;border-radius:var(--qz-r-full);
+  background:var(--qz-ok);color:#fff;font-size:14px;font-weight:600;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:1301;
+  animation:qpRise .38s cubic-bezier(.2,0,0,1);
+}
+@keyframes qpRise{from{opacity:0;transform:translate(-50%,16px)}}
+
+@media (max-width:640px){
+  #quiz-fullscreen .qp-q{font-size:20px}
+  #quiz-fullscreen .qp-card{padding:28px 20px}
+  #quiz-fullscreen .qp-opt{padding:14px 15px;font-size:13.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  #page-quiz *,#quiz-fullscreen *{transition-duration:.01ms!important;animation:none!important}
+}
+
+
+/* ── Alignement sur l'application : fond blanc (noir en sombre),
+   action principale en pilule noire, accent ardoise pour la
+   progression. Vert et rouge restent pour bonne / mauvaise réponse. */
+#quiz-fullscreen{background:#FFFFFF!important;
+  --qz-info:#111214;--qz-info-c:color-mix(in srgb,#4F6A85 12%,transparent);
+  --qz-surf1:#F6F7F8;--qz-surf2:#F0F1F3;--qz-line:#E6E8EB}
+[data-theme="dark"] #quiz-fullscreen{background:#000!important;
+  --qz-info:#F4F4F5;--qz-info-c:rgba(147,175,203,.14)}
+[data-theme="dark"] #quiz-fullscreen .qp-btn{color:#111}
+#quiz-fullscreen .qp-bar i,#quiz-fullscreen [class*="progress"] i{background:#4F6A85!important}
+[data-theme="dark"] #quiz-fullscreen .qp-bar i,[data-theme="dark"] #quiz-fullscreen [class*="progress"] i{background:#93AFCB!important}
+/* Le lecteur vit hors de #page-quiz : il reçoit ici les couleurs de
+   palier (une seule teinte, comme le parcours). */
+#quiz-fullscreen{--g-green:#111214;--g-blue:#111214;--g-purple:#111214;--g-gold:color-mix(in srgb,#4F6A85 14%,#fff);--g-fire:#111214}
+[data-theme="dark"] #quiz-fullscreen{--g-green:#F4F4F5;--g-blue:#F4F4F5;--g-purple:#F4F4F5;--g-gold:rgba(147,175,203,.18);--g-fire:#F4F4F5}
+[data-theme="dark"] #quiz-fullscreen .qz-chip[style*="--g-green"],[data-theme="dark"] #quiz-fullscreen .qz-chip[style*="var(--g-"]{color:#111!important}
+[data-theme="dark"] #quiz-fullscreen .qz-chip[style*="--g-gold"]{color:#BFD2E6!important}
+#quiz-fullscreen .qz-chip[style*="--g-gold"]{color:#2F4A66!important}
+#quiz-fullscreen .qp-btn.ghost{background:transparent!important;color:var(--qz-ink)!important;border:1px solid var(--qz-line)!important}

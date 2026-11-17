@@ -1,0 +1,711 @@
+/* ══════════════════════════════════════════════
+   M3 NAVIGATION DRAWER — sidebar
+   Indicateur pill · surface tonale · state layers
+══════════════════════════════════════════════ */
+/* Palette neutre partagée par le chrome (sidebar + topbar).
+   Déclarée aussi sur :root — les modales, panneaux et overlays vivent
+   en frères de .app (juste avant </body>) et n'héritaient donc d'aucun
+   token M3 : leurs var(--m3-*) tombaient dans le vide, ce qui rendait
+   les surfaces littéralement transparentes. */
+:root,
+.app{
+  --m3-primary:        #4F6A85;
+  --m3-primary-cont:   #E4EAF0;
+  --m3-on-primary-cont:#2F4A66;
+  --m3-secondary-cont: #ECE7DF;
+  --m3-surface:        #FCFBF8;
+  --m3-surf-1:         #F7F5F0;
+  --m3-surf-2:         #F0ECE5;
+  --m3-surf-3:         #E8E3DA;
+  --m3-on-surface:     #26251F;
+  --m3-on-surf-var:    #6D695F;
+  --m3-outline:        #CEC8BC;
+  --m3-outline-var:    #E6E1D7;
+  /* --m3-error manquait ici : il n'était déclaré que sur
+     #page-dashboard, donc toute page hors dashboard qui l'utilisait
+     (Absences : bandeau de conflits, préavis manqué) voyait sa règle
+     `color:var(--m3-error)` tomber dans le vide et hériter du texte
+     courant — un « Non prévenu » gris au lieu de rouge. */
+  --m3-error:          #A9493B;
+  --m3-error-cont:     #F5E3DF;
+  --m3-on-error-cont:  #7C3127;
+  --m3-success:        #3F7A56;
+  /* surface des KPI : juste décollée de la page, sans aller
+     jusqu'au contraste de surf-2 */
+  --m3-kpi-surf:       #F8F6F1;
+  --m3-kpi-surf-hov:   #F0ECE5;
+  /* formes : reprises telles quelles du bloc Dashboard pour que les
+     éléments hors .app (modales) aient les mêmes coins */
+  --m3-r-xl:  28px;
+  --m3-r-lg:  20px;
+  --m3-r-md:  16px;
+  --m3-r-sm:  12px;
+  --m3-r-full:999px;
+  --m3-ease:cubic-bezier(.2,0,0,1);
+}
+/* :root porte lui-même data-theme : il ne peut pas être son propre
+   descendant, d'où la forme attachée plutôt que `[data-theme] :root`. */
+:root[data-theme="dark"],
+[data-theme="dark"] .app{
+  --m3-primary:        #93AFCB;
+  --m3-primary-cont:   #1C2734;
+  --m3-on-primary-cont:#BFD2E6;
+  --m3-secondary-cont: #262626;
+  --m3-surface:        #000000;
+  --m3-surf-1:         #0E0E10;
+  --m3-surf-2:         #151517;
+  --m3-surf-3:         #1F1F22;
+  --m3-on-surface:     #E3E3E3;
+  --m3-on-surf-var:    #9AA0A6;
+  --m3-outline:        #3A3A3A;
+  --m3-outline-var:    #262626;
+  /* pendant sombre du --m3-error ajouté au bloc clair : le rouge vif
+     du thème clair devient illisible sur fond noir. */
+  --m3-error:          #E58A7D;
+  --m3-error-cont:     #2A1618;
+  --m3-on-error-cont:  #F0B3AA;
+  --m3-success:        #6DD58C;
+  /* Page en noir pur (#000) : les cartes montent d'un cran (#0E0E10). */
+  --m3-kpi-surf:       #0E0E10;
+  --m3-kpi-surf-hov:   #151517;
+}
+.sidebar{
+  background:var(--m3-surface);
+  border-right:none;
+}
+
+/* ── En-tête drawer ── */
+.sidebar-header{border-bottom:none;height:64px;padding:0 16px}
+.sidebar-brand-badge{
+  border-radius:var(--m3-r-full);
+  background:var(--m3-primary);
+  box-shadow:none;
+  font-weight:500;letter-spacing:0;
+}
+[data-theme="dark"] .sidebar-brand-badge{color:#690005}
+.sidebar-brand-name{
+  font-size:16px;font-weight:500;letter-spacing:0;
+  color:var(--m3-on-surface);
+}
+.sidebar-brand-sub{
+  font-size:11px;font-weight:400;letter-spacing:.05em;
+  color:var(--m3-on-surf-var);
+}
+
+/* Sous-titre de groupe dans la barre : sépare les rubriques de
+   Configuration des autres écrans d'administration. */
+.sidebar-subsection{
+  padding:14px 12px 4px;font-size:9.5px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;
+  color:var(--m3-on-surf-var,var(--mute));opacity:.7;
+}
+.sidebar-subsection.nav-mode-off{display:none!important}
+
+/* ── Bascule Simple / Admin ── */
+.nav-mode-switch{
+  display:flex;gap:4px;margin:8px 4px 4px;padding:3px;
+  background:var(--m3-surf-2,rgba(0,0,0,.05));border-radius:var(--m3-r-full,999px);
+}
+.nav-mode-switch[hidden]{display:none}
+.nav-mode-btn{
+  flex:1;min-width:0;padding:6px 10px;border:none;background:none;cursor:pointer;
+  font:inherit;font-size:11.5px;font-weight:600;color:var(--m3-on-surf-var,var(--mute));
+  border-radius:var(--m3-r-full,999px);transition:background .15s,color .15s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.nav-mode-btn:hover{color:var(--m3-on-surface,var(--dark))}
+.nav-mode-btn.is-active{
+  background:var(--m3-surf,var(--white,#fff));color:var(--red);
+  box-shadow:0 1px 3px rgba(0,0,0,.12);
+}
+/* Cadenas quand la session admin manque : le bouton reste cliquable,
+   il mène à l'écran de connexion. */
+.nav-mode-btn.needs-auth::after{
+  content:"";display:inline-block;vertical-align:-1px;margin-left:5px;
+  width:9px;height:9px;opacity:.75;
+  background:currentColor;
+  -webkit-mask:var(--pw-lock) center/contain no-repeat;
+  mask:var(--pw-lock) center/contain no-repeat;
+}
+:root{
+  --pw-lock:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] .nav-mode-btn.is-active{background:rgba(255,255,255,.12);color:#fff}
+
+/* ── Titres de section ── */
+.sidebar-body{padding:4px 8px 12px}
+.sidebar-section{
+  padding:12px 12px 4px;
+  font-size:10px;font-weight:500;letter-spacing:.09em;
+  color:var(--m3-on-surf-var);
+}
+
+/* ── Item : pill compacte (densité -2, ~70 entrées) ── */
+.nav-item{
+  height:36px;padding:0 12px;margin-bottom:0;
+  border-radius:var(--m3-r-full);
+  transition:background .2s var(--m3-ease);
+}
+.nav-item-left{gap:10px}
+.nav-item-label{
+  font-size:12.5px;font-weight:500;letter-spacing:.006em;
+  color:var(--m3-on-surf-var);
+}
+.nav-icon{width:17px;height:17px;opacity:1;color:var(--m3-on-surf-var)}
+
+.nav-item:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+.nav-item:hover .nav-item-label{color:var(--m3-on-surface)}
+.nav-item:hover .nav-icon{opacity:1;color:var(--m3-on-surface)}
+
+/* actif : pill teintée à l'accent — le seul endroit coloré du menu */
+.nav-item.active{
+  background:var(--m3-primary-cont);
+  box-shadow:none;
+}
+.nav-item.active .nav-item-label{
+  color:var(--m3-on-primary-cont);font-weight:500;
+}
+.nav-item.active .nav-icon{color:var(--m3-on-primary-cont) !important;opacity:1}
+.nav-item.active .nav-item-badge{
+  background:color-mix(in srgb,var(--m3-on-primary-cont) 14%,transparent);
+  color:var(--m3-on-primary-cont);
+}
+
+.nav-item-badge{
+  font-size:10px;font-weight:500;
+  color:var(--m3-on-surf-var);
+  background:var(--m3-surf-3);
+  padding:1px 6px;border-radius:var(--m3-r-full);
+}
+
+/* ── Footer ── */
+.sidebar-footer{border-top:1px solid var(--m3-outline-var);padding:12px}
+.sidebar-upgrade{
+  border-radius:var(--m3-r-full);border:none;
+  background:var(--m3-surf-2);padding:10px 14px;
+  transition:background .2s var(--m3-ease);
+}
+.sidebar-upgrade:hover{background:var(--m3-surf-3)}
+.sidebar-upgrade-icon{
+  border-radius:var(--m3-r-full);background:var(--m3-primary);
+  width:32px;height:32px;
+}
+[data-theme="dark"] .sidebar-upgrade-icon svg{stroke:#690005}
+.sidebar-upgrade-text{font-size:13px;font-weight:500;color:var(--m3-on-surface)}
+.sidebar-upgrade-sub{font-size:11px;color:var(--m3-on-surf-var)}
+
+/* ══════════════════════════════════════════════
+   M3 TOP APP BAR
+══════════════════════════════════════════════ */
+.topbar{
+  background:var(--m3-surface);
+  border-bottom:1px solid transparent;
+  padding:0 16px;gap:8px;
+  transition:background .2s var(--m3-ease),border-color .2s var(--m3-ease);
+}
+/* La barre se « colle » en surface élevée dès que le contenu scrolle.
+   Le changement de fond suffit à marquer la séparation : le filet
+   ajoutait une ligne dure en travers de l'écran. */
+.topbar.m3-scrolled{background:var(--m3-surf-2)}
+
+.topbar-sub{
+  font-family:'Inter',sans-serif;
+  font-size:13px;font-weight:500;letter-spacing:.006em;
+  color:var(--m3-on-surf-var);
+}
+
+/* ── Icon buttons M3 : ronds, sans bordure, state layer ── */
+.topbar-btn{
+  width:40px;height:40px;border-radius:var(--m3-r-full);
+  border:none;background:transparent;color:var(--m3-on-surf-var);
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease);
+}
+.topbar-btn:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surface);
+}
+.topbar-btn svg{width:20px;height:20px}
+
+/* ── Search : la "pill" M3, élément central de la barre Google ── */
+#global-search-trigger{
+  height:36px;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-2)!important;
+  padding:0 14px!important;gap:10px!important;
+  color:var(--m3-on-surf-var);
+  margin:0 8px!important;
+  min-width:0;max-width:420px!important;
+}
+#global-search-trigger:hover{background:var(--m3-surf-3)!important}
+#global-search-trigger svg{width:16px;height:16px;flex-shrink:0}
+#global-search-trigger span{
+  font-size:13px!important;color:var(--m3-on-surf-var)!important;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* ── Segmented button M3 (Global / SN / CI) ── */
+#country-toggle{
+  background:transparent;border:1px solid var(--m3-outline-var);
+  border-radius:var(--m3-r-full);padding:0;gap:0;height:40px;overflow:hidden;
+}
+.country-toggle-btn{
+  height:100%;padding:0 16px;border-radius:0;
+  font-size:13px;font-weight:500;letter-spacing:.006em;
+  color:var(--m3-on-surf-var);
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease);
+}
+.country-toggle-btn + .country-toggle-btn{border-left:1px solid var(--m3-outline-var)}
+.country-toggle-btn:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surface);
+}
+.country-toggle-btn.active{
+  background:var(--m3-secondary-cont);
+  color:var(--m3-on-primary-cont);
+  box-shadow:none;
+}
+
+/* ── Badge breach : error container ── */
+.topbar-breach{
+  background:var(--m3-primary);color:var(--m3-surface);
+  border-radius:var(--m3-r-full);padding:6px 14px;
+  font-size:12px;font-weight:500;letter-spacing:.01em;
+}
+
+/* ── User pill ── */
+.user-pill{
+  height:40px;border-radius:var(--m3-r-full);
+  border:none;background:transparent;
+  padding:0 14px 0 4px;gap:10px;
+  font-size:14px;font-weight:500;color:var(--m3-on-surface);
+  transition:background .2s var(--m3-ease);
+}
+.user-pill:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);border-color:transparent}
+.user-avatar{
+  width:32px;height:32px;font-size:12px;font-weight:500;
+  background:var(--m3-primary);
+}
+[data-theme="dark"] .user-avatar{color:#690005}
+#user-pill-dot{border-color:var(--m3-surface)!important}
+
+/* ══════════════════════════════════════════════
+   SIDEBAR — gestion de la longueur
+══════════════════════════════════════════════ */
+/* filtre de navigation */
+.nav-filter-wrap{padding:8px 12px 4px;position:relative}
+.nav-filter{
+  width:100%;height:40px;
+  border:none;border-radius:var(--m3-r-full);
+  background:var(--m3-surf-3);
+  padding:0 14px 0 38px;
+  font-family:'Inter',sans-serif;font-size:13px;
+  color:var(--m3-on-surface);outline:none;
+}
+.nav-filter::placeholder{color:var(--m3-on-surf-var)}
+.nav-filter:focus{background:var(--m3-surf-2);box-shadow:inset 0 0 0 2px var(--m3-primary)}
+.nav-filter-wrap svg{
+  position:absolute;left:24px;top:50%;transform:translateY(-50%);
+  width:16px;height:16px;color:var(--m3-on-surf-var);pointer-events:none;
+}
+/* masquage pendant le filtrage */
+.nav-item.nav-hidden,
+.sidebar-section.nav-hidden{display:none}
+/* Un écran épinglé est déjà listé en haut : on masque son doublon
+   dans la section d'origine plutôt que de l'afficher deux fois. */
+.nav-item.nav-dup{display:none}
+/* masquage par la bascule Simple / Admin — distinct du filtrage pour que
+   les deux mécanismes ne se neutralisent pas. `!important` prend le pas
+   sur `nav-force-open`, qu'une recherche pourrait poser sur un groupe
+   pourtant hors du mode courant. */
+.nav-item.nav-mode-off,
+.sidebar-section.nav-mode-off,
+.sidebar-group.nav-mode-off{display:none!important}
+.sidebar-group.nav-force-open{display:flex!important}
+
+/* chevron : plus visible, c'est le seul affordance de repli */
+.sidebar-section[data-section]{cursor:pointer;border-radius:var(--m3-r-full);margin:0 4px}
+.sidebar-section[data-section]:hover{background:color-mix(in srgb,var(--m3-on-surface) 6%,transparent)}
+.sidebar-section .sidebar-section-chevron{opacity:1;width:18px;height:18px}
+
+/* ══════════════════════════════════════════════
+   RAIL — sidebar repliée en icônes
+   ══════════════════════════════════════════════
+   Le menu compte ~70 entrées : à pleine largeur il occupe la hauteur de
+   l'écran. Replié, il ne garde que les icônes et rend 148 px au contenu.
+
+   Le repli se pose sur `.app` et non sur `.sidebar` : c'est la grille
+   parente qui porte la largeur de colonne, et une seule classe évite que
+   la barre et la grille se désynchronisent le temps d'une transition. */
+.app{transition:grid-template-columns .2s var(--m3-ease,cubic-bezier(.4,0,.2,1))}
+.app.sb-rail{grid-template-columns:56px minmax(0,1fr)}
+
+/* Tout ce qui est texte disparaît ; seule l'icône reste. Les libellés
+   sont retirés du flux plutôt que masqués visuellement — un `width:0`
+   laissait le flex les comprimer sans les faire disparaître. */
+.app.sb-rail .nav-item-label,
+.app.sb-rail .sidebar-brand-name,
+.app.sb-rail .sidebar-brand-sub,
+.app.sb-rail .nav-filter-wrap,
+.app.sb-rail .nav-mode-switch,
+.app.sb-rail .sidebar-footer,
+.app.sb-rail .sidebar-section-chevron,
+.app.sb-rail .nav-pin,
+.app.sb-rail .nav-pin-sep,
+.app.sb-rail #nav-pinned-wrap .sidebar-section span{display:none}
+
+/* Épingles et cadenas : à 72 px il n'y a de place que pour l'icône de
+   la page. Le cadenas d'« Absences » et celui du bouton Admin sont des
+   SVG sans classe, posés dans le conteneur qui suit `.nav-item-left` —
+   on masque ce conteneur, sauf le badge qui devient une pastille. */
+.app.sb-rail .nav-item > span:not(.nav-item-left) > svg{display:none}
+/* Le conteneur vidé de son cadenas ne doit plus peser dans le flex,
+   sinon il décale l'icône vers la gauche. Sorti du flux : le badge
+   qu'il peut contenir est de toute façon positionné en absolu. */
+/* `inset:0` ferait du conteneur le référent du badge, qui se placerait
+   alors dans son coin à lui. On le réduit à un point en haut à droite de
+   la pill : le badge s'y accroche directement. */
+/* `:not(.nav-item-badge)` : un badge posé directement sur l'item est lui
+   aussi un <span> ; sans l'exclure, il était réduit à 0 × 0 et toutes les
+   pastilles du menu replié (Tracker SN…) disparaissaient. */
+.app.sb-rail .nav-item > span:not(.nav-item-left):not(.nav-item-badge){
+  position:absolute;top:4px;right:4px;left:auto;bottom:auto;
+  width:0;height:0;gap:0;pointer-events:none;
+}
+
+/* Les titres de section deviennent un simple filet : sans eux, les
+   groupes d'icônes se toucheraient sans respiration. Garder le mot
+   tronqué aurait été illisible à 72 px.
+
+   Le texte est sorti du flux (`text-indent`) et non seulement rogné :
+   `overflow:hidden` sur un bloc de 1 px laissait encore dépasser les
+   jambages, qui se lisaient en filigrane derrière les icônes. */
+.app.sb-rail .sidebar-section{
+  height:1px;padding:0;margin:6px 20px;overflow:hidden;
+  background:var(--m3-outline-var);border-radius:0;
+  font-size:0;line-height:0;color:transparent;
+  text-indent:-9999px;white-space:nowrap;
+}
+.app.sb-rail .sidebar-section:hover{background:var(--m3-outline-var)}
+.app.sb-rail .sidebar-section:first-child{margin-top:2px}
+
+/* Un groupe replié par l'accordéon reste replié ; mais en rail les
+   sections ne sont plus dépliables (le chevron est caché), donc on
+   rouvre tout pour ne pas rendre des pages inatteignables. */
+.app.sb-rail .sidebar-group.collapsed{display:flex}
+
+.app.sb-rail .nav-item{
+  justify-content:center;padding:0;width:40px;height:40px;
+  margin:0 auto;border-radius:var(--m3-r-full);
+}
+/* `.nav-item-left` ne s'étire pas par défaut : sans `flex:1` il garde la
+   largeur de l'icône et reste calé à gauche de la pill, au lieu d'être
+   centré dans les 48 px. */
+.app.sb-rail .nav-item-left{gap:0;flex:1;justify-content:center}
+.app.sb-rail .nav-icon{width:18px;height:18px}
+
+/* Le badge ne tient plus à côté du libellé : il devient une pastille
+   posée sur l'icône. Le compteur exact n'est pas lisible à cette
+   taille, mais sa présence — « il reste quelque chose ici » — l'est. */
+.app.sb-rail .nav-item-badge{
+  position:absolute;top:0;right:0;
+  min-width:7px;width:7px;height:7px;padding:0;
+  font-size:0;line-height:0;overflow:hidden;
+  background:var(--m3-primary);
+}
+/* Deux cas dans le markup : badge enfant direct de l'item, ou glissé
+   dans le conteneur qui portait le cadenas. Le second est déjà décalé
+   de 4 px par son parent ; le premier se cale ici sur l'item. */
+.app.sb-rail .nav-item > .nav-item-badge{top:4px;right:4px}
+.app.sb-rail .nav-item.active .nav-item-badge{background:var(--m3-on-primary-cont)}
+
+.app.sb-rail .sidebar-header{justify-content:center;padding:0;height:56px}
+.app.sb-rail .sidebar-body{padding:2px 4px 10px;overflow-x:hidden}
+.app.sb-rail .sb-rail-toggle{width:32px;height:32px}
+.app.sb-rail .sb-rail-toggle svg{width:18px;height:18px}
+
+/* Infobulle : en rail, le libellé n'est plus lisible à l'écran. Sans
+   elle, les icônes proches (Tracker SN / CI) ne se distinguent pas.
+   `title` natif aurait suffi mais son délai d'~1 s le rend inutilisable
+   pour parcourir un menu. */
+.app.sb-rail .nav-item{position:relative}
+.app.sb-rail .nav-item::after{
+  content:attr(data-tip);
+  position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);
+  background:var(--m3-inverse-surf,#303030);color:var(--m3-inverse-on-surf,#f5f5f5);
+  font-size:12px;font-weight:500;white-space:nowrap;
+  padding:6px 10px;border-radius:6px;
+  opacity:0;pointer-events:none;transition:opacity .12s var(--m3-ease);
+  z-index:400;
+}
+.app.sb-rail .nav-item:hover::after{opacity:1}
+
+/* Le bouton de repli vit dans l'en-tête, au même niveau que la marque. */
+.sb-rail-toggle{
+  display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;flex-shrink:0;margin-left:auto;
+  border:none;background:transparent;cursor:pointer;
+  border-radius:var(--m3-r-full);color:var(--m3-on-surf-var,var(--mute));
+  transition:background .2s var(--m3-ease),color .2s var(--m3-ease);
+}
+.sb-rail-toggle:hover{
+  background:color-mix(in srgb,var(--m3-on-surface,#000) 8%,transparent);
+  color:var(--m3-on-surface,var(--dark));
+}
+.sb-rail-toggle svg{width:20px;height:20px;transition:transform .2s var(--m3-ease)}
+.app.sb-rail .sb-rail-toggle{margin-left:0}
+.app.sb-rail .sb-rail-toggle svg{transform:rotate(180deg)}
+
+/* Sur mobile la barre est déjà un tiroir qui se ferme entièrement :
+   un rail de 72 px n'y aurait aucun sens et volerait de la largeur. */
+@media(max-width:768px){
+  /* minmax(0,1fr), comme dans responsive.css : une piste 1fr s'élargit à
+     la barre du haut (~900 px) et toute la page déborde du téléphone. Le
+     rail étant désormais l'état par défaut, c'est cette règle qui compte. */
+  .app.sb-rail{grid-template-columns:minmax(0,1fr)}
+  .app.sb-rail .sidebar{width:240px}
+  .app.sb-rail .nav-item-label,
+  .app.sb-rail .sidebar-brand-name,
+  .app.sb-rail .sidebar-brand-sub,
+  .app.sb-rail .nav-filter,
+  .app.sb-rail .nav-filter-wrap,
+  .app.sb-rail .nav-mode-switch,
+  .app.sb-rail .sidebar-footer,
+  .app.sb-rail .nav-pin,
+  .app.sb-rail .nav-pin-sep,
+  .app.sb-rail #nav-pinned-wrap .sidebar-section span,
+  .app.sb-rail .sidebar-section-chevron{display:revert}
+  .app.sb-rail .sidebar-section{
+    height:auto;padding:12px 12px 4px;margin:0 4px;background:none;
+  }
+  .app.sb-rail .nav-item{
+    justify-content:space-between;width:auto;height:36px;padding:0 12px;margin:0 0 0 0;
+  }
+  .app.sb-rail .nav-item-left{gap:10px;justify-content:flex-start}
+  .app.sb-rail .nav-item-badge{position:static;min-width:0;height:auto;font-size:10px;line-height:normal;padding:1px 6px}
+  .app.sb-rail .nav-item::after{display:none}
+  .sb-rail-toggle{display:none}
+}
+
+
+/* Barre du haut sur écran moyen : sans retour à la ligne elle mesure
+   ~900 px et poussait toute la page hors de l'écran. Elle se compacte
+   par paliers (heure, nom, libellés de pays) au lieu de déborder. */
+.topbar{min-width:0}
+@media(max-width:1200px){.topbar-sub{display:none}}
+@media(max-width:1000px){
+  #user-name-top{display:none}
+  .country-toggle-btn span{display:none}
+  .country-toggle-btn{padding-left:9px;padding-right:9px}
+  #global-search-trigger span{display:none}
+  #global-search-trigger{flex:0 0 auto!important;margin:0 6px!important}
+}
+
+/* ══════════════════════════════════════════════
+   BARRE LATÉRALE FLOTTANTE
+   ══════════════════════════════════════════════
+   Un bloc posé sur le fond, décollé des bords : coins arrondis, bordure
+   très fine, et un dégradé vertical — du blanc vers le crème en thème
+   clair, du gris anthracite vers le noir en thème sombre. La colonne de
+   la grille s'élargit de la marge (10 px de chaque côté utile) pour que
+   le bloc garde sa largeur d'origine (220 px, ou 56 px replié). */
+@media(min-width:769px){
+  .app{grid-template-columns:254px minmax(0,1fr)}
+  .app.sb-rail{grid-template-columns:90px minmax(0,1fr)}
+  .app .sidebar{
+    /* 14 px à droite : le bloc ne colle plus à la barre du haut ni au contenu. */
+    margin:10px 14px 10px 10px;min-height:0;
+    border-radius:22px;
+    border:1px solid rgba(38,37,31,.09);
+    background:linear-gradient(180deg,#FFFFFF 0%,#FBF8F2 50%,#F2ECE1 100%);
+    box-shadow:0 1px 1px rgba(38,37,31,.03),0 14px 34px -14px rgba(38,37,31,.16);
+  }
+}
+@media(max-width:768px){
+  .app .sidebar{
+    top:8px;left:8px;bottom:8px;
+    border-radius:20px;
+    border:1px solid rgba(38,37,31,.09);
+    background:linear-gradient(180deg,#FFFFFF 0%,#FBF8F2 50%,#F2ECE1 100%);
+    box-shadow:0 20px 50px -10px rgba(38,37,31,.28);
+  }
+  .app .sidebar:not(.sb-open){box-shadow:none}
+}
+[data-theme="dark"] .app .sidebar{
+  border-color:rgba(255,255,255,.08);
+  background:linear-gradient(180deg,#1B1B1E 0%,#0E0E10 50%,#000000 100%);
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.9);
+}
+/* Les éléments de la barre gardaient un fond plein (surface M3) qui
+   cachait le dégradé : on les laisse transparents. */
+.app .sidebar .sidebar-header,
+.app .sidebar .sidebar-body,
+.app .sidebar .sidebar-footer{background:transparent}
+.app .sidebar .sidebar-footer{border-top-color:rgba(38,37,31,.07)}
+[data-theme="dark"] .app .sidebar .sidebar-footer{border-top-color:rgba(255,255,255,.06)}
+
+/* ══════════════════════════════════════════════
+   THÈME CLAIR : UN SEUL FOND
+   ══════════════════════════════════════════════
+   Trois tons se côtoyaient (page beige, barre du haut crème, contenu en
+   blanc pur forcé page par page via .main:has(#page-….active)) : une bande
+   se voyait entre la barre latérale et le contenu. Tout le fond prend
+   désormais le même blanc cassé ; la barre latérale, un cran plus claire,
+   s'en détache par sa bordure fine et son ombre. Les !important battent les
+   règles par page, qui portent un identifiant dans :has(). */
+:root[data-theme="light"]{--canvas:#F7F5F0}
+:root[data-theme="light"] body,
+:root[data-theme="light"] .app,
+:root[data-theme="light"] .topbar,
+:root[data-theme="light"] .main{background:var(--canvas)!important}
+:root[data-theme="light"] .topbar{border-bottom-color:transparent}
+:root[data-theme="light"] .app .sidebar{
+  background:linear-gradient(180deg,#FFFFFF 0%,#FDFCF9 55%,#F9F6F0 100%);
+  border-color:rgba(38,37,31,.08);
+  box-shadow:0 1px 2px rgba(38,37,31,.04),0 16px 36px -18px rgba(38,37,31,.18);
+}
+/* Champs de la barre (filtre, bascule Simple / Admin) : plus légers. */
+:root[data-theme="light"] .app .sidebar .nav-filter,
+:root[data-theme="light"] .app .sidebar .nav-filter-wrap input,
+:root[data-theme="light"] .app .sidebar .nav-mode-switch{background:rgba(38,37,31,.045)!important;border-color:transparent!important}
+:root[data-theme="light"] .app .sidebar .nav-mode-btn.is-active{background:#FFFFFF;box-shadow:0 1px 2px rgba(38,37,31,.08)}
+/* Recherche de la barre du haut : même légèreté. */
+:root[data-theme="light"] #global-search-trigger{background:rgba(38,37,31,.045)!important;border-color:transparent!important}
+/* Boutons à contour de la barre du haut (pays, thème) : contour plus fin. */
+:root[data-theme="light"] .topbar .topbar-btn{border-color:rgba(38,37,31,.10)}
+
+/* ══════════════════════════════════════════════
+   POLICE DE LA BARRE LATÉRALE : QUICKSAND
+   ══════════════════════════════════════════════
+   Embarquée (public/fonts, licence OFL) : elle s'affiche même sans accès
+   à Internet. Police variable, graisses 400 à 700. */
+@font-face{font-family:'Quicksand';font-style:normal;font-weight:400 700;font-display:swap;
+  src:url('/fonts/quicksand-latin-ext.woff2') format('woff2');
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Quicksand';font-style:normal;font-weight:400 700;font-display:swap;
+  src:url('/fonts/quicksand-latin.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+.app .sidebar,
+.app .sidebar input,
+.app .sidebar button{font-family:'Quicksand','Segoe UI',system-ui,sans-serif}
+/* Quicksand est plus fine qu'Inter : un cran de graisse en plus pour rester lisible. */
+.app .sidebar .nav-item-label{font-weight:600;letter-spacing:.005em}
+.app .sidebar .sidebar-section{font-weight:700}
+.app .sidebar .sidebar-brand-name{font-weight:700;letter-spacing:-.01em}
+
+/* ══════════════════════════════════════════════
+   LOGO « Radar » dans la marque
+══════════════════════════════════════════════ */
+.sidebar-logo{width:24px;height:24px;flex-shrink:0;display:block}
+.app.sb-rail .sidebar-brand{justify-content:center}
+
+/* ══════════════════════════════════════════════
+   BARRE DU HAUT — recherche au centre, état à droite
+   La recherche devient l'élément principal : un vrai champ, large,
+   toujours visible. L'horloge passe à droite en format court.
+══════════════════════════════════════════════ */
+.topbar{gap:12px}
+.tb-search{position:relative;flex:1 1 auto;max-width:640px;min-width:0;height:40px;
+  display:flex;align-items:center;border-radius:12px;
+  background:var(--m3-surf-2);border:1px solid transparent;
+  transition:background .15s,border-color .15s,box-shadow .15s}
+:root[data-theme="light"] .tb-search{background:#FFFFFF;border-color:rgba(38,37,31,.10)}
+.tb-search:hover{border-color:color-mix(in srgb,var(--m3-on-surface) 18%,transparent)}
+body.cmd-open .tb-search{border-color:var(--m3-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--m3-primary) 16%,transparent)}
+.tb-search-ic{width:17px;height:17px;margin:0 2px 0 12px;color:var(--m3-on-surf-var);flex-shrink:0}
+#cmd-input{flex:1;min-width:0;height:100%;border:none;outline:none;background:transparent;
+  padding:0 10px;font-size:14px;color:var(--m3-on-surface);font-family:inherit}
+#cmd-input::placeholder{color:var(--m3-on-surf-var);opacity:.8}
+#cmd-input::-webkit-search-cancel-button{display:none}
+.tb-search-kbd{margin-right:8px;font:500 11px/1 'Inter',sans-serif;color:var(--m3-on-surf-var);
+  border:1px solid var(--m3-outline-var);border-radius:6px;padding:4px 6px;white-space:nowrap}
+body.cmd-open .tb-search-kbd{display:none}
+#cmd-open-mobile{display:none}
+.tb-clock{font:500 12px/1 'Inter',sans-serif;color:var(--m3-on-surf-var);padding:0 6px;
+  white-space:nowrap;font-variant-numeric:tabular-nums;cursor:default}
+.topbar-breach{cursor:pointer;background:var(--danger,#A9493B)!important;color:#fff!important}
+.topbar-breach:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+
+/* Périmètre plus discret : pastilles dans un rail, sans bordures. */
+#country-toggle{height:34px;border:none;background:var(--m3-surf-2);padding:3px;border-radius:10px;gap:2px}
+:root[data-theme="light"] #country-toggle{background:rgba(38,37,31,.05)}
+.country-toggle-btn{border-radius:8px!important;padding:0 10px;font-size:12px;border-left:none!important}
+.country-toggle-btn.active{background:var(--m3-surface)!important;color:var(--m3-on-surface)!important;
+  box-shadow:0 1px 2px rgba(0,0,0,.10)!important}
+:root[data-theme="light"] .country-toggle-btn.active{background:#fff!important}
+
+/* ── Panneau de résultats ── */
+.cmd-panel{display:none;position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:1200;
+  max-height:min(70vh,560px);overflow:auto;border-radius:14px;padding:6px;
+  background:var(--m3-surface);border:1px solid var(--m3-outline-var);
+  box-shadow:0 18px 50px rgba(20,20,24,.18),0 2px 6px rgba(20,20,24,.06)}
+:root[data-theme="light"] .cmd-panel{background:#FFFFFF;border-color:rgba(38,37,31,.10)}
+body.cmd-open .cmd-panel{display:block}
+.cmd-gt{font:600 10.5px/1 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);padding:12px 10px 6px}
+.cmd-it{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:10px;cursor:pointer}
+.cmd-it.on{background:color-mix(in srgb,var(--m3-primary) 11%,transparent)}
+.cmd-ic{width:18px;height:18px;flex-shrink:0;color:var(--m3-on-surf-var)}
+.cmd-it.on .cmd-ic{color:var(--m3-primary)}
+.cmd-tx{flex:1;min-width:0}
+.cmd-t{font-size:13.5px;color:var(--m3-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmd-t mark,.cmd-s mark{background:color-mix(in srgb,#F2A65A 35%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+.cmd-num{font:600 12px/1 'JetBrains Mono',monospace;color:var(--m3-primary);margin-right:8px}
+.cmd-n{float:right;margin-left:8px;font-size:11.5px;font-weight:600;color:var(--m3-on-surf-var);background:var(--m3-surf-2);border-radius:999px;padding:2px 8px}
+.cmd-s{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px;font-size:11.5px;color:var(--m3-on-surf-var)}
+.cmd-s > span{white-space:nowrap}
+.cmd-s > span + span:not(.cmd-br)::before{content:'·';margin-right:6px;opacity:.6}
+.cmd-p{font-weight:700;border-radius:5px;padding:1px 5px;font-size:10.5px;background:var(--m3-surf-2)}
+.cmd-p1{background:#A9493B;color:#fff}.cmd-p2{background:#F2A65A;color:#3a2410}
+.cmd-br{color:#fff;background:#A9493B;border-radius:5px;padding:1px 6px;font-weight:600}
+.cmd-it kbd{font:500 10.5px/1 'Inter',sans-serif;color:var(--m3-on-surf-var);opacity:0;white-space:nowrap}
+.cmd-it.on kbd{opacity:1}
+.cmd-it.on kbd::after{content:' ↵'}
+.cmd-all .cmd-t{color:var(--m3-primary);font-weight:600}
+.cmd-chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px 2px}
+.cmd-chips span{font-size:11.5px;font-weight:600;color:var(--m3-primary);
+  background:color-mix(in srgb,var(--m3-primary) 10%,transparent);border-radius:999px;padding:3px 10px}
+.cmd-vide{padding:22px 12px;text-align:center;font-size:13px;color:var(--m3-on-surface)}
+.cmd-vide small{color:var(--m3-on-surf-var);line-height:1.8}
+.cmd-ft{position:sticky;bottom:-6px;margin:6px -6px -6px;padding:9px 14px;display:flex;flex-wrap:wrap;gap:14px;
+  font-size:11px;color:var(--m3-on-surf-var);border-top:1px solid var(--m3-outline-var);background:inherit;border-radius:0 0 14px 14px}
+.cmd-ft kbd{font:500 10px/1 'Inter',sans-serif;border:1px solid var(--m3-outline-var);border-radius:4px;padding:2px 5px;margin-right:3px}
+.cmd-tips{margin-left:auto}
+.cmd-tips b{color:var(--m3-on-surface);font-family:'JetBrains Mono',monospace;font-weight:500}
+
+@media(max-width:1100px){.tb-clock,.cmd-tips{display:none}}
+@media(max-width:900px){.tb-search-kbd{display:none}}
+/* Téléphone : une loupe ; la barre s'ouvre alors en plein écran. */
+@media(max-width:640px){
+  .tb-search{display:none}
+  #cmd-open-mobile{display:inline-flex!important;align-items:center;justify-content:center}
+  body.cmd-open .tb-search{display:flex;position:fixed;top:8px;left:8px;right:8px;max-width:none;z-index:1300;height:46px}
+  body.cmd-open .cmd-panel{position:fixed;top:62px;left:8px;right:8px;max-height:calc(100vh - 74px)}
+  body.cmd-open::after{content:'';position:fixed;inset:0;background:rgba(20,20,24,.35);z-index:1250}
+  .cmd-ft{display:none}
+}
+/* Menu replié : le logo au-dessus, le bouton de dépliage dessous. */
+.app.sb-rail .sidebar-header{flex-direction:column;height:auto!important;padding:14px 0 6px!important;gap:8px}
+.app.sb-rail .sidebar-brand{gap:0}
+#cmd-input,#cmd-input:focus,#cmd-input:focus-visible{outline:none!important;box-shadow:none!important;border:none!important}
+.app.sb-rail .sidebar-logo{width:22px;height:22px}
+
+/* Logo plus discret ; recherche plus haute ; pays en drapeaux seuls
+   (le nom reste dans l'infobulle). */
+.sidebar-logo{width:20px!important;height:20px!important}
+.app.sb-rail .sidebar-logo{width:18px!important;height:18px!important}
+.tb-search{height:46px;border-radius:14px;max-width:680px}
+#cmd-input{font-size:15px}
+.tb-search-ic{width:19px;height:19px;margin-left:14px}
+.country-toggle-btn span{display:none}
+.country-toggle-btn{padding:0 9px!important;gap:0!important}
+.country-toggle-btn svg{width:18px;height:auto}
+#country-btn-all svg{width:16px;height:16px}
+/* Barre du haut abaissée : le haut de la recherche s'aligne sur celui de
+   la barre latérale (marge de 10 px). */
+@media(min-width:769px){
+  .app{grid-template-rows:68px 1fr}
+  .topbar{padding-top:10px!important;padding-bottom:12px!important;align-items:center}
+}
+
+/* Boîte à idées dans l'application : le tableau occupe la zone de contenu. */
+.main:has(#page-ideas.active){background:transparent!important}
+#page-ideas iframe{display:block;width:100%;height:calc(100vh - 68px - 68px);border:0;background:transparent;margin-top:8px}

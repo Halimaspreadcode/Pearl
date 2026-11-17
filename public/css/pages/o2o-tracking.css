@@ -1,0 +1,529 @@
+/* ── Suivi One-to-One ─────────────────────────────────────────
+   Page de lecture, refaite au vocabulaire Material 3 du reste de la
+   zone admin. Trois règles tenues partout :
+   — pas de liseré de couleur à gauche des cartes ; ce qui alerte se
+     dit par un mot, pas par un bord teinté ;
+   — une seule graisse forte (500) : les 700 empilés faisaient une
+     page qui crie du haut en bas ;
+   — le trait et le fond suffisent à délimiter ; les rayons suivent
+     ceux des cartes (16 px) et des pastilles (999 px). */
+/* Barre d'outils : collante en haut de la page. Sur un profil long, le
+   sélecteur d'agent et les onglets restaient perdus tout en haut — il
+   fallait remonter pour changer de personne. */
+/* Formes et courbe de mouvement, déclarées ici seulement : le bloc de
+   jetons partagé plus haut sert 15 pages admin, y ajouter des rayons les
+   redessinerait toutes. */
+#page-cfg-o2o{
+  --m3-r-lg:16px; --m3-r-md:12px; --m3-r-sm:8px; --m3-r-full:999px;
+  --m3-ease:cubic-bezier(.2,0,0,1);
+}
+
+/* Cartes de la page : surface tonale sans trait, élévation au survol.
+   L'override est local — .gm-scope .config-card sert 15 pages admin. */
+#page-cfg-o2o .config-card{
+  background:var(--m3-surf-1);border:none;border-radius:var(--m3-r-lg,16px);
+  padding:22px 24px;margin-bottom:14px;
+  transition:box-shadow .2s var(--m3-ease,ease);
+}
+[data-theme="dark"] #page-cfg-o2o .config-card{background:var(--m3-surf-2)}
+#page-cfg-o2o .config-card:hover{
+  box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15);
+}
+[data-theme="dark"] #page-cfg-o2o .config-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.45)}
+#page-cfg-o2o .config-card h3{
+  font-size:15px;font-weight:500;letter-spacing:0;color:var(--m3-on-surface);
+  margin-bottom:16px;
+}
+/* Tableau : lignes seules, en-têtes en capitales discrètes. Le cadre de
+   .table-wrap doublait celui de la carte qui le contient déjà. */
+#page-cfg-o2o .table-wrap{border:none;background:transparent;border-radius:0}
+#page-cfg-o2o table th{
+  font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--m3-on-surf-var);border-bottom:1px solid var(--m3-outline-var);
+  background:transparent;
+}
+#page-cfg-o2o table td{
+  border-bottom:1px solid var(--m3-outline-var);font-size:13px;
+  color:var(--m3-on-surface);
+}
+#page-cfg-o2o table tbody tr{transition:background .15s var(--m3-ease,ease)}
+#page-cfg-o2o table tbody tr:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 5%,transparent);
+}
+#page-cfg-o2o table tbody tr:last-child td{border-bottom:none}
+
+/* Collée au bord haut de .main, qui est la zone de défilement. Le fond
+   translucide est indispensable ici : sans lui, le contenu défilerait
+   visiblement sous une barre transparente. */
+/* `.o2os-bar` nommait deux choses sans rapport : cette barre d'outils et
+   la jauge d'avancement dans les cellules du tableau. La barre gagnait
+   sur les cellules, qui héritaient de son fond, de son ombre et de son
+   flou — d'où les rectangles noirs dans les colonnes Progress et
+   Deadlines. La barre a désormais son propre nom. */
+/* Barre d'outils de la page : fixe dans le flux, elle défile avec le
+   contenu. Collée en haut, elle suivait le regard sur toute la page et
+   masquait une bande du tableau à chaque défilement. */
+#page-cfg-o2o .o2os-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin:0 0 22px;padding:12px 16px;
+  border-radius:var(--m3-r-lg,16px);
+  background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-cfg-o2o .o2os-toolbar{background:var(--m3-surf-2)}
+/* Onglets : segmented button M3. Un seul conteneur bordé, les segments
+   se partagent la piste au lieu de flotter chacun dans sa pastille. */
+#page-cfg-o2o .o2os-tabs{
+  display:inline-flex;padding:0;border-radius:var(--m3-r-full,999px);
+  border:1px solid var(--m3-outline-var);overflow:hidden;
+  background:var(--m3-surface);
+}
+[data-theme="dark"] #page-cfg-o2o .o2os-tabs{background:var(--m3-surf-1);border-color:var(--m3-outline-var)}
+#page-cfg-o2o .o2os-tab{
+  position:relative;height:38px;padding:0 22px;border:none;background:transparent;
+  color:var(--m3-on-surf-var);font:inherit;font-size:13.5px;font-weight:500;
+  cursor:pointer;letter-spacing:.01em;
+  transition:background .2s var(--m3-ease,ease),color .2s var(--m3-ease,ease);
+}
+#page-cfg-o2o .o2os-tab + .o2os-tab{border-left:1px solid var(--m3-outline-var)}
+#page-cfg-o2o .o2os-tab:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+  color:var(--m3-on-surface);
+}
+#page-cfg-o2o .o2os-tab.is-on{
+  background:var(--m3-primary-cont);color:var(--m3-on-primary-cont);
+}
+#page-cfg-o2o .o2os-tab:focus-visible{outline:2px solid var(--m3-primary);outline-offset:-2px}
+/* Sélecteur d'agent : champ M3 « outlined » avec son étiquette flottante
+   au-dessus du trait, plutôt qu'un label empilé qui décalait la barre. */
+#page-cfg-o2o .o2os-agent{position:relative;min-width:240px}
+#page-cfg-o2o .o2os-agent .form-label{
+  position:absolute;top:-7px;left:12px;z-index:1;margin:0 !important;
+  padding:0 6px;background:var(--m3-surface);
+  font-size:11px;font-weight:500;line-height:1.2;
+  color:var(--m3-on-surf-var);letter-spacing:.02em;
+}
+[data-theme="dark"] #page-cfg-o2o .o2os-agent .form-label{background:var(--m3-surf-2)}
+#page-cfg-o2o .o2os-agent .form-control{
+  height:40px;border-radius:var(--m3-r-sm,8px);
+  border:1px solid var(--m3-outline);background:transparent;
+  color:var(--m3-on-surface);font-size:13.5px;
+}
+#page-cfg-o2o .o2os-agent .form-control:focus{
+  border-color:var(--m3-primary);box-shadow:0 0 0 1px var(--m3-primary);outline:none;
+}
+
+/* KPIs : cartes M3 individuelles. La bande unique découpée au trait
+   vertical se lisait comme un tableau ; en cartes, chaque chiffre a son
+   propre poids et la grille respire aux petites largeurs. */
+#page-cfg-o2o .o2os-kpis{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;margin-bottom:24px;
+}
+#page-cfg-o2o .o2os-kpi{
+  position:relative;padding:18px 18px 16px;
+  border-radius:var(--m3-r-lg,16px);background:var(--m3-surf-1);
+  transition:box-shadow .2s var(--m3-ease,ease),transform .18s var(--m3-ease,ease);
+}
+[data-theme="dark"] #page-cfg-o2o .o2os-kpi{background:var(--m3-surf-2)}
+#page-cfg-o2o .o2os-kpi:hover{
+  box-shadow:0 1px 2px rgba(60,64,67,.3),0 2px 6px 2px rgba(60,64,67,.12);
+  transform:translateY(-1px);
+}
+[data-theme="dark"] #page-cfg-o2o .o2os-kpi:hover{box-shadow:0 2px 8px rgba(0,0,0,.5)}
+#page-cfg-o2o .o2os-kpi-v{
+  font-size:30px;font-weight:400;color:var(--m3-on-surface);line-height:1.05;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+}
+/* Un compteur en alerte prend le conteneur primaire : la teinte porte
+   sur toute la carte, pas seulement sur le chiffre — repérable du coin
+   de l'œil sans devenir une tache vive. */
+#page-cfg-o2o .o2os-kpi.warn{background:var(--m3-primary-cont)}
+#page-cfg-o2o .o2os-kpi.warn .o2os-kpi-v{color:var(--m3-on-primary-cont)}
+#page-cfg-o2o .o2os-kpi.warn .o2os-kpi-l{color:var(--m3-on-primary-cont);opacity:.82}
+#page-cfg-o2o .o2os-kpi-l{
+  font-size:12px;color:var(--m3-on-surf-var);margin-top:6px;line-height:1.35;
+}
+
+/* Ce qui appelle une action : carte tonale. Plus de bord gauche rouge —
+   le mot « Objectifs en retard » dit déjà ce qu'il faut, et le compteur
+   le chiffre. */
+#page-cfg-o2o .o2os-alert{
+  border-radius:var(--m3-r-lg,16px);
+  padding:16px 20px;margin-bottom:12px;background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-cfg-o2o .o2os-alert{background:var(--m3-surf-2)}
+#page-cfg-o2o .o2os-alert-t{
+  display:flex;align-items:center;gap:8px;
+  font-size:13.5px;font-weight:500;color:var(--m3-on-surface);margin-bottom:12px;
+}
+/* Le compteur : pastille discrète à contour, teintée seulement sur le
+   texte. Un aplat rouge par bloc d'alerte faisait trois taches vives
+   avant même d'avoir lu la page. */
+#page-cfg-o2o .o2os-alert-t span{
+  background:transparent;color:var(--m3-primary);
+  border:1px solid currentColor;border-radius:var(--m3-r-full,999px);
+  padding:0 8px;font-size:11.5px;font-weight:500;margin-left:0;
+  font-variant-numeric:tabular-nums;
+}
+#page-cfg-o2o .o2os-alert-l{display:flex;gap:8px;flex-wrap:wrap}
+#page-cfg-o2o .o2os-chip{
+  display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 14px;
+  border:1px solid var(--m3-outline-var);border-radius:var(--m3-r-full,999px);
+  background:transparent;font:inherit;font-size:12.5px;cursor:pointer;
+  color:var(--m3-on-surface);
+  transition:background .18s var(--m3-ease,ease);
+}
+#page-cfg-o2o .o2os-chip b{font-weight:500}
+#page-cfg-o2o .o2os-chip:hover{
+  background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);
+}
+#page-cfg-o2o .o2os-chip:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+#page-cfg-o2o .o2os-chip small{color:var(--m3-on-surf-var);font-size:11.5px}
+
+/* Jauge d'avancement en cellule : un seul gris. Trois couleurs de
+   remplissage sur une colonne entière donnaient un tableau bariolé
+   pour une information que le chiffre juste à côté porte déjà. */
+#page-cfg-o2o td .o2os-bar{
+  display:inline-block;width:72px;height:4px;border-radius:2px;
+  background:var(--m3-surf-3);overflow:hidden;vertical-align:middle;
+}
+#page-cfg-o2o td .o2os-bar span{
+  display:block;height:100%;border-radius:2px;background:var(--m3-on-surf-var);
+}
+#page-cfg-o2o td .o2os-bar span.low{background:var(--m3-primary)}
+#page-cfg-o2o .o2os-bar-v{
+  margin-left:8px;color:var(--m3-on-surf-var);font-size:11.5px;
+  font-variant-numeric:tabular-nums;
+}
+#page-cfg-o2o .o2os-na{color:var(--m3-on-surf-var);font-size:12.5px}
+#page-cfg-o2o .o2os-late{color:var(--m3-primary);font-weight:500}
+#page-cfg-o2o .o2os-empty{
+  padding:48px 24px;text-align:center;color:var(--m3-on-surf-var);font-size:13.5px;
+}
+
+/* En-tête de profil : bandeau tonal. C'est la carte d'identité de la
+   page — lui donner la surface primaire douce la détache de la pile de
+   cartes grises qui suit, sans ajouter de trait ni de couleur vive. */
+#page-cfg-o2o .o2os-prof-head{
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  border-radius:var(--m3-r-lg,16px);padding:24px 26px;
+  background:var(--m3-primary-cont);margin-bottom:14px;
+}
+#page-cfg-o2o .o2os-prof-av{
+  width:56px;height:56px;border-radius:50%;color:#fff;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:500;font-size:19px;letter-spacing:.02em;
+  box-shadow:0 1px 3px rgba(0,0,0,.22);
+}
+#page-cfg-o2o .o2os-prof-id{flex:1;min-width:200px}
+#page-cfg-o2o .o2os-prof-nom{
+  font-size:21px;font-weight:500;color:var(--m3-on-primary-cont);letter-spacing:-.01em;
+}
+#page-cfg-o2o .o2os-prof-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+/* Sur le bandeau tonal, les pastilles reprennent la couleur du texte du
+   conteneur : un gris neutre y perdrait tout contraste. */
+#page-cfg-o2o .o2os-prof-head .o2os-tag{
+  border-color:color-mix(in srgb,var(--m3-on-primary-cont) 34%,transparent);
+  color:var(--m3-on-primary-cont);
+  background:color-mix(in srgb,var(--m3-on-primary-cont) 7%,transparent);
+}
+#page-cfg-o2o .o2os-prof-focus{
+  font-size:13px;color:var(--m3-on-primary-cont);opacity:.85;margin-top:10px;
+  line-height:1.55;max-width:70ch;
+}
+/* Note du mois : jeton circulaire posé sur la surface, plutôt qu'un
+   chiffre séparé par un filet vertical. */
+#page-cfg-o2o .o2os-prof-note{
+  flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:96px;height:96px;border-radius:50%;text-align:center;padding:0 8px;
+  background:var(--m3-surface);
+}
+[data-theme="dark"] #page-cfg-o2o .o2os-prof-note{background:var(--m3-surf-2)}
+#page-cfg-o2o .o2os-prof-note-v{
+  font-size:32px;font-weight:400;color:var(--m3-on-surface);line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+}
+#page-cfg-o2o .o2os-prof-note-l{
+  font-size:10px;color:var(--m3-on-surf-var);margin-top:5px;line-height:1.25;
+}
+#page-cfg-o2o .o2os-tag{
+  display:inline-flex;align-items:center;height:24px;padding:0 10px;
+  border-radius:var(--m3-r-full,999px);font-size:11.5px;
+  background:transparent;border:1px solid var(--m3-outline-var);
+  color:var(--m3-on-surf-var);
+}
+#page-cfg-o2o .o2os-tag.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+#page-cfg-o2o .o2os-tag.warn{border-color:currentColor;color:var(--m3-primary)}
+
+#page-cfg-o2o .o2os-cards{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:14px;
+}
+#page-cfg-o2o .o2os-card{
+  border-radius:var(--m3-r-lg,16px);
+  padding:18px 20px;background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-cfg-o2o .o2os-card{background:var(--m3-surf-2)}
+#page-cfg-o2o .o2os-card-t{
+  font-size:13.5px;font-weight:500;color:var(--m3-on-surface);
+  letter-spacing:0;text-transform:none;margin-bottom:12px;
+}
+/* Ligne clé/valeur : trait fin entre les lignes, valeur alignée à
+   droite. Le tableau se lit sans avoir à séparer les blocs. */
+#page-cfg-o2o .o2os-card-r{
+  display:flex;justify-content:space-between;gap:12px;
+  font-size:13px;padding:8px 0;color:var(--m3-on-surf-var);
+  border-top:1px solid var(--m3-outline-var);
+}
+#page-cfg-o2o .o2os-card-r:first-of-type{border-top:none;padding-top:0}
+#page-cfg-o2o .o2os-card-r b{
+  color:var(--m3-on-surface);font-weight:500;font-variant-numeric:tabular-nums;
+}
+
+/* Points forts / points d'attention : c'est le titre qui distingue les
+   deux colonnes, pas un liseré vert ou orange sur le flanc de la
+   carte. Les deux blocs sont désormais identiques au trait près. */
+#page-cfg-o2o .o2os-swwrap{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:14px;
+}
+#page-cfg-o2o .o2os-sw{
+  border-radius:var(--m3-r-lg,16px);
+  padding:18px 20px;background:var(--m3-surf-1);
+}
+[data-theme="dark"] #page-cfg-o2o .o2os-sw{background:var(--m3-surf-2)}
+/* Le titre porte une pastille de couleur : appui / vigilance se
+   distinguent d'un coup d'œil sans teinter la carte entière. */
+#page-cfg-o2o .o2os-sw-t{
+  display:flex;align-items:center;gap:8px;
+  font-size:13.5px;font-weight:500;color:var(--m3-on-surface);margin-bottom:10px;
+}
+#page-cfg-o2o .o2os-sw-t::before{
+  content:"";width:8px;height:8px;border-radius:50%;flex:none;
+  background:var(--m3-outline);
+}
+#page-cfg-o2o .o2os-sw.is-up .o2os-sw-t::before{background:#1E8E3E}
+#page-cfg-o2o .o2os-sw.is-down .o2os-sw-t::before{background:#E37400}
+[data-theme="dark"] #page-cfg-o2o .o2os-sw.is-up .o2os-sw-t::before{background:#81C995}
+[data-theme="dark"] #page-cfg-o2o .o2os-sw.is-down .o2os-sw-t::before{background:#FCC934}
+/* Puces remplacées par des tirets cadratins en retrait : plus calme
+   qu'un disque noir, et le texte reste aligné sur une seule colonne. */
+#page-cfg-o2o .o2os-sw ul{margin:0;padding:0;list-style:none}
+#page-cfg-o2o .o2os-sw li{
+  font-size:13px;color:var(--m3-on-surf-var);line-height:1.6;
+  padding-left:16px;position:relative;margin-top:6px;
+}
+#page-cfg-o2o .o2os-sw li:first-child{margin-top:0}
+#page-cfg-o2o .o2os-sw li::before{
+  content:"–";position:absolute;left:0;color:var(--m3-outline);
+}
+
+/* Toile d'araignée : traits fins, une seule surface colorée. La forme
+   porte l'information, pas l'habillage. */
+#page-cfg-o2o .o2os-rdwrap{
+  display:flex;gap:28px;align-items:center;flex-wrap:wrap;
+}
+#page-cfg-o2o .o2os-rd{width:100%;max-width:340px;height:auto;flex:none}
+#page-cfg-o2o .o2os-rd-grid{fill:none;stroke:var(--m3-outline-var);stroke-width:1}
+#page-cfg-o2o .o2os-rd-axis{stroke:var(--m3-outline-var);stroke-width:1}
+#page-cfg-o2o .o2os-rd-area{
+  fill:color-mix(in srgb,var(--m3-primary) 12%,transparent);
+  stroke:var(--m3-primary);stroke-width:1.5;stroke-linejoin:round;
+}
+#page-cfg-o2o .o2os-rd-dot{fill:var(--m3-primary)}
+#page-cfg-o2o .o2os-rd-lab{font-size:9.5px;font-weight:500;fill:var(--m3-on-surface)}
+#page-cfg-o2o .o2os-rd-lab.is-na{fill:var(--m3-on-surf-var);opacity:.7}
+#page-cfg-o2o .o2os-rd-val{font-size:9px;fill:var(--m3-on-surf-var)}
+#page-cfg-o2o .o2os-rd-side{flex:1;min-width:180px;display:flex;flex-direction:column;gap:10px}
+#page-cfg-o2o .o2os-rd-moy{display:flex;align-items:baseline;gap:10px}
+#page-cfg-o2o .o2os-rd-moy b{
+  font-size:32px;font-weight:400;color:var(--m3-on-surface);line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
+#page-cfg-o2o .o2os-rd-moy span{font-size:12.5px;color:var(--m3-on-surf-var)}
+/* Mention « non renseigné » : une note, pas un encadré. Le pavé gris
+   lui donnait le poids d'un avertissement qu'elle n'a pas. */
+#page-cfg-o2o .o2os-rd-warn{
+  font-size:12.5px;color:var(--m3-on-surf-var);line-height:1.55;
+  padding:0;background:none;border-radius:0;
+}
+
+#page-cfg-o2o .o2os-moods{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+#page-cfg-o2o .o2os-mood{display:flex;flex-direction:column;align-items:center;gap:6px}
+/* Humeur : le seul endroit de la page où la couleur reste, parce
+   qu'elle encode trois états sur une frise et rien d'autre ne le dit.
+   Pastilles réduites, teintes Google plutôt que le rouge de marque. */
+#page-cfg-o2o .o2os-mood i{
+  width:10px;height:10px;border-radius:50%;background:var(--m3-outline);display:block;
+}
+#page-cfg-o2o .o2os-mood.is-up i{background:#1E8E3E}
+#page-cfg-o2o .o2os-mood.is-flat i{background:var(--m3-outline)}
+#page-cfg-o2o .o2os-mood.is-down i{background:#D93025}
+[data-theme="dark"] #page-cfg-o2o .o2os-mood.is-up i{background:#81C995}
+[data-theme="dark"] #page-cfg-o2o .o2os-mood.is-down i{background:#F28B82}
+#page-cfg-o2o .o2os-mood small{font-size:10.5px;color:var(--m3-on-surf-var)}
+
+/* Agreed actions: a ruled list, no frame per row. State reads from the
+   checkbox on the left and the pill on the right; row actions appear only
+   on hover so reading stays calm. */
+#page-cfg-o2o .o2os-actions{display:flex;flex-direction:column;gap:0}
+#page-cfg-o2o .o2os-action{
+  display:flex;align-items:flex-start;gap:12px;padding:12px 0;
+  border:none;border-top:1px solid var(--m3-outline-var);
+  border-radius:0;font-size:13px;background:none;
+}
+#page-cfg-o2o .o2os-action:first-child{border-top:none;padding-top:0}
+
+/* Block header: title left, bulk action right. */
+#page-cfg-o2o .o2os-act-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+#page-cfg-o2o .o2os-act-head h3{margin:0}
+
+/* Figures band: the rate first, then its breakdown. */
+#page-cfg-o2o .o2os-act-stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));
+  gap:8px;margin:0 0 14px;
+}
+#page-cfg-o2o .o2os-act-kpi{
+  padding:10px 12px;border-radius:10px;background:var(--m3-surf-2);
+  border:1px solid var(--m3-outline-var);
+}
+#page-cfg-o2o .o2os-act-kpi b{
+  display:block;font-size:19px;font-weight:650;line-height:1.15;
+  color:var(--m3-on-surface);font-variant-numeric:tabular-nums;
+}
+#page-cfg-o2o .o2os-act-kpi small{
+  display:block;font-size:10.5px;color:var(--m3-on-surf-var);margin-top:2px;
+}
+#page-cfg-o2o .o2os-act-kpi.is-ok b{color:#1E8E3E}
+#page-cfg-o2o .o2os-act-kpi.is-bad b{color:#D93025}
+#page-cfg-o2o .o2os-act-kpi.is-na b{color:var(--m3-on-surf-var)}
+[data-theme="dark"] #page-cfg-o2o .o2os-act-kpi.is-ok b{color:#81C995}
+[data-theme="dark"] #page-cfg-o2o .o2os-act-kpi.is-bad b{color:#F28B82}
+
+/* Checkbox: the same gesture as in My Tasks, so ticking an action feels
+   identical on both sides. */
+#page-cfg-o2o .o2os-act-check{
+  flex:none;width:20px;height:20px;margin-top:1px;border-radius:50%;
+  border:1.5px solid var(--m3-outline);background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:transparent;padding:0;transition:background .12s,border-color .12s,color .12s;
+}
+#page-cfg-o2o .o2os-act-check:hover{border-color:var(--m3-primary)}
+#page-cfg-o2o .o2os-action.is-done .o2os-act-check{
+  background:#1E8E3E;border-color:#1E8E3E;color:#fff;
+}
+#page-cfg-o2o .o2os-action.is-late .o2os-act-check{border-color:#D93025}
+[data-theme="dark"] #page-cfg-o2o .o2os-action.is-done .o2os-act-check{
+  background:#81C995;border-color:#81C995;color:#0b1f12;
+}
+
+#page-cfg-o2o .o2os-act-body{flex:1;min-width:0}
+#page-cfg-o2o .o2os-act-t{color:var(--m3-on-surface);line-height:1.5}
+#page-cfg-o2o .o2os-action.is-done .o2os-act-t,
+#page-cfg-o2o .o2os-action.is-drop .o2os-act-t{
+  text-decoration:line-through;color:var(--m3-on-surf-var);
+}
+#page-cfg-o2o .o2os-act-meta{
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  margin-top:3px;font-size:11px;color:var(--m3-on-surf-var);
+}
+#page-cfg-o2o .o2os-sep{opacity:.5}
+#page-cfg-o2o .o2os-act-link{
+  color:var(--m3-primary);cursor:pointer;text-decoration:underline;
+  text-underline-offset:2px;
+}
+
+/* State pills. Overdue is the only one strongly coloured: it is the only
+   one that calls for a decision. */
+#page-cfg-o2o .o2os-tag.is-late{
+  border-color:#D93025;color:#D93025;
+}
+#page-cfg-o2o .o2os-tag.is-done{color:#1E8E3E;border-color:#1E8E3E}
+#page-cfg-o2o .o2os-tag.is-drop{opacity:.6}
+[data-theme="dark"] #page-cfg-o2o .o2os-tag.is-late{border-color:#F28B82;color:#F28B82}
+[data-theme="dark"] #page-cfg-o2o .o2os-tag.is-done{color:#81C995;border-color:#81C995}
+
+/* Row actions: discreet at rest, visible on hover. Touch screens have no
+   hover, so there they stay permanently visible. */
+#page-cfg-o2o .o2os-act-acts{
+  display:flex;gap:2px;flex:none;opacity:0;transition:opacity .12s;
+}
+#page-cfg-o2o .o2os-action:hover .o2os-act-acts,
+#page-cfg-o2o .o2os-action:focus-within .o2os-act-acts{opacity:1}
+@media (hover:none){#page-cfg-o2o .o2os-act-acts{opacity:1}}
+#page-cfg-o2o .o2os-iact{
+  width:28px;height:28px;border:none;background:none;border-radius:7px;
+  color:var(--m3-on-surf-var);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0;
+}
+#page-cfg-o2o .o2os-iact:hover{background:var(--m3-surf-3);color:var(--m3-on-surface)}
+#page-cfg-o2o .o2os-iact.danger:hover{color:#D93025}
+[data-theme="dark"] #page-cfg-o2o .o2os-iact.danger:hover{color:#F28B82}
+
+/* To prepare: whatever calls for a decision, at the top of the profile. */
+#page-cfg-o2o .o2os-prep-n{
+  font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;
+  background:var(--m3-surf-3);color:var(--m3-on-surf-var);
+}
+#page-cfg-o2o .o2os-prep-l{display:flex;flex-direction:column;gap:0;margin-top:10px}
+#page-cfg-o2o .o2os-prep-i{
+  display:flex;align-items:center;gap:12px;padding:11px 0 11px 12px;
+  border-top:1px solid var(--m3-outline-var);border-left:2px solid transparent;
+}
+#page-cfg-o2o .o2os-prep-i:first-child{border-top:none}
+#page-cfg-o2o .o2os-prep-i.is-bad{border-left-color:#D93025}
+#page-cfg-o2o .o2os-prep-i.is-warn{border-left-color:#E37400}
+#page-cfg-o2o .o2os-prep-i.is-info{border-left-color:var(--m3-outline)}
+[data-theme="dark"] #page-cfg-o2o .o2os-prep-i.is-bad{border-left-color:#F28B82}
+[data-theme="dark"] #page-cfg-o2o .o2os-prep-i.is-warn{border-left-color:#FCC934}
+#page-cfg-o2o .o2os-prep-b{flex:1;min-width:0}
+#page-cfg-o2o .o2os-prep-t{font-size:13px;color:var(--m3-on-surface);line-height:1.45}
+#page-cfg-o2o .o2os-prep-d{font-size:11px;color:var(--m3-on-surf-var);margin-top:2px}
+
+#page-cfg-o2o .o2os-meet{border-top:1px solid var(--m3-outline-var);padding:0}
+#page-cfg-o2o .o2os-meet summary{
+  cursor:pointer;display:flex;align-items:center;gap:12px;
+  font-size:13px;color:var(--m3-on-surface);padding:14px 0;
+  list-style:none;border-radius:8px;
+}
+#page-cfg-o2o .o2os-meet summary::-webkit-details-marker{display:none}
+/* Le marqueur natif est supprimé : on redessine un chevron qui pivote,
+   comme les replis du reste de l'application. Il vient en premier dans
+   la ligne, la date le suit. */
+#page-cfg-o2o .o2os-meet summary::before{
+  content:"";flex:none;width:0;height:0;order:-1;
+  border-left:5px solid var(--m3-on-surf-var);
+  border-top:4px solid transparent;border-bottom:4px solid transparent;
+  transition:transform .18s var(--m3-ease,ease);
+}
+#page-cfg-o2o .o2os-meet[open] summary::before{transform:rotate(90deg)}
+#page-cfg-o2o .o2os-meet summary b{font-weight:500;font-variant-numeric:tabular-nums}
+/* Pastille d'humeur dans la ligne repliée : poussée à droite, elle
+   forme une colonne lisible sur toute la pile d'entretiens. */
+#page-cfg-o2o .o2os-meet summary i.o2os-mood{
+  margin-left:auto;flex:none;
+  width:10px;height:10px;border-radius:50%;background:var(--m3-outline);
+}
+#page-cfg-o2o .o2os-meet summary i.o2os-mood.is-up{background:#1E8E3E}
+#page-cfg-o2o .o2os-meet summary i.o2os-mood.is-flat{background:var(--m3-outline)}
+#page-cfg-o2o .o2os-meet summary i.o2os-mood.is-down{background:#D93025}
+[data-theme="dark"] #page-cfg-o2o .o2os-meet summary i.o2os-mood.is-up{background:#81C995}
+[data-theme="dark"] #page-cfg-o2o .o2os-meet summary i.o2os-mood.is-down{background:#F28B82}
+#page-cfg-o2o .o2os-meet summary:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+#page-cfg-o2o .o2os-meet summary span{color:var(--m3-on-surf-var);font-size:12.5px}
+#page-cfg-o2o .o2os-meet-b{padding:2px 0 16px 0}
+#page-cfg-o2o .o2os-meet-s{margin-bottom:14px}
+#page-cfg-o2o .o2os-meet-s:last-child{margin-bottom:0}
+/* Intitulé de rubrique d'entretien : capitales espacées, en gris. Le
+   700 noir en faisait un titre concurrent du contenu qu'il annonce. */
+#page-cfg-o2o .o2os-meet-l{
+  font-size:11px;font-weight:500;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--m3-on-surf-var);margin-bottom:5px;
+}
+#page-cfg-o2o .o2os-meet-x{font-size:13px;color:var(--m3-on-surface);line-height:1.65}
+
+/* Pas de liseré latéral : un point de couleur devant l'intitulé. */
+#page-cfg-o2o .o2os-prep-i{border-left:0!important;padding-left:2px!important}
+#page-cfg-o2o .o2os-prep-t::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;background:var(--m3-outline,#D5D7DC)}
+#page-cfg-o2o .o2os-prep-i.is-bad .o2os-prep-t::before{background:#D64545}
+#page-cfg-o2o .o2os-prep-i.is-warn .o2os-prep-t::before{background:#E8833A}

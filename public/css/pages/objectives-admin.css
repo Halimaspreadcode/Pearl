@@ -1,0 +1,421 @@
+/* ── Arbitrage des objectifs (page Admin) ─────────────────────
+   La vue répond à « qu'est-ce qui attend une décision de ma part ? ».
+   Elle vit dans la page Performance, qui suit le vocabulaire M3 : on
+   emprunte donc ses jetons plutôt que ceux de la page agent. */
+#perf-obj-review{display:flex;flex-direction:column;gap:14px}
+
+.or-sess-on,.or-sess-off{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-top:14px;padding:14px 16px;
+  border-radius:var(--m3-r-md,12px);background:var(--m3-surf-1);
+  font-size:13px;color:var(--m3-on-surface);
+}
+[data-theme="dark"] .or-sess-on,[data-theme="dark"] .or-sess-off{background:var(--m3-surf-2)}
+.or-sess-n{font-size:14px;font-weight:500;color:var(--m3-on-surface)}
+.or-sess-d{font-size:12px;color:var(--m3-on-surf-var);margin-top:2px}
+.or-sess-past{font-size:11.5px;color:var(--m3-on-surf-var);margin-top:10px}
+
+/* Rattrapage de reprise : signale que des objectifs restent hors du
+   flux, donc invisibles pour l'agent. */
+.or-sess-imp{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;margin-top:10px;padding:13px 15px;
+  border-radius:var(--m3-r-md,12px);
+  background:var(--p3-bg);color:var(--p3-fg);
+  font-size:12px;line-height:1.55;
+}
+.or-sess-imp b{display:block;font-weight:600;margin-bottom:2px}
+.or-sess-imp > div{flex:1 1 340px;min-width:0}
+
+/* Onglets internes : même segmented button que le reste de la zone
+   admin. Sans cette règle, c'étaient des boutons bruts du navigateur. */
+.or-tabs{
+  display:inline-flex;border-radius:var(--m3-r-full,999px);overflow:hidden;
+  border:1px solid var(--m3-outline-var);background:var(--m3-surface);
+}
+[data-theme="dark"] .or-tabs{background:var(--m3-surf-1)}
+.or-tab{
+  height:36px;padding:0 18px;border:none;background:transparent;
+  color:var(--m3-on-surf-var);font:inherit;font-size:13px;font-weight:500;
+  cursor:pointer;white-space:nowrap;
+  transition:background .2s ease,color .2s ease;
+}
+.or-tab + .or-tab{border-left:1px solid var(--m3-outline-var)}
+.or-tab:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent)}
+.or-tab.is-on{background:var(--m3-primary-cont);color:var(--m3-on-primary-cont)}
+
+.or-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+/* Recherche et filtres : une seule ligne, le champ prend la place
+   restante. Sur 36 objectifs, parcourir n'est plus une option. */
+.or-filters{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.or-search{
+  position:relative;display:flex;align-items:center;gap:8px;
+  flex:1 1 260px;min-width:200px;height:36px;padding:0 12px;
+  border-radius:999px;border:1px solid var(--m3-outline-var);
+  background:var(--m3-surface);color:var(--m3-on-surf-var);
+}
+[data-theme="dark"] .or-search{background:var(--m3-surf-1)}
+.or-search:focus-within{
+  border-color:var(--m3-primary);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--m3-primary) 16%,transparent);
+}
+.or-search svg{flex:none;opacity:.7}
+.or-search input{
+  flex:1;min-width:0;border:none;background:transparent;outline:none;
+  font:inherit;font-size:13px;color:var(--m3-on-surface);
+}
+.or-search input::-webkit-search-cancel-button{display:none}
+.or-search-x{
+  flex:none;border:none;background:transparent;cursor:pointer;
+  color:var(--m3-on-surf-var);font-size:17px;line-height:1;padding:0 2px;
+}
+.or-search-x:hover{color:var(--m3-on-surface)}
+.or-count{font-size:11.5px;color:var(--m3-on-surf-var);margin:-2px 0 -4px 2px}
+
+/* Faits de la carte : échéance, jalons, KPIs, session. Une rangée de
+   repères courts plutôt qu'un paragraphe à lire. */
+/* Chaque repère porte son étiquette au-dessus de sa valeur : « 2 of 3 »
+   seul ne disait pas de quoi il s'agissait. */
+.or-facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.or-fact{
+  display:flex;flex-direction:column;gap:1px;
+  font-size:12px;font-weight:500;color:var(--m3-on-surface);
+  background:var(--m3-surf-3);border-radius:var(--m3-r-sm,8px);padding:6px 11px;
+}
+.or-fact i{
+  font-style:normal;font-size:9.5px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--m3-on-surf-var);
+}
+.or-fact.is-late{background:var(--p1-bg);color:var(--p1-fg);font-weight:600}
+.or-fact.is-late i{color:var(--p1-fg);opacity:.85}
+
+/* Sections nommées : l'admin doit savoir s'il lit des indicateurs ou
+   des jalons sans avoir à le déduire de la forme des lignes. */
+.or-sec{margin-top:14px;padding-top:12px;border-top:1px solid var(--m3-outline-var)}
+.or-sec-t{
+  font-size:10.5px;font-weight:600;letter-spacing:.03em;
+  color:var(--m3-on-surf-var);margin-bottom:8px;
+}
+
+/* Sélecteur de statut, avec son intitulé. */
+.or-sellbl{display:flex;flex-direction:column;gap:3px;margin-left:auto;flex:none}
+.or-sellbl > span{
+  font-size:9.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+.or-row.is-late{border-color:color-mix(in srgb,var(--red) 30%,transparent)}
+
+/* KPIs et jalons en lecture, dans la vue « tout ». */
+.or-kpis{display:flex;flex-direction:column;gap:4px;margin-top:11px}
+.or-kpi{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:12px}
+.or-kpi-n{color:var(--m3-on-surface);font-weight:500;overflow-wrap:anywhere}
+.or-kpi-t{
+  color:var(--m3-primary);font-weight:600;white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.or-kpi-s{color:var(--m3-on-surf-var);font-size:11px}
+
+.or-steps{display:flex;flex-direction:column;gap:2px;margin-top:10px}
+.or-step{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--m3-on-surface)}
+.or-step-b{
+  flex:none;width:15px;height:15px;border-radius:4px;
+  border:1.5px solid var(--m3-outline-var);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:transparent;
+}
+.or-step.is-done .or-step-b{background:var(--ok-fg);border-color:var(--ok-fg);color:#fff}
+.or-step.is-done .or-step-l{color:var(--m3-on-surf-var);text-decoration:line-through}
+.or-step-l{flex:1;min-width:0;overflow-wrap:anywhere}
+.or-step-d{font-size:11px;color:var(--m3-on-surf-var);white-space:nowrap}
+
+.or-lastnote{
+  font-size:11.5px;color:var(--p1-fg);line-height:1.5;margin-top:12px;
+  padding:9px 11px;border-radius:var(--m3-r-sm,8px);background:var(--p1-bg);
+}
+.or-lastnote i{
+  display:block;font-style:normal;font-size:9.5px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;opacity:.85;margin-bottom:2px;
+}
+
+/* Suppression : action rare et définitive, donc discrète tant qu'on ne
+   la demande pas — un lien, pas un bouton en concurrence avec le reste. */
+.or-rowfoot{display:flex;justify-content:flex-end;margin-top:12px}
+.or-link{
+  border:none;background:transparent;cursor:pointer;font:inherit;
+  font-size:11.5px;color:var(--m3-on-surf-var);padding:4px 2px;
+  text-decoration:underline;text-underline-offset:2px;
+}
+.or-link:hover{color:var(--red)}
+
+.or-del{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;margin-top:12px;padding:12px 14px;
+  border-radius:var(--m3-r-sm,8px);background:var(--p1-bg);color:var(--p1-fg);
+  font-size:11.5px;line-height:1.55;
+}
+.or-del b{display:block;font-weight:600;margin-bottom:2px}
+.or-del > div:first-child{flex:1 1 320px;min-width:0}
+.or-del-acts{display:flex;gap:8px;flex:none}
+
+/* Formulaire d'objectif posé par l'admin. */
+.or-newform{
+  padding:20px 22px;border-radius:var(--m3-r-lg,16px);
+  background:var(--m3-surf-1);border:1px solid var(--m3-outline-var);
+}
+[data-theme="dark"] .or-newform{background:var(--m3-surf-2)}
+.or-newform-t{font-size:14px;font-weight:600;color:var(--m3-on-surface)}
+.or-newform-d{font-size:12px;color:var(--m3-on-surf-var);line-height:1.55;margin-top:5px;max-width:62ch}
+.or-newform .mo-lbl{color:var(--m3-on-surface)}
+.or-newform-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.or-newform-foot{
+  display:flex;gap:8px;justify-content:flex-end;
+  margin-top:20px;padding-top:16px;border-top:1px solid var(--m3-outline-var);
+}
+@media (max-width:720px){ .or-newform-row{grid-template-columns:1fr} }
+
+.or-list{display:flex;flex-direction:column;gap:12px}
+
+/* Une demande = une carte, lue de haut en bas : qui, quoi, puis la
+   décision. Les boutons rejetés en haut à droite pesaient plus que le
+   contenu qu'ils arbitrent — ils passent en pied de carte. */
+.or-row{
+  border-radius:var(--m3-r-lg,16px);
+  background:var(--m3-surf-1);
+  border:1px solid transparent;
+  overflow:hidden;
+  transition:border-color .18s ease,box-shadow .18s ease;
+}
+[data-theme="dark"] .or-row{background:var(--m3-surf-2)}
+.or-row:hover{box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.or-row.is-rej{border-color:color-mix(in srgb,var(--red) 45%,transparent)}
+
+.or-top{display:flex;align-items:center;gap:11px;padding:14px 16px 0}
+.or-av{
+  width:32px;height:32px;flex:none;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--m3-primary);color:var(--m3-on-primary);
+  font-size:11.5px;font-weight:600;letter-spacing:.02em;
+}
+.or-id{min-width:0}
+.or-fo{font-size:13.5px;font-weight:600;color:var(--m3-on-surface);line-height:1.3}
+.or-kindline{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:3px}
+.or-kind{
+  font-size:10.5px;font-weight:500;color:var(--m3-on-surf-var);
+}
+.or-smart{
+  font-size:10px;font-weight:600;padding:1px 7px;border-radius:999px;
+  background:var(--ok-bg);color:var(--ok-fg);
+}
+.or-smart.warn{background:var(--p2-bg);color:var(--p2-fg)}
+
+.or-body{padding:11px 16px 0}
+/* Vue « tout » : pas de pied d'action, la carte doit donc refermer
+   elle-même son espacement du bas. */
+.or-body-last{padding-bottom:15px}
+/* Vue « tout » : le corps repart sous la colonne d'identité, pas sous
+   l'anneau. Aligné sur 16px, l'intitulé démarrait 47px à gauche du nom
+   de l'agent — deux points de départ pour une même carte. */
+.or-row.is-full .or-body{padding-left:63px}
+
+/* Anneau d'avancement de la vue « tout ». Même langage que la page
+   agent : la valeur et sa lecture visuelle au même endroit. */
+.or-ring{position:relative;width:36px;height:36px;flex:none}
+.or-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.or-ring circle{fill:none;stroke:var(--m3-surf-3);stroke-width:3}
+.or-ring .or-ring-v{
+  stroke:var(--m3-primary);stroke-linecap:round;
+  transition:stroke-dashoffset .5s cubic-bezier(.2,0,0,1);
+}
+.or-ring.is-full .or-ring-v{stroke:var(--ok-fg)}
+/* Le contenu doit être centré dans l'anneau. `align-items:baseline`
+   alignait le chiffre et son « % » sur la même ligne de base, ce qui
+   décalait l'ensemble vers le bas du cercle : on recentre, et le « % »
+   se relève par son propre décalage plutôt que par l'alignement du bloc. */
+.or-ring span{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  gap:1px;line-height:1;
+  font-size:11px;font-weight:700;color:var(--m3-on-surface);
+  font-variant-numeric:tabular-nums;
+}
+/* Le « % » suit le chiffre au lieu de flotter au-dessus : posé en
+   exposant il déséquilibrait le centre optique de l'anneau, surtout
+   sur une valeur à un seul caractère. */
+.or-ring span i{
+  font-style:normal;font-size:7.5px;font-weight:600;opacity:.7;
+  align-self:center;
+}
+
+/* Sélecteur de statut : posé en tête de carte, il ne doit pas peser
+   autant qu'un bouton de décision. */
+.or-sel{
+  flex:none;height:32px;padding:0 12px;
+  border-radius:999px;border:1px solid var(--m3-outline-var);
+  background:transparent;color:var(--m3-on-surface);
+  font:inherit;font-size:12px;cursor:pointer;
+}
+.or-sel:focus-visible{outline:2px solid var(--m3-primary);outline-offset:2px}
+
+/* Boutons de décision : pleine largeur en pied, l'action positive à
+   droite. Deux boutons de même poids obligeaient à lire deux fois pour
+   savoir lequel valide. */
+.or-acts,.or-reason-foot{
+  display:flex;gap:8px;justify-content:flex-end;
+  padding:13px 16px;margin-top:13px;
+}
+.or-btn{
+  height:34px;padding:0 16px;border-radius:999px;cursor:pointer;
+  font:inherit;font-size:12.5px;font-weight:500;
+  border:1px solid var(--m3-outline-var);background:transparent;
+  color:var(--m3-on-surf-var);
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+}
+.or-btn:hover{background:color-mix(in srgb,var(--m3-on-surface) 8%,transparent);color:var(--m3-on-surface)}
+.or-btn.is-ok{background:var(--m3-primary);border-color:transparent;color:var(--m3-on-primary)}
+.or-btn.is-ok:hover{filter:brightness(1.08);background:var(--m3-primary);color:var(--m3-on-primary)}
+.or-btn.is-rej:hover{border-color:var(--red);color:var(--red);background:transparent}
+.or-btn.is-send{background:var(--red);border-color:transparent;color:#fff}
+.or-btn.is-send:hover{filter:brightness(1.08);background:var(--red);color:#fff}
+
+/* Le texte doit pouvoir revenir à la ligne : un intitulé long sortait
+   de la carte au lieu de s'y plier. */
+.or-what{font-size:13.5px;color:var(--m3-on-surface);line-height:1.45;overflow-wrap:anywhere}
+.or-why{font-size:12px;color:var(--m3-on-surf-var);line-height:1.55;margin-top:5px;overflow-wrap:anywhere}
+.or-diff{font-size:12.5px;color:var(--m3-on-surface);line-height:1.5;margin-top:5px;overflow-wrap:anywhere}
+.or-diff s{color:var(--m3-on-surf-var)}
+.or-src{font-size:11px;color:var(--m3-on-surf-var);margin-left:8px}
+
+.or-when{font-size:11.5px;color:var(--m3-on-surf-var);margin-top:4px}
+
+/* Ce qui change, sous l'objectif. Une ligne par élément, précédée de sa
+   nature : c'est ce qui permet de lire « nouveau KPI » sans se demander
+   de quel objectif il relève. */
+/* Ce qui change : une liste, pas des pavés gris. Les blocs pleins
+   ressemblaient à des champs désactivés — on ne voyait pas que c'était
+   la substance de la demande. */
+.or-changes{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column}
+.or-changes li{
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  font-size:12.5px;color:var(--m3-on-surface);line-height:1.6;
+  padding:8px 0;overflow-wrap:anywhere;
+}
+.or-changes li + li{border-top:1px solid var(--m3-outline-var)}
+.or-changes s{color:var(--m3-on-surf-var);text-decoration-color:color-mix(in srgb,var(--m3-on-surf-var) 60%,transparent)}
+.or-changes b{font-weight:600}
+/* L'étiquette de nature tient dans une colonne fixe : les libellés
+   alignés, l'œil descend la liste sans zigzaguer. */
+.or-tag{
+  flex:none;width:74px;
+  font-size:9.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--m3-on-surf-var);
+}
+
+.or-sub{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.or-pill{
+  font-size:11px;color:var(--m3-on-surface);
+  background:var(--m3-surf-3);border-radius:999px;padding:3px 10px;
+  overflow-wrap:anywhere;
+}
+.or-pill.soft{color:var(--m3-on-surf-var);background:transparent;border:1px solid var(--m3-outline-var)}
+.or-issues{margin:10px 0 0;padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.or-issues li{font-size:11.5px;color:var(--m3-on-surf-var);line-height:1.5}
+
+.or-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:none}
+.or-rej{color:var(--red)}
+.or-none{font-size:13px;color:var(--m3-on-surf-var);padding:18px 0;text-align:center}
+
+/* Motif de refus : sous la ligne concernée, pour que l'admin garde sous
+   les yeux ce qu'il refuse pendant qu'il écrit pourquoi. */
+.or-reason{flex-basis:100%;margin-top:12px;padding-top:12px;border-top:1px solid var(--m3-outline-var)}
+.or-reason-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+
+/* Modale d'ouverture de session : remplace la file de prompt() du
+   navigateur, qui ne montrait jamais les champs ensemble. */
+.or-modal-d{font-size:12.5px;color:var(--m3-on-surf-var);line-height:1.6;margin-bottom:6px}
+.or-modal-dates{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.or-modal-imp{
+  display:flex;gap:10px;align-items:flex-start;margin-top:18px;
+  padding:13px 14px;border-radius:var(--m3-r-md,12px);
+  background:var(--m3-surf-1);font-size:12px;color:var(--m3-on-surf-var);
+  line-height:1.55;cursor:pointer;
+}
+[data-theme="dark"] .or-modal-imp{background:var(--m3-surf-2)}
+.or-modal-imp input{flex:none;margin-top:2px;width:15px;height:15px;accent-color:var(--m3-primary)}
+.or-modal-imp b{color:var(--m3-on-surface);font-weight:500}
+.or-modal-imp i{display:block;margin-top:4px;font-style:normal;opacity:.8}
+.or-modal-none{font-size:12px;color:var(--m3-on-surf-var);margin-top:16px}
+.or-modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* Le formulaire d'ajout d'un KPI ou d'un jalon est défini avec le reste
+   du bloc « Mes objectifs », plus haut. */
+
+@media (max-width:720px){
+  .or-row{flex-direction:column;gap:12px}
+  .or-acts{width:100%}
+  /* Sur une colonne étroite, 63 px d'alinéa coûtent plus de lisibilité
+     à l'intitulé qu'ils n'en gagnent en alignement : on revient au bord
+     de la carte. */
+  .or-row.is-full .or-body{padding-left:16px}
+}
+
+@media (max-width:1080px){
+  .myperf-grid{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .myperf-hero{grid-template-columns:1fr;gap:20px;padding:22px 18px;text-align:center}
+  .myperf-heroside{text-align:center}
+  .myperf-level-d{margin-left:auto;margin-right:auto}
+  .myperf-gauge,.myperf-steplabels{justify-content:center}
+  .myperf-stats{grid-template-columns:1fr}
+  /* L'anneau à 172 px déborde une colonne étroite une fois les marges
+     de la carte retirées. */
+  .myperf-ring{width:140px;height:140px}
+  .myperf-score{font-size:34px}
+  /* La barre d'identité passe sur deux lignes : le nom d'abord, le
+     statut et la sortie ensuite, plutôt que de sortir de l'écran. */
+  .myperf-idbar{padding:14px}
+  .myperf-idbar-sp{flex-basis:100%;height:0}
+  .myperf-sec{padding:18px 16px}
+  .myperf-hist{gap:5px}
+  /* La toile passe au-dessus du panneau latéral et se centre : à cette
+     largeur, la coller à gauche laisse une colonne vide à droite. */
+  .myperf-rdwrap{gap:16px;justify-content:center}
+  .myperf-rd{max-width:100%}
+  .myperf-rd-side{min-width:0;flex-basis:100%}
+}
+/* Les libellés de paliers ne tiennent plus côte à côte bien avant le
+   point de bascule de la grille : on garde les segments, qui suffisent. */
+@media (max-width:520px){
+  .myperf-steplabels{display:none}
+}
+
+
+/* ── Check : avis de l'assistant IA ─────────────────────────── */
+.or-btn.is-ai{border-color:var(--m3-primary,#C7000B);color:var(--m3-primary,#C7000B);background:transparent}
+.or-ai{margin:10px 0 4px;padding:12px 14px;border:1px solid var(--m3-outline-var,#E3E3E3);border-radius:12px;background:var(--m3-surf-1,#F8F9FA);font-size:13px;color:var(--m3-on-surface,#1F1F1F)}
+.or-ai.is-busy{color:var(--m3-on-surf-var,#5F6368);font-style:italic}
+.or-ai.is-err{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#C5221F;background:#FCE8E6;border-color:transparent}
+.or-ai-h{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.or-ai-v{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+.or-ai-v.is-ok{background:#E6F4EA;color:#1E8E3E}
+.or-ai-v.is-warn{background:#FEF7E0;color:#9A5B00}
+.or-ai-x{margin-left:auto;border:0;background:none;font-size:18px;line-height:1;cursor:pointer;color:var(--m3-on-surf-var,#5F6368)}
+.or-ai-r{margin:0 0 8px}
+.or-ai-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px 16px}
+.or-ai-st{font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--m3-on-surf-var,#5F6368);margin:8px 0 3px}
+.or-ai ul{margin:0;padding-left:18px}
+.or-ai-q{margin:0 0 6px;padding:8px 10px;border-left:3px solid var(--m3-primary,#C7000B);background:var(--m3-surface,#fff);border-radius:0 8px 8px 0}
+.or-ai-raw{line-height:1.5}
+.or-ai-meta{margin-top:8px;font-size:11px;color:var(--m3-on-surf-var,#5F6368)}
+[data-theme="dark"] .or-ai{background:#151517;border-color:rgba(255,255,255,.08);color:#E8EAED}
+[data-theme="dark"] .or-ai-q{background:#0E0E10}
+[data-theme="dark"] .or-ai.is-err{background:rgba(242,139,130,.12);color:#F28B82}
+[data-theme="dark"] .or-ai-v.is-ok{background:rgba(129,201,149,.12);color:#81C995}
+[data-theme="dark"] .or-ai-v.is-warn{background:rgba(253,214,99,.1);color:#FDD663}
+.or-ai-imp{margin:0 0 6px}
+.or-ai-imp em{color:var(--m3-on-surf-var,#5F6368);font-style:normal}
+.or-ai-n{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-right:6px;text-transform:capitalize}
+.or-ai-n.is-fort{background:#E6F4EA;color:#1E8E3E}.or-ai-n.is-moyen{background:#E8F0FE;color:#1A5FB4}.or-ai-n.is-faible{background:#F1F3F4;color:#5F6368}
+[data-theme="dark"] .or-ai-n.is-fort{background:rgba(129,201,149,.12);color:#81C995}
+[data-theme="dark"] .or-ai-n.is-moyen{background:rgba(138,180,248,.12);color:#8AB4F8}
+[data-theme="dark"] .or-ai-n.is-faible{background:rgba(255,255,255,.06);color:#BDC1C6}

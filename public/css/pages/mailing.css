@@ -1,0 +1,388 @@
+/* ══════════════════════════════════════════════════════════════
+   DIFFUSION (Admin › Diffusion)
+
+   Ordre de lecture = ordre d'usage : quatre cartes d'état (le serveur
+   marche-t-il, quand part le prochain, le dernier est-il parti), puis
+   les envois programmés et leur journal au centre. Les réglages qu'on
+   touche une fois — destinataires, serveur, test — vivent sur le côté.
+   Une seule barre d'enregistrement, flottante, n'apparaît que s'il y a
+   quelque chose à enregistrer.
+   ══════════════════════════════════════════════════════════════ */
+#page-mailing{
+  --ml-surf:var(--m3-surface,#fff);
+  --ml-surf-2:var(--m3-surf-1,#F8F9FA);
+  --ml-line:var(--m3-outline-var,#E3E3E3);
+  --ml-ink:var(--m3-on-surface,#1F1F1F);
+  --ml-mute:var(--m3-on-surf-var,#5F6368);
+  --ml-ok:#1E8E3E;--ml-ok-bg:#E6F4EA;
+  --ml-bad:#C5221F;--ml-bad-bg:#FCE8E6;
+  --ml-warn:#B06000;--ml-warn-bg:#FEF7E0;
+  --ml-pri:var(--m3-primary,#C7000B);
+  --ml-pri-cont:var(--m3-primary-cont,#FDECEC);
+  --ml-on-pri-cont:var(--m3-on-primary-cont,#8C0009);
+  padding-bottom:84px;
+}
+[data-theme="dark"] #page-mailing{
+  --ml-surf:var(--m3-surf-1,#0E0E10);
+  --ml-surf-2:var(--m3-surf-2,#151517);
+  --ml-line:rgba(255,255,255,.08);
+  --ml-ok:#81C995;--ml-ok-bg:rgba(129,201,149,.12);
+  --ml-bad:#F28B82;--ml-bad-bg:rgba(242,139,130,.12);
+  --ml-warn:#FDD663;--ml-warn-bg:rgba(253,214,99,.12);
+}
+#page-mailing .ml-muted{color:var(--ml-mute);font-weight:400}
+#page-mailing .ml-mono{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+  background:var(--ml-surf-2);padding:1px 5px;border-radius:4px;
+}
+
+/* ── Boutons ── */
+#page-mailing .ml-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:36px;padding:0 16px;border-radius:999px;border:none;cursor:pointer;
+  font:inherit;font-size:13px;font-weight:600;white-space:nowrap;flex-shrink:0;
+  transition:background .15s,box-shadow .15s,filter .15s;
+}
+#page-mailing .ml-btn:disabled{opacity:.55;cursor:default}
+#page-mailing .ml-btn-filled{background:var(--ml-pri);color:#fff}
+#page-mailing .ml-btn-filled:hover:not(:disabled){filter:brightness(1.08);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] #page-mailing .ml-btn-filled{color:#1A1A1A}
+#page-mailing .ml-btn-tonal{background:var(--ml-pri-cont);color:var(--ml-on-pri-cont)}
+#page-mailing .ml-btn-tonal:hover:not(:disabled){filter:brightness(.97)}
+#page-mailing .ml-btn-text{background:transparent;color:var(--ml-pri);padding:0 12px}
+#page-mailing .ml-btn-text:hover{background:var(--ml-pri-cont)}
+#page-mailing .ml-icon-btn{
+  width:34px;height:34px;display:inline-grid;place-items:center;flex-shrink:0;
+  border:none;border-radius:50%;background:transparent;color:var(--ml-mute);cursor:pointer;
+  transition:background .15s,color .15s;
+}
+#page-mailing .ml-icon-btn:hover:not(:disabled),
+#page-mailing .ml-icon-btn.is-on{background:var(--ml-surf-2);color:var(--ml-ink)}
+#page-mailing .ml-icon-btn.is-danger:hover{background:var(--ml-bad-bg);color:var(--ml-bad)}
+#page-mailing .ml-icon-btn:disabled{opacity:.35;cursor:default}
+#page-mailing .ml-icon-btn.is-busy svg{animation:ml-pulse 1s ease-in-out infinite}
+@keyframes ml-pulse{50%{transform:translate(2px,-2px);opacity:.4}}
+
+/* ── Cartes d'état ── */
+#page-mailing .ml-kpis{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;
+  margin:4px 0 16px;max-width:1360px;
+}
+#page-mailing .ml-kpi{
+  position:relative;padding:14px 16px 13px;border-radius:14px;min-width:0;
+  background:var(--ml-surf);border:1px solid var(--ml-line);overflow:hidden;
+}
+#page-mailing .ml-kpi[role="button"]{cursor:pointer;transition:border-color .15s}
+#page-mailing .ml-kpi[role="button"]:hover{border-color:var(--m3-outline,#C4C7C5)}
+/* L'état se lit par la pastille et la couleur du texte, pas par un
+   liseré latéral. */
+#page-mailing .ml-kpi.is-bad{background:var(--ml-bad-bg);border-color:transparent}
+#page-mailing .ml-kpi.is-warn .ml-kpi-s{color:var(--ml-warn)}
+#page-mailing .ml-kpi-l{
+  font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--ml-mute);
+}
+#page-mailing .ml-kpi-v{
+  display:flex;align-items:center;gap:8px;margin:6px 0 3px;
+  font-size:20px;font-weight:600;color:var(--ml-ink);font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#page-mailing .ml-kpi-v small{font-size:13px;font-weight:500;color:var(--ml-mute)}
+#page-mailing .ml-kpi-s{
+  font-size:12px;color:var(--ml-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#page-mailing .ml-kpi.is-bad .ml-kpi-s{color:var(--ml-bad)}
+#page-mailing .ml-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  background:var(--ml-mute);margin-right:6px;vertical-align:middle;
+}
+#page-mailing .ml-kpi-v .ml-dot{margin-right:0}
+#page-mailing .ml-dot.is-ok{background:var(--ml-ok);box-shadow:0 0 0 3px var(--ml-ok-bg)}
+#page-mailing .ml-dot.is-bad{background:var(--ml-bad);box-shadow:0 0 0 3px var(--ml-bad-bg)}
+
+/* ── Bandeau d'alerte ── */
+#page-mailing .ml-alert{
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;max-width:1360px;
+  margin:0 0 16px;padding:10px 12px 10px 16px;border-radius:12px;
+  background:var(--ml-bad-bg);color:var(--ml-bad);font-size:13px;line-height:1.5;
+}
+#page-mailing .ml-alert[hidden]{display:none}
+#page-mailing .ml-alert .ml-btn{margin-left:auto;height:30px;color:var(--ml-bad)}
+
+/* ── Mise en page ── */
+#page-mailing .ml-layout{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);
+  gap:16px;max-width:1360px;align-items:start;
+}
+#page-mailing .ml-main,#page-mailing .ml-side{display:flex;flex-direction:column;gap:16px;min-width:0}
+#page-mailing .ml-sec{
+  padding:18px 20px;border-radius:16px;background:var(--ml-surf);border:1px solid var(--ml-line);
+}
+#page-mailing .ml-sec-h{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;
+}
+#page-mailing .ml-sec-t{
+  font-size:15px;font-weight:600;margin:0;color:var(--ml-ink);border:none;padding:0;
+}
+#page-mailing .ml-sec-d{margin:3px 0 0;font-size:12px;color:var(--ml-mute);line-height:1.45}
+
+/* ── Envois programmés ── */
+#page-mailing #ml-schedules{display:flex;flex-direction:column;gap:10px}
+#page-mailing .ml-sc{
+  border:1px solid var(--ml-line);border-radius:14px;background:var(--ml-surf);
+  transition:border-color .15s,box-shadow .15s;
+}
+#page-mailing .ml-sc:hover{border-color:var(--m3-outline,#C4C7C5)}
+#page-mailing .ml-sc.is-open{border-color:var(--ml-pri);box-shadow:0 0 0 1px var(--ml-pri)}
+#page-mailing .ml-sc-top{display:flex;align-items:center;gap:14px;padding:14px 10px 14px 16px}
+#page-mailing .ml-sc-sum{flex:1;min-width:0;cursor:pointer}
+#page-mailing .ml-sc-title{font-size:14px;font-weight:600;color:var(--ml-ink)}
+#page-mailing .ml-sc-sub{font-size:12.5px;color:var(--ml-ink);margin-top:2px}
+#page-mailing .ml-sc-sub b{font-weight:600}
+#page-mailing .ml-sc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:8px}
+#page-mailing .ml-sc-next{font-size:12px;color:var(--ml-mute)}
+#page-mailing .ml-sc-next b{color:var(--ml-ink);font-weight:600}
+#page-mailing .ml-sc-next.is-off{font-style:italic}
+#page-mailing .ml-sc-next.is-new{color:var(--ml-warn);font-weight:600}
+#page-mailing .ml-sc-act{display:flex;gap:2px;flex-shrink:0}
+#page-mailing .ml-sc.is-off .ml-sc-title,
+#page-mailing .ml-sc.is-off .ml-sc-sub{color:var(--ml-mute)}
+#page-mailing .ml-sc-form{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;
+  padding:14px 16px 16px;border-top:1px solid var(--ml-line);background:var(--ml-surf-2);
+  border-radius:0 0 13px 13px;
+}
+#page-mailing .ml-pill{
+  display:inline-flex;align-items:center;gap:4px;padding:2px 9px 2px 7px;border-radius:999px;
+  font-size:11.5px;font-weight:600;background:var(--ml-surf-2);color:var(--ml-mute);white-space:nowrap;
+}
+#page-mailing .ml-pill.is-ok{background:var(--ml-ok-bg);color:var(--ml-ok)}
+#page-mailing .ml-pill.is-bad{background:var(--ml-bad-bg);color:var(--ml-bad)}
+
+/* Interrupteur Material : l'état actif/pause se lit à distance. */
+#page-mailing .ml-switch{position:relative;display:inline-block;width:40px;height:24px;flex-shrink:0;cursor:pointer}
+#page-mailing .ml-switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+#page-mailing .ml-switch span{
+  position:absolute;inset:0;border-radius:999px;background:var(--ml-surf-2);
+  border:2px solid var(--m3-outline,#8E918F);transition:background .2s,border-color .2s;
+}
+#page-mailing .ml-switch span::after{
+  content:'';position:absolute;top:50%;left:4px;width:12px;height:12px;border-radius:50%;
+  background:var(--m3-outline,#8E918F);transform:translateY(-50%);
+  transition:left .2s var(--m3-ease,ease),width .2s,height .2s,background .2s;
+}
+#page-mailing .ml-switch input:checked + span{background:var(--ml-pri);border-color:var(--ml-pri)}
+#page-mailing .ml-switch input:checked + span::after{left:18px;width:16px;height:16px;background:#fff}
+#page-mailing .ml-switch input:focus-visible + span{outline:2px solid var(--ml-pri);outline-offset:2px}
+
+/* ── Champs ── */
+#page-mailing .ml-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+#page-mailing .ml-f{
+  display:flex;flex-direction:column;gap:5px;min-width:0;
+  font-size:11.5px;font-weight:600;color:var(--ml-mute);
+}
+#page-mailing .ml-grid .ml-f-wide{grid-column:span 2}
+#page-mailing .ml-grid .ml-f-full{grid-column:1/-1}
+#page-mailing .ml-f .form-control{width:100%}
+#page-mailing .ml-hint{font-size:12px;line-height:1.5;color:var(--ml-mute);margin:10px 0 0}
+#page-mailing .ml-hint:empty{display:none}
+#page-mailing .ml-hint[data-tone="ok"]{color:var(--ml-ok);font-weight:600}
+#page-mailing .ml-hint[data-tone="bad"]{color:var(--ml-bad);font-weight:600}
+
+/* Section repliable (serveur) : l'en-tête reste un titre de section. */
+#page-mailing .ml-fold > summary{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  list-style:none;cursor:pointer;
+}
+#page-mailing .ml-fold > summary::-webkit-details-marker{display:none}
+#page-mailing .ml-chev{color:var(--ml-mute);transition:transform .2s;flex-shrink:0}
+#page-mailing .ml-fold[open] .ml-chev{transform:rotate(180deg)}
+#page-mailing .ml-help{margin-top:12px;font-size:12px}
+#page-mailing .ml-help summary{cursor:pointer;color:var(--ml-pri);font-weight:600;list-style:none;padding:4px 0}
+#page-mailing .ml-help summary::-webkit-details-marker{display:none}
+#page-mailing .ml-help summary::before{content:'▸ ';font-size:10px}
+#page-mailing .ml-help[open] summary::before{content:'▾ '}
+#page-mailing .ml-help p{
+  margin:6px 0 0;line-height:1.6;color:var(--ml-mute);
+  padding:10px 12px;border-radius:10px;background:var(--ml-surf-2);
+}
+
+/* ── Test ── */
+#page-mailing .ml-test{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#page-mailing .ml-test #ml-test-to{grid-column:1/-1}
+#page-mailing .ml-test .ml-btn{height:auto;min-height:36px}
+
+/* ── Groupes : adresses en puces ── */
+#page-mailing #ml-groups{display:flex;flex-direction:column;gap:10px}
+#page-mailing .ml-gp{border:1px solid var(--ml-line);border-radius:12px;padding:8px 6px 10px 12px}
+#page-mailing .ml-gp-h{display:flex;align-items:center;gap:6px}
+#page-mailing .ml-gp-name{
+  flex:1;min-width:0;border:none;background:transparent;font:inherit;font-size:13.5px;
+  font-weight:600;color:var(--ml-ink);padding:6px 6px;margin-left:-6px;border-radius:6px;
+}
+#page-mailing .ml-gp-name:hover{background:var(--ml-surf-2)}
+#page-mailing .ml-gp-name:focus{outline:2px solid var(--ml-pri);background:var(--ml-surf)}
+#page-mailing .ml-gp-n{font-size:11.5px;white-space:nowrap}
+#page-mailing .ml-chips{
+  display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 6px 0 0;
+  padding:6px;border-radius:10px;background:var(--ml-surf-2);cursor:text;min-height:40px;
+}
+#page-mailing .ml-chip{
+  display:inline-flex;align-items:center;gap:2px;max-width:100%;
+  padding:3px 3px 3px 10px;border-radius:999px;font-size:12px;
+  background:var(--ml-surf);border:1px solid var(--ml-line);color:var(--ml-ink);
+  overflow-wrap:anywhere;
+}
+#page-mailing .ml-chip.is-bad{border-color:var(--ml-bad);color:var(--ml-bad);background:var(--ml-bad-bg)}
+#page-mailing .ml-chip button{
+  display:grid;place-items:center;width:20px;height:20px;border:none;border-radius:50%;
+  background:transparent;color:var(--ml-mute);cursor:pointer;flex-shrink:0;
+}
+#page-mailing .ml-chip button:hover{background:var(--ml-surf-2);color:var(--ml-ink)}
+#page-mailing .ml-chip-in{
+  flex:1 1 140px;min-width:120px;border:none;background:transparent;font:inherit;font-size:12.5px;
+  color:var(--ml-ink);padding:4px;outline:none;
+}
+
+/* ── Journal ── */
+#page-mailing .ml-log-tools{display:flex;align-items:center;gap:6px;flex-shrink:0}
+#page-mailing .ml-seg{display:inline-flex;padding:3px;border-radius:999px;background:var(--ml-surf-2)}
+#page-mailing .ml-seg button{
+  display:inline-flex;align-items:center;gap:5px;
+  border:none;background:transparent;font:inherit;font-size:12px;font-weight:600;
+  color:var(--ml-mute);padding:5px 12px;border-radius:999px;cursor:pointer;
+}
+#page-mailing .ml-seg button.is-on{background:var(--ml-surf);color:var(--ml-ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+#page-mailing .ml-seg-n{
+  font-size:10.5px;padding:0 6px;border-radius:999px;background:var(--ml-bad);color:#fff;line-height:16px;
+}
+#page-mailing .ml-lg-day{
+  font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--ml-mute);
+  padding:14px 4px 6px;
+}
+#page-mailing .ml-lg-day:first-child{padding-top:0}
+#page-mailing .ml-lg-day::first-letter{text-transform:uppercase}
+#page-mailing .ml-lg{
+  display:flex;align-items:flex-start;gap:12px;padding:10px 10px;border-radius:10px;
+}
+#page-mailing .ml-lg:hover{background:var(--ml-surf-2)}
+#page-mailing .ml-lg + .ml-lg{box-shadow:0 -1px 0 var(--ml-line)}
+#page-mailing .ml-lg:hover + .ml-lg{box-shadow:none}
+#page-mailing .ml-lg-ic{
+  width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;margin-top:1px;
+  background:var(--ml-ok-bg);color:var(--ml-ok);
+}
+#page-mailing .ml-lg.is-ko .ml-lg-ic{background:var(--ml-bad-bg);color:var(--ml-bad)}
+#page-mailing .ml-lg-main{flex:1;min-width:0}
+#page-mailing .ml-lg-t{
+  display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:13px;color:var(--ml-ink);
+}
+#page-mailing .ml-lg-t b{font-weight:600}
+#page-mailing .ml-lg-s{
+  display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:2px;font-size:12px;color:var(--ml-mute);
+  overflow-wrap:anywhere;
+}
+#page-mailing .ml-lg-file{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;opacity:.85}
+#page-mailing .ml-lg-err{
+  margin-top:6px;padding:6px 10px;border-radius:8px;font-size:12px;line-height:1.45;
+  background:var(--ml-bad-bg);color:var(--ml-bad);overflow-wrap:anywhere;
+}
+#page-mailing .ml-lg-time{
+  flex-shrink:0;font-size:12px;font-weight:600;color:var(--ml-mute);font-variant-numeric:tabular-nums;margin-top:3px;
+}
+#page-mailing .ml-org{
+  display:inline-block;padding:1px 8px;border-radius:999px;font-size:10.5px;font-weight:600;letter-spacing:.2px;
+}
+#page-mailing .ml-org-auto{background:var(--ml-ok-bg);color:var(--ml-ok)}
+#page-mailing .ml-org-manual{background:var(--ml-pri-cont);color:var(--ml-on-pri-cont)}
+#page-mailing .ml-org-test{background:var(--ml-surf-2);color:var(--ml-mute)}
+#page-mailing #ml-log{max-height:560px;overflow-y:auto;margin:0 -6px;padding:0 6px}
+
+/* ── États vides ── */
+#page-mailing .ml-empty{
+  display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;
+  padding:28px 16px;border:1.5px dashed var(--ml-line);border-radius:14px;
+  font-size:12.5px;color:var(--ml-mute);
+}
+#page-mailing .ml-empty b{font-size:13.5px;color:var(--ml-ink);font-weight:600}
+#page-mailing .ml-empty .ml-btn{margin-top:8px}
+#page-mailing .ml-empty-sm{padding:16px 12px;border-style:solid;border-width:0;background:var(--ml-surf-2)}
+#page-mailing .ml-empty.is-bad{color:var(--ml-bad);background:var(--ml-bad-bg)}
+
+/* ── Barre d'enregistrement ── */
+#page-mailing .ml-savebar{
+  position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  z-index:60;display:flex;align-items:center;gap:8px;
+  padding:8px 8px 8px 18px;border-radius:999px;max-width:calc(100vw - 32px);
+  background:var(--m3-on-surface,#1F1F1F);color:var(--m3-surface,#fff);
+  box-shadow:0 6px 24px rgba(0,0,0,.22),0 2px 6px rgba(0,0,0,.12);
+  animation:ml-rise .22s var(--m3-ease,ease);
+}
+#page-mailing .ml-savebar[hidden]{display:none}
+#page-mailing .ml-savebar-t{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;margin-right:8px;white-space:nowrap}
+#page-mailing .ml-savebar .ml-btn-text{color:inherit;opacity:.85}
+#page-mailing .ml-savebar .ml-btn-text:hover{background:rgba(127,127,127,.2);opacity:1}
+@keyframes ml-rise{from{opacity:0;transform:translate(-50%,12px)}}
+
+/* ── Responsive ── */
+@media (max-width:1180px){
+  #page-mailing .ml-layout{grid-template-columns:1fr}
+  #page-mailing .ml-side{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start}
+}
+@media (max-width:900px){
+  #page-mailing .ml-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:620px){
+  #page-mailing .ml-sec{padding:16px 14px}
+  #page-mailing .ml-sec-h{flex-wrap:wrap}
+  #page-mailing .ml-sc-top{flex-wrap:wrap;gap:10px 12px;padding:12px}
+  #page-mailing .ml-sc-sum{flex:1 1 calc(100% - 60px)}
+  #page-mailing .ml-sc-act{width:100%;justify-content:flex-end;border-top:1px solid var(--ml-line);padding-top:6px}
+  #page-mailing .ml-grid{grid-template-columns:1fr}
+  #page-mailing .ml-grid .ml-f-wide{grid-column:auto}
+  #page-mailing .ml-lg{flex-wrap:wrap}
+  #page-mailing .ml-lg-time{order:-1;margin-left:auto}
+  #page-mailing .ml-savebar-t{display:none}
+}
+
+#page-mailing .ml-sc-form .ml-f-subject{grid-column:1/-1}
+#page-mailing .ml-subj-help{font-size:11px;font-weight:400;color:var(--ml-mute);line-height:1.5}
+#page-mailing .ml-subj-help code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;
+  background:var(--ml-surf);border:1px solid var(--ml-line);padding:0 4px;border-radius:4px;
+}
+#page-mailing .ml-subj-help b{color:var(--ml-ink);font-weight:600}
+#page-mailing .ml-sc-subj{
+  font-size:12px;color:var(--ml-mute);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* ── Relances, alerte, aperçu ── */
+#page-mailing .ml-pill.is-warn{background:var(--ml-warn-bg);color:var(--ml-warn)}
+#page-mailing .ml-org-retry{background:var(--ml-warn-bg);color:var(--ml-warn)}
+#page-mailing .ml-org-alert{background:var(--ml-bad-bg);color:var(--ml-bad)}
+
+/* Aperçu : l'objet, les destinataires et la pièce jointe en tête, puis le
+   corps du mail dans un cadre isolé, sur fond blanc comme dans une
+   messagerie — le mail est conçu pour un fond clair, même en thème sombre. */
+#page-mailing .ml-modal{
+  position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+  padding:24px 16px;background:rgba(0,0,0,.45);
+}
+#page-mailing .ml-modal[hidden]{display:none}
+#page-mailing .ml-modal-box{
+  width:min(960px,100%);max-height:calc(100vh - 48px);display:flex;flex-direction:column;
+  background:var(--ml-surf);border-radius:16px;overflow:hidden;
+  box-shadow:0 12px 40px rgba(0,0,0,.3);
+}
+#page-mailing .ml-modal-h{
+  display:flex;align-items:flex-start;gap:12px;padding:16px 18px;border-bottom:1px solid var(--ml-line);
+}
+#page-mailing .ml-modal-meta{flex:1;min-width:0}
+#page-mailing .ml-pv-l{font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--ml-mute)}
+#page-mailing .ml-pv-subject{font-size:16px;font-weight:600;color:var(--ml-ink);margin:2px 0 8px;overflow-wrap:anywhere}
+#page-mailing .ml-pv-row{font-size:12.5px;color:var(--ml-ink);margin-top:2px;overflow-wrap:anywhere}
+#page-mailing .ml-pv-row .ml-pv-l{margin-right:6px}
+#page-mailing .ml-pv-frame{flex:1;min-height:60vh;width:100%;border:0;background:#fff}
+
+/* Pays de l'envoi, à côté du nom du rapport. */
+#page-mailing .ml-pill-pays{margin-left:6px;vertical-align:2px;font-size:10.5px;font-weight:700;letter-spacing:.3px;padding:1px 7px}

@@ -1,0 +1,57 @@
+/* ══════════════════════════════════════════════
+   TABLE
+══════════════════════════════════════════════ */
+.table-header{display:flex;align-items:flex-start;flex-direction:column-reverse;margin-bottom:18px;gap:12px}
+.table-filters{display:flex;gap:8px;flex-wrap:wrap;width:100%}
+
+/* Observations header - action row (count à gauche, bouton à droite) puis filtres */
+.obs-header{display:flex;flex-direction:column;gap:16px;margin-bottom:20px}
+.obs-header-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.obs-count{font-size:13px;color:var(--mute);font-weight:500}
+.table-actions{display:flex;gap:8px;flex-shrink:0}
+
+#country-toggle{display:flex;align-items:center;gap:2px;padding:3px;border-radius:9px;background:var(--bg2);border:1px solid var(--tb-line)}
+.country-toggle-btn{display:flex;align-items:center;gap:6px;border:none;background:transparent;padding:5px 11px;border-radius:7px;cursor:pointer;font-size:11.5px;font-weight:600;color:var(--mute);transition:background .15s,box-shadow .15s,color .15s}
+.country-toggle-btn:hover{color:var(--dark)}
+.country-toggle-btn.active{background:var(--tb-bg);color:var(--dark);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+/* Les styles de Weekly Progress vivent désormais dans le bloc
+   Material 3 dédié à #page-weekly-progress (préfixe .wp-). */
+
+/* Kanban board */
+.kanban-board{display:flex;gap:14px;align-items:flex-start;overflow-x:auto;padding-bottom:4px}
+.kanban-col{flex:1;min-width:250px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px;transition:background .2s}
+.kanban-col-head{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin-bottom:12px;padding:0 2px}
+.kanban-col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kanban-col-title{flex:1}
+.kanban-count{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:1px 9px;font-size:10.5px;font-weight:700;color:var(--mid)}
+.kanban-card{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--r);
+  padding:11px 13px;margin-bottom:8px;cursor:pointer;font-size:12.5px;line-height:1.45;
+  box-shadow:var(--sh-xs);transition:box-shadow .15s,border-color .15s,transform .1s;
+}
+.kanban-card:hover{border-color:var(--accent);box-shadow:var(--sh-sm);transform:translateY(-1px)}
+.kanban-card-meta{font-size:10px;color:var(--mute);margin-bottom:5px;font-family:'JetBrains Mono',monospace}
+.kanban-empty{font-size:11px;color:var(--mute);padding:14px 6px;text-align:center;border:1px dashed var(--line);border-radius:var(--r-sm)}
+
+/* Status (Done vs Delayed) columns */
+.kanban-col.is-done-col{background:var(--ok-bg)}
+.kanban-col.is-delayed-col{background:var(--p1-bg)}
+
+.rpt-layout{display:flex;gap:20px;align-items:flex-start}
+.rpt-main{flex:1;min-width:0}
+
+/* Barre d'outils des rapports : ligne propre sous le bloc titre, comme la
+   barre de période du dashboard. Navigation à gauche, exports à droite. */
+.rpt-toolbar{
+  display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;
+}
+.rpt-nav,.rpt-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rpt-actions{margin-left:auto}
+/* Dans .page-header le sous-titre ne porte plus sa marge basse : c'est
+   l'en-tête qui espace, sinon les deux s'additionnaient. */
+.page-header .page-sub{margin-bottom:0}
+@media(max-width:640px){
+  .rpt-actions{margin-left:0}
+}
+
