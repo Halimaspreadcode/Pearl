@@ -111,7 +111,7 @@ router.get('/api/export', requireAdmin, (req, res) => {
     observations: readObs(), audit: readAudit(), config
   };
   const date = new Date().toISOString().slice(0,10);
-  res.setHeader('Content-Disposition', `attachment; filename="emoc-data-${date}.json"`);
+  res.setHeader('Content-Disposition', `attachment; filename="pearl-data-${date}.json"`);
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(data, null, 2));
 });

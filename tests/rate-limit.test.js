@@ -12,7 +12,7 @@ before(async () => {
   base = `http://127.0.0.1:${srv.address().port}`;
 });
 after(() => srv.close());
-const essai = (id, ok = false) => fetch(`${base}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ huaweiId: id, ok }) }).then(r => r.status);
+const essai = (id, ok = false) => fetch(`${base}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ employeeId: id, ok }) }).then(r => r.status);
 
 test('les connexions réussies ne rapprochent pas du blocage', async () => {
   for (let i = 0; i < 40; i++) assert.equal(await essai('a00000009', true), 200);

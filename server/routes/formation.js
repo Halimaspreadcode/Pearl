@@ -8,7 +8,7 @@ const router = express.Router();
 // ── FORMATIONS (DigitalView, Process ITSM) ────────────────────
 // La formation (public/formation/digitalview.html) enregistre sa
 // progression ici, par agent, via le pont qui lui tient lieu de
-// window.claude (digitalview-bridge.js). Clé = ID Huawei de l'agent, en
+// window.claude (digitalview-bridge.js). Clé = ID employé de l'agent, en
 // minuscules — celui de son identification dans l'app.
 //
 // Le contenu est l'état de la formation tel quel (leçons faites, position,

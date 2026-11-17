@@ -97,7 +97,7 @@ const apiRateLimit = rateLimit({
     const now = Date.now();
     if (now - _dernierAvis > 60 * 1000) {
       _dernierAvis = now;
-      console.warn(`[EMOC] Limite de requêtes atteinte (${cleSession(req) ? 'session' : 'adresse ' + req.ip}) sur ${req.originalUrl.split('?')[0]}.`);
+      console.warn(`[Pearl] Limite de requêtes atteinte (${cleSession(req) ? 'session' : 'adresse ' + req.ip}) sur ${req.originalUrl.split('?')[0]}.`);
     }
     res.status(options.statusCode).json(options.message);
   },
@@ -107,7 +107,7 @@ let _dernierAvis = 0;
 // Mots de passe et codes : seuls les ÉCHECS comptent (une connexion réussie
 // ne rapproche plus du blocage — la session Performance expirant toutes les
 // 30 min, un agent qui se reconnectait souvent finissait bloqué), et le
-// plafond vise le COMPTE saisi (ID Huawei), quel que soit le poste : 10
+// plafond vise le COMPTE saisi (ID employé), quel que soit le poste : 10
 // codes faux bloquent ce compte 15 min, sans toucher aux collègues derrière
 // la même adresse. L'admin peut le débloquer (Codes personnels › Débloquer).
 // Un filet large par adresse reste en place contre le balayage de comptes.
@@ -121,7 +121,7 @@ const authParAdresse = rateLimit({
   message: { error: 'Trop d\'essais depuis ce poste. Réessaie dans 15 minutes.' },
 });
 function cleCompte(req) {
-  const id = String(req.body?.huaweiId || '').trim().toLowerCase();
+  const id = String(req.body?.employeeId || '').trim().toLowerCase();
   return id ? `id:${id}` : `ip:${ipKeyGenerator(req.ip || '')}`;
 }
 const authParCompte = rateLimit({
@@ -134,8 +134,8 @@ const authParCompte = rateLimit({
   message: { error: 'Trop de codes erronés pour cet identifiant : compte bloqué 15 minutes. L\'admin peut le débloquer.' },
 });
 // Débloque un identifiant (route admin, routes/fo-access.js).
-function debloquerCompte(huaweiId) {
-  const id = String(huaweiId || '').trim().toLowerCase();
+function debloquerCompte(employeeId) {
+  const id = String(employeeId || '').trim().toLowerCase();
   if (id) return authParCompte.resetKey(`id:${id}`);
 }
 const authLimiter = (req, res, next) => authParAdresse(req, res, err => err ? next(err) : authParCompte(req, res, next));

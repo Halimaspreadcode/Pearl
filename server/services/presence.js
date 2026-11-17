@@ -3,7 +3,7 @@ const { readBO, readCfg } = require('../core/store');
 // ── PRESENCE (who is online right now) ────────────────────────
 // Volatile on purpose: presence is a live signal, not a record. It lives in
 // memory only, so a restart simply empties it and clients repopulate it on
-// their next ping. Keyed by huaweiId when available (a user may open several
+// their next ping. Keyed by employeeId when available (a user may open several
 // tabs), falling back to the name.
 const PRESENCE_TTL_MS   = 90 * 1000;  // a client is "online" if seen within 90s
 const PRESENCE_SWEEP_MS = 60 * 1000;

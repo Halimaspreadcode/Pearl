@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════
-// RÉSULTATS ÉPINGLÉS SUR L'ACCUEIL DE BIG BROTHER
+// RÉSULTATS ÉPINGLÉS SUR L'ACCUEIL DE PEARL AI
 //
 // Une réponse de skill épinglée devient un widget de l'accueil : elle
 // survit au rechargement de la page (data/ai_pins.json), se relance avec

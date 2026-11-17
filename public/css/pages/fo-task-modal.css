@@ -376,7 +376,7 @@ table:has(.rpt-in) tbody tr:last-child td{border-bottom:none}
 
 /* ── Écrans épinglés ──────────────────────────────────────────
    Les raccourcis suivent le profil (stockés côté serveur sur l'ID
-   Huawei), pas le poste : un agent qui change de machine retrouve les
+   employé), pas le poste : un agent qui change de machine retrouve les
    siens. */
 .sidebar-section-pin{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .pin-hint-ico{width:12px;height:12px;opacity:.45;flex-shrink:0}

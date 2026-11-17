@@ -104,8 +104,8 @@ function renderFOHandover() {
   const incomingFOs = currentFONames.length > 0 ? currentFONames : (state.config?.fo_list || []).slice().sort();
 
   // Handover confirmé — persisté par shift+date
-  const hbKey = `emoc_hb_from_${current.date}_${current.id}`;
-  const vpKey = `emoc_hb_vp_${current.date}_${current.id}`;
+  const hbKey = `pearl_hb_from_${current.date}_${current.id}`;
+  const vpKey = `pearl_hb_vp_${current.date}_${current.id}`;
   const selFrom = localStorage.getItem(hbKey) || '';
   const selFO   = localStorage.getItem(vpKey)  || '';
 

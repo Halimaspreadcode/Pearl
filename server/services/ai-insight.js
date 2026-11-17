@@ -2,7 +2,7 @@ const { FILES } = require('../config/paths');
 const { readCfg, readJSON, writeJSON, withFileLock, writeCfg } = require('../core/store');
 
 // ══════════════════════════════════════════════════════════════
-// INSIGHT DE PERFORMANCE POUR L'AGENT (Big Brother)
+// INSIGHT DE PERFORMANCE POUR L'AGENT (Pearl AI)
 //
 // L'agent lit, sur sa page My Performance, une lecture courte de sa
 // propre fiche : ce qui va bien, où gagner des points, la prochaine étape.
@@ -11,7 +11,7 @@ const { readCfg, readJSON, writeJSON, withFileLock, writeCfg } = require('../cor
 // une passe toutes les 20 minutes, et dès que l'admin active un agent.
 // Une passe traite, dans l'ordre, les agents activés dont l'insight du
 // mois manque, ou dont la fiche a changé depuis le dernier insight (au
-// plus un par jour). Si Big Brother est injoignable (tunnel éteint), la
+// plus un par jour). Si Pearl AI est injoignable (tunnel éteint), la
 // passe s'arrête et les agents restants attendent la suivante. L'admin
 // voit l'état de chaque agent et peut lancer une passe ou un agent.
 //
@@ -163,7 +163,7 @@ async function genererPour(fo, { force } = {}) {
   const r = await chat([{ role: 'user', content: `Scorecard:\n${JSON.stringify(st.fiche)}` }],
     { system: SYSTEM, max_tokens: 3000, temperature: 0.4, max_chars: 16000 });
   const data = lireJson(r.content);
-  if (!data || !data.headline) { const e = new Error('Réponse de Big Brother illisible.'); e.status = 502; throw e; }
+  if (!data || !data.headline) { const e = new Error('Réponse de Pearl AI illisible.'); e.status = 502; throw e; }
   const entree = { id: `i${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, periode: st.v.periode, at: new Date().toISOString(), data, model: r.model, empreinte: st.emp };
   // On ajoute, on n'écrase pas : chaque insight reste consultable.
   await withFileLock(FILES.ai_insights, () => {
@@ -201,10 +201,10 @@ function lancerPasse({ fo, force } = {}) {
       } catch (e) {
         JOB.etats[x] = { etat: 'echec', at: new Date().toISOString(), erreur: String(e.message).slice(0, 160) };
         console.error('[ai] insight', x, ':', e.message);
-        // Big Brother injoignable : inutile d'insister sur les suivants.
+        // Pearl AI injoignable : inutile d'insister sur les suivants.
         if (RESEAU.test(e.message)) {
-          JOB.motif = 'Big Brother injoignable (tunnel éteint ?) : la passe reprendra plus tard.';
-          liste.slice(i + 1).forEach(y => { JOB.etats[y] = { etat: 'attente', at: null, erreur: 'Big Brother injoignable' }; });
+          JOB.motif = 'Pearl AI injoignable (tunnel éteint ?) : la passe reprendra plus tard.';
+          liste.slice(i + 1).forEach(y => { JOB.etats[y] = { etat: 'attente', at: null, erreur: 'Pearl AI injoignable' }; });
           break;
         }
       }

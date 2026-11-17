@@ -126,7 +126,7 @@ function onSectionDrop(reportType, targetKey, ev) {
   if (typeof fn === 'function') fn();
 }
 
-const RPT_AUTHORS = ['Halima GUEYE - Front Office Leader', 'Steven TOME - Front Office Leader'];
+const RPT_AUTHORS = [];   // signataires connus (« Nom - Fonction »), par organisation
 const RPT_AUTHOR_INPUT_IDS = { daily: 'daily-author', weekly: 'wk-author', monthly: 'mo-author' };
 
 // Who signs a report by default. Previously hard-coded to one name, so every

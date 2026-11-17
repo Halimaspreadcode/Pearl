@@ -35,11 +35,11 @@ function backupData() {
       fs.copyFileSync(src, path.join(dest, f));
       n++;
     }
-    console.log(`[EMOC] Sauvegarde ${day} : ${n} fichier(s) → ${dest}`);
+    console.log(`[Pearl] Sauvegarde ${day} : ${n} fichier(s) → ${dest}`);
     pruneBackups();
   } catch (err) {
     // Une sauvegarde ratée ne doit jamais empêcher l'app de tourner.
-    console.error('[EMOC] Sauvegarde impossible :', err.message);
+    console.error('[Pearl] Sauvegarde impossible :', err.message);
   }
 }
 
@@ -53,7 +53,7 @@ function pruneBackups() {
   for (const old of dirs.slice(0, Math.max(0, dirs.length - BACKUP_RETENTION))) {
     try {
       fs.rmSync(path.join(BACKUPS_DIR, old), { recursive: true, force: true });
-      console.log(`[EMOC] Expired backup removed: ${old}`);
+      console.log(`[Pearl] Expired backup removed: ${old}`);
     } catch { /* on réessaiera au prochain passage */ }
   }
 }

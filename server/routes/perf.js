@@ -15,11 +15,11 @@ const router = express.Router();
 
 // Ouverture d'une session FO. Le rate-limit est celui des autres écrans
 // d'authentification : un code à 8 caractères doit rester coûteux à
-// deviner, même en connaissant l'ID Huawei de la personne.
+// deviner, même en connaissant l'ID employé de la personne.
 router.post('/api/fo-access/login', authLimiter, (req, res) => {
-  const huaweiId = String(req.body?.huaweiId || '').trim().toLowerCase();
+  const employeeId = String(req.body?.employeeId || '').trim().toLowerCase();
   const code     = String(req.body?.code     || '').trim();
-  if (!huaweiId || !code)
+  if (!employeeId || !code)
     return res.status(400).json({ error: 'ID and code are required.' });
 
   const codes = foAccessCodes();
@@ -27,7 +27,7 @@ router.post('/api/fo-access/login', authLimiter, (req, res) => {
   // message d'erreur reste le même dans les deux cas : distinguer
   // « ID inconnu » de « code faux » dirait quels ID existent.
   const entry = Object.entries(codes)
-    .find(([, v]) => String(v?.huawei_id || '').toLowerCase() === huaweiId);
+    .find(([, v]) => String(v?.employee_id || '').toLowerCase() === employeeId);
 
   const norme = code.replace(/[\s-]+/g, '').toUpperCase();   // saisie en minuscules acceptée
   if (!entry || !entry[1]?.hash || !(bcrypt.compareSync(code, entry[1].hash)
@@ -36,12 +36,12 @@ router.post('/api/fo-access/login', authLimiter, (req, res) => {
 
   const { token, expires_in } = issueFoSession(entry[0]);
   // Même code, même personne : la connexion à Ma performance ouvre aussi la
-  // session nominative de FOps (auth/identity.js), sauf si une autre
+  // session nominative de Pearl (auth/identity.js), sauf si une autre
   // personne est déjà connectée sur ce navigateur.
   const team = require('../auth/team-gate');
   const cur = team.sessionEquipe(req);
   if (!cur || !cur.qui?.name)
-    team.ouvrirSession(res, req, { name: entry[0], huaweiId: entry[1].huawei_id, role: require('../auth/identity').roleDe(entry[0]) });
+    team.ouvrirSession(res, req, { name: entry[0], employeeId: entry[1].employee_id, role: require('../auth/identity').roleDe(entry[0]) });
   addAudit('perf', entry[0], entry[0], 'consult-login', {});
   res.json({ ok: true, token, expires_in, fo: entry[0] });
 });

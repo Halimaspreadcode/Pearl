@@ -60,7 +60,7 @@ function revalidateStoredIdentity(tries = 0) {
   // Observateur. Seules les identités inventées (« sddd ») sont chassées.
   const nameOk = known.some(n => n.toLowerCase() === stored.toLowerCase())
               || _isPlausibleName(stored);
-  const idOk   = /^[a-zA-Z]{1,2}\d{7,8}$/.test(currentUser?.huaweiId || '');
+  const idOk   = /^[a-zA-Z]{1,2}\d{7,8}$/.test(currentUser?.employeeId || '');
   if (nameOk && idOk) return;
 
   stopPresence();

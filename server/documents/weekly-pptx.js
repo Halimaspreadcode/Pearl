@@ -23,7 +23,7 @@
 
 const PptxGenJS = require('pptxgenjs');
 
-// Palette : rouge de marque Huawei en accent, sur une structure Material
+// Palette : couleur de marque en accent, sur une structure Material
 // (surfaces claires, neutres gris, ombres douces). Sans le '#' :
 // PptxGenJS attend des hex nus.
 //
@@ -32,7 +32,7 @@ const PptxGenJS = require('pptxgenjs');
 //   · `red`   (#D93025) porte le signal d'alerte — SLA rompu, breach.
 // Les confondre ferait lire toute slide de marque comme une alerte.
 const C = {
-  brand:     'CF0A2C',  // rouge Huawei, accent d'identité
+  brand:     'CF0A2C',  // accent d'identité
   brandDark: '9E0821',
   brandSoft: 'FDE8EC',
   blue:      '1A73E8',  // conservé pour les séries de données neutres
@@ -64,7 +64,7 @@ const SEV_C    = { critical: C.red, major: C.amber, minor: C.blue, warning: C.fa
 // Rang de tri : P1 avant P2, etc. Une priorité absente passe en dernier.
 const PRIO_RANK = { P1: 0, P2: 1, P3: 2, P4: 3 };
 // Séquence catégorielle : le rouge de marque ouvre la série (la catégorie
-// dominante porte l'accent Huawei), puis des teintes distinctes en teinte
+// dominante porte l’accent de marque), puis des teintes distinctes en teinte
 // et en clarté pour rester lisibles côte à côte et en niveaux de gris.
 const DOMAIN_C = [C.brand, '1A73E8', '12B5CB', 'F9AB00', '1E8E3E', '9334E6'];
 
@@ -391,7 +391,7 @@ function slideFooter(slide, n, total, ville) {
   slide.addShape('rect', {
     x: M, y: 6.9, w: CW, h: 0.01, fill: { color: C.line }, line: { type: 'none' },
   });
-  slide.addText(`EMOC · Front Office · ${ville || VILLE} · Internal distribution`, {
+  slide.addText(`Pearl · ${ville || VILLE} · Internal distribution`, {
     x: M, y: 7.0, w: 8, h: 0.24,
     fontSize: 8, color: C.faint, fontFace: FONT, valign: 'middle',
   });
@@ -1766,9 +1766,9 @@ async function buildWeeklyPptx(rawData, form = {}) {
 
   const pptx = new PptxGenJS();
   pptx.layout = 'LAYOUT_WIDE';           // 13.33 x 7.5 pouces
-  pptx.author  = form.author || 'EMOC Front Office';
-  pptx.company = 'EMOC';
-  pptx.title   = 'EMOC Weekly Report';
+  pptx.author  = form.author || 'Pearl';
+  pptx.company = 'Pearl';
+  pptx.title   = 'Weekly Report';
 
   const k   = data.kpis || {};
   const period = `${fmtDate(data.week_start)} to ${fmtDate(data.week_end)}`;
@@ -1818,7 +1818,7 @@ async function buildWeeklyPptx(rawData, form = {}) {
   cover.background = { color: C.wash };
 
   // Colonne gauche : le contexte, en petit corps, haut de page.
-  cover.addText(`EMOC · Front Office · ${VILLE}`, {
+  cover.addText(`Pearl · ${VILLE}`, {
     x: M, y: 0.72, w: 5.2, h: 0.24,
     fontSize: 10, color: '4A6169', fontFace: FONT,
   });
@@ -2735,7 +2735,7 @@ async function buildWeeklyPptx(rawData, form = {}) {
   const sEnd = pptx.addSlide();
   statement(sEnd, {
     bg: C.brand, on: 'FFFFFF', onMute: 'F0AFB8', rule: 'E8737F',
-    eyebrow: `EMOC · Front Office · ${VILLE}`,
+    eyebrow: `Pearl · ${VILLE}`,
     lead: 'Thanks to the Front Office team for the shifts covered, the tickets closed '
         + 'and the escalations handled this week. Questions on any figure in this deck '
         + 'are welcome; the underlying tickets are all traceable in the tracker.',
@@ -2753,7 +2753,7 @@ async function buildWeeklyPptx(rawData, form = {}) {
     if (!encre) { slideFooter(slide, n, total); return; }
     // Pied sur fond coloré : même géométrie que slideFooter(), sans le
     // filet — ces slides n'en portent pas — et dans l'encre de la slide.
-    slide.addText(`EMOC · Front Office · ${VILLE} · Internal distribution`, {
+    slide.addText(`Pearl · ${VILLE} · Internal distribution`, {
       x: M, y: 7.0, w: 8, h: 0.24,
       fontSize: 8, color: encre.mute, fontFace: FONT, valign: 'middle',
     });

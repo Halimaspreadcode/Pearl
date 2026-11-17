@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════
-// ACCÈS ÉQUIPE — mot de passe demandé à l'ouverture de FOps
+// ACCÈS ÉQUIPE — mot de passe demandé à l'ouverture de Pearl
 // (voir server/auth/team-gate.js). Le condensé reste côté serveur,
 // hors de git ; l'écran n'en montre que l'état.
 // ══════════════════════════════════════════════════════════════
@@ -18,7 +18,7 @@ async function renderTeamAccess() {
       + ` <span style="color:var(--mute)">— ${d.sessions} session(s) d'équipe ouverte(s)</span>`;
   } else {
     box.innerHTML = '<span style="color:var(--red);font-weight:600">● Inactif</span>'
-      + ' <span style="color:var(--mute)">— toute personne du réseau peut lire les données de FOps.</span>';
+      + ' <span style="color:var(--mute)">— toute personne du réseau peut lire les données de Pearl.</span>';
   }
   if (btn) btn.style.display = d.actif && !d.via_env ? '' : 'none';
   const req = document.getElementById('team-required');

@@ -13,7 +13,7 @@
 // Ce fichier-ci reste donc écrit dans une syntaxe que tout Node comprend.
 var NODE_MIN = 18;
 if (parseInt(process.versions.node, 10) < NODE_MIN) {
-  console.error('\n  FOps demande Node.js ' + NODE_MIN + ' ou plus récent (20 conseillé).');
+  console.error('\n  Pearl demande Node.js ' + NODE_MIN + ' ou plus récent (20 conseillé).');
   console.error('  Version installée : ' + process.version + '  (' + process.execPath + ')');
   console.error('  Mise à jour : voir « Prérequis » dans le README.\n');
   process.exit(1);
@@ -69,7 +69,6 @@ const formationRoutes = require('./routes/formation');
 const formationAskRoutes = require('./routes/formation-ask');
 const academyRoutes = require('./routes/academy');
 const aiRoutes = require('./routes/ai');
-const imocRoutes = require('./routes/imoc');
 const indicateursRoutes = require('./routes/indicateurs');
 const partiesRoutes = require('./routes/parties');
 const aiInsightRoutes = require('./routes/ai-insight');
@@ -162,7 +161,6 @@ app.use(formationRoutes);
 app.use(formationAskRoutes);
 app.use(academyRoutes);
 app.use(aiRoutes);
-app.use(imocRoutes);
 app.use(indicateursRoutes);
 app.use(partiesRoutes);
 app.use(aiInsightRoutes);
@@ -171,11 +169,11 @@ app.use(aiInsightRoutes);
 app.use(errorHandler);
 
 process.on('uncaughtException', err => {
-  console.error('[EMOC] Uncaught exception:', err);
+  console.error('[Pearl] Uncaught exception:', err);
 });
 
 process.on('unhandledRejection', err => {
-  console.error('[EMOC] Unhandled rejection:', err);
+  console.error('[Pearl] Unhandled rejection:', err);
 });
 
 // Une copie au démarrage — c'est le moment où l'on vient souvent de
@@ -187,13 +185,13 @@ setInterval(backupData, 24 * 60 * 60 * 1000).unref();
 
 // Corrections de nom d'agent demandées (services/rename-agent.js), après la
 // sauvegarde : en cas de souci, la copie du jour a l'état d'avant.
-require('./services/rename-agent').appliquerCorrections().catch(e => console.error('[EMOC] Corrections :', e.message));
+require('./services/rename-agent').appliquerCorrections().catch(e => console.error('[Pearl] Corrections :', e.message));
 
 // Insights des agents : passes automatiques (services/ai-insight.js).
-try { require('./services/ai-insight').demarrerAuto(); } catch (e) { console.error('[EMOC] Insights :', e.message); }
+try { require('./services/ai-insight').demarrerAuto(); } catch (e) { console.error('[Pearl] Insights :', e.message); }
 
 const server = app.listen(PORT, HOST, () => {
-  console.log(`\n  EMOC running at http://localhost:${PORT}  (écoute ${HOST}:${PORT})`);
+  console.log(`\n  Pearl running at http://localhost:${PORT}  (écoute ${HOST}:${PORT})`);
   console.log(`  données : ${DATA_DIR}\n`);
 });
 // HTTPS en plus, si un certificat est configuré (voir http/tls.js).
@@ -209,10 +207,10 @@ let shuttingDown = false;
 async function gracefulShutdown(signal) {
   if (shuttingDown) return;          // un second Ctrl-C ne doit pas relancer la séquence
   shuttingDown = true;
-  console.log(`[EMOC] ${signal} received — shutting down…`);
+  console.log(`[Pearl] ${signal} received — shutting down…`);
 
   // On cesse d'accepter de nouvelles connexions ; celles en cours finissent.
-  server.close(() => console.log('[EMOC] HTTP server closed.'));
+  server.close(() => console.log('[Pearl] HTTP server closed.'));
   if (serverTls) serverTls.close();
 
   // Les écritures passent toutes par withLock : attendre que les chaînes
@@ -225,8 +223,8 @@ async function gracefulShutdown(signal) {
   } catch { /* une écriture ratée ne doit pas empêcher l'arrêt */ }
 
   if (getPendingWrites() > 0)
-    console.warn(`[EMOC] Shutting down with ${getPendingWrites()} write(s) still queued.`);
-  console.log('[EMOC] Shutdown complete.');
+    console.warn(`[Pearl] Shutting down with ${getPendingWrites()} write(s) still queued.`);
+  console.log('[Pearl] Shutdown complete.');
   process.exit(0);
 }
 

@@ -108,7 +108,7 @@ describe('routes', () => {
     assert.equal(recu[0].auth, `Bearer ${CLE}`);
     const msgs = recu[0].corps.messages;
     assert.equal(msgs[0].role, 'system');
-    assert.ok(msgs[0].content.includes('EMOC'));
+    assert.ok(msgs[0].content.includes('Pearl'));
     // Un « system » venu du client n'en est pas un.
     assert.equal(msgs.filter(m => m.role === 'system').length, 1);
     assert.ok(recu[0].corps.max_tokens <= ai.LIMITES.max_tokens);
@@ -192,24 +192,24 @@ describe('proxy Windows', () => {
   const REG = `
 HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings
     ProxyEnable    REG_DWORD    0x1
-    ProxyServer    REG_SZ    http://proxy.huawei.com:8080
-    ProxyOverride    REG_SZ    *-dev.huaweicloud.com;*-dev.myhuaweicloud.com;<local>
+    ProxyServer    REG_SZ    http://proxy.example.com:8080
+    ProxyOverride    REG_SZ    *-dev.cloud.example.com;*-dev.mycloud.example.com;<local>
 `;
   test('lecture du registre', () => {
     const w = ai.lireRegistreProxy(REG);
     assert.equal(w.actif, true);
-    assert.equal(w.url, 'http://proxy.huawei.com:8080');
+    assert.equal(w.url, 'http://proxy.example.com:8080');
     assert.equal(w.pac, '');
   });
   test('formes « hôte:port » et « http=…;https=… »', () => {
-    assert.equal(ai.lireRegistreProxy(REG.replace('http://proxy.huawei.com:8080', 'proxy.huawei.com:8080')).url, 'http://proxy.huawei.com:8080');
-    assert.equal(ai.lireRegistreProxy(REG.replace('http://proxy.huawei.com:8080', 'http=p1:80;https=p2:8443')).url, 'http://p2:8443');
+    assert.equal(ai.lireRegistreProxy(REG.replace('http://proxy.example.com:8080', 'proxy.example.com:8080')).url, 'http://proxy.example.com:8080');
+    assert.equal(ai.lireRegistreProxy(REG.replace('http://proxy.example.com:8080', 'http=p1:80;https=p2:8443')).url, 'http://p2:8443');
     assert.equal(ai.lireRegistreProxy(REG.replace('0x1', '0x0')).actif, false);
   });
   test('exceptions', () => {
-    const ex = '*-dev.huaweicloud.com;*-dev.myhuaweicloud.com;<local>';
-    assert.equal(ai.horsProxyWindows('models.ascend.huawei.com', ex), false);
-    assert.equal(ai.horsProxyWindows('abc-dev.huaweicloud.com', ex), true);
+    const ex = '*-dev.cloud.example.com;*-dev.mycloud.example.com;<local>';
+    assert.equal(ai.horsProxyWindows('ai.example.com', ex), false);
+    assert.equal(ai.horsProxyWindows('abc-dev.cloud.example.com', ex), true);
     assert.equal(ai.horsProxyWindows('intranet', ex), true);
   });
 });
@@ -278,7 +278,7 @@ describe('diagnostic réseau', () => {
   test('proxy au nom inconnu : conseil de prendre son adresse IP', async () => {
     ai.majConf({ base_url: mockUrl, api_key: CLE, model: 'glm-5.3', proxy_mode: 'manual', proxy: 'http://proxy.nexiste-pas.invalid:8080', clear_proxy_auth: true });
     const d = await ai.diagnostiquer();
-    assert.ok(d.etapes.some(e => e.t === 'Serveur EMOC'));
+    assert.ok(d.etapes.some(e => e.t === 'Serveur Pearl'));
     const k = d.etapes.find(e => e.ok === false);
     assert.equal(k.t, 'DNS du proxy');
     assert.match(k.d, /nslookup proxy\.nexiste-pas\.invalid/);
@@ -302,7 +302,7 @@ describe('certificat de l\'entreprise', () => {
   const https = require('https');
   let srvTls, urlTls, pem, ok = true;
   before(async () => {
-    const d = fs.mkdtempSync(path.join(os.tmpdir(), 'emoc-ca-'));
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), 'pearl-ca-'));
     try {
       execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '2', '-subj', '/CN=localhost',
         '-addext', 'subjectAltName=IP:127.0.0.1', '-keyout', path.join(d, 'k.pem'), '-out', path.join(d, 'c.pem')], { stdio: 'ignore' });
@@ -386,7 +386,7 @@ describe('tunnel depuis le poste', () => {
     // PowerShell encodé : tunnel inverse vers la VM, sans fenêtre
     const ps = [...bat.matchAll(/-EncodedCommand (\S+)/g)].map(m => Buffer.from(m[1], 'base64').toString('utf16le'));
     assert.equal(ps.length, 3);
-    assert.match(ps[0], /'-R','18080:models\.ascend\.huawei\.com:80','\S+@10\.20\.93\.173calc'/);
+    assert.match(ps[0], /'-R','18080:ai\.example\.internal:80','\S+@10\.20\.93\.173calc'/);
     assert.match(ps[0], /-WindowStyle Hidden/);
     assert.match(ps[1], /Stop-Process/);
     // Inscription sur la VM : clé restreinte au seul tunnel

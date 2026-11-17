@@ -26,23 +26,9 @@ const DIR = path.resolve(__dirname, '../../public/formation');
 // Les formations proposées, dans l'ordre d'affichage. `hue` donne la
 // couleur de la carte dans l'Academy (une teinte unie, posée deux fois
 // pour la compatibilité du gabarit), `page` l'ancienne entrée de menu.
-const COURSES = [
-  { id: 'digitalview', file: 'digitalview.html', title: 'DigitalView',
-    tag: 'Supervision', desc: 'La plateforme de supervision : alarmes, ressources, analyse, maintenance, dépannage.',
-    hue: ['#5B5FC7', '#5B5FC7'], page: 'digitalview' },
-  { id: 'process', file: 'process.html', title: 'Process ITSM',
-    tag: 'Process', desc: 'Incidents, problèmes, changements, escalade et SLA tels qu\'on les pratique chez EMOC, puis les fondations et les pratiques d\'ITIL 4.',
-    hue: ['#C8553D', '#C8553D'], page: 'process-training' },
-  { id: 'mobilemoney', file: 'mobilemoney.html', title: 'Mobile Money 2.0',
-    tag: 'Plateforme', desc: 'L\'architecture cloud native de MM 2.0 : stripes, microservices, modèle de service, actif-actif, gray release, DigitalView, AIOps et données.',
-    hue: ['#1F7D74', '#1F7D74'], page: null },
-  { id: 'datacenter', file: 'datacenter.html', title: 'Data center',
-    tag: 'Infrastructure', desc: 'Du bâtiment au port : énergie et froid, baie, serveurs et stockage, câbles et optiques, leaf-spine, VXLAN, pare-feux et ports logiques.',
-    hue: ['#3A4A68', '#3A4A68'], page: null },
-  { id: 'reseau', file: 'reseau.html', title: 'Réseaux',
-    tag: 'Infrastructure', desc: 'Des bits à internet : couches, Ethernet, IP et sous-réseaux, routage et BGP, NAT, TCP et UDP, DNS, HTTPS, pare-feux et diagnostic.',
-    hue: ['#2F6690', '#2F6690'], page: null },
-];
+// Vide par défaut : chaque organisation ajoute ses propres formations
+// (fichiers HTML du moteur de formation déposés dans public/formation/).
+const COURSES = [];
 
 const _cache = new Map();   // id → { mtime, modules }
 

@@ -1,10 +1,10 @@
 // ══════════════════════════════════════════════════════════════
-// ACCUEIL DE BIG BROTHER (affiché dans la page Big Brother, ai.js)
+// ACCUEIL DE PEARL AI (affiché dans la page Pearl AI, ai.js)
 //
 // Ce qui attend l'admin aujourd'hui, en widgets : sa journée (planning et
 // absents), ses sujets à décider (tickets, équipe, absences, One-to-One…),
 // les inquiétudes relevées en One-to-One à suivre, les absences, les
-// opérations, et ce que Big Brother lit.
+// opérations, et ce que Pearl AI lit.
 //
 // Deux couches :
 //   · les signaux, calculés sans IA et affichés tout de suite : ceux de
@@ -138,7 +138,7 @@ const AIC_PAYS = [['ALL', 'Global'], ['SN', 'Dakar'], ['CI', 'Abidjan']];
 const _aicPerimetre = () => ({ ALL: 'Global', SN: 'Dakar (SN)', CI: 'Abidjan (CI)' })[_aicPays()] || 'Global';
 function aicPays(v) {
   if (typeof setActiveCountry === 'function') setActiveCountry(v);
-  // La barre de Big Brother porte le sélecteur : on la repeint avec l'accueil.
+  // La barre de Pearl AI porte le sélecteur : on la repeint avec l'accueil.
   if (typeof _aiPaint === 'function') _aiPaint(); else renderAiCockpit();
 }
 const _aicTracker = () => ({ SN: 'sn', CI: 'ci' })[_aicPays()] || 'global';

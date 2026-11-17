@@ -1,6 +1,7 @@
 # Architecture
 
-Carte du code, pour savoir où lire et où écrire. Le « pourquoi » détaillé
+Carte du code, pour savoir où lire et où écrire. La cible SaaS multi-tenant
+est décrite dans `SAAS-ARCHITECTURE.md`. Le « pourquoi » détaillé
 reste dans les commentaires, à côté du code qu'il explique.
 
 Principes :
@@ -226,7 +227,7 @@ Artefact claude.ai intégré tel quel (`digitalview.html`, runtime claude.ai
 retiré). Il synchronise sa progression via `window.claude.use('db'|'user')` ;
 `digitalview-bridge.js`, chargé avant lui, fournit cette interface adossée
 au serveur (`GET/PUT /api/formation/progress/:id`, `data/formation_progress.json`,
-clé = ID Huawei de l'agent identifié), range l'état local par agent (poste
+clé = ID employé de l'agent identifié), range l'état local par agent (poste
 partagé), suit le thème de l'app et lance `initSync()` que l'artefact
 n'appelait pas. Vue d'équipe admin : `GET /api/formation/progress`.
 Mettre la formation à jour : remplacer `digitalview.html` par le nouvel

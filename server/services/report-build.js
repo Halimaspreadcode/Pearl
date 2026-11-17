@@ -120,7 +120,7 @@ async function buildReportFile(kind, countryIn) {
       slaText: t => require('../core/sla').slaTargetLabel(t, cfg),
     });
     return {
-      filename: `EMOC_Daily_Report_${code}_${jour}.xlsx`,
+      filename: `Pearl_Daily_Report_${code}_${jour}.xlsx`,
       content: Buffer.from(buffer),
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       period: jour,
@@ -163,7 +163,7 @@ async function buildReportFile(kind, countryIn) {
       fo_trackers: readCfg().fo_trackers || {},
     });
     return {
-      filename: `EMOC_Weekly_Review_${code}_${jour}.pptx`,
+      filename: `Pearl_Weekly_Review_${code}_${jour}.pptx`,
       content: Buffer.from(buf),
       type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       period: jour,
@@ -178,7 +178,7 @@ async function buildReportFile(kind, countryIn) {
     const absences = country === 'ALL' ? readAbsences() : readAbsences().filter(a => agents.has(a.fo_name));
     const buf = buildAbsencePdf({ summary, absences, generatedAt: new Date() });
     return {
-      filename: `EMOC_Absence_Report_${code}_${summary.from}_${summary.to}.pdf`,
+      filename: `Pearl_Absence_Report_${code}_${summary.from}_${summary.to}.pdf`,
       content: Buffer.from(buf),
       type: 'application/pdf',
       period: jour,

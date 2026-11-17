@@ -20,7 +20,7 @@ const router = express.Router();
 const iaLimit = rateLimit({
   windowMs: 60 * 1000, max: 20,
   standardHeaders: true, legacyHeaders: false,
-  message: { error: 'Trop de requêtes vers Big Brother : attendez une minute.' },
+  message: { error: 'Trop de requêtes vers Pearl AI : attendez une minute.' },
 });
 
 router.use('/api/ai', requireAdmin, (_req, res, next) => {

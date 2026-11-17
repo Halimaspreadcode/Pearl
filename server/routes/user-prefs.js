@@ -11,7 +11,7 @@ const router = express.Router();
    ce qui convient à une préférence d'affichage locale (thème, replis) —
    mais pas à un choix de travail qu'on refait sinon à chaque poste.
 
-   La clé est l'ID Huawei, seul identifiant stable et attribué. Le nom ne
+   La clé est l'ID employé, seul identifiant stable et attribué. Le nom ne
    suffit pas : il change de graphie, l'ID non. */
 function readUserPrefs() { return readJSON(FILES.user_prefs, {}); }
 
@@ -19,15 +19,15 @@ function readUserPrefs() { return readJSON(FILES.user_prefs, {}); }
 // personne — c'est le genre d'écart qui crée deux profils fantômes.
 const prefKey = id => String(id || '').trim().toLowerCase();
 
-router.get('/api/user-prefs/:huaweiId', (req, res) => {
-  const k = prefKey(req.params.huaweiId);
+router.get('/api/user-prefs/:employeeId', (req, res) => {
+  const k = prefKey(req.params.employeeId);
   if (!k) return res.status(400).json({ error: 'ID required' });
   res.json(readUserPrefs()[k] || { pinned: [] });
 });
 
-router.put('/api/user-prefs/:huaweiId', (req, res) => {
+router.put('/api/user-prefs/:employeeId', (req, res) => {
   withFileLock(FILES.user_prefs, () => {
-    const k = prefKey(req.params.huaweiId);
+    const k = prefKey(req.params.employeeId);
     if (!k) return res.status(400).json({ error: 'ID required' });
 
     const all = readUserPrefs();

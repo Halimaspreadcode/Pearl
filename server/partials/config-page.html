@@ -25,7 +25,7 @@
       <div id="config-main-screen" style="display:none">
       <div class="cfh-head"><div>
       <div class="page-title">Configuration</div>
-      <div class="page-sub">Everything that sets up FOps, grouped by purpose</div></div>
+      <div class="page-sub">Everything that sets up Pearl, grouped by purpose</div></div>
       <div class="cfg-hub-search">
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>
         <input id="cfg-hub-q" type="search" placeholder="Search a section…"
@@ -157,7 +157,7 @@
           <div id="config-fo-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input class="form-control" id="new-fo" placeholder="Full name..." style="flex:1;min-width:180px;max-width:240px">
-            <input class="form-control idt-mono" id="new-fo-id" placeholder="ID Huawei" style="width:150px" maxlength="12">
+            <input class="form-control idt-mono" id="new-fo-id" placeholder="ID employé" style="width:150px" maxlength="12">
             <select class="form-control" id="new-fo-tracker" style="width:72px">
               <option value="SN">SN</option>
               <option value="CI">CI</option>
@@ -165,7 +165,7 @@
             <button class="btn btn-primary btn-sm" onclick="addFo()">Add</button>
           </div>
           <p style="font-size:11.5px;color:var(--mute);margin:8px 0 0;line-height:1.5">
-            The Huawei ID identifies the agent when consulting their
+            The Employee ID identifies the agent when consulting their
             performance. It can be added later by clicking the ID
             d’un agent dans la liste.
           </p>
@@ -626,7 +626,7 @@
         <div class="config-card" id="config-fo-access">
           <h3>Codes personnels (connexion)</h3>
           <p style="font-size:12.5px;color:var(--mute);margin:-2px 0 14px;line-height:1.5">
-            Chaque membre de l'équipe se connecte à FOps avec son ID Huawei et son code
+            Chaque membre de l'équipe se connecte à Pearl avec son ID employé et son code
             personnel : c'est ce qui prouve qui il est. Une fois l'accès équipe actif,
             le mot de passe d'équipe ne permet plus que de consulter — pour modifier
             quoi que ce soit, il faut ce code. Il ouvre aussi « Ma performance ».
@@ -635,14 +635,14 @@
           </p>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
             <select class="form-control" id="foacc-fo" style="flex:1;min-width:180px"></select>
-            <input class="form-control idt-mono" id="foacc-id" placeholder="Agent Huawei ID" style="flex:1;min-width:180px">
+            <input class="form-control idt-mono" id="foacc-id" placeholder="Agent employee ID" style="flex:1;min-width:180px">
             <button class="btn btn-primary btn-sm" onclick="generateFoCode()">Generate a code</button>
           </div>
           <div id="foacc-new" style="display:none"></div>
           <div class="table-wrap">
             <table>
               <thead><tr>
-                <th>Agent</th><th>Huawei ID</th><th>Code created on</th>
+                <th>Agent</th><th>Employee ID</th><th>Code created on</th>
                 <th>Consultations ouvertes</th><th style="width:90px"></th>
               </tr></thead>
               <tbody id="foacc-tbody"></tbody>
@@ -653,9 +653,9 @@
         <div class="config-card" id="config-team-access">
           <h3>Accès équipe</h3>
           <p style="font-size:12.5px;color:var(--mute);margin:-2px 0 14px;line-height:1.5">
-            Une fois défini, ce mot de passe est demandé à l'ouverture de FOps : sans lui,
+            Une fois défini, ce mot de passe est demandé à l'ouverture de Pearl : sans lui,
             plus aucune donnée ne sort du serveur. Les agents peuvent aussi entrer avec
-            leur identifiant Huawei et leur code personnel ; le mot de passe admin fonctionne aussi.
+            leur identifiant employé et leur code personnel ; le mot de passe admin fonctionne aussi.
           </p>
           <div id="team-access-state" style="font-size:12.5px;margin-bottom:12px"></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -674,7 +674,7 @@
             <input type="checkbox" id="team-required" onchange="setIdentityRequired(this.checked)" style="margin-top:3px">
             <span><b>Exiger le code personnel pour modifier</b><br>
             <span style="color:var(--mute)">Même sans mot de passe d'équipe : tout le monde peut consulter,
-            mais seule une personne connectée avec son ID Huawei et son code peut modifier.
+            mais seule une personne connectée avec son ID employé et son code peut modifier.
             Délivre d'abord un code à chacun (carte « Codes personnels »).</span></span>
           </label>
         </div>
@@ -691,7 +691,7 @@
           </label>
           <div id="abs-allow-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <input class="form-control" id="abs-allow-input" placeholder="Huawei ID (ex. hw1)"
+            <input class="form-control" id="abs-allow-input" placeholder="Employee ID (ex. hw1)"
               style="flex:1;min-width:0"
               onkeydown="if(event.key==='Enter'){event.preventDefault();addAbsenceAllowedId()}">
             <button class="btn btn-ghost btn-sm" onclick="addAbsenceAllowedId()">+ Add</button>
@@ -1001,7 +1001,7 @@
         <div class="table-wrap">
           <table>
             <thead><tr>
-              <th>User</th><th>Huawei ID</th><th>Role</th>
+              <th>User</th><th>Employee ID</th><th>Role</th>
               <th>Page viewed</th><th>Last seen</th><th style="width:120px"></th>
             </tr></thead>
             <tbody id="sess-tbody"></tbody>
@@ -1012,10 +1012,9 @@
 
     <!-- Assistant IA (js/pages/ai/ai.js) : n'existe que dans le fragment admin. -->
     <div class="page gm-scope" id="page-ai"><div id="ai-root"></div></div>
-    <div class="page gm-scope" id="page-imoc"><div id="imoc-root"></div></div>
     <div class="page gm-scope" id="page-indicateurs"><div id="indicateurs-root"></div></div>
     <div class="page gm-scope" id="page-cfg-parties"><div id="parties-root"></div></div>
-    <!-- L'ancien « Tableau de bord Big Brother » est désormais l'accueil de Big Brother (page-ai). -->
+    <!-- L'ancien « Tableau de bord Pearl AI » est désormais l'accueil de Pearl AI (page-ai). -->
     <div class="page gm-scope" id="page-ai-cockpit"></div>
 
     <div class="page gm-scope" id="page-audit">

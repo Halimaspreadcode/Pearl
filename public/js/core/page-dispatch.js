@@ -6,7 +6,7 @@ const _origRP = window.renderPage;
 const ADMIN_ONLY_PAGES = ['config', 'audit', 'shift-approvals', 'data-quality', 'ops-review', 'export', 'mailing',
   'cfg-annonces', 'cfg-general', 'cfg-sla', 'cfg-goals', 'cfg-perf', 'cfg-rota',
   'cfg-security', 'cfg-data', 'cfg-quiz', 'cfg-glossary', 'cfg-sessions', 'cfg-training', 'cfg-o2o',
-  'cfg-assign', 'cfg-myteam', 'cfg-objectifs', 'cfg-vues', 'equipe', 'ai', 'ai-cockpit', 'imoc', 'indicateurs', 'cfg-parties'];
+  'cfg-assign', 'cfg-myteam', 'cfg-objectifs', 'cfg-vues', 'equipe', 'ai', 'ai-cockpit', 'indicateurs', 'cfg-parties'];
 
 window.renderPage = function(page) {
   // L'Academy retire la barre latérale ; toute autre page la rend.
@@ -57,9 +57,8 @@ window.renderPage = function(page) {
   }
   if (page === 'audit')           { _origRP(page); renderAudit();         return; }
   if (page === 'ai')              { _origRP(page); renderAiPage();        return; }
-  if (page === 'imoc')            { _origRP(page); if (typeof renderImocPage === 'function') renderImocPage(); return; }
   if (page === 'indicateurs')     { _origRP(page); if (typeof renderIndicateursPage === 'function') renderIndicateursPage(); return; }
-  // Le tableau de bord est devenu l'accueil de Big Brother.
+  // Le tableau de bord est devenu l'accueil de Pearl AI.
   if (page === 'ai-cockpit')      { window.renderPage('ai'); if (typeof aiAccueil === 'function') aiAccueil(); return; }
   if (page === 'academy')         { _origRP(page); renderAcademy();       return; }
   if (page === 'ideas') {

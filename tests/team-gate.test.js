@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 process.env.CONFIG_PW_HASH = bcrypt.hashSync('admin-pw', 4);
 delete process.env.TEAM_PW_HASH;
 useTempDataDir({
-  'config.json': { fo_list: ['Awa'], fo_access_codes: { Awa: { hash: bcrypt.hashSync('CODE2345', 4), huawei_id: 'a00123456' } } },
+  'config.json': { fo_list: ['Awa'], fo_access_codes: { Awa: { hash: bcrypt.hashSync('CODE2345', 4), employee_id: 'a00123456' } } },
   'sn.json': [], 'ci.json': [], 'observations.json': [], 'audit.json': [],
 });
 const { test, before, after } = require('node:test');
@@ -64,9 +64,9 @@ test('mauvais mot de passe refusé, bon mot de passe → cookie qui ouvre l\'API
 });
 
 test('code personnel d\'agent et mot de passe admin ouvrent aussi', async () => {
-  const bad = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"huaweiId":"a00123456","password":"equipe-2026!"}' });
+  const bad = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"employeeId":"a00123456","password":"equipe-2026!"}' });
   assert.equal(bad.status, 401);
-  const ag = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"huaweiId":"A00123456","password":"CODE2345"}' });
+  const ag = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"employeeId":"A00123456","password":"CODE2345"}' });
   assert.equal(ag.status, 200);
   assert.equal((await fetch(`${base}/api/sn`, { headers: { cookie: cookieDe(ag) } })).status, 200);
   const ad = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"password":"admin-pw"}' });

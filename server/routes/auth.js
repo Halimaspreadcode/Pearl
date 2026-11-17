@@ -50,7 +50,7 @@ router.post('/api/config/logout', (req, res) => {
 
 router.post('/api/absences/auth', authLimiter, (req, res) => {
   const pwOk = absencePwMatches(req.body.password);
-  const idOk = absenceIdAllowed(req.body.huaweiId);
+  const idOk = absenceIdAllowed(req.body.employeeId);
   // Message unique : distinguer « mauvais ID » de « mauvais mot de passe »
   // dirait à un inconnu lequel des deux il a déjà trouvé.
   if (!pwOk || !idOk)

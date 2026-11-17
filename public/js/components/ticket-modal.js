@@ -170,7 +170,7 @@ const saveTicket = withSaveGuard(async function() {
   // auto-inject identity
   if (typeof currentUser !== 'undefined' && currentUser) {
     if (!data.modified_by) data.modified_by = currentUser.name;
-    data._operator_id = currentUser.huaweiId || '';
+    data._operator_id = currentUser.employeeId || '';
   }
   ['occur_time','detection_time','open_date','close_date','workaround_date','modified_at'].forEach(f => {
     data[f] = data[f] ? new Date(data[f]).toISOString() : null;

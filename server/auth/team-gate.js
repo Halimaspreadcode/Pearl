@@ -17,7 +17,7 @@ const {
 // code personnel d'un agent (identifiant + code). Les sessions admin,
 // absences et FO déjà ouvertes valent aussi.
 //
-// Le condensé vit dans data/team-access.secret : comme la clé Big Brother,
+// Le condensé vit dans data/team-access.secret : comme la clé Pearl AI,
 // hors de git (data/*.secret est ignoré) même si data/ est versionné.
 //
 // Tant qu'aucun mot de passe d'équipe n'est défini, le verrou laisse passer :
@@ -86,7 +86,7 @@ function fermerSession(req, res) {
 }
 
 // Session d'équipe de la requête : { expires, qui } ou null. `qui` porte
-// l'identité vérifiée ({ name, huaweiId, role }) quand la session a été
+// l'identité vérifiée ({ name, employeeId, role }) quand la session a été
 // ouverte avec un code personnel, { lecture: true } avec le mot de passe
 // d'équipe (voir auth/identity.js).
 function sessionEquipe(req) {
@@ -135,7 +135,7 @@ function teamGate(req, res, next) {
 
 // Pages statiques qui montrent des données (captures de démonstration,
 // analyseur de journaux) : même verrou, renvoi vers l'accueil sinon.
-const PAGES_PROTEGEES = /^\/(demo(\/|\.html$|\.backup\.html$)|log-analyzer\.html$)/;
+const PAGES_PROTEGEES = /^\/(demo(\/|\.html$))/;
 function teamGateStatique(req, res, next) {
   if (!PAGES_PROTEGEES.test(req.path)) return next();
   if (!teamGateActif() || requeteAuthentifiee(req)) return next();

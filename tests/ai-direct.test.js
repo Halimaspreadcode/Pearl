@@ -1,4 +1,4 @@
-// Big Brother : réponse directe (sans réflexion) et bouton Stop.
+// Pearl AI : réponse directe (sans réflexion) et bouton Stop.
 const { useTempDataDir } = require('./helpers/data-dir');
 useTempDataDir({});
 process.env.AI_ALLOW_HTTP = '1';

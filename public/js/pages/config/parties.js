@@ -60,8 +60,8 @@ function _ptyPaint() {
   const r = PTY.res;
   const test = `<section class="pt-card pt-test">
     <h3>Reconnaître un nom vu ailleurs</h3>
-    <p class="pt-mute">Colle un nom tel qu'il apparaît dans IMOC (Initiator, Managing Owner technician…) : FOps dit à qui il correspond.</p>
-    <form onsubmit="event.preventDefault();ptyTester(this.q.value)"><input name="q" value="${esc(PTY.test)}" placeholder="ex. DRPS/DEX/SMC-N/QSM FAYE PAPA TAHIROU" autocomplete="off"><button type="submit" class="pt-btn">Reconnaître</button></form>
+    <p class="pt-mute">Colle un nom tel qu'il apparaît dans IMOC (Initiator, Managing Owner technician…) : Pearl dit à qui il correspond.</p>
+    <form onsubmit="event.preventDefault();ptyTester(this.q.value)"><input name="q" value="${esc(PTY.test)}" placeholder="ex. DIR/OPS/SMC-N/QSM MOREAU PIERRE ANTOINE" autocomplete="off"><button type="submit" class="pt-btn">Reconnaître</button></form>
     ${r ? (r.sur ? `<div class="pt-res is-ok"><span class="pt-tag" style="--c:${esc(r.color || '#141518')}"><i></i>${esc(r.role)}</span><b>${esc(r.name)}</b><small>${esc(r.role_label)}${r.country ? ` · ${_ptyPays(r.country)}` : ''} · reconnu par ${esc(r.via)}</small></div>`
       : `<div class="pt-res"><p>Nom lu : <b>${esc(r.nom)}</b>${r.org ? ` <small>· organisation « ${esc(r.org)} »</small>` : ''} — personne de connu.</p>
         ${(r.suggestions || []).length ? `<p class="pt-mute">C'est peut-être : ${r.suggestions.filter(x => x.id).map(x => `<button type="button" class="pt-chip" onclick="ptyAlias(${escAttrArg(x.id)},${escAttrArg(r.brut)})">${esc(x.name)} · ${esc(x.role)}</button>`).join(' ')}</p>` : ''}
@@ -94,12 +94,12 @@ function _ptyRoleForm() {
 }
 function _ptyPersonneForm(p) {
   return `<form class="pt-form pt-p-form" onsubmit="event.preventDefault();ptyPersonneSave(this,${escAttrArg(p.id || '')})">
-    <label class="is-wide"><span>Nom</span><input name="name" value="${esc(p.name || '')}" placeholder="Papa Tahirou Faye" required></label>
+    <label class="is-wide"><span>Nom</span><input name="name" value="${esc(p.name || '')}" placeholder="Pierre Antoine Moreau" required></label>
     <label><span>Rôle</span><select name="role">${PTY.data.roles.map(x => `<option value="${esc(x.key)}"${x.key === p.role ? ' selected' : ''}>${esc(x.key)}</option>`).join('')}</select></label>
     <label><span>Pays</span><select name="country"><option value="">—</option><option value="SN"${p.country === 'SN' ? ' selected' : ''}>Sénégal</option><option value="CI"${p.country === 'CI' ? ' selected' : ''}>Côte d'Ivoire</option></select></label>
     <label><span>E-mail</span><input name="email" value="${esc(p.email || '')}"></label>
     <label><span>Téléphone</span><input name="phone" value="${esc(p.phone || '')}"></label>
-    <label class="is-full"><span>Graphies reconnues (une par ligne, telles que dans IMOC)</span><textarea name="aliases" rows="2" placeholder="DRPS/DEX/SMC-N/QSM FAYE PAPA TAHIROU">${esc((p.aliases || []).join('\n'))}</textarea></label>
+    <label class="is-full"><span>Graphies reconnues (une par ligne, telles que dans IMOC)</span><textarea name="aliases" rows="2" placeholder="DIR/OPS/SMC-N/QSM MOREAU PIERRE ANTOINE">${esc((p.aliases || []).join('\n'))}</textarea></label>
     <div class="pt-form-a">${p.id ? `<button type="button" class="pt-btn is-ghost" onclick="ptyPersonneSuppr(${escAttrArg(p.id)})">Retirer</button>` : ''}
       <button type="button" class="pt-btn" onclick="PTY.edit=null;_ptyPaint()">Annuler</button><button type="submit" class="pt-btn is-pri">Enregistrer</button></div>
   </form>`;

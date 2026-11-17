@@ -13,7 +13,7 @@ async function init() {
   // directement la Configuration plutôt que la dernière page visitée.
   let lastPage = location.pathname.startsWith('/admin')
     ? 'config'
-    : (localStorage.getItem('emoc-last-page') || 'dashboard');
+    : (localStorage.getItem('pearl-last-page') || 'dashboard');
   // Une dernière page devenue réservée à l'admin renverrait aussitôt vers
   // /admin à l'ouverture de l'app publique : on retombe sur le tableau
   // de bord plutôt que d'imposer le mot de passe au démarrage.
@@ -181,7 +181,7 @@ function initNav() {
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       item.classList.add('active');
       window.renderPage(item.dataset.page);
-      localStorage.setItem('emoc-last-page', item.dataset.page);
+      localStorage.setItem('pearl-last-page', item.dataset.page);
       closeSidebar();
     });
   });

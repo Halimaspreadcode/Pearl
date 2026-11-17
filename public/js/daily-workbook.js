@@ -221,7 +221,7 @@ async function buildDailyWorkbook(ExcelJS, data, form, opts) {
   // Row 1 - titre
   ws.mergeCells(1, 1, 1, 10);
   const t1 = ws.getCell(1, 1);
-  t1.value = 'FRONT OFFICE DAILY REPORT - EMOC';
+  t1.value = 'DAILY REPORT';
   xlFill(t1, XL_RED);
   xlFont(t1, { bold: true, color: { argb: XL_WHITE }, size: 14 });
   xlCenter(t1);

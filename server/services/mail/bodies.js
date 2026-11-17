@@ -143,7 +143,7 @@ function corpsDaily(d, br, _dateStr, pays = 'SN') {
 
   return `
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:900px;border-collapse:collapse;${FONT};color:${X.black}">
-  <tr><td colspan="10" style="background:${X.red};color:${X.white};padding:10px;font-size:17px;font-weight:700;text-align:center">FRONT OFFICE DAILY REPORT - EMOC</td></tr>
+  <tr><td colspan="10" style="background:${X.red};color:${X.white};padding:10px;font-size:17px;font-weight:700;text-align:center">DAILY REPORT</td></tr>
   <tr>
     <td colspan="3" style="background:${X.black};color:${X.white};padding:6px 10px;font-size:12px">Date : ${esc(dateStr)}</td>
     <td colspan="4" style="background:${X.black};color:${X.white};padding:6px 10px;font-size:12px;text-align:center">${esc(br.author || '')}</td>
@@ -236,7 +236,7 @@ function corpsWeeklyOverview(data, pays = 'SN') {
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:860px;${FONT};color:#1A1C1E">
   <tr><td style="padding:0 0 4px;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#C7000B;font-weight:700">Weekly Report · Overview</td></tr>
   <tr><td style="font-size:24px;line-height:1.2;font-weight:700;padding-bottom:4px">What the week shows in numbers</td></tr>
-  <tr><td style="font-size:12.5px;color:#6B7280;padding-bottom:18px">${esc(fmtD(data.week_start))} to ${esc(fmtD(data.week_end))} · EMOC Front Office · ${esc(PAYS[normPays(pays)].ville)}</td></tr>
+  <tr><td style="font-size:12.5px;color:#6B7280;padding-bottom:18px">${esc(fmtD(data.week_start))} to ${esc(fmtD(data.week_end))} · Pearl · ${esc(PAYS[normPays(pays)].ville)}</td></tr>
   ${calme ? `
   <tr><td style="padding-bottom:14px">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">

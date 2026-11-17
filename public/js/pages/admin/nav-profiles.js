@@ -22,7 +22,7 @@ const NVP_PROFILS_BASE = [
   { key: 'FO',       label: 'Front Office', desc: 'Saisit les tickets, tient les rotations' },
   { key: 'BO',       label: 'Back Office',  desc: 'Traite ce que le FO escalade' },
   { key: 'Observer', label: 'Observateur',  desc: 'Consultation seule' },
-  // Ceux qui ont ouvert FOps avec le mot de passe d'équipe, sans code
+  // Ceux qui ont ouvert Pearl avec le mot de passe d'équipe, sans code
   // personnel : ils ne sont personne en particulier, on choisit ce qu'on
   // leur montre.
   { key: 'Guest',    label: 'Non connecté', desc: 'Mot de passe d’équipe, sans code personnel' },
@@ -81,7 +81,6 @@ const NVP_PAGES = [
     { id: 'export',     l: 'Exports',    admin: true },
   ]},
   { grp: 'Outils', items: [
-    { id: 'log-analyzer', l: 'Analyseur' },
     { id: 'academy',      l: 'Academy (formations)' },
     { id: 'ideas',        l: 'Idea box' },
   ]},
@@ -93,7 +92,7 @@ const NVP_PAGES = [
     { id: 'cfg-annonces',    l: 'Annonces',       admin: true },
     { id: 'data-quality',    l: 'Data Quality',   admin: true },
     { id: 'audit',           l: 'Audit Trail',    admin: true },
-    { id: 'ai',              l: 'Big Brother',    admin: true },
+    { id: 'ai',              l: 'Pearl AI',    admin: true },
     { id: 'shift-approvals', l: 'Approbations',   admin: true },
   ]},
 ];
@@ -117,9 +116,9 @@ function _nvpResItems(g) { return g.items.filter(i => !i.admin); }
 const NVP_DEFAUTS = {
   FO: ['dashboard', 'sn', 'ci', 'observations', 'fo-dashboard', 'fo-handover',
        'shift-planning', 'my-requests', 'my-perf', 'absences',
-       'weekly-progress', 'quiz', 'daily-report', 'log-analyzer', 'academy', 'ideas'],
+       'weekly-progress', 'quiz', 'daily-report', 'academy', 'ideas'],
   BO: ['dashboard', 'sn', 'ci', 'global', 'observations', 'absences',
-       'daily-report', 'weekly-report', 'log-analyzer', 'ideas'],
+       'daily-report', 'weekly-report', 'ideas'],
   Observer: ['dashboard', 'global', 'fo-dashboard', 'daily-report',
              'weekly-report', 'monthly-report'],
   Guest: ['dashboard', 'global', 'daily-report', 'academy', 'ideas'],
@@ -291,7 +290,7 @@ function _nvpRenderReserved() {
             </div>
             <div class="nvp-res-add">
               <input class="form-control" id="nvp-res-in-${it.id}"
-                     placeholder="ID Huawei (ex. wx1234567)"
+                     placeholder="ID employé (ex. wx1234567)"
                      onkeydown="if(event.key==='Enter'){event.preventDefault();nvpResAddId('${it.id}')}">
               <button type="button" class="nvp-mini" onclick="nvpResAddId('${it.id}')">Ajouter</button>
             </div>
@@ -306,7 +305,7 @@ function _nvpRenderReserved() {
       <div class="gsla-card-head">
         <h3 class="gsla-card-t">Pages réservées</h3>
         <p class="gsla-card-d">
-          Cochez une page pour la réserver, puis inscrivez les ID Huawei
+          Cochez une page pour la réserver, puis inscrivez les ID employé
           autorisés. Elle disparaît alors de la barre de tout le monde,
           sauf de la vôtre — l'administrateur en session voit toujours tout —
           et de celle des ID inscrits, qui la voient même si la vue de leur

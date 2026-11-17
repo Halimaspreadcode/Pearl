@@ -22,15 +22,15 @@ function codeOk(saisi, hash) {
 // renseignerait un attaquant sur ce qu'il a déjà trouvé.
 router.post('/api/team/auth', authLimiter, (req, res) => {
   const password = String(req.body?.password || '');
-  const huaweiId = String(req.body?.huaweiId || '').trim().toLowerCase();
+  const employeeId = String(req.body?.employeeId || '').trim().toLowerCase();
   let qui = null;
 
-  if (huaweiId) {
+  if (employeeId) {
     // Code personnel : connexion nominative, la seule qui permet d'écrire.
     const entry = Object.entries(foAccessCodes())
-      .find(([, v]) => String(v?.huawei_id || '').toLowerCase() === huaweiId);
+      .find(([, v]) => String(v?.employee_id || '').toLowerCase() === employeeId);
     if (entry && entry[1]?.hash && codeOk(password, entry[1].hash))
-      qui = { name: entry[0], huaweiId: entry[1].huawei_id, role: roleDe(entry[0]) };
+      qui = { name: entry[0], employeeId: entry[1].employee_id, role: roleDe(entry[0]) };
   } else if (team.teamPwMatches(password) || pwMatches(password)) {
     // Mot de passe d'équipe (ou admin saisi ici) : consultation seulement.
     qui = { lecture: true };
@@ -55,7 +55,7 @@ router.get('/api/team/session', (req, res) => {
     exige: actif || !!cfg.identity_required,
     codes: Object.keys(cfg.fo_access_codes || {}).length > 0,
     ok: !actif || team.requeteAuthentifiee(req),
-    user: q && q.name && q.name !== 'Admin' ? { name: q.name, huaweiId: q.huaweiId || '', role: q.role || '' } : null,
+    user: q && q.name && q.name !== 'Admin' ? { name: q.name, employeeId: q.employeeId || '', role: q.role || '' } : null,
     lecture: !!(q && q.lecture),
     admin: !!(q && q.admin),
   });

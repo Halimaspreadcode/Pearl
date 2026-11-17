@@ -35,7 +35,7 @@ router.post('/api/reports/weekly.pptx', async (req, res) => {
     res.setHeader('Content-Type',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation');
     res.setHeader('Content-Disposition',
-      `attachment; filename="EMOC_Weekly_Report_${day}.pptx"`);
+      `attachment; filename="Pearl_Weekly_Report_${day}.pptx"`);
     res.send(buf);
   } catch (err) {
     console.error('PPTX generation failed:', err);
@@ -71,7 +71,7 @@ router.post('/api/reports/weekly-combined.pptx', async (req, res) => {
     res.setHeader('Content-Type',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation');
     res.setHeader('Content-Disposition',
-      `attachment; filename="EMOC_Weekly_Performance_Dakar_Abidjan_${day}.pptx"`);
+      `attachment; filename="Pearl_Weekly_Performance_Dakar_Abidjan_${day}.pptx"`);
     res.send(buf);
   } catch (err) {
     console.error('Combined PPTX generation failed:', err);

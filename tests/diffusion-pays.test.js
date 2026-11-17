@@ -23,7 +23,7 @@ const DAILY = {
   breach_tickets: [],
 };
 const BR = {
-  author: 'Fatim NDOYE',
+  author: 'Jean DUPONT',
   highlights: [
     { source: 'NOC', observation: 'Toujours en cours', priority: 'P1', status: 'Open' },
     { source: 'NOC', observation: 'Réglé hier', priority: 'P3', status: 'Closed' },
@@ -45,7 +45,7 @@ test('highlights clôturés retirés, quelle que soit l\'écriture', () => {
 
 test('corps du daily : ville du pays, highlights clôturés absents, cible SLA remplie', () => {
   const html = corpsDaily(DAILY, BR, '', 'CI');
-  assert.match(html, /FRONT OFFICE DAILY REPORT - EMOC/);
+  assert.match(html, /DAILY REPORT/);
   assert.match(html, />Abidjan</);
   assert.doesNotMatch(html, />Dakar</);
   assert.match(html, /Toujours en cours/);

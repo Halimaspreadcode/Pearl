@@ -32,20 +32,16 @@ const FILES = {
   formation_reseau_progress: path.join(DATA_DIR, 'formation_reseau_progress.json'),
   // Clé de l'assistant IA : hors de git (.gitignore) et hors des
   // sauvegardes (qui ne copient que les .json). Voir services/ai.js.
-  // Insights Big Brother des agents, gardés pour ne pas rappeler le modèle
+  // Insights Pearl AI des agents, gardés pour ne pas rappeler le modèle
   // à chaque ouverture de la page.
   ai_insights:     path.join(DATA_DIR, 'ai_insights.json'),
-  // Résultats de skills épinglés sur l'accueil de Big Brother.
+  // Résultats de skills épinglés sur l'accueil de Pearl AI.
   ai_pins:         path.join(DATA_DIR, 'ai_pins.json'),
-  // Base de connaissances de Big Brother : documents importés, découpés
+  // Base de connaissances de Pearl AI : documents importés, découpés
   // en passages (services/ai-kb.js).
   ai_kb:           path.join(DATA_DIR, 'ai_kb.json'),
   // Vecteurs (embeddings) des passages, un fichier par document.
   ai_kb_vec:       path.join(DATA_DIR, 'ai_kb_vec'),
-  // Connecteur IMOC (outil de tickets du réseau) : réglages non secrets et
-  // dernier relevé. Les identifiants ne sont jamais enregistrés.
-  imoc:            path.join(DATA_DIR, 'imoc.json'),
-  imoc_tickets:    path.join(DATA_DIR, 'imoc_tickets.json'),
   // Indicateurs (KPI / PI) définis avec l'IA puis suivis automatiquement.
   indicateurs:     path.join(DATA_DIR, 'indicateurs.json'),
   ai_secret:       path.join(DATA_DIR, 'ai.secret'),

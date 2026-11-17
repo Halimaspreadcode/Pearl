@@ -46,7 +46,7 @@ const RP_TABS = [
 // une seule table, pas de copie à aligner.
 const RP_LEGACY_PAGES = Object.fromEntries(RP_TABS.map(t => [t.page, t.id]));
 
-const RP_TAB_KEY = 'emoc-rapports-tab';
+const RP_TAB_KEY = 'pearl-rapports-tab';
 
 const RpUI = {
   tab: null,          // onglet affiché

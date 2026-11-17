@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════
-// Vue RAPPORT — la slide « EMOC FO Progress » rendue à l'écran.
+// Vue RAPPORT — la slide « Team Progress » rendue à l'écran.
 //
 // Le même découpage que le PPTX, alimenté par les mêmes règles :
 //  · Achievements  = items Done de la semaine, regroupés par FO
@@ -99,7 +99,7 @@ function _wpRenderReport(el, weekStart) {
   el.innerHTML = `
     <div class="wp-report">
       <div class="wp-rep-head">
-        <div class="wp-rep-title">EMOC FO Progress</div>
+        <div class="wp-rep-title">Team Progress</div>
         <div class="wp-rep-meta">
           Semaine du ${esc(_wpFmtDate(weekStart))} au ${esc(_wpFmtDate(weekEnd))}
           · ${country === 'ALL' ? 'Dakar + Abidjan' : (country === 'CI' ? 'Abidjan (CI)' : 'Dakar (SN)')}
@@ -129,7 +129,7 @@ async function wpCopyReport() {
   const { weekStart, weekEnd } = _progressWeekRange(progressAnchorDate);
   const d = _wpReportData(weekStart);
   const L = [];
-  L.push(`EMOC FO Progress — week of ${_wpFmtDate(weekStart)} to ${_wpFmtDate(weekEnd)}`, '');
+  L.push(`Team Progress — week of ${_wpFmtDate(weekStart)} to ${_wpFmtDate(weekEnd)}`, '');
   L.push('ACHIEVEMENTS');
   d.achievements.length
     ? d.achievements.forEach(([who, tasks]) => tasks.forEach(t => L.push(`  - ${who} : ${t.task}`)))

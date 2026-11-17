@@ -3,7 +3,7 @@ const { readCfg, readWeeklyProgress, readShiftsPlan, readObs } = require('../cor
 // ══════════════════════════════════════════════════════════════
 // RAPPORT D'AIDE À LA DÉCISION
 //
-// Le serveur calcule les faits ; Big Brother ne fait que les lire. Chaque
+// Le serveur calcule les faits ; Pearl AI ne fait que les lire. Chaque
 // décision qu'il propose doit pouvoir se vérifier dans ces chiffres, qui
 // sont aussi affichés tels quels à côté de sa lecture.
 //

@@ -19,10 +19,10 @@ test('unité systemd : chemins absolus, utilisateur, relance et arrêt propre', 
 });
 
 test('plist launchd : démarre à l\'ouverture, relancé, caractères XML échappés', () => {
-  const p = plistLaunchd({ root: '/Users/a&b/fops', node: '/usr/local/bin/node' });
+  const p = plistLaunchd({ root: '/Users/a&b/pearl', node: '/usr/local/bin/node' });
   assert.match(p, /<key>RunAtLoad<\/key><true\/>/);
   assert.match(p, /<key>KeepAlive<\/key><true\/>/);
   assert.match(p, /<key>WATCHDOG_SUPERVISED<\/key><string>1<\/string>/);
-  assert.match(p, /<string>\/Users\/a&amp;b\/fops\/server\/watchdog\.js<\/string>/);
+  assert.match(p, /<string>\/Users\/a&amp;b\/pearl\/server\/watchdog\.js<\/string>/);
   assert.doesNotMatch(p, /a&b/);
 });

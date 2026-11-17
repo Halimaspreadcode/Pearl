@@ -11,7 +11,7 @@ window.renderPage = function(page) {
   // d'entrée de menu, et .nav-item.active reste alors sur « Vue
   // d'ensemble ». Sans cette trace, tout ce qui relit la page courante —
   // le sélecteur Global/SN/CI, la présence — y renvoyait l'utilisateur.
-  try { if (page) localStorage.setItem('emoc-last-page', page); } catch (_) {}
+  try { if (page) localStorage.setItem('pearl-last-page', page); } catch (_) {}
   // Signale la nouvelle page à la présence. Après _origRenderPage : la
   // classe .active de la barre latérale doit être posée avant la lecture.
   try { notePresencePage(); } catch (_) {}
@@ -86,10 +86,8 @@ const CFG_RUBRIQUES = [
     desc: 'Daily, Weekly, Monthly, Ops Review, diffusion par mail et exports',
     kw: 'Diffusion envoi mail SMTP groupes planification Export Excel PowerPoint JSON sauvegarde' },
   { page: 'indicateurs',  grp: 'pilot', titre: 'Indicateurs',
-    desc: 'KPI et PI décrits à Big Brother, suivis automatiquement', kw: 'KPI PI MTTD MTTR SLA indicateur formule degradation' },
-  { page: 'imoc',         grp: 'pilot', titre: 'Tickets IMOC',
-    desc: 'Tickets relevés dans IMOC, à la demande', kw: 'eticket ticketing oceane imoc import' },
-  { page: 'ai',           grp: 'pilot', titre: 'Big Brother',
+    desc: 'KPI et PI décrits à Pearl AI, suivis automatiquement', kw: 'KPI PI MTTD MTTR SLA indicateur formule degradation' },
+  { page: 'ai',           grp: 'pilot', titre: 'Pearl AI',
     desc: 'L\'assistant IA, ses outils et sa base de connaissances', kw: 'IA AI assistant knowledge documents cle API modele' },
 
   // ── Paramétrage ──

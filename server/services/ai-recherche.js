@@ -1,12 +1,12 @@
 // ══════════════════════════════════════════════════════════════
-// RECHERCHE EN LANGAGE NATUREL DANS FOPS
+// RECHERCHE EN LANGAGE NATUREL DANS PEARL
 //
 // « Trouve celui qui a oublié de fermer son ticket vendredi », « combien
 // d'absences par agent en septembre », « les P1 encore ouverts à
-// Abidjan »… Big Brother ne voit pas les données : il traduit la question
+// Abidjan »… Pearl AI ne voit pas les données : il traduit la question
 // en requête sur un schéma décrit (source, filtres, tri, regroupement),
-// et c'est FOps qui l'exécute. Le résultat s'affiche tel quel, avec la
-// lecture que Big Brother a faite de la question pour la vérifier.
+// et c'est Pearl qui l'exécute. Le résultat s'affiche tel quel, avec la
+// lecture que Pearl AI a faite de la question pour la vérifier.
 //
 // Les agents sont des alias pour le modèle (« Agent 03 ») : un nom cité
 // dans la question est remplacé avant l'envoi, puis remis dans la requête.
@@ -141,7 +141,7 @@ function systeme(alias, auj) {
   const d = new Date(auj + 'T12:00:00Z');
   const nomJour = d.toLocaleDateString('fr-FR', { weekday: 'long', timeZone: 'UTC' });
   return [
-    'Tu traduis une question de manager en requête sur les données de FOps (outil de suivi d\'une équipe Front Office de supervision ITSM).',
+    'Tu traduis une question de manager en requête sur les données de Pearl (outil de suivi d\'une équipe Front Office de supervision ITSM).',
     `Aujourd'hui : ${auj} (${nomJour}). Résous les dates relatives (« vendredi », « la semaine dernière », « en septembre ») en dates AAAA-MM-JJ.`,
     'Les agents sont des alias (« Agent 01 »…) : réutilise-les exactement.',
     'Sources et champs :', schema(alias),

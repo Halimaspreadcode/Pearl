@@ -30,7 +30,7 @@ const AbsenceSession = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           password,
-          huaweiId: (typeof currentUser !== 'undefined' && currentUser?.huaweiId) || '',
+          employeeId: (typeof currentUser !== 'undefined' && currentUser?.employeeId) || '',
         }),
       });
       if (res.status === 429) return { ok: false, error: 'Too many attempts. Try again later.' };

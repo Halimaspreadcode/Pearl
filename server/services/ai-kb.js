@@ -1,4 +1,4 @@
-// ── BASE DE CONNAISSANCES DE BIG BROTHER ──────────────────────
+// ── BASE DE CONNAISSANCES DE PEARL AI ──────────────────────
 // L'admin importe des documents (procédures, guides, comptes rendus…).
 // Chacun est réduit à son texte, découpé en passages d'environ un
 // paragraphe, puis gardé dans data/ai_kb.json.

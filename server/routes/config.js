@@ -28,7 +28,7 @@ router.get('/api/config', (req, res) => {
     // Les sessions partent avec eux : leur calendrier n'a de sens que
     // pour qui a le droit de voir les objectifs qu'elles portent.
     fo_objectives, objective_sessions,
-    // Qui a droit à l'insight Big Brother : réglage d'admin, route dédiée.
+    // Qui a droit à l'insight Pearl AI : réglage d'admin, route dédiée.
     ai_insights,
     ...cfg
   } = readCfg();
@@ -73,7 +73,7 @@ router.put('/api/config', requireAdmin, (req, res) => {
     // (/api/academy/locks). Un client qui renverrait une config lue avant
     // le dernier réglage rouvrirait sinon un module que l'admin vient de fermer.
     delete body.academy;
-    // Insights Big Brother des agents : route dédiée (/api/ai/insights).
+    // Insights Pearl AI des agents : route dédiée (/api/ai/insights).
     delete body.ai_insights;
     // Rôles et parties prenantes : routes dédiées (/api/parties).
     delete body.parties;
@@ -109,7 +109,7 @@ router.put('/api/config', requireAdmin, (req, res) => {
       // Trace volontaire : si ce message apparaît, un client lit la config
       // sans en-tête d'administration. Le refus a protégé la donnée, mais la
       // cause est côté appelant et mérite d'être corrigée.
-      console.warn(`[EMOC] PUT /api/config : bloc(s) vide(s) ignoré(s) pour ` +
+      console.warn(`[Pearl] PUT /api/config : bloc(s) vide(s) ignoré(s) pour ` +
                    `ne pas écraser des données en place : ${ecrases.join(', ')}.`);
     }
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FOps</title>
+<title>Pearl</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='1' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%233FB7A0'/%3E%3Cstop offset='1' stop-color='%234F6A85'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M6 34A28 28 0 0 1 34 6' fill='none' stroke='url(%23g)' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M13 34A21 21 0 0 1 34 13' fill='none' stroke='url(%23g)' stroke-width='4.5' stroke-linecap='round' opacity='.7'/%3E%3Cpath d='M20 34A14 14 0 0 1 34 20' fill='none' stroke='url(%23g)' stroke-width='4.5' stroke-linecap='round' opacity='.45'/%3E%3Ccircle cx='31' cy='31' r='4.5' fill='%23F2A65A'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <!-- Polices chargées sans bloquer l'affichage : derrière un proxy qui laisse
@@ -67,7 +67,6 @@
 <link rel="stylesheet" href="/css/pages/rapports.css">
 <link rel="stylesheet" href="/css/pages/mon-espace.css">
 <link rel="stylesheet" href="/css/pages/admin-ux.css">
-<link rel="stylesheet" href="/css/pages/imoc.css">
 <link rel="stylesheet" href="/css/pages/indicateurs.css">
 <link rel="stylesheet" href="/css/pages/parties.css">
 </head>
@@ -78,9 +77,9 @@
   <nav class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-brand">
-        <svg class="sidebar-logo" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="fops-logo-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#3FB7A0"/><stop offset="1" stop-color="#4F6A85"/></linearGradient></defs><path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="url(#fops-logo-g)" stroke-width="4.5" stroke-linecap="round"/><path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="url(#fops-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".7"/><path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="url(#fops-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".45"/><circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg>
+        <svg class="sidebar-logo" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="pearl-logo-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#3FB7A0"/><stop offset="1" stop-color="#4F6A85"/></linearGradient></defs><path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="url(#pearl-logo-g)" stroke-width="4.5" stroke-linecap="round"/><path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="url(#pearl-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".7"/><path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="url(#pearl-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".45"/><circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg>
         <div>
-          <div class="sidebar-brand-name">FOps</div>
+          <div class="sidebar-brand-name">Pearl</div>
           <div class="sidebar-brand-sub">Front Office</div>
         </div>
       </div>
@@ -285,15 +284,15 @@
         </div>
       </div>
 
-      <!-- L'accueil de Big Brother (ai-cockpit.js) remplace l'ancien tableau de bord. -->
+      <!-- L'accueil de Pearl AI (ai-cockpit.js) remplace l'ancien tableau de bord. -->
       <div class="nav-item nav-mode-off" data-page="ai">
         <div class="nav-item-left">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>
-          <span class="nav-item-label">Big Brother</span>
+          <span class="nav-item-label">Pearl AI</span>
         </div>
       </div>
 
-      <!-- KPI / PI définis avec Big Brother, suivis automatiquement. -->
+      <!-- KPI / PI définis avec Pearl AI, suivis automatiquement. -->
       <div class="nav-item nav-mode-off" data-page="indicateurs">
         <div class="nav-item-left">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
@@ -301,24 +300,11 @@
         </div>
       </div>
 
-      <!-- Tickets relevés dans IMOC (eTicket), à la demande de l'admin. -->
-      <div class="nav-item nav-mode-off" data-page="imoc">
-        <div class="nav-item-left">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 0 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 0 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>
-          <span class="nav-item-label">Tickets IMOC</span>
-        </div>
-      </div>
 
       </div><!-- /sidebar-group reporting -->
 
       <div class="sidebar-section">Outils</div>
 
-      <div class="nav-item" data-page="log-analyzer">
-        <div class="nav-item-left">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span class="nav-item-label">Analyseur</span>
-        </div>
-      </div>
 
       <!-- Academy : entrée unique des formations (DigitalView, Process
            ITSM), avec intro, heatmaps et cours en plein écran. Les anciennes
@@ -387,7 +373,6 @@
 
     <!-- sidebar footer -->
     <div class="sidebar-footer">
-      <div style="font-size:10px;color:var(--mute);text-align:center;padding:6px 0">Designed by Halima GUEYE</div>
     </div>
   </nav>
 
@@ -1069,10 +1054,6 @@
       </div>
     </div>
 
-    <!-- LOG ANALYZER -->
-    <div class="page" id="page-log-analyzer" style="margin:-28px -28px -32px">
-      <iframe src="/log-analyzer.html" style="width:100%;height:calc(100vh - 56px);border:none;display:block"></iframe>
-    </div>
 
     <!-- Formation DigitalView. L'iframe n'est chargée qu'à la première
          ouverture (formation.js) : 190 Ko que personne ne télécharge
@@ -1309,11 +1290,11 @@
           </div>
           <div class="myperf-lock-t">Personal access</div>
           <div class="myperf-lock-d">
-            Enter your Huawei ID and the personal code given to you by your
+            Enter your Employee ID and the personal code given to you by your
             manager. You will only ever see your own review.
           </div>
           <div class="myperf-form">
-            <input class="form-control idt-mono" id="myperf-id" placeholder="Huawei ID (e.g. h50056630)"
+            <input class="form-control idt-mono" id="myperf-id" placeholder="Employee ID (e.g. h50056630)"
                    autocomplete="off" onkeydown="if(event.key==='Enter')myPerfLogin()">
             <input class="form-control idt-mono" id="myperf-code" placeholder="Personal code" type="password"
                    autocomplete="off" onkeydown="if(event.key==='Enter')myPerfLogin()">
@@ -1493,7 +1474,7 @@
       <div class="qz-header">
         <div class="qz-header-id">
           <div class="qz-title">Quiz</div>
-          <div class="qz-sub">EMOC procedures, SLA and tools — at your own pace</div>
+          <div class="qz-sub">Procedures, SLAs and tools — at your own pace</div>
         </div>
         <div class="qz-header-actions">
           <div class="qz-search">
@@ -1784,9 +1765,9 @@
         <div class="idt-suggest" id="identity-suggest"></div>
       </div>
       <div class="form-group idt-field idt-field-last">
-        <label class="form-label" for="identity-huawei-input">ID Huawei <span class="req">*</span></label>
+        <label class="form-label" for="identity-employee-input">ID employé <span class="req">*</span></label>
         <div class="idt-input-wrap">
-          <input class="form-control idt-mono" id="identity-huawei-input" placeholder="ex : hw12345678" autocomplete="off"
+          <input class="form-control idt-mono" id="identity-employee-input" placeholder="ex : hw12345678" autocomplete="off"
             oninput="updateIdentityPreview()" onkeydown="if(event.key==='Enter')saveIdentity()">
           <!-- Le format valide se signale par un check dans le champ, pas
                par une ligne de texte : l'info tient au même endroit que la
@@ -1865,7 +1846,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">IMOC TT#</label>
-            <input class="form-control" name="imoc_tt" placeholder="IMOC number"
+            <input class="form-control" name="imoc_tt" placeholder="Référence externe"
               style="font-family:'JetBrains Mono',monospace">
           </div>
 
@@ -2570,7 +2551,7 @@
 
         <div class="form-group">
           <label class="form-label">Name <span class="req">*</span></label>
-          <input class="form-control" name="name" required placeholder="e.g. EMOC Basics">
+          <input class="form-control" name="name" required placeholder="e.g. Onboarding basics">
         </div>
 
         <div class="form-group">
@@ -2805,7 +2786,6 @@
 <script src="/js/pages/audit.js"></script>
 <script src="/js/pages/ai/ai.js"></script>
 <script src="/js/pages/ai/ai-cockpit.js"></script>
-<script src="/js/pages/imoc/imoc.js"></script>
 <script src="/js/pages/indicateurs/indicateurs.js"></script>
 <script src="/js/pages/config/parties.js"></script>
 <script src="/js/pages/reports/reports-common.js"></script>

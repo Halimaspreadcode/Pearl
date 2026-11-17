@@ -56,7 +56,9 @@ function writeJSON(file, data) {
 let _hashDefautApprobation = null;
 function hashDefautApprobation() {
   if (_hashDefautApprobation === null) {
-    _hashDefautApprobation = bcrypt.hashSync('EMOC2024', 10);
+    _hashDefautApprobation = // Aucun mot de passe connu par défaut : un secret aléatoire, que personne
+    // ne connaît, tant que l'admin n'en a pas défini un.
+    bcrypt.hashSync(require('crypto').randomBytes(24).toString('hex'), 10);
   }
   return _hashDefautApprobation;
 }
@@ -80,7 +82,7 @@ function migrateIfNeeded() {
   if (!fs.existsSync(FILES.legacy)) return;
   const allExist = ['sn','ci','observations','audit','config'].every(k => fs.existsSync(FILES[k]));
   if (allExist) return; // already migrated
-  console.log('[EMOC] Migrating tickets.json → split data files…');
+  console.log('[Pearl] Migrating tickets.json → split data files…');
   let legacy;
   try { legacy = JSON.parse(fs.readFileSync(FILES.legacy, 'utf8')); }
   catch { return; }
@@ -94,7 +96,7 @@ function migrateIfNeeded() {
   }
   // Rename legacy file so it's not re-read
   fs.renameSync(FILES.legacy, FILES.legacy + '.bak');
-  console.log('[EMOC] Migration done. tickets.json → tickets.json.bak');
+  console.log('[Pearl] Migration done. tickets.json → tickets.json.bak');
 }
 migrateIfNeeded();
 
@@ -106,7 +108,7 @@ function migratePasswordsIfNeeded() {
     cfg.approval_password_hash = bcrypt.hashSync(cfg.approval_password, 10);
     delete cfg.approval_password;
     writeJSON(FILES.config, cfg);
-    console.log('[EMOC] Migrated approval_password → approval_password_hash (hashed).');
+    console.log('[Pearl] Migrated approval_password → approval_password_hash (hashed).');
   }
 }
 migratePasswordsIfNeeded();
@@ -193,10 +195,10 @@ function migrateHoldPeriodsIfNeeded() {
       if (x.hold_periods.length) n++;
     }
     writeTracker(t, tickets);
-    console.log(`[EMOC] Périodes On Hold reconstituées (${t.toUpperCase()}) : ${n} ticket(s) concerné(s).`);
+    console.log(`[Pearl] Périodes On Hold reconstituées (${t.toUpperCase()}) : ${n} ticket(s) concerné(s).`);
   }
 }
-try { migrateHoldPeriodsIfNeeded(); } catch (e) { console.error('[EMOC] Migration On Hold échouée :', e.message); }
+try { migrateHoldPeriodsIfNeeded(); } catch (e) { console.error('[Pearl] Migration On Hold échouée :', e.message); }
 
 module.exports = {
   _locks, withFileLock, readJSON, writeJSON, readSN, readCI, readObs,

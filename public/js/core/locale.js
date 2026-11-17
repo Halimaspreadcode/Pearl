@@ -24,7 +24,7 @@ function applyLang(val) {
 }
 
 // ── ACTIVE COUNTRY ───────────────────────────────────────────
-let currentCountry = localStorage.getItem('emoc-active-country') || 'SN';
+let currentCountry = localStorage.getItem('pearl-active-country') || 'SN';
 
 function getActiveCountry() { return currentCountry; }
 
@@ -118,12 +118,12 @@ function _syncCountryDropdowns() {
 function _currentPageId() {
   const el = document.querySelector('.page.active');
   if (el && el.id && el.id.startsWith('page-')) return el.id.slice(5);
-  try { return localStorage.getItem('emoc-last-page') || ''; } catch (_) { return ''; }
+  try { return localStorage.getItem('pearl-last-page') || ''; } catch (_) { return ''; }
 }
 
 function setActiveCountry(val) {
   currentCountry = (val === 'CI' || val === 'ALL') ? val : 'SN';
-  localStorage.setItem('emoc-active-country', currentCountry);
+  localStorage.setItem('pearl-active-country', currentCountry);
   _applyCountryNav();
   _syncCountryDropdowns();
   _syncCountryDot();

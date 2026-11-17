@@ -312,7 +312,7 @@ function _o2osPrep(fo, ctx) {
   // 6. Trous de données : ils se voyaient passivement dans les cartes,
   //    on en fait une consigne.
   if (!fid) pts.push({
-    ton: 'warn', txt: 'Huawei ID missing',
+    ton: 'warn', txt: 'Employee ID missing',
     det: 'Without it, no “My Performance” code can be issued.',
   });
   if (!att) pts.push({

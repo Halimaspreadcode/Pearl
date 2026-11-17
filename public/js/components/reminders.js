@@ -509,7 +509,7 @@ const NF = {
     const nav = typeof mesCanonPage === 'function' ? mesCanonPage(page) : page;
     document.querySelectorAll('.nav-item').forEach(n =>
       n.classList.toggle('active', n.dataset.page === nav));
-    try { localStorage.setItem('emoc-last-page', nav); } catch (_) {}
+    try { localStorage.setItem('pearl-last-page', nav); } catch (_) {}
   },
 
   toggle(ev) {

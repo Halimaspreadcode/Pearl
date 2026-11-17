@@ -1,7 +1,7 @@
 {
-  "name": "fops",
-  "version": "2.8.0",
-  "description": "FOps - Front Office Ticket Tracker - DKR",
+  "name": "pearl",
+  "version": "0.1.0",
+  "description": "Pearl — plateforme SaaS marque blanche de pilotage d’équipe",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
@@ -16,9 +16,7 @@
     "dev": "node --watch server/index.js",
     "test:run": "PORT=3001 DATA_DIR=./data-test node server/index.js",
     "test:seed": "rm -rf ./data-test && cp -R ./data ./data-test && rm -rf ./data-test/backups",
-    "migrate": "node migrate-data.js",
-    "restore:team": "node scripts/restore-team.js",
-    "test": "node --test tests/"
+    "test": "node --test tests/*.test.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

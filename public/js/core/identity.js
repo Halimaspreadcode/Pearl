@@ -28,9 +28,9 @@ function applyServerIdentity(t) {
     if (typeof applyNavMode === 'function') try { applyNavMode(); } catch {}
     return;
   }
-  const meme = currentUser && currentUser.name === u.name && currentUser.huaweiId === u.huaweiId;
+  const meme = currentUser && currentUser.name === u.name && currentUser.employeeId === u.employeeId;
   currentUser = {
-    name: u.name, huaweiId: u.huaweiId, role: u.role || 'Observer',
+    name: u.name, employeeId: u.employeeId, role: u.role || 'Observer',
     color: (meme && currentUser.color) || _autoAvatarColor(u.name),
     initials: getInitials(u.name), verified: true,
   };
@@ -51,7 +51,7 @@ function openUserModal(forceMode) {
   if (_serverIdentityActive()) {
     const t = window.TeamIdentity;
     if (t.user) {
-      if (confirm(`Connecté(e) en tant que ${t.user.name} (${t.user.huaweiId}).\n\nSe déconnecter ?`)) teamLogout();
+      if (confirm(`Connecté(e) en tant que ${t.user.name} (${t.user.employeeId}).\n\nSe déconnecter ?`)) teamLogout();
     } else if (typeof teamLogin === 'function') teamLogin();
     return;
   }
@@ -79,8 +79,8 @@ function openUserModal(forceMode) {
 
   const inp = document.getElementById('identity-name-input');
   inp.value = currentUser?.name || '';
-  const hwInp = document.getElementById('identity-huawei-input');
-  if (hwInp) hwInp.value = currentUser?.huaweiId || '';
+  const hwInp = document.getElementById('identity-employee-input');
+  if (hwInp) hwInp.value = currentUser?.employeeId || '';
 
   // La couleur n'est plus un choix : un champ de moins à remplir pour une
   // décision sans enjeu. On garde celle déjà attribuée, sinon on en dérive
@@ -231,7 +231,7 @@ function pickIdentityName(btn) {
   if (!inp) return;
   inp.value = btn.dataset.name;
   updateIdentityPreview();   // re-rend aussi les suggestions
-  document.getElementById('identity-huawei-input')?.focus();
+  document.getElementById('identity-employee-input')?.focus();
 }
 
 // Entrée dans le champ nom : si une seule suggestion reste, la retenir.
@@ -240,10 +240,10 @@ function idtNameKey(ev) {
   const btns = document.querySelectorAll('#identity-suggest .idt-sg[data-name]');
   if (btns.length === 1) { ev.preventDefault(); pickIdentityName(btns[0]); return; }
   ev.preventDefault();
-  document.getElementById('identity-huawei-input')?.focus();
+  document.getElementById('identity-employee-input')?.focus();
 }
 
-// L'ID Huawei suit un format connu (une ou deux lettres + 8 chiffres,
+// L'ID employé suit un format connu (une ou deux lettres + 8 chiffres,
 // ex. h50056630). Le refus est dur : un ID libre laissait passer des
 // identités non attribuables, et c'est précisément ce que l'audit doit
 // empêcher.
@@ -260,7 +260,7 @@ function _identityHwState(v) {
 function updateIdentityPreview() {
   const nameRaw  = document.getElementById('identity-name-input')?.value || '';
   const name     = nameRaw.trim();
-  const huaweiId = document.getElementById('identity-huawei-input')?.value || '';
+  const employeeId = document.getElementById('identity-employee-input')?.value || '';
   const color    = _identityColor || _autoAvatarColor(name);
   const initials = getInitials(nameRaw);
 
@@ -276,16 +276,16 @@ function updateIdentityPreview() {
       roleEl.innerHTML =
         `<span class="idt-role ${r.cls}">
            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${r.ico}</svg>
-           ${r.label}${huaweiId.trim() ? ' · ' + esc(huaweiId.trim()) : ''}
+           ${r.label}${employeeId.trim() ? ' · ' + esc(employeeId.trim()) : ''}
          </span>
          <div class="idt-role-note">${r.note}</div>`;
     }
   }
 
   // Validation de l'ID
-  const hwInp  = document.getElementById('identity-huawei-input');
+  const hwInp  = document.getElementById('identity-employee-input');
   const hwHint = document.getElementById('identity-hw-hint');
-  const hw     = _identityHwState(huaweiId);
+  const hw     = _identityHwState(employeeId);
   if (hwHint) { hwHint.textContent = hw.msg; hwHint.className = 'idt-hint ' + hw.cls; }
   if (hwInp)  hwInp.classList.toggle('is-err', hw.cls === 'err');
   document.getElementById('identity-hw-check')?.classList.toggle('show', hw.cls === 'ok');
@@ -310,9 +310,9 @@ function getInitials(name) {
 
 function saveIdentity() {
   const name    = document.getElementById('identity-name-input')?.value.trim() || '';
-  const huaweiId = document.getElementById('identity-huawei-input')?.value.trim() || '';
+  const employeeId = document.getElementById('identity-employee-input')?.value.trim() || '';
   if (!name)     { toast('Enter your name', 'error');       document.getElementById('identity-name-input').focus();    return; }
-  if (!huaweiId) { toast('Enter your Huawei ID', 'error'); document.getElementById('identity-huawei-input').focus(); return; }
+  if (!employeeId) { toast('Enter your Employee ID', 'error'); document.getElementById('identity-employee-input').focus(); return; }
 
   // Deux cas légitimes : un nom des listes FO / BO, ou un nom cohérent
   // hors listes (rôle Observateur — des gens consultent le tracker sans y
@@ -325,12 +325,12 @@ function saveIdentity() {
     document.getElementById('identity-name-input').focus();
     return;
   }
-  // L'ID Huawei suit le format interne (une ou deux lettres + 7 ou 8 chiffres).
+  // L'ID employé suit le format interne (une ou deux lettres + 7 ou 8 chiffres).
   // Refus dur ici, contrairement au simple avertissement de la saisie : un
   // ID mal formé rend la trace d'audit inexploitable.
-  if (!/^[a-zA-Z]{1,2}\d{7,8}$/.test(huaweiId)) {
-    toast('ID Huawei invalide — format attendu : h50056630 ou wx1488808', 'error');
-    document.getElementById('identity-huawei-input').focus();
+  if (!/^[a-zA-Z]{1,2}\d{7,8}$/.test(employeeId)) {
+    toast('ID employé invalide — format attendu : h50056630 ou wx1488808', 'error');
+    document.getElementById('identity-employee-input').focus();
     return;
   }
 
@@ -346,7 +346,7 @@ function saveIdentity() {
   const isBO    = (state.boList || []).some(b => b.name === finalName);
   const pp      = !isFO && !isBO ? _identityPartie(finalName) : null;
   const role    = isFO ? 'FO' : isBO ? 'BO' : pp ? pp.role.key : 'Observer';
-  currentUser   = { name: finalName, huaweiId, color, initials: getInitials(finalName), role };
+  currentUser   = { name: finalName, employeeId, color, initials: getInitials(finalName), role };
   localStorage.setItem('fo-user', JSON.stringify(currentUser));
   updateUserPill();
   startPresence();

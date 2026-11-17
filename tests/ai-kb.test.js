@@ -1,4 +1,4 @@
-// Base de connaissances de Big Brother : extraction, découpage, recherche.
+// Base de connaissances de Pearl AI : extraction, découpage, recherche.
 const { useTempDataDir } = require('./helpers/data-dir');
 useTempDataDir({});
 const { test } = require('node:test');

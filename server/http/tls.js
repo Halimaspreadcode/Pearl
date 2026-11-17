@@ -28,7 +28,7 @@ if (CERT && KEY) {
   try {
     options = { cert: fs.readFileSync(CERT), key: fs.readFileSync(KEY), minVersion: 'TLSv1.2' };
   } catch (e) {
-    console.error(`[EMOC] HTTPS désactivé : certificat illisible (${e.message}).`);
+    console.error(`[Pearl] HTTPS désactivé : certificat illisible (${e.message}).`);
   }
 }
 const actif = !!options;
@@ -55,7 +55,7 @@ function demarrer(app, host) {
   srv.listen(HTTPS_PORT, host, () => {
     console.log(`  HTTPS actif : https://<adresse>:${HTTPS_PORT}  (HTTP réservé à la machine locale)\n`);
   });
-  srv.on('error', e => console.error(`[EMOC] HTTPS : ${e.message}`));
+  srv.on('error', e => console.error(`[Pearl] HTTPS : ${e.message}`));
   return srv;
 }
 
@@ -64,10 +64,10 @@ function demarrer(app, host) {
 const path = require('path');
 const CA_CRT = path.join(path.dirname(path.resolve(CERT || 'data/tls/server.crt')), 'ca.crt');
 function routeCa(req, res, next) {
-  if (req.path !== '/emoc-ca.crt' || req.method !== 'GET') return next();
+  if (req.path !== '/pearl-ca.crt' || req.method !== 'GET') return next();
   if (!fs.existsSync(CA_CRT)) return res.status(404).end();
   res.set('Content-Type', 'application/x-x509-ca-cert');
-  res.set('Content-Disposition', 'attachment; filename="emoc-ca.crt"');
+  res.set('Content-Disposition', 'attachment; filename="pearl-ca.crt"');
   res.sendFile(CA_CRT);
 }
 

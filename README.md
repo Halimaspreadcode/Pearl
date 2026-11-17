@@ -1,9 +1,14 @@
 # Pearl
 
-# EMOC Tracker
+Plateforme de pilotage d'équipe opérationnelle : tickets et délais (SLA),
+plannings et rotations, absences, objectifs et performance, formation et
+quiz, rapports diffusés par mail, assistant IA.
 
-Application web de suivi des tickets Front Office - Huawei DKR EMOC.
-Conçue et développée par **Halima GUEYE**.
+Pearl est en cours de transformation en **SaaS marque blanche multi-tenant**.
+La cible et le plan de migration sont décrits dans
+[`docs/SAAS-ARCHITECTURE.md`](docs/SAAS-ARCHITECTURE.md). Ce README décrit
+l'application telle qu'elle tourne aujourd'hui (une instance = une
+organisation).
 
 ## Prérequis
 
@@ -11,7 +16,7 @@ Conçue et développée par **Halima GUEYE**.
 - Accès réseau local entre les postes FO et le serveur
 
 Sur un Node plus ancien, le serveur s'arrête au démarrage avec
-« FOps demande Node.js 18 ou plus récent ». Les paquets `nodejs` d'Ubuntu
+« Pearl demande Node.js 18 ou plus récent ». Les paquets `nodejs` d'Ubuntu
 sont souvent trop vieux (Node 10 ou 12). Mise à jour sur Ubuntu :
 
 ```bash
@@ -40,14 +45,14 @@ de paquets adaptées à celui-ci.
 ## Installation (poste avec accès internet)
 
 ```bash
-cd emoc-tracker
+cd pearl
 npm install        # installe les dépendances, pas besoin d'internet ensuite
 ```
 
 ## Déploiement sur une VM sans accès internet
 
 `npm install` ne fonctionnera pas sur une VM hors-ligne. À la place, copier le
-dossier `emoc-tracker` **avec son `node_modules/`** (déjà généré sur un poste
+dossier `pearl` **avec son `node_modules/`** (déjà généré sur un poste
 avec internet) directement sur la VM - clé USB, partage réseau, etc. Aucune
 installation supplémentaire n'est nécessaire, `node_modules/` contient déjà
 tout.
@@ -72,7 +77,7 @@ npm start          # démarre au premier plan, Ctrl+C pour arrêter
 Pour le laisser tourner après fermeture du terminal :
 
 ```bash
-nohup npm start > fops.log 2>&1 &
+nohup npm start > pearl.log 2>&1 &
 ```
 
 ## Reprendre les objectifs d'une ancienne version
@@ -148,25 +153,7 @@ utilisateur que le service reprend. Arrêter d'abord un serveur lancé à la mai
 (`npm start`), sinon le port est pris. Après une mise à jour de Node ou un
 déplacement du projet, relancer `npm run service:install`.
 
-Pour régler soi-même, modèles dans `deploy/` (adapter les chemins marqués ⚠) :
-
-- **Linux (systemd)** — `deploy/fops.service` :
-  ```bash
-  sudo cp deploy/fops.service /etc/systemd/system/
-  sudo systemctl daemon-reload && sudo systemctl enable --now fops
-  systemctl status fops        # état      journalctl -u fops -f   # journal
-  ```
-- **macOS (launchd)** — `deploy/com.fops.watchdog.plist` :
-  ```bash
-  cp deploy/com.fops.watchdog.plist ~/Library/LaunchAgents/
-  launchctl load -w ~/Library/LaunchAgents/com.fops.watchdog.plist
-  ```
-- **Windows** — Planificateur de tâches : nouvelle tâche « Au démarrage »,
-  programme `node`, arguments `server\watchdog.js`, « Commencer dans » = dossier
-  du projet, et dans Paramètres « Si la tâche échoue, redémarrer toutes les
-  1 minute ».
-
-Avec un service installé, on arrête par le service (`systemctl stop fops`,
+Avec un service installé, on arrête par le service (`systemctl stop pearl`,
 `launchctl unload …`) : tuer le serveur seul le ferait relancer aussitôt.
 
 ## Arrêter le serveur
@@ -257,10 +244,10 @@ fuseau du poste de travail.
 - Dashboard temps réel : KPIs (Total, Open, Breach, Near Breach, SLA
   Compliance), alertes Breach / Near Breach, countdown SLA en direct,
   sélecteur de période et Activité récente
-- Trackers SN (Dakar) et CI (Abidjan) - saisie, modification, filtres,
-  export Excel
+- Trackers par site (aujourd'hui deux sites, `SN` et `CI`, à rendre
+  configurables : voir docs/SAAS-ARCHITECTURE.md) - saisie, filtres, export Excel
 - Observations - log opérationnel
-- FO Dashboard - statistiques, classement par Front Office et Trust Matrix
+- Tableau d'équipe - statistiques, classement par agent et Trust Matrix
 - Rapports Daily / Weekly / Monthly avec sections auto-remplies
   (tickets en risque, breaches actifs) et export PowerPoint du Weekly
 - Handover Board - passage de relais entre shifts, avec détection des
@@ -297,7 +284,7 @@ sensibles sont malgré tout protégés :
   admin. Sans lui, tickets, observations, planning… restent lisibles par tout
   poste du réseau. Le condensé vit dans `data/team-access.secret`, hors de git.
 - **Identité vérifiée** : avec l'accès équipe actif, on se connecte avec son ID
-  Huawei et son **code personnel** (Configuration → Sécurité → Codes
+  employé et son **code personnel** (Configuration → Sécurité → Codes
   personnels, pour FO, BO ou toute autre personne). C'est la session, et non
   un nom choisi dans le navigateur, qui dit qui agit : le serveur signe
   chaque écriture (tickets, tâches, demandes, quiz) avec cette identité, et un
@@ -319,7 +306,7 @@ npm run service:restart
 L'équipe ouvre ensuite `https://[IP-DU-SERVEUR]:3443` ; l'ancienne adresse
 `http://…:3000` y renvoie d'elle-même (le HTTP ne sert plus que la machine
 locale, pour le watchdog). Sur chaque poste, une fois, installer
-`https://[IP-DU-SERVEUR]:3443/emoc-ca.crt` dans les « Autorités de
+`https://[IP-DU-SERVEUR]:3443/pearl-ca.crt` dans les « Autorités de
 certification racines de confiance » pour ne plus voir d'avertissement. Mieux :
 faire signer `data/tls/server.csr` par l'autorité de l'entreprise et remplacer
 `data/tls/server.crt`.
@@ -328,11 +315,10 @@ Pour autoriser une origine supplémentaire (autre nom de machine, port
 différent) :
 
 ```bash
-CORS_ORIGINS=http://serveur-emoc:8080,http://autre-poste:3000 npm start
+CORS_ORIGINS=http://serveur-pearl:8080,http://autre-poste:3000 npm start
 ```
 
 ---
-DKR EMOC Front Office - Huawei | Version 2.7 | Conçu et développé par Halima GUEYE
 
 ## Architecture du code
 

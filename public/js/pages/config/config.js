@@ -2,37 +2,16 @@
 // switchConfigTab a disparu avec la barre d'onglets : chaque rubrique
 // est maintenant une page, atteinte par renderPage('cfg-…').
 
-// ── GLOSSAIRE LOGS (partage avec log-analyzer.html via localStorage) ──
+// ── GLOSSAIRE LOGS (localStorage) ──
 const LOG_ANALYZER_DEFAULT_GLOSSARY = {
-  "mdn": "Cluster Medina (Production 2)",
-  "pr1": "Production 1 (Rufisque)",
-  "osnpp2": "Environnement de preproduction OSN",
-  "gaussdb": "Base de donnees distribuee Huawei GaussDB",
-  "wallet": "Plateforme Mobile Money",
   "snmp": "Protocole de supervision reseau",
   "sftp": "Protocole de transfert de fichiers securise",
-  "ocprox6000": "Baie de stockage OceanStor Pro X6000",
-  "csn": "Numero de serie chassis (Chassis Serial Number)",
-  "moname": "Nom de l'objet gere (Managed Object)",
   "ftp": "Protocole de transfert de fichiers",
-  "vrrp": "Protocole de redondance de routeur virtuel",
-  "bgp": "Protocole de routage Border Gateway Protocol",
-  "ospf": "Protocole de routage a etat de liens",
-  "raid": "Technologie de redondance de disques",
-  "nfs": "Systeme de fichiers reseau (Network File System)",
-  "cifs": "Protocole de partage de fichiers Windows",
-  "san": "Reseau de stockage (Storage Area Network)",
-  "nas": "Stockage en reseau (Network Attached Storage)",
-  "vlan": "Reseau local virtuel",
   "cpu": "Unite centrale de traitement",
   "mem": "Memoire",
   "disk": "Disque de stockage",
-  "link": "Liaison reseau",
-  "down": "Hors service / inactif",
-  "up": "En service / actif",
   "timeout": "Depassement de delai de reponse",
-  "auth": "Authentification",
-  "huawei": "Equipementier Huawei"
+  "auth": "Authentification"
 };
 const LOG_ANALYZER_GLOSSARY_KEY = 'logAnalyzer.customGlossary';
 
@@ -150,7 +129,7 @@ function renderConfig() {
       // L'ID est cliquable : c'est le seul moyen de le corriger, et un
       // agent sans ID doit rester repérable d'un coup d'œil.
       const fid = (cfg.fo_ids || {})[fo] || '';
-      const idBtn = `<button onclick="editFoId('${foEsc}')" title="${fid ? 'Modifier' : 'Ajouter'} l’ID Huawei"
+      const idBtn = `<button onclick="editFoId('${foEsc}')" title="${fid ? 'Modifier' : 'Ajouter'} l’ID employé"
         style="font-size:10px;font-family:monospace;padding:1px 6px;border-radius:3px;cursor:pointer;
                border:1px dashed ${fid ? 'transparent' : 'var(--mute)'};
                background:${fid ? 'var(--white)' : 'transparent'};
@@ -333,7 +312,7 @@ async function removeTicketStatus(s) {
   await fetch(`${API}/api/config`, { method:'PUT', headers: AdminSession.headers({'Content-Type':'application/json'}), credentials:'same-origin', body: JSON.stringify(cfg) });
   await loadConfig(); renderConfig();
 }
-// Format d'ID Huawei, aligné sur le contrôle serveur de /api/presence/ping
+// Format d'ID employé, aligné sur le contrôle serveur de /api/presence/ping
 // et sur celui de la saisie d'identité. Un seul format pour toute l'app.
 const FO_ID_RE = /^[a-zA-Z]{1,2}\d{7,8}$/;
 
@@ -354,11 +333,11 @@ async function addFo() {
   // L'ID reste facultatif — on n'empêche pas d'ajouter un agent parce que
   // son ID n'est pas encore connu — mais s'il est saisi, il doit être valide.
   if (id && !FO_ID_RE.test(id)) {
-    toast('ID Huawei invalide (ex : h50056630 ou wx1488808)', 'error'); return;
+    toast('ID employé invalide (ex : h50056630 ou wx1488808)', 'error'); return;
   }
   if (id && Object.entries(state.config.fo_ids || {})
       .some(([fo, v]) => fo !== val && String(v).toLowerCase() === id.toLowerCase())) {
-    toast('This Huawei ID is already assigned to another agent', 'error'); return;
+    toast('This Employee ID is already assigned to another agent', 'error'); return;
   }
 
   const foTrackers = { ...(state.config.fo_trackers||{}), [val]: tracker };
@@ -375,14 +354,14 @@ async function addFo() {
 // Saisie ou correction de l'ID d'un agent déjà dans la liste.
 async function editFoId(fo) {
   const cur = foIdOf(fo);
-  const val = prompt(`ID Huawei de ${fo} :\n\n(ex : h50056630 ou wx1488808 — laisser vide pour retirer)`, cur);
+  const val = prompt(`ID employé de ${fo} :\n\n(ex : h50056630 ou wx1488808 — laisser vide pour retirer)`, cur);
   if (val === null) return;                 // annulation
   const id = val.trim();
   if (id && !FO_ID_RE.test(id))
-    return toast('ID Huawei invalide (ex : h50056630 ou wx1488808)', 'error');
+    return toast('ID employé invalide (ex : h50056630 ou wx1488808)', 'error');
   if (id && Object.entries(state.config.fo_ids || {})
       .some(([n, v]) => n !== fo && String(v).toLowerCase() === id.toLowerCase()))
-    return toast('This Huawei ID is already assigned to another agent', 'error');
+    return toast('This Employee ID is already assigned to another agent', 'error');
 
   const foIds = { ...(state.config.fo_ids || {}) };
   if (id) foIds[fo] = id; else delete foIds[fo];
