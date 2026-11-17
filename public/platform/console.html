@@ -1,39 +1,46 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Console · Pearl</title>
+<script src="/platform/platform.js"></script>
 <link rel="stylesheet" href="/platform/platform.css">
 </head>
 <body>
 <div class="wrap">
   <header class="top">
-    <a class="brand" href="/"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="#4F6A85" stroke-width="4.5" stroke-linecap="round"/><path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="#4F6A85" stroke-width="4.5" stroke-linecap="round" opacity=".7"/><circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg>Pearl · Console</a>
-    <nav id="who"></nav>
+    <a class="brand" href="/" data-logo>Pearl <span style="color:var(--mute);font-weight:600">Console</span></a>
+    <nav class="nav"><span id="who" style="display:flex;gap:8px;align-items:center"></span><button type="button" class="icon-btn" id="theme-btn"></button></nav>
   </header>
 
-  <form class="panel card" id="login" hidden>
-    <h2 style="margin:0 0 6px">Connexion à la console</h2>
-    <p class="hint">Réservée aux administrateurs de la plateforme.</p>
+  <form class="form-shell form-panel" id="login" hidden>
+    <h2>Connexion à la console</h2>
+    <p class="lead">Réservée aux administrateurs de la plateforme.</p>
     <label for="l-email">Email</label><input id="l-email" type="email" autocomplete="username" required>
     <label for="l-pw">Mot de passe</label><input id="l-pw" type="password" autocomplete="current-password" required>
     <div class="err" id="l-err" role="alert"></div>
-    <button class="btn primary" style="margin-top:12px;width:100%">Se connecter</button>
+    <button class="btn primary" style="margin-top:20px;width:100%">Se connecter</button>
   </form>
 
-  <form class="panel card" id="setup" hidden>
-    <h2 style="margin:0 0 6px">Installation de la console</h2>
-    <p class="hint">Première connexion : saisissez le code d'installation reçu, puis choisissez vos identifiants d'administrateur. Le code ne sert qu'une fois.</p>
+  <form class="form-shell form-panel" id="setup" hidden>
+    <h2>Installation de la console</h2>
+    <p class="lead">Première connexion : saisissez le code d'installation reçu, puis choisissez vos identifiants d'administrateur. Le code ne sert qu'une fois.</p>
     <label for="s-code">Code d'installation</label><input id="s-code" autocomplete="one-time-code" spellcheck="false" required>
     <label for="s-email">Email</label><input id="s-email" type="email" autocomplete="username" required>
     <label for="s-pw">Mot de passe (10 caractères minimum)</label><input id="s-pw" type="password" autocomplete="new-password" minlength="10" required>
     <div class="err" id="s-err" role="alert"></div>
-    <button class="btn primary" style="margin-top:12px;width:100%">Créer mon compte administrateur</button>
+    <button class="btn primary" style="margin-top:20px;width:100%">Créer mon compte administrateur</button>
   </form>
 
   <main id="app" hidden>
-    <section class="card">
+    <div class="stats">
+      <div class="stat"><small>Organisations</small><strong id="st-total">0</strong></div>
+      <div class="stat"><small>Actives</small><strong id="st-active">0</strong></div>
+      <div class="stat"><small>En essai</small><strong id="st-trial">0</strong></div>
+      <div class="stat"><small>Membres</small><strong id="st-members">0</strong></div>
+    </div>
+    <section class="panel">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
         <h2 style="margin:0">Organisations <span class="hint" id="count"></span></h2>
         <button class="btn primary sm" id="new-btn">Nouvelle organisation</button>
@@ -43,17 +50,17 @@
       </div>
     </section>
 
-    <section class="card" id="new" hidden style="margin-top:16px">
+    <section class="panel" id="new" hidden style="margin-top:14px">
       <h2 style="margin:0 0 6px">Nouvelle organisation</h2>
-      <div class="row">
+      <div class="row2">
         <div><label for="n-name">Nom</label><input id="n-name" maxlength="80"></div>
         <div><label for="n-slug">Adresse (slug)</label><input id="n-slug" maxlength="40" spellcheck="false"></div>
       </div>
-      <div class="row">
+      <div class="row2">
         <div><label for="n-pack">Pack</label><select id="n-pack"></select></div>
         <div><label for="n-plan">Offre</label><input id="n-plan" value="standard" maxlength="40"></div>
       </div>
-      <div class="row">
+      <div class="row2">
         <div><label for="n-owner">Email du propriétaire</label><input id="n-owner" type="email"></div>
         <div><label for="n-owner-name">Nom du propriétaire</label><input id="n-owner-name" maxlength="80"></div>
       </div>
@@ -62,16 +69,16 @@
       <button class="btn primary" id="n-create" style="margin-top:8px">Créer</button>
     </section>
 
-    <section class="card" id="edit" hidden style="margin-top:16px">
+    <section class="panel" id="edit" hidden style="margin-top:14px">
       <h2 style="margin:0 0 6px" id="e-title"></h2>
-      <div class="row">
+      <div class="row2">
         <div><label for="e-status">Statut</label><select id="e-status"><option value="trial">Essai</option><option value="active">Active</option><option value="suspended">Suspendue</option></select></div>
         <div><label for="e-plan">Offre</label><input id="e-plan" maxlength="40"></div>
       </div>
       <label for="e-domains">Domaines personnalisés (un par ligne, ex. ops.client.com)</label>
-      <textarea id="e-domains" rows="2" style="height:auto;padding:8px 12px"></textarea>
+      <textarea id="e-domains" rows="2"></textarea>
       <label>Modules</label>
-      <div id="e-mods" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+      <div id="e-mods" class="checks"></div>
       <div class="err" id="e-err" role="alert"></div>
       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
         <button class="btn primary" id="e-save">Enregistrer</button>
@@ -84,7 +91,6 @@
 </div>
 <script>
 const $ = id => document.getElementById(id);
-const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const api = async (url, method = 'GET', body) => {
   const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
   const j = await r.json().catch(() => ({}));
@@ -97,7 +103,7 @@ const STATUT = { trial: 'Essai', active: 'Active', suspended: 'Suspendue' };
 async function start() {
   try {
     const me = await api('/api/platform/console/me');
-    $('who').innerHTML = `<span class="hint">${esc(me.email)}</span> <button class="btn sm" id="logout">Déconnexion</button>`;
+    $('who').innerHTML = `<span class="hint" style="margin:0">${esc(me.email)}</span> <button class="btn sm" id="logout">Déconnexion</button>`;
     $('logout').onclick = async () => { await api('/api/platform/console/logout', 'POST'); location.reload(); };
     $('login').hidden = true; $('app').hidden = false;
     [C.mods, C.packs] = await Promise.all([api('/api/platform/modules'), api('/api/platform/packs')]);
@@ -119,6 +125,10 @@ $('setup').addEventListener('submit', async e => {
 async function load() {
   C.tenants = await api('/api/platform/console/tenants');
   $('count').textContent = `(${C.tenants.length})`;
+  $('st-total').textContent = C.tenants.length;
+  $('st-active').textContent = C.tenants.filter(t => t.status === 'active').length;
+  $('st-trial').textContent = C.tenants.filter(t => t.status === 'trial').length;
+  $('st-members').textContent = C.tenants.reduce((n, t) => n + (t.members || 0), 0);
   $('rows').innerHTML = C.tenants.map(t => `<tr>
     <td><b>${esc(t.name)}</b><br><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.slug)}</a></td>
     <td>${esc(t.pack || '—')}</td>
@@ -135,7 +145,7 @@ function edit(slug) {
   $('e-status').value = t.status; $('e-plan').value = t.plan || '';
   $('e-domains').value = (t.domains || []).join('\n');
   const on = new Set(t.modules && t.modules.length ? t.modules : C.mods.map(m => m.id));
-  $('e-mods').innerHTML = C.mods.map(m => `<label style="display:inline-flex;gap:6px;align-items:center;margin:0;font-weight:600;color:var(--ink)"><input type="checkbox" value="${esc(m.id)}" ${on.has(m.id) ? 'checked' : ''} ${m.always ? 'disabled' : ''} style="width:auto;height:auto"> ${esc(m.label)}</label>`).join('');
+  $('e-mods').innerHTML = C.mods.map(m => `<label><input type="checkbox" value="${esc(m.id)}" ${on.has(m.id) ? 'checked' : ''} ${m.always ? 'disabled' : ''}> ${esc(m.label)}</label>`).join('');
   $('e-err').textContent = '';
   $('edit').scrollIntoView({ behavior: 'smooth' });
 }
