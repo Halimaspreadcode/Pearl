@@ -1,7 +1,7 @@
 // ── REPORT DRAFT PERSISTENCE (local only — never touches server data) ──
 // Each report type/period gets its own draft key so editing one date/week/month
 // never clobbers another, and the underlying tickets/observations stay read-only.
-function _reportDraftKey(reportType, period) { return `emoc_${reportType}_draft_${period}`; }
+function _reportDraftKey(reportType, period) { return `pearl_${reportType}_draft_${period}`; }
 
 // customCols is intentionally excluded here — it's shared layout (server-side via
 // _reportLayout), not per-date draft content. Only row text/author/notes are local drafts.
@@ -275,12 +275,12 @@ async function renderPage_daily() {
     <div class="rpt-doc rd-doc">
       <header class="rd-head">
         <div>
-          <div class="rd-eyebrow">Front Office daily report · EMOC</div>
+          <div class="rd-eyebrow">Daily report</div>
           <h2 class="rd-title">${dateLong}</h2>
         </div>
         <div class="rd-meta">
           <label class="rd-author"><span>Prepared by</span><input id="daily-author" value="${esc(dailyForm.author || rptDefaultAuthor())}" placeholder="Name - Role" oninput="dailyForm.author=this.value"></label>
-          <span class="rd-site">Dakar · ${dateShort}</span>
+          <span class="rd-site">${esc(scopeLabel(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL'))} · ${dateShort}</span>
         </div>
       </header>
       <nav class="rd-nav" aria-label="Sections">

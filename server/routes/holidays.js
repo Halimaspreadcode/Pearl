@@ -1,7 +1,7 @@
 const express     = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { FILES } = require('../config/paths');
-const { readHolidays, withFileLock, writeJSON } = require('../core/store');
+const { readHolidays, withFileLock, writeJSON, siteCodes } = require('../core/store');
 
 const router = express.Router();
 
@@ -15,7 +15,7 @@ router.get('/api/holidays', (_req, res) => res.json(readHolidays()));
 
    C'est faux en pratique. Un férié se déplace par décret, un pont
    s'ajoute, une date à calcul lunaire est corrigée, et un jour chômé
-   n'est pas le même à Dakar et à Abidjan. Ces dates pilotent le décompte
+   n'est pas le même d'un site à l'autre. Ces dates pilotent le décompte
    des jours ouvrés (absences, SLA en mode business) : ne pas pouvoir les
    corriger fausse tout ce qui en dépend.
 
@@ -27,8 +27,8 @@ function normalizeHoliday(body = {}) {
   if (body.name != null) out.name = String(body.name).trim().slice(0, 80);
   if (body.country != null) {
     const c = String(body.country).trim().toUpperCase();
-    // '' / 'ALL' = férié commun aux deux sites.
-    out.country = (c === 'SN' || c === 'CI') ? c : '';
+    // '' / 'ALL' = férié commun à tous les sites.
+    out.country = siteCodes().includes(c) ? c : '';
   }
   return out;
 }

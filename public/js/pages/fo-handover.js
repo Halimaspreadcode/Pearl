@@ -104,15 +104,14 @@ function renderFOHandover() {
   const incomingFOs = currentFONames.length > 0 ? currentFONames : (state.config?.fo_list || []).slice().sort();
 
   // Handover confirmé — persisté par shift+date
-  const hbKey = `emoc_hb_from_${current.date}_${current.id}`;
-  const vpKey = `emoc_hb_vp_${current.date}_${current.id}`;
+  const hbKey = `pearl_hb_from_${current.date}_${current.id}`;
+  const vpKey = `pearl_hb_vp_${current.date}_${current.id}`;
   const selFrom = localStorage.getItem(hbKey) || '';
   const selFO   = localStorage.getItem(vpKey)  || '';
 
   // Tickets actifs
   const allActive = [
-    ...state.sn.map(t => ({ ...t, _tracker: 'SN' })),
-    ...state.ci.map(t => ({ ...t, _tracker: 'CI' })),
+    ...ticketsInScope('ALL').map(t => ({ ...t, _tracker: t._tracker.toUpperCase() })),
   ].filter(t => ['Open', 'In Progress', 'On Hold'].includes(t.status))
    .sort((a, b) => (a.open_date ? new Date(a.open_date).getTime() : 0)
                  - (b.open_date ? new Date(b.open_date).getTime() : 0));
@@ -153,8 +152,8 @@ function renderFOHandover() {
       onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''">
       <td style="padding:8px 12px;white-space:nowrap">
         <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;
-          background:${t._tracker==='SN'?'rgba(37,99,235,.1)':'rgba(5,150,105,.1)'};
-          color:${t._tracker==='SN'?'#1D4ED8':'#047857'}">${t._tracker}</span>
+          background:${siteBg(t._tracker)};
+          color:${siteColor(t._tracker)}">${esc(t._tracker)}</span>
       </td>
       <td style="padding:8px 12px;font-family:monospace;font-size:11px;color:var(--mute);white-space:nowrap">${esc(t.sn_tt||'—')}</td>
       <td style="padding:8px 12px;font-size:12px;font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(t.title||'')}">${esc(t.title||'—')}</td>

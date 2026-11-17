@@ -189,7 +189,7 @@ function _o2osRenderProfil(fo) {
   const d = _o2oBreakdown(fo, sid);
   const today = _o2oToday();
 
-  const tracker = (state.config.fo_trackers || {})[fo] || 'SN';
+  const tracker = personSite(fo);
   const fid = (state.config.fo_ids || {})[fo] || '';
   const card = _perfMonthData(perfUI.month || _perfMonthKey())[fo];
   const note = typeof perfScore === 'function' ? perfScore(card).score : null;
@@ -312,7 +312,7 @@ function _o2osPrep(fo, ctx) {
   // 6. Trous de données : ils se voyaient passivement dans les cartes,
   //    on en fait une consigne.
   if (!fid) pts.push({
-    ton: 'warn', txt: 'Huawei ID missing',
+    ton: 'warn', txt: 'Employee ID missing',
     det: 'Without it, no “My Performance” code can be issued.',
   });
   if (!att) pts.push({

@@ -17,7 +17,7 @@ function readFixture(dir, name) {
 }
 
 function useTempDataDir(files = {}) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'emoc-test-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pearl-test-'));
   for (const [name, content] of Object.entries(files)) writeFixture(dir, name, content);
   process.env.DATA_DIR = dir;
   // Nettoyage en fin de process : les fixtures ne doivent pas s'accumuler.

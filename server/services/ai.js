@@ -24,19 +24,19 @@ const { FILES } = require('../config/paths');
 // ══════════════════════════════════════════════════════════════
 
 const DEFAUT = {
-  base_url: 'https://models.ascend.huawei.com/v1',
-  model:    'glm-5.3',
+  base_url: 'https://api.anthropic.com/v1',
+  model:    'claude-sonnet-5-5',
 };
 
 // ── Tunnel SSH depuis le poste ──
-// La VM qui héberge EMOC n'a pas accès au réseau de l'entreprise ; le
+// La VM qui héberge Pearl n'a pas accès au réseau de l'entreprise ; le
 // poste de l'admin, si. Un tunnel lancé depuis le poste
-// (ssh -R PORT:models.ascend.huawei.com:80 utilisateur@VM) ouvre sur la VM
+// (ssh -R PORT:<hôte du modèle>:80 utilisateur@VM) ouvre sur la VM
 // un port local qui mène au service. Réglages correspondants, posés d'un
 // clic par le bouton « Connecter via le tunnel ».
 const TUNNEL = {
   port:  18080,
-  host:  'models.ascend.huawei.com',
+  host:  'ai.example.internal',
   remote_port: 80,
   model: 'qwen-aw-35b',
 };
@@ -68,8 +68,8 @@ const LIMITES = {
 };
 
 const SYSTEM = [
-  "Tu es l'assistant de l'équipe Front Office EMOC (supervision et support",
-  "ITSM : incidents, problèmes, SLA, shifts, rapports). Réponds en français,",
+  "Tu es Pearl AI, l'assistant de l'équipe (suivi d'activité : tickets,",
+  "délais, plannings, absences, objectifs, rapports). Réponds en français,",
   "de façon concise et concrète. Si une information te manque, dis-le plutôt",
   "que de l'inventer.",
 ].join(' ');
@@ -279,14 +279,10 @@ function causeReseau(e, base, proxy) {
 }
 
 function lireFichier() {
-  try { return JSON.parse(fs.readFileSync(FILES.ai_secret, 'utf8')) || {}; }
-  catch { return {}; }
+  return require('../core/store').readJSON(FILES.ai_secret, {}) || {};
 }
 function ecrireFichier(d) {
-  const tmp = FILES.ai_secret + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(d, null, 2), { mode: 0o600 });
-  fs.renameSync(tmp, FILES.ai_secret);
-  try { fs.chmodSync(FILES.ai_secret, 0o600); } catch {}
+  require('../core/store').writeJSON(FILES.ai_secret, d, { mode: 0o600 });
 }
 
 // Réglages effectifs. L'environnement prime : c'est la place d'un secret
@@ -437,7 +433,7 @@ function majConf(body) {
 }
 
 // `max` : les skills construisent leur message côté serveur (données
-// d'EMOC) et peuvent dépasser la limite d'une saisie libre.
+// de Pearl) et peuvent dépasser la limite d'une saisie libre.
 function nettoyerMessages(list, max = LIMITES.chars_message) {
   if (!Array.isArray(list) || !list.length) throw new Error('Aucun message.');
   const msgs = list.slice(-LIMITES.messages).map(m => {
@@ -690,12 +686,12 @@ async function diagnostiquer() {
   }
 
   // 3. Machine qui fait les appels. Ce n'est pas forcément le poste
-  // depuis lequel on regarde la page : si le serveur EMOC tourne ailleurs
+  // depuis lequel on regarde la page : si le serveur Pearl tourne ailleurs
   // (VM, serveur Linux), il n'a ni le proxy ni le DNS du poste.
   const os = require('os');
   const dnsCb = require('dns');
   const plateforme = { win32: 'Windows', linux: 'Linux', darwin: 'macOS' }[process.platform] || process.platform;
-  info('Serveur EMOC', `${plateforme} · machine « ${os.hostname()} » · Node ${process.version} · DNS ${dnsCb.getServers().join(', ') || 'inconnu'}. C'est cette machine qui appelle le modèle, pas le navigateur.`);
+  info('Serveur Pearl', `${plateforme} · machine « ${os.hostname()} » · Node ${process.version} · DNS ${dnsCb.getServers().join(', ') || 'inconnu'}. C'est cette machine qui appelle le modèle, pas le navigateur.`);
 
   // 4. DNS (avec un proxy, seul son nom à lui doit se résoudre ici)
   const dns = dnsCb.promises;
@@ -788,7 +784,7 @@ async function diagnostiquer() {
 }
 
 // ── Script du tunnel pour le poste Windows ──
-// Compte SSH à utiliser sur la VM : celui qui possède le dossier d'EMOC
+// Compte SSH à utiliser sur la VM : celui qui possède le dossier de Pearl
 // (le service peut tourner en root, mais on se connecte avec le compte
 // de l'utilisateur).
 function compteVm() {
@@ -836,7 +832,7 @@ function scriptTunnel(hoteVm) {
     // permitlisten limite -R au port du tunnel ; permitopen vers un port
     // fermé neutralise -L (« none » n'existe pas ici) ; command remplace
     // toute commande demandée. Vérifié sur un vrai sshd (tests manuels).
-    `l="restrict,port-forwarding,permitlisten=\\"${TUNNEL.port}\\",permitopen=\\"127.0.0.1:1\\",command=\\"echo Cle reservee au tunnel Big Brother\\" $k"`,
+    `l="restrict,port-forwarding,permitlisten=\\"${TUNNEL.port}\\",permitopen=\\"127.0.0.1:1\\",command=\\"echo Cle reservee au tunnel Pearl AI\\" $k"`,
     'touch ~/.ssh/authorized_keys',
     // Une réinstallation remplace la ligne de cette clé au lieu d'en ajouter une.
     'grep -vF "$k" ~/.ssh/authorized_keys > ~/.ssh/.ak.tmp || true',
@@ -849,30 +845,30 @@ function scriptTunnel(hoteVm) {
 
   const trouve = `Get-CimInstance Win32_Process -Filter "Name='ssh.exe'" | Where-Object { $_.CommandLine -like '*-R ${fwd}*' }`;
   const psOn = [
-    "$key = Join-Path $env:USERPROFILE '.ssh\\emoc_ia'",
+    "$key = Join-Path $env:USERPROFILE '.ssh\\pearl_ia'",
     "if (-not (Test-Path $key)) { Write-Host ' La commande n''est pas encore installee : double-clique sur ia.bat.'; exit 1 }",
-    `if (${trouve}) { Write-Host ' Big Brother deja allume.'; exit 0 }`,
+    `if (${trouve}) { Write-Host ' Pearl AI deja allume.'; exit 0 }`,
     `$a = @('-N','-i',('"' + $key + '"'),'-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=30','-o','ServerAliveCountMax=3','-o','StrictHostKeyChecking=accept-new','-R','${fwd}','${vm}')`,
     '$p = Start-Process ssh -ArgumentList $a -WindowStyle Hidden -PassThru',
     'Start-Sleep -Seconds 6',
     `if ($p.HasExited) { Write-Host (' Echec (code ' + $p.ExitCode + '). Souvent un ancien tunnel garde le port sur la VM. Sur la VM : sudo ss -ltnp | grep ${TUNNEL.port} puis sudo kill <pid>, et refais : ia on'); exit 1 }`,
-    "Write-Host ' Big Brother allume. Pour eteindre : ia off'",
+    "Write-Host ' Pearl AI allume. Pour eteindre : ia off'",
   ].join('\n');
   const psOff = [
     `$p = ${trouve}`,
-    "if (-not $p) { Write-Host ' Big Brother deja eteint.'; exit 0 }",
+    "if (-not $p) { Write-Host ' Pearl AI deja eteint.'; exit 0 }",
     '$p | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }',
-    "Write-Host ' Big Brother eteint.'",
+    "Write-Host ' Pearl AI eteint.'",
   ].join('\n');
   const psStatus = [
-    `if (${trouve}) { Write-Host ' Big Brother allume (tunnel actif).' } else { Write-Host ' Big Brother eteint. Pour allumer : ia on' }`,
+    `if (${trouve}) { Write-Host ' Pearl AI allume (tunnel actif).' } else { Write-Host ' Pearl AI eteint. Pour allumer : ia on' }`,
   ].join('\n');
   const lancer = code => `powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${ps(code)}`;
 
   const L = [
     '@echo off',
     'setlocal',
-    `set "KEY=%USERPROFILE%\\.ssh\\emoc_ia"`,
+    `set "KEY=%USERPROFILE%\\.ssh\\pearl_ia"`,
     'if /i "%~1"=="on" goto :on',
     'if /i "%~1"=="off" goto :off',
     'if /i "%~1"=="status" goto :status',
@@ -892,12 +888,12 @@ function scriptTunnel(hoteVm) {
     '',
     ':install',
     'echo.',
-    `echo  Installation de la commande "ia" pour EMOC (VM ${h})`,
+    `echo  Installation de la commande "ia" pour Pearl (VM ${h})`,
     'echo.',
     'set "DEST=%LOCALAPPDATA%\\Microsoft\\WindowsApps\\ia.bat"',
     'if /i not "%~f0"=="%DEST%" copy /y "%~f0" "%DEST%" >nul',
     'if not exist "%USERPROFILE%\\.ssh" mkdir "%USERPROFILE%\\.ssh"',
-    'if not exist "%KEY%" ssh-keygen -q -t ed25519 -N "" -C emoc-ia -f "%KEY%"',
+    'if not exist "%KEY%" ssh-keygen -q -t ed25519 -N "" -C pearl-ia -f "%KEY%"',
     'echo  Tape le mot de passe de la VM (une seule fois) :',
     `ssh -o StrictHostKeyChecking=accept-new ${vm} "f=$(mktemp); echo ${b64(installVm)} | base64 -d > $f; bash $f; r=$?; rm -f $f; exit $r" < "%KEY%.pub"`,
     'if errorlevel 1 (',
@@ -911,8 +907,8 @@ function scriptTunnel(hoteVm) {
     // Si une stratégie d'entreprise a retiré WindowsApps du PATH, la
     // commande courte n'existe pas : on donne le chemin complet.
     'where ia >nul 2>nul || echo  (si "ia" n est pas reconnu, tape plutot : "%DEST%" on)',
-    'echo     ia on      allume Big Brother (tunnel en arriere-plan, sans mot de passe)',
-    'echo     ia off     eteint Big Brother',
+    'echo     ia on      allume Pearl AI (tunnel en arriere-plan, sans mot de passe)',
+    'echo     ia off     eteint Pearl AI',
     'echo     ia status  dit si elle est allumee',
     'echo.',
     'pause',

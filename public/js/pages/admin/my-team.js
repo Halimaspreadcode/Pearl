@@ -27,12 +27,12 @@ function _mtMonth() {
 }
 
 // Même périmètre que le reste de l'application : le sélecteur
-// Global/SN/CI de la barre du haut. Comparer Dakar et Abidjan dans une
+// de site de la barre du haut. Comparer plusieurs sites dans une
 // même grille n'aurait pas de sens sur « SN ».
 function _mtFoList() {
   const scope = (typeof getActiveCountry === 'function') ? getActiveCountry() : 'ALL';
   return (state.config.fo_list || []).filter(fo =>
-    scope === 'ALL' || ((state.config.fo_trackers || {})[fo] || 'SN') === scope);
+    scope === 'ALL' || personInScope(fo, scope));
 }
 
 // Score de livraison ramené sur 100. _foScoreBreakdown produit des
@@ -228,7 +228,7 @@ function _mtRenderRank(rows) {
 
   el.innerHTML = `<div class="mt-rank">${list.map(r => {
     const safe = esc(r.fo).replace(/'/g, "\\'");
-    const tr   = (state.config.fo_trackers || {})[r.fo] || 'SN';
+    const tr   = personSite(r.fo);
     const open = mtUI.open === r.fo;
     // Le rang reste celui du classement composite même quand on trie sur
     // une autre colonne : c'est l'identité de la ligne, pas sa position.
@@ -243,7 +243,7 @@ function _mtRenderRank(rows) {
         <span class="mt-av" style="background:${foAvatarColor(r.fo)}">${foInitials(r.fo)}</span>
         <span class="mt-name">
           ${esc(r.fo)}
-          <span class="mt-tracker mt-tracker-${tr === 'CI' ? 'ci' : 'sn'}">${tr}</span>
+          <span class="mt-tracker" style="color:${siteColor(tr)};background:${siteBg(tr)}">${esc(tr)}</span>
         </span>
         <span class="mt-bar"><i style="width:${Math.round(r.rankScore / max * 100)}%"></i></span>
         <span class="mt-score">${r.rankScore}</span>

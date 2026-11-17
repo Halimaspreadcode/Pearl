@@ -72,7 +72,7 @@ const S = [
   { m: 'PUT', u: '/api/user-prefs/hw123', b: { theme: 'dark' } },
   { m: 'POST', u: '/api/shift-requests', b: { fo_name: FO, date: '2026-10-12', reason: 'swap' }, save: (r, c) => c.sr = r.id },
   { m: 'DELETE', u: c => `/api/shift-requests/${c.sr}` },
-  { m: 'POST', u: '/api/presence/ping', b: { name: FO, huawei_id: 'hw123', page: 'dashboard' } },
+  { m: 'POST', u: '/api/presence/ping', b: { name: FO, employee_id: 'hw123', page: 'dashboard' } },
   { m: 'POST', u: '/api/reports/weekly.pptx', b: { form: {} }, bin: true },
   // Erreurs
   { m: 'PUT', u: '/api/sn/does-not-exist', b: { status: 'Open' } },

@@ -96,7 +96,7 @@ async function exportAbsenceReportPDF() {
   }
   const blob = await res.blob();
   const cd   = res.headers.get('Content-Disposition') || '';
-  const name = (cd.match(/filename="?([^";]+)"?/) || [])[1] || `EMOC_Absence_Report_${year}.pdf`;
+  const name = (cd.match(/filename="?([^";]+)"?/) || [])[1] || `Pearl_Absence_Report_${year}.pdf`;
   _dlBlob(blob, name);
   toast('Rapport PDF téléchargé', 'success');
 }

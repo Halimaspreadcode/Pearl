@@ -19,9 +19,8 @@
 //
 // L'index est mis en cache par tracker et reconstruit quand le fichier change
 // (mtime + taille) : une requête ne relit ni ne retokenise l'historique.
-const fs = require('fs');
-const { FILES } = require('../config/paths');
-const { readCfg, readTracker, readBO } = require('../core/store');
+const { siteFile } = require('../config/paths');
+const { readCfg, readTracker, readBO, docVersion } = require('../core/store');
 
 const K               = 15;     // voisins retenus
 const MIN_SIMILARITY  = 0.25;   // en dessous, un ticket n'est pas « similaire »
@@ -152,13 +151,14 @@ function rank(index, title) {
 // ── Cache par tracker ────────────────────────────────────────
 const _cache = {};
 function indexFor(tracker) {
-  let st = null;
-  try { st = fs.statSync(FILES[tracker]); } catch { /* fichier absent : index vide */ }
-  const key = st ? `${st.mtimeMs}:${st.size}` : 'none';
-  const c = _cache[tracker];
+  // Clé de cache : tenant + site, invalidée à chaque écriture du tracker.
+  const file = siteFile(tracker);
+  const v = docVersion(file);
+  const key = v || 'none';
+  const c = _cache[file];
   if (c && c.key === key) return c.index;
-  const index = buildIndex(st ? readTracker(tracker) : []);
-  _cache[tracker] = { key, index };
+  const index = buildIndex(v ? readTracker(tracker) : []);
+  _cache[file] = { key, index };
   return index;
 }
 

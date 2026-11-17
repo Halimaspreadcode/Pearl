@@ -30,9 +30,9 @@ const {
 
 // Ville et libellé d'équipe du deck en cours : posés par
 // buildObjectivesPptx selon sess.team (SN, CI ou les deux).
-let VILLE = 'Dakar';
-let EQUIPE = 'Front Office Team';
-let FOOTER_TEXT = 'EMOC · Front Office · Dakar · Internal distribution';
+let VILLE = '';
+let EQUIPE = 'Team';
+let FOOTER_TEXT = 'Pearl · Internal distribution';
 const SMART_PASS = 70;
 const DAY = 86400000;
 
@@ -434,12 +434,14 @@ async function buildObjectivesPptx({ sess, lignes, cfg }) {
 
   const pptx = new PptxGenJS();
   pptx.layout = 'LAYOUT_WIDE';
-  pptx.author = 'EMOC Front Office';
-  pptx.company = 'EMOC';
-  VILLE = { SN: 'Dakar', CI: 'Abidjan' }[sess.team] || (sess.team === 'ALL' || !sess.team ? 'Dakar + Abidjan' : 'Dakar');
-  EQUIPE = sess.team === 'SN' ? 'Front Office Team · Senegal' : sess.team === 'CI' ? "Front Office Team · Côte d'Ivoire" : 'Front Office Team';
-  FOOTER_TEXT = `EMOC · Front Office · ${VILLE} · Internal distribution`;
-  pptx.title = `EMOC Objectives Review · ${clip(sess.name || sess.id || '')}`;
+  pptx.author = 'Pearl';
+  pptx.company = 'Pearl';
+  const { scopeLabel, normScope } = require('../core/store');
+  const scope = normScope(sess.team, 'ALL');
+  VILLE = scopeLabel(scope);
+  EQUIPE = scope === 'ALL' ? 'Team' : `Team · ${VILLE}`;
+  FOOTER_TEXT = `Pearl · ${VILLE} · Internal distribution`;
+  pptx.title = `Objectives Review · ${clip(sess.name || sess.id || '')}`;
 
   const sessName = clip(sess.name || sess.id) || 'Objectives session';
   const period = A.hasWindow ? `${fmtDay(A.sStart)} to ${fmtDay(A.sEnd)}`
@@ -458,7 +460,7 @@ async function buildObjectivesPptx({ sess, lignes, cfg }) {
   {
     const cover = pptx.addSlide();
     cover.background = { color: C.wash };
-    cover.addText(`EMOC · Front Office · ${VILLE}`, {
+    cover.addText(`Pearl · ${VILLE}`, {
       x: M, y: 0.72, w: 5.2, h: 0.24, fontSize: 10, color: '4A6169', fontFace: FONT,
     });
     cover.addText(
@@ -1266,7 +1268,7 @@ async function buildObjectivesPptx({ sess, lignes, cfg }) {
     const s = pptx.addSlide();
     statement(s, {
       bg: C.brand, on: 'FFFFFF', onMute: 'F0AFB8', rule: 'E8737F',
-      eyebrow: `EMOC · Front Office · ${VILLE}`,
+      eyebrow: `Pearl · ${VILLE}`,
       lead: 'Thanks to every agent for the objectives set, the milestones delivered and the '
           + 'discipline of keeping them up to date. Every figure in this deck is traceable in '
           + 'the objectives module and its Excel export.',

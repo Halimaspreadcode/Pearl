@@ -14,17 +14,24 @@ const { slaTargetLabel } = require('../../core/sla');
 // « Nothing to report » d'affilée noyaient le reste.
 //
 // HTML de mail : tableaux et styles en ligne uniquement.
-// ── PAYS D'UN RAPPORT ─────────────────────────────────────────
-// Chaque envoi programmé choisit son périmètre : Sénégal, Côte d'Ivoire ou
-// les deux. Le code sert aux filtres ('SN' | 'CI' | 'ALL'), le libellé au
-// mail et au classeur (la ville remplace « Dakar » écrit en dur).
-const PAYS = {
-  SN:  { code: 'SN', en: 'Senegal', ville: 'Dakar' },
-  CI:  { code: 'CI', en: "Côte d'Ivoire", ville: 'Abidjan' },
-  ALL: { code: 'SN + CI', en: 'Senegal + Côte d\'Ivoire', ville: 'Dakar + Abidjan' },
-};
-// Valeur absente ou inconnue : Sénégal, le périmètre historique du deck.
-function normPays(v) { return PAYS[v] ? v : 'SN'; }
+// ── PÉRIMÈTRE D'UN RAPPORT ────────────────────────────────────
+// Chaque envoi programmé choisit son périmètre : un site de l'organisation
+// ou tous ('ALL'). Le code sert aux filtres, le libellé au mail et au
+// classeur. Les sites viennent de la configuration (cfg.sites).
+const { normScope, siteByCode, scopeLabel, scopeCodes, readSites } = require('../../core/store');
+function paysInfo(code) {
+  if (code === 'ALL') {
+    const sites = readSites();
+    return { code: scopeCodes('ALL'), en: sites.map(s => s.country || s.name).filter((v, i, a) => a.indexOf(v) === i).join(' + ') || 'All sites', ville: scopeLabel('ALL') };
+  }
+  const s = siteByCode(code);
+  return s ? { code: s.code, en: s.country || s.name, ville: s.city || s.name }
+           : { code: String(code || ''), en: String(code || ''), ville: String(code || '') };
+}
+// PAYS[code] reste lisible comme avant (PAYS.LYO.ville…), mais calculé.
+const PAYS = new Proxy({}, { get: (_, k) => (typeof k === 'string' ? paysInfo(k) : undefined) });
+// Valeur absente ou inconnue : le premier site.
+function normPays(v) { return normScope(v, 'first'); }
 
 // Un highlight clôturé n'a plus rien à signaler : il reste dans la page
 // (historique de la journée) mais sort du mail et du classeur.
@@ -39,7 +46,7 @@ function highlightsOuverts(liste) {
 // métriques colorées, cellules colorées selon le statut. Qui lit le mail
 // puis ouvre l'Excel retrouve le même document. Tableaux et styles en
 // ligne : les clients mail ignorent les feuilles de style.
-function corpsDaily(d, br, _dateStr, pays = 'SN') {
+function corpsDaily(d, br, _dateStr, pays) {
   const k = d.kpis || {};
   const P = PAYS[normPays(pays)];
   const esc = v => String(v ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -143,7 +150,7 @@ function corpsDaily(d, br, _dateStr, pays = 'SN') {
 
   return `
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:900px;border-collapse:collapse;${FONT};color:${X.black}">
-  <tr><td colspan="10" style="background:${X.red};color:${X.white};padding:10px;font-size:17px;font-weight:700;text-align:center">FRONT OFFICE DAILY REPORT - EMOC</td></tr>
+  <tr><td colspan="10" style="background:${X.red};color:${X.white};padding:10px;font-size:17px;font-weight:700;text-align:center">DAILY REPORT</td></tr>
   <tr>
     <td colspan="3" style="background:${X.black};color:${X.white};padding:6px 10px;font-size:12px">Date : ${esc(dateStr)}</td>
     <td colspan="4" style="background:${X.black};color:${X.white};padding:6px 10px;font-size:12px;text-align:center">${esc(br.author || '')}</td>
@@ -191,7 +198,7 @@ function mailSubject(kind, modele, now = new Date(), pays) {
 // HTML de mail (tableaux et styles en ligne — les clients mail ignorent
 // les feuilles de style). Le lecteur a les chiffres de la semaine sans
 // ouvrir le PowerPoint ; le deck reste en pièce jointe pour le détail.
-function corpsWeeklyOverview(data, pays = 'SN') {
+function corpsWeeklyOverview(data, pays) {
   const esc = v => String(v ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const k = data.kpis || {};
   const fmtD = v => new Date(v).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -236,7 +243,7 @@ function corpsWeeklyOverview(data, pays = 'SN') {
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:860px;${FONT};color:#1A1C1E">
   <tr><td style="padding:0 0 4px;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#C7000B;font-weight:700">Weekly Report · Overview</td></tr>
   <tr><td style="font-size:24px;line-height:1.2;font-weight:700;padding-bottom:4px">What the week shows in numbers</td></tr>
-  <tr><td style="font-size:12.5px;color:#6B7280;padding-bottom:18px">${esc(fmtD(data.week_start))} to ${esc(fmtD(data.week_end))} · EMOC Front Office · ${esc(PAYS[normPays(pays)].ville)}</td></tr>
+  <tr><td style="font-size:12.5px;color:#6B7280;padding-bottom:18px">${esc(fmtD(data.week_start))} to ${esc(fmtD(data.week_end))} · Pearl · ${esc(PAYS[normPays(pays)].ville)}</td></tr>
   ${calme ? `
   <tr><td style="padding-bottom:14px">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">

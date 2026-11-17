@@ -139,7 +139,7 @@ async function exportJSON() {
   const a = document.createElement('a');
   const date = new Date().toISOString().slice(0, 10);
   a.href = url;
-  a.download = `emoc-data-${date}.json`;
+  a.download = `pearl-data-${date}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -219,7 +219,7 @@ async function _uploadReportFile(type, buf, filename, period) {
     await fetch(`${API}/api/report-file/${type}`
       + `?filename=${encodeURIComponent(filename)}&period=${encodeURIComponent(period)}`
       // Pays affiché : le serveur range un classeur par pays.
-      + `&country=${encodeURIComponent(typeof getActiveCountry === 'function' ? getActiveCountry() : 'SN')}`, {
+      + `&country=${encodeURIComponent(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL')}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/octet-stream' },
       body: buf,
@@ -249,7 +249,7 @@ async function _buildDailyWorkbookBuffer(dataIn) {
       .map(([key]) => key)
       .filter(key => !isSectionHidden('daily', key)),
     slaText: slaTargetText,
-    lieu: { SN: 'Dakar', CI: 'Abidjan', ALL: 'Dakar + Abidjan' }[typeof getActiveCountry === 'function' ? getActiveCountry() : 'SN'] || 'Dakar',
+    lieu: scopeLabel(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL'),
   });
 }
 
@@ -263,7 +263,7 @@ async function exportDailyExcel() {
   const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `EMOC_Daily_Report_${jourISO}.xlsx`;
+  a.download = `Pearl_Daily_Report_${jourISO}.xlsx`;
   a.click();
   _uploadReportFile('daily', buf, a.download, jourISO);
   _dailyPublished = jourISO;
@@ -288,7 +288,7 @@ async function _publishDailyForMail() {
     if (typeof rptCanWrite === 'function' && !rptCanWrite()) return;
     const buf = await _buildDailyWorkbookBuffer(data);
     if (!buf) return;
-    await _uploadReportFile('daily', buf, `EMOC_Daily_Report_${jourISO}.xlsx`, jourISO);
+    await _uploadReportFile('daily', buf, `Pearl_Daily_Report_${jourISO}.xlsx`, jourISO);
     _dailyPublished = jourISO;
   } catch { /* la page reste utilisable, l'envoi retombera sur le repli */ }
 }

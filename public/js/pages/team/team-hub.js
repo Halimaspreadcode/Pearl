@@ -237,7 +237,7 @@ function _eqRenderRail() {
     return mots.every(m => toks.some(t => t.startsWith(m)));
   });
   const nAct = all.filter(s => s.actions).length;
-  const tracker = fo => (state.config?.fo_trackers || {})[fo] || 'SN';
+  const tracker = fo => personSite(fo);
   const ouvrir = fo => EqUI.view === 'agent' ? `eqOpenAgent(${_eqQ(fo)},'${EqUI.atab}')` : `eqOpenAgent(${_eqQ(fo)})`;
   el.innerHTML = `<button type="button" class="eq-rail-item is-team${EqUI.view === 'team' ? ' is-on' : ''}" onclick="eqBack()" aria-current="${EqUI.view === 'team' ? 'page' : 'false'}">
       <span class="eq-rail-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></svg></span>
@@ -288,7 +288,7 @@ function _eqRenderHead() {
   const fo = EqUI.fo;
   const s = eqAgentSignals(fo, _eqCtx());
   const st = s.stats;
-  const tracker = (state.config?.fo_trackers || {})[fo] || 'SN';
+  const tracker = personSite(fo);
   // Précédent / suivant dans l'ordre de la grille : on traite la liste
   // des urgences sans repasser par l'équipe entre deux fiches.
   const ordre = _eqOrdered().map(x => x.fo);
@@ -632,7 +632,7 @@ const EQ_LVL_LABEL = { urgent: 'Échéance dépassée', todo: 'À faire', info: 
 function _eqCard(s) {
   const fo = s.fo;
   const st = s.stats;
-  const tracker = (state.config?.fo_trackers || {})[fo] || 'SN';
+  const tracker = personSite(fo);
   const top = s.items.find(x => x.lvl !== 'info');
   const urg = s.items.filter(x => x.lvl === 'urgent').length;
   const etat = s.actions

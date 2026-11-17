@@ -1,0 +1,17 @@
+{
+  "id": "support-it",
+  "label": "Support IT / Service desk",
+  "desc": "Incidents et demandes avec SLA, astreintes, rapports quotidiens et hebdomadaires, base de connaissances IA.",
+  "modules": ["core", "tickets", "planning", "absences", "objectives", "academy", "reporting", "mailing", "ai", "ideas"],
+  "config": {
+    "domains": ["Réseau", "Poste de travail", "Applications", "Serveurs", "Sécurité"],
+    "ticket_statuses": ["Open", "In Progress", "On Hold", "Resolved", "Closed"],
+    "ticket_priorities": ["P1", "P2", "P3", "P4"],
+    "sla_hours": {
+      "Incident P1": 4, "Incident P2": 8, "Incident P3": 24, "Incident P4": 72,
+      "Demande P1": 8, "Demande P2": 24, "Demande P3": { "hours": 40, "mode": "business" }, "Demande P4": { "hours": 80, "mode": "business" }
+    },
+    "leave_entitlement_days": 25
+  },
+  "sites": [{ "code": "HQ", "name": "Siège" }]
+}

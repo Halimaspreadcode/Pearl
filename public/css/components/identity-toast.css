@@ -73,7 +73,7 @@
 .idt-sg-more{border-style:dashed;cursor:default}
 .idt-sg-more:hover{background:transparent;color:var(--m3-on-surf-var)}
 
-/* Validation en ligne de l'ID Huawei */
+/* Validation en ligne de l'ID employé */
 .idt-input-wrap{position:relative}
 /* Réserve la place du check pour que le texte ne saute pas à l'apparition. */
 .idt-input-wrap .form-control{padding-right:34px}

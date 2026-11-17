@@ -6,7 +6,7 @@
    la barre latérale.
 
    La préférence suit la PERSONNE et non le poste : elle est stockée côté
-   serveur sur l'ID Huawei. Le reste des réglages d'interface (thème,
+   serveur sur l'ID employé. Le reste des réglages d'interface (thème,
    sections repliées) reste en localStorage, ce qui convient à un choix
    d'affichage local — mais pas à une organisation de travail qu'on
    refait sinon sur chaque machine.
@@ -18,9 +18,9 @@
    dès que l'utilisateur épingle ou retire quoi que ce soit, son choix
    remplace le défaut et rien n'y revient. */
 const PIN_DEFAULTS = {
-  FO:       ['sn', 'fo-dashboard', 'shift-planning', 'mon-espace'],
-  BO:       ['sn', 'observations', 'shift-approvals', 'rapports'],
-  Observer: ['dashboard', 'sn', 'rapports'],
+  FO:       ['site', 'fo-dashboard', 'shift-planning', 'mon-espace'],
+  BO:       ['site', 'observations', 'shift-approvals', 'rapports'],
+  Observer: ['dashboard', 'site', 'rapports'],
 };
 
 // Daily, Weekly, Monthly, Ops Review, Diffusion et Export sont devenus
@@ -50,7 +50,7 @@ let _pinned = null;     // null = pas encore chargé
 const PIN_LOCAL_KEY = 'fo-pinned';   // repli hors-ligne
 
 function _pinApiBase() {
-  const id = (typeof currentUser !== 'undefined' && currentUser?.huaweiId) || '';
+  const id = (typeof currentUser !== 'undefined' && currentUser?.employeeId) || '';
   return id ? `${API}/api/user-prefs/${encodeURIComponent(id)}` : null;
 }
 

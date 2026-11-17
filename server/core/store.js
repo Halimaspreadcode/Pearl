@@ -1,6 +1,8 @@
 const fs          = require('fs');
 const bcrypt      = require('bcryptjs');
-const { DATA_DIR, FILES } = require('../config/paths');
+const { DATA_DIR, FILES, siteFile } = require('../config/paths');
+const { backend } = require('./backend');
+const { currentTenant } = require('./tenant');
 
 // ── WRITE QUEUE (per-file locks) ──────────────────────────────
 // Each file gets its own promise-chain lock so a slow write to
@@ -29,15 +31,21 @@ function withFileLock(filePath, fn) { return withLock(fn, filePath); }
 // on le crée au démarrage, sinon la première écriture échouerait.
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
+// Toute lecture / écriture de document passe par ici, donc par le
+// stockage choisi (core/backend : fichiers, Supabase ou PostgreSQL).
 function readJSON(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); }
+  const text = backend().readText(file);
+  if (text == null) return fallback;
+  try { return JSON.parse(text); }
   catch { return fallback; }
 }
-function writeJSON(file, data) {
-  const tmp = file + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
-  fs.renameSync(tmp, file);
+function writeJSON(file, data, opts) {
+  backend().writeText(file, JSON.stringify(data, null, 2), opts);
 }
+const docExists  = file => backend().exists(file);
+const removeDoc  = file => backend().remove(file);
+// Empreinte d'un document : change à chaque écriture (sert aux caches).
+const docVersion = file => backend().version(file);
 
 // Condensé du mot de passe d'approbation par défaut. Calculé une seule fois,
 // à la première demande, puis réutilisé.
@@ -56,7 +64,9 @@ function writeJSON(file, data) {
 let _hashDefautApprobation = null;
 function hashDefautApprobation() {
   if (_hashDefautApprobation === null) {
-    _hashDefautApprobation = bcrypt.hashSync('EMOC2024', 10);
+    _hashDefautApprobation = // Aucun mot de passe connu par défaut : un secret aléatoire, que personne
+    // ne connaît, tant que l'admin n'en a pas défini un.
+    bcrypt.hashSync(require('crypto').randomBytes(24).toString('hex'), 10);
   }
   return _hashDefautApprobation;
 }
@@ -77,26 +87,24 @@ function defaultConfig() {
 
 // One-time migration: tickets.json → split files
 function migrateIfNeeded() {
-  if (!fs.existsSync(FILES.legacy)) return;
-  const allExist = ['sn','ci','observations','audit','config'].every(k => fs.existsSync(FILES[k]));
+  if (!docExists(FILES.legacy)) return;
+  const allExist = ['sn','ci','observations','audit','config'].every(k => docExists(FILES[k]));
   if (allExist) return; // already migrated
-  console.log('[EMOC] Migrating tickets.json → split data files…');
-  let legacy;
-  try { legacy = JSON.parse(fs.readFileSync(FILES.legacy, 'utf8')); }
-  catch { return; }
-  if (!fs.existsSync(FILES.sn))           writeJSON(FILES.sn,           legacy.sn           || []);
-  if (!fs.existsSync(FILES.ci))           writeJSON(FILES.ci,           legacy.ci           || []);
-  if (!fs.existsSync(FILES.observations)) writeJSON(FILES.observations, legacy.observations  || []);
-  if (!fs.existsSync(FILES.audit))        writeJSON(FILES.audit,        legacy.audit        || []);
-  if (!fs.existsSync(FILES.config)) {
+  console.log('[Pearl] Migrating tickets.json → split data files…');
+  const legacy = readJSON(FILES.legacy, null);
+  if (!legacy) return;
+  if (!docExists(FILES.sn))           writeJSON(FILES.sn,           legacy.sn           || []);
+  if (!docExists(FILES.ci))           writeJSON(FILES.ci,           legacy.ci           || []);
+  if (!docExists(FILES.observations)) writeJSON(FILES.observations, legacy.observations  || []);
+  if (!docExists(FILES.audit))        writeJSON(FILES.audit,        legacy.audit        || []);
+  if (!docExists(FILES.config)) {
     const cfg = { ...defaultConfig(), ...(legacy.config || {}) };
     writeJSON(FILES.config, cfg);
   }
-  // Rename legacy file so it's not re-read
-  fs.renameSync(FILES.legacy, FILES.legacy + '.bak');
-  console.log('[EMOC] Migration done. tickets.json → tickets.json.bak');
+  writeJSON(FILES.legacy.replace(/\.json$/, '.bak.json'), legacy);
+  removeDoc(FILES.legacy);
+  console.log('[Pearl] Migration done. tickets.json → tickets.bak.json');
 }
-migrateIfNeeded();
 
 // One-time migration: plaintext approval_password → bcrypt hash
 function migratePasswordsIfNeeded() {
@@ -106,10 +114,9 @@ function migratePasswordsIfNeeded() {
     cfg.approval_password_hash = bcrypt.hashSync(cfg.approval_password, 10);
     delete cfg.approval_password;
     writeJSON(FILES.config, cfg);
-    console.log('[EMOC] Migrated approval_password → approval_password_hash (hashed).');
+    console.log('[Pearl] Migrated approval_password → approval_password_hash (hashed).');
   }
 }
-migratePasswordsIfNeeded();
 
 function readSN()  { return readJSON(FILES.sn,           []); }
 function readCI()  { return readJSON(FILES.ci,           []); }
@@ -162,8 +169,9 @@ function writeQuizPublished(d) { writeJSON(FILES.quiz_published, d); }
 function writeWeeklyProgress(d) { writeJSON(FILES.weekly_progress, d); }
 function writeReportLayout(d) { writeJSON(FILES.report_layout, d); }
 
-function readTracker(t) { return t === 'sn' ? readSN()  : readCI(); }
-function writeTracker(t, d) { t === 'sn' ? writeSN(d) : writeCI(d); }
+// Tickets d'un site, par code (« sn », « CI », « lyon1 »…).
+function readTracker(t) { return readJSON(siteFile(t), []); }
+function writeTracker(t, d) { writeJSON(siteFile(t), d); }
 
 function readHolidays() { return readJSON(FILES.holidays, []); }
 
@@ -177,7 +185,7 @@ function getPendingWrites() { return pendingWrites; }
 function migrateHoldPeriodsIfNeeded() {
   const { reconstruireAttentes } = require('./holds');
   let audit = null;
-  for (const t of ['sn', 'ci']) {
+  for (const t of siteCodes().map(c => c.toLowerCase())) {
     const tickets = readTracker(t);
     if (!tickets.some(x => !Array.isArray(x.hold_periods))) continue;
     audit = audit || readAudit();
@@ -193,10 +201,96 @@ function migrateHoldPeriodsIfNeeded() {
       if (x.hold_periods.length) n++;
     }
     writeTracker(t, tickets);
-    console.log(`[EMOC] Périodes On Hold reconstituées (${t.toUpperCase()}) : ${n} ticket(s) concerné(s).`);
+    console.log(`[Pearl] Périodes On Hold reconstituées (${t.toUpperCase()}) : ${n} ticket(s) concerné(s).`);
   }
 }
-try { migrateHoldPeriodsIfNeeded(); } catch (e) { console.error('[EMOC] Migration On Hold échouée :', e.message); }
+// ── SITES ─────────────────────────────────────────────────────
+// Les sites (agences, plateaux, pays…) d'une organisation sont dans sa
+// configuration : cfg.sites = [{ code, name, city, country, tz }]. Chaque
+// site a son tracker de tickets (<code>.json). Aucun site n'est écrit en
+// dur dans le code.
+function normSite(s) {
+  const code = String((s && s.code) || '').trim().toUpperCase();
+  return {
+    code,
+    name:    String((s && s.name) || code).trim(),
+    city:    String((s && s.city) || '').trim(),
+    country: String((s && s.country) || '').trim(),
+    tz:      String((s && s.tz) || '').trim(),
+  };
+}
+function readSites(cfg = readCfg()) {
+  const seen = new Set();
+  return (Array.isArray(cfg.sites) ? cfg.sites : []).map(normSite)
+    .filter(s => /^[A-Z0-9]{2,8}$/.test(s.code) && !seen.has(s.code) && seen.add(s.code));
+}
+const siteCodes = cfg => readSites(cfg).map(s => s.code);
+const siteByCode = (code, cfg) => readSites(cfg).find(s => s.code === String(code || '').toUpperCase()) || null;
+// Périmètre d'une vue ou d'un envoi : un code de site connu, ou 'ALL'.
+// `fallback` : 'ALL' (défaut) ou 'first' (premier site, pour les écrans
+// qui ont toujours porté sur un seul site).
+function normScope(v, fallback = 'ALL', cfg) {
+  const c = String(v || '').trim().toUpperCase();
+  const codes = siteCodes(cfg);
+  if (codes.includes(c)) return c;
+  if (c === 'ALL' || fallback !== 'first') return 'ALL';
+  return codes[0] || 'ALL';
+}
+// Libellé lisible d'un périmètre : « Lyon », « Lyon + Paris ».
+function scopeLabel(scope, cfg) {
+  const sites = readSites(cfg);
+  if (scope && scope !== 'ALL') { const s = sites.find(x => x.code === scope); return s ? (s.city || s.name) : String(scope); }
+  return sites.length ? sites.map(s => s.city || s.name).join(' + ') : 'All sites';
+}
+// Code(s) affiché(s) : « LYO » ou « LYO + PAR ».
+function scopeCodes(scope, cfg) {
+  if (scope && scope !== 'ALL') return String(scope);
+  return siteCodes(cfg).join(' + ') || 'ALL';
+}
+// Sites d'une personne (fo_trackers : code ou liste de codes), à défaut le
+// premier site de l'organisation.
+function personSiteCodes(name, cfg = readCfg()) {
+  const v = (cfg.fo_trackers || {})[name];
+  const list = [].concat(v || []).map(x => String(x).toUpperCase()).filter(Boolean);
+  if (list.length) return list;
+  const first = siteCodes(cfg)[0];
+  return first ? [first] : [];
+}
+const personInScope = (name, scope, cfg) => !scope || scope === 'ALL' || personSiteCodes(name, cfg).includes(scope);
+
+// Tous les tickets de tous les sites, chacun marqué de son site.
+function readAllTickets(cfg) {
+  return readSites(cfg).flatMap(s => readTracker(s.code).map(t => ({ ...t, tracker: t.tracker || s.code, country: t.country || s.code })));
+}
+
+// ── INITIALISATION D'UN TENANT ───────────────────────────────
+// Migrations de données, une fois par tenant et par démarrage, dans le
+// contexte du tenant (appelé par le middleware de tenant, ou au
+// chargement en mode mono-tenant).
+const _initialised = new Set();
+function initTenant() {
+  const t = currentTenant();
+  if (_initialised.has(t)) return;
+  _initialised.add(t);
+  try { migrateIfNeeded(); } catch (e) { console.error(`[Pearl] ${t} : migration tickets.json échouée :`, e.message); }
+  try { migratePasswordsIfNeeded(); } catch (e) { console.error(`[Pearl] ${t} : migration mot de passe échouée :`, e.message); }
+  try { migrateSitesIfNeeded(); } catch (e) { console.error(`[Pearl] ${t} : migration des sites échouée :`, e.message); }
+  try { migrateHoldPeriodsIfNeeded(); } catch (e) { console.error(`[Pearl] ${t} : migration On Hold échouée :`, e.message); }
+}
+// Les installations d'avant les sites configurables avaient deux trackers
+// fixes (sn.json, ci.json) : on les déclare comme sites, avec leurs
+// fichiers tels quels, pour ne rien perdre.
+function migrateSitesIfNeeded() {
+  const cfg = readJSON(FILES.config, null);
+  if (!cfg || Array.isArray(cfg.sites)) return;
+  const sites = [];
+  if (docExists(siteFile('SN'))) sites.push({ code: 'SN', name: 'SN' });
+  if (docExists(siteFile('CI'))) sites.push({ code: 'CI', name: 'CI' });
+  cfg.sites = sites;
+  writeJSON(FILES.config, cfg);
+  if (sites.length) console.log(`[Pearl] Sites déclarés depuis les trackers existants : ${sites.map(s => s.code).join(', ')}.`);
+}
+const _resetInit = () => _initialised.clear();
 
 module.exports = {
   _locks, withFileLock, readJSON, writeJSON, readSN, readCI, readObs,
@@ -207,5 +301,11 @@ module.exports = {
   writeBO, writeShiftsPlan, writeFOTasks, writeQuizzes, writeQuizResults,
   writeQuizProgress, writeQuizPublished, writeWeeklyProgress,
   writeReportLayout, readTracker, writeTracker, readHolidays,
-  getPendingWrites,
+  getPendingWrites, docExists, removeDoc, docVersion,
+  readSites, siteCodes, siteByCode, readAllTickets, normScope, scopeLabel, scopeCodes, personSiteCodes, personInScope, normSite, initTenant, _resetInit,
 };
+
+// Mono-tenant sur fichiers : le tenant « default » est prêt dès le
+// chargement, comme avant. Ailleurs, c'est le middleware de tenant qui
+// charge les données puis appelle initTenant().
+if (!require('./tenant').isMultiTenant() && backend().kind === 'fs') initTenant();

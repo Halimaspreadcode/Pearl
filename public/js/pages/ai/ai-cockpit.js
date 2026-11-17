@@ -1,10 +1,10 @@
 // ══════════════════════════════════════════════════════════════
-// ACCUEIL DE BIG BROTHER (affiché dans la page Big Brother, ai.js)
+// ACCUEIL DE PEARL AI (affiché dans la page Pearl AI, ai.js)
 //
 // Ce qui attend l'admin aujourd'hui, en widgets : sa journée (planning et
 // absents), ses sujets à décider (tickets, équipe, absences, One-to-One…),
 // les inquiétudes relevées en One-to-One à suivre, les absences, les
-// opérations, et ce que Big Brother lit.
+// opérations, et ce que Pearl AI lit.
 //
 // Deux couches :
 //   · les signaux, calculés sans IA et affichés tout de suite : ceux de
@@ -134,14 +134,14 @@ function aicDemasquer() { try { localStorage.removeItem(AIC_MASQUE_KEY); } catch
 // Même périmètre que le reste de l'appli (sélecteur Global / SN / CI de
 // l'en-tête) : changer ici change partout, et inversement.
 function _aicPays() { return typeof getActiveCountry === 'function' ? (getActiveCountry() || 'ALL') : 'ALL'; }
-const AIC_PAYS = [['ALL', 'Global'], ['SN', 'Dakar'], ['CI', 'Abidjan']];
-const _aicPerimetre = () => ({ ALL: 'Global', SN: 'Dakar (SN)', CI: 'Abidjan (CI)' })[_aicPays()] || 'Global';
+const AIC_PAYS_LIST = () => [['ALL', 'Global'], ...siteList().map(s => [s.code, siteName(s.code)])];
+const _aicPerimetre = () => (_aicPays() === 'ALL' ? 'Global' : siteLabel(_aicPays()));
 function aicPays(v) {
   if (typeof setActiveCountry === 'function') setActiveCountry(v);
-  // La barre de Big Brother porte le sélecteur : on la repeint avec l'accueil.
+  // La barre de Pearl AI porte le sélecteur : on la repeint avec l'accueil.
   if (typeof _aiPaint === 'function') _aiPaint(); else renderAiCockpit();
 }
-const _aicTracker = () => ({ SN: 'sn', CI: 'ci' })[_aicPays()] || 'global';
+const _aicTracker = () => (_aicPays() !== 'ALL' && isSiteCode(_aicPays()) ? _aicPays().toLowerCase() : 'global');
 const _aicQ = v => `'${esc(String(v)).replace(/'/g, "\\'")}'`;
 const _aicAuj = () => new Date().toISOString().slice(0, 10);
 const _aicJours = iso => Math.round((Date.parse(_aicAuj()) - Date.parse(String(iso).slice(0, 10))) / 864e5);

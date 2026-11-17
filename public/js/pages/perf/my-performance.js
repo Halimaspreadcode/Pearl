@@ -9,7 +9,7 @@ async function renderFoAccess() {
   const sel = document.getElementById('foacc-fo');
   if (sel) {
     const cur = sel.value;
-    // Toute l'équipe : le code personnel est aussi la connexion à FOps
+    // Toute l'équipe : le code personnel est aussi la connexion à Pearl
     // (seule une session nominative peut modifier quand le verrou d'équipe
     // est actif). « Autre personne » couvre qui n'est ni FO ni BO.
     const fos = state.config.fo_list || [];
@@ -48,7 +48,7 @@ async function renderFoAccess() {
     tb.innerHTML = list.length ? list.map(r => `
       <tr>
         <td style="font-weight:600">${esc(r.fo)}</td>
-        <td style="font-family:monospace;font-size:12px">${esc(r.huawei_id || '—')}</td>
+        <td style="font-family:monospace;font-size:12px">${esc(r.employee_id || '—')}</td>
         <td>${r.updated_at ? esc(new Date(r.updated_at).toLocaleDateString('en-GB')) : '—'}</td>
         <td>${r.sessions || 0}</td>
         <td style="text-align:right">
@@ -72,7 +72,7 @@ function syncFoAccessId() {
   const el = document.getElementById('foacc-id');
   if (!el) return;
   el.value = fo && fo !== '__autre' ? foIdOf(fo) : '';
-  el.placeholder = el.value ? '' : 'Huawei ID — to be set in General';
+  el.placeholder = el.value ? '' : 'Employee ID — to be set in General';
 }
 
 async function generateFoCode() {
@@ -83,7 +83,7 @@ async function generateFoCode() {
   }
   const id = document.getElementById('foacc-id')?.value.trim();
   if (!fo) return toast('Choose an agent', 'error');
-  if (!id)  return toast(`Enter ${fo}'s Huawei ID`, 'error');
+  if (!id)  return toast(`Enter ${fo}'s Employee ID`, 'error');
 
   if (!confirm(`Generate a code for ${fo} ?\n\nIf they already had one, it will stop working immediately.`))
     return;
@@ -93,11 +93,11 @@ async function generateFoCode() {
       method: 'POST',
       headers: AdminSession.headers({ 'Content-Type': 'application/json' }),
       credentials: 'same-origin',
-      body: JSON.stringify({ huaweiId: id }),
+      body: JSON.stringify({ employeeId: id }),
     });
     const data = await res.json().catch(() => ({}));
     // On remonte le message du serveur tel quel : « Agent inconnu » et
-    // « ID Huawei invalide » demandent deux corrections différentes, un
+    // « ID employé invalide » demandent deux corrections différentes, un
     // message unique obligeait à deviner laquelle.
     if (!res.ok) throw new Error(
       data.error
@@ -265,7 +265,7 @@ async function myPerfLogin() {
   try {
     const res = await fetch(`${API}/api/fo-access/login`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ huaweiId: id, code }),
+      body: JSON.stringify({ employeeId: id, code }),
     });
     const data = await res.json().catch(() => ({}));
     if (res.status === 429) throw new Error(data.error || 'Trop d\'essais : réessaie dans 15 minutes.');

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FOps</title>
+<title>Pearl</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='1' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%233FB7A0'/%3E%3Cstop offset='1' stop-color='%234F6A85'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M6 34A28 28 0 0 1 34 6' fill='none' stroke='url(%23g)' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M13 34A21 21 0 0 1 34 13' fill='none' stroke='url(%23g)' stroke-width='4.5' stroke-linecap='round' opacity='.7'/%3E%3Cpath d='M20 34A14 14 0 0 1 34 20' fill='none' stroke='url(%23g)' stroke-width='4.5' stroke-linecap='round' opacity='.45'/%3E%3Ccircle cx='31' cy='31' r='4.5' fill='%23F2A65A'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <!-- Polices chargées sans bloquer l'affichage : derrière un proxy qui laisse
@@ -67,7 +67,6 @@
 <link rel="stylesheet" href="/css/pages/rapports.css">
 <link rel="stylesheet" href="/css/pages/mon-espace.css">
 <link rel="stylesheet" href="/css/pages/admin-ux.css">
-<link rel="stylesheet" href="/css/pages/imoc.css">
 <link rel="stylesheet" href="/css/pages/indicateurs.css">
 <link rel="stylesheet" href="/css/pages/parties.css">
 </head>
@@ -78,9 +77,9 @@
   <nav class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-brand">
-        <svg class="sidebar-logo" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="fops-logo-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#3FB7A0"/><stop offset="1" stop-color="#4F6A85"/></linearGradient></defs><path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="url(#fops-logo-g)" stroke-width="4.5" stroke-linecap="round"/><path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="url(#fops-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".7"/><path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="url(#fops-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".45"/><circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg>
+        <svg class="sidebar-logo" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="pearl-logo-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#3FB7A0"/><stop offset="1" stop-color="#4F6A85"/></linearGradient></defs><path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="url(#pearl-logo-g)" stroke-width="4.5" stroke-linecap="round"/><path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="url(#pearl-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".7"/><path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="url(#pearl-logo-g)" stroke-width="4.5" stroke-linecap="round" opacity=".45"/><circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg>
         <div>
-          <div class="sidebar-brand-name">FOps</div>
+          <div class="sidebar-brand-name">Pearl</div>
           <div class="sidebar-brand-sub">Front Office</div>
         </div>
       </div>
@@ -162,26 +161,20 @@
       <div class="sidebar-section">Trackers</div>
 
 
-      <div class="nav-item" data-page="sn">
+      <!-- Un seul tracker dans la barre : celui du site choisi en haut
+           (js/core/sites.js, locale.js). -->
+      <div class="nav-item" data-page="site">
         <div class="nav-item-left">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
-          <span class="nav-item-label">Tracker SN</span>
+          <span class="nav-item-label" id="sb-site-label">Tickets</span>
         </div>
-        <span class="nav-item-badge" id="sb-count-sn">-</span>
-      </div>
-
-      <div class="nav-item" data-page="ci">
-        <div class="nav-item-left">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
-          <span class="nav-item-label">Tracker CI</span>
-        </div>
-        <span class="nav-item-badge" id="sb-count-ci">-</span>
+        <span class="nav-item-badge" id="sb-count-site">-</span>
       </div>
 
       <div class="nav-item" data-page="global" style="display:none">
         <div class="nav-item-left">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <span class="nav-item-label">Tracker Global</span>
+          <span class="nav-item-label">All sites</span>
         </div>
         <span class="nav-item-badge" id="sb-count-global">-</span>
       </div>
@@ -285,15 +278,15 @@
         </div>
       </div>
 
-      <!-- L'accueil de Big Brother (ai-cockpit.js) remplace l'ancien tableau de bord. -->
+      <!-- L'accueil de Pearl AI (ai-cockpit.js) remplace l'ancien tableau de bord. -->
       <div class="nav-item nav-mode-off" data-page="ai">
         <div class="nav-item-left">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>
-          <span class="nav-item-label">Big Brother</span>
+          <span class="nav-item-label">Pearl AI</span>
         </div>
       </div>
 
-      <!-- KPI / PI définis avec Big Brother, suivis automatiquement. -->
+      <!-- KPI / PI définis avec Pearl AI, suivis automatiquement. -->
       <div class="nav-item nav-mode-off" data-page="indicateurs">
         <div class="nav-item-left">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
@@ -301,24 +294,11 @@
         </div>
       </div>
 
-      <!-- Tickets relevés dans IMOC (eTicket), à la demande de l'admin. -->
-      <div class="nav-item nav-mode-off" data-page="imoc">
-        <div class="nav-item-left">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 0 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 0 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>
-          <span class="nav-item-label">Tickets IMOC</span>
-        </div>
-      </div>
 
       </div><!-- /sidebar-group reporting -->
 
       <div class="sidebar-section">Outils</div>
 
-      <div class="nav-item" data-page="log-analyzer">
-        <div class="nav-item-left">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span class="nav-item-label">Analyseur</span>
-        </div>
-      </div>
 
       <!-- Academy : entrée unique des formations (DigitalView, Process
            ITSM), avec intro, heatmaps et cours en plein écran. Les anciennes
@@ -387,7 +367,6 @@
 
     <!-- sidebar footer -->
     <div class="sidebar-footer">
-      <div style="font-size:10px;color:var(--mute);text-align:center;padding:6px 0">Designed by Halima GUEYE</div>
     </div>
   </nav>
 
@@ -413,20 +392,9 @@
         <span id="breach-count-label">0 BREACH</span>
       </div>
 
-      <div id="country-toggle">
-        <button type="button" id="country-btn-all" class="country-toggle-btn" onclick="setActiveCountry('ALL')" title="Vue globale (SN + CI)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <span>Global</span>
-        </button>
-        <button type="button" id="country-btn-sn" class="country-toggle-btn" onclick="setActiveCountry('SN')" title="Dakar (SN)">
-          <svg width="14" height="10" viewBox="0 0 3 2"><rect width="1" height="2" x="0" fill="#00853F"/><rect width="1" height="2" x="1" fill="#FDEF42"/><rect width="1" height="2" x="2" fill="#E31B23"/><polygon points="1.5,0.55 1.61,0.88 1.95,0.88 1.67,1.08 1.78,1.41 1.5,1.21 1.22,1.41 1.33,1.08 1.05,0.88 1.39,0.88" fill="#00853F"/></svg>
-          <span>SN</span>
-        </button>
-        <button type="button" id="country-btn-ci" class="country-toggle-btn" onclick="setActiveCountry('CI')" title="Abidjan (CI)">
-          <svg width="14" height="10" viewBox="0 0 3 2"><rect width="1" height="2" x="0" fill="#F77F00"/><rect width="1" height="2" x="1" fill="#FFFFFF"/><rect width="1" height="2" x="2" fill="#009E60"/></svg>
-          <span>CI</span>
-        </button>
-      </div>
+      <!-- Sélecteur de site : « All » puis un bouton par site configuré
+           (rempli par renderCountryToggle, js/core/locale.js). -->
+      <div id="country-toggle"></div>
 
       <div class="tb-clock" id="topbar-clock"></div>
 
@@ -553,14 +521,14 @@
              Les id sont conservés — le JS n'a pas à changer. -->
         <div class="d-kpibar d-card-full">
 
-          <button class="d-kpi" id="dc-total" onclick="renderPage('sn')">
+          <button class="d-kpi" id="dc-total" onclick="renderPage('site')">
             <span class="d-kpi-label">Total tickets</span>
             <span class="d-kpi-value" id="dc-total-val">-</span>
             <span class="d-kpi-sub" id="dc-total-sub">Combined total</span>
             <span class="d-chart-bars d-kpi-spark" title="Last 7 days" id="dc-total-chart"></span>
           </button>
 
-          <button class="d-kpi" id="dc-open" onclick="renderPage('sn')">
+          <button class="d-kpi" id="dc-open" onclick="renderPage('site')">
             <span class="d-kpi-label">Open &amp; active</span>
             <span class="d-kpi-value" id="dc-open-val">-</span>
             <span class="d-kpi-sub" id="dc-open-sub">pending</span>
@@ -575,14 +543,14 @@
             <span class="d-chart-bars d-kpi-spark" title="Last 7 days" id="dc-breach-chart"></span>
           </button>
 
-          <button class="d-kpi" id="dc-resolved" onclick="renderPage('sn')">
+          <button class="d-kpi" id="dc-resolved" onclick="renderPage('site')">
             <span class="d-kpi-label">Resolved</span>
             <span class="d-kpi-value" id="dc-res-val">-</span>
             <span class="d-kpi-sub" id="dc-res-sub">closed tickets</span>
             <span class="d-chart-bars d-kpi-spark" title="Last 7 days" id="dc-res-chart"></span>
           </button>
 
-          <button class="d-kpi" id="dc-today" onclick="renderPage('sn')">
+          <button class="d-kpi" id="dc-today" onclick="renderPage('site')">
             <span class="d-kpi-label">Opened today</span>
             <span class="d-kpi-value" id="dc-today-val">-</span>
             <span class="d-kpi-sub">new tickets</span>
@@ -790,100 +758,55 @@
       </div><!-- /dash-panel -->
     </div>
 
-    <!-- TRACKER SN -->
-    <div class="page" id="page-sn">
-      <div class="page-title" style="margin-bottom:8px">Tracker SN</div>
-      <div class="page-sub" style="margin-bottom:20px">Dakar · Senegal tickets</div>
+    <!-- TRACKER D'UN SITE (le site actif) -->
+    <div class="page" id="page-site">
+      <div class="page-title" style="margin-bottom:8px" id="site-page-title">Tickets</div>
+      <div class="page-sub" style="margin-bottom:20px" id="site-page-sub"></div>
       <div class="dash-panel tr-shell">
-      <div class="tr-views" id="sn-views" role="tablist" aria-label="Quick views"></div>
-      <div class="tracker-filter-bar" id="sn-filter-bar">
+      <div class="tr-views" id="site-views" role="tablist" aria-label="Quick views"></div>
+      <div class="tracker-filter-bar" id="site-filter-bar">
         <div class="tfb-row1">
           <div class="tfb-search-wrap">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="tfb-search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input tfb-search" id="sn-search" placeholder="Search TT#, title, FO, domain…" oninput="filterTable('sn');updateTrackerFilterBadges('sn')">
+            <input class="search-input tfb-search" id="site-search" placeholder="Search TT#, title, FO, domain…" oninput="filterTable('site');updateTrackerFilterBadges('site')">
           </div>
           <div class="tfb-actions">
-            <span class="tk-count" id="sn-result-count"></span>
-            <button id="sn-reset-btn" class="btn btn-ghost btn-sm tfb-reset" onclick="resetTrackerFilters('sn')" style="display:none">
+            <span class="tk-count" id="site-result-count"></span>
+            <button id="site-reset-btn" class="btn btn-ghost btn-sm tfb-reset" onclick="resetTrackerFilters('site')" style="display:none">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Reset
             </button>
-            <button class="btn btn-ghost btn-sm" onclick="exportTrackerExcel('sn')">
+            <button class="btn btn-ghost btn-sm" onclick="exportTrackerExcel('site')">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export
             </button>
-            <button class="btn btn-primary btn-sm tfb-new" onclick="openNewTicket('sn')">
+            <button class="btn btn-primary btn-sm tfb-new" onclick="openNewTicket('site')">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New ticket
             </button>
           </div>
         </div>
         <div class="tfb-row2">
-          <select class="filter-select" id="sn-filter-status" onchange="filterTable('sn');updateTrackerFilterBadges('sn')"><option value="">All statuses</option></select>
-          <select class="filter-select" id="sn-filter-priority" onchange="filterTable('sn');updateTrackerFilterBadges('sn')"><option value="">All priorities</option></select>
-          <select class="filter-select" id="sn-filter-fo" onchange="filterTable('sn');updateTrackerFilterBadges('sn')"><option value="">All FOs</option></select>
-          <select class="filter-select" id="sn-filter-domain" onchange="filterTable('sn');updateTrackerFilterBadges('sn')"><option value="">All domains</option></select>
+          <select class="filter-select" id="site-filter-status" onchange="filterTable('site');updateTrackerFilterBadges('site')"><option value="">All statuses</option></select>
+          <select class="filter-select" id="site-filter-priority" onchange="filterTable('site');updateTrackerFilterBadges('site')"><option value="">All priorities</option></select>
+          <select class="filter-select" id="site-filter-fo" onchange="filterTable('site');updateTrackerFilterBadges('site')"><option value="">All FOs</option></select>
+          <select class="filter-select" id="site-filter-domain" onchange="filterTable('site');updateTrackerFilterBadges('site')"><option value="">All domains</option></select>
           <div class="tfb-daterange">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tfb-cal-icon"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <input class="filter-select" id="sn-filter-date-from" type="date" onchange="filterTable('sn');updateTrackerFilterBadges('sn')" title="Open date — from">
+            <input class="filter-select" id="site-filter-date-from" type="date" onchange="filterTable('site');updateTrackerFilterBadges('site')" title="Open date — from">
             <span class="tfb-arrow">→</span>
-            <input class="filter-select" id="sn-filter-date-to" type="date" onchange="filterTable('sn');updateTrackerFilterBadges('sn')" title="Open date — to">
+            <input class="filter-select" id="site-filter-date-to" type="date" onchange="filterTable('site');updateTrackerFilterBadges('site')" title="Open date — to">
           </div>
         </div>
-        <div class="tfb-chips" id="sn-active-chips" style="display:none"></div>
+        <div class="tfb-chips" id="site-active-chips" style="display:none"></div>
       </div>
       <div class="table-wrap">
-        <table id="sn-table"><thead><tr id="sn-thead-row"></tr></thead><tbody id="sn-tbody"></tbody></table>
-      </div>
-      </div>
-    </div>
-
-    <!-- TRACKER CI -->
-    <div class="page" id="page-ci">
-      <div class="page-title" style="margin-bottom:8px">Tracker CI</div>
-      <div class="page-sub" style="margin-bottom:20px">Abidjan · Côte d'Ivoire tickets</div>
-      <div class="dash-panel tr-shell">
-      <div class="tr-views" id="ci-views" role="tablist" aria-label="Quick views"></div>
-      <div class="tracker-filter-bar" id="ci-filter-bar">
-        <div class="tfb-row1">
-          <div class="tfb-search-wrap">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="tfb-search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input tfb-search" id="ci-search" placeholder="Search TT#, title, FO, domain…" oninput="filterTable('ci');updateTrackerFilterBadges('ci')">
-          </div>
-          <div class="tfb-actions">
-            <span class="tk-count" id="ci-result-count"></span>
-            <button id="ci-reset-btn" class="btn btn-ghost btn-sm tfb-reset" onclick="resetTrackerFilters('ci')" style="display:none">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Reset
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="exportTrackerExcel('ci')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export
-            </button>
-            <button class="btn btn-primary btn-sm tfb-new" onclick="openNewTicket('ci')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New ticket
-            </button>
-          </div>
-        </div>
-        <div class="tfb-row2">
-          <select class="filter-select" id="ci-filter-status" onchange="filterTable('ci');updateTrackerFilterBadges('ci')"><option value="">All statuses</option></select>
-          <select class="filter-select" id="ci-filter-priority" onchange="filterTable('ci');updateTrackerFilterBadges('ci')"><option value="">All priorities</option></select>
-          <select class="filter-select" id="ci-filter-fo" onchange="filterTable('ci');updateTrackerFilterBadges('ci')"><option value="">All FOs</option></select>
-          <select class="filter-select" id="ci-filter-domain" onchange="filterTable('ci');updateTrackerFilterBadges('ci')"><option value="">All domains</option></select>
-          <div class="tfb-daterange">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tfb-cal-icon"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <input class="filter-select" id="ci-filter-date-from" type="date" onchange="filterTable('ci');updateTrackerFilterBadges('ci')" title="Open date — from">
-            <span class="tfb-arrow">→</span>
-            <input class="filter-select" id="ci-filter-date-to" type="date" onchange="filterTable('ci');updateTrackerFilterBadges('ci')" title="Open date — to">
-          </div>
-        </div>
-        <div class="tfb-chips" id="ci-active-chips" style="display:none"></div>
-      </div>
-      <div class="table-wrap">
-        <table id="ci-table"><thead><tr id="ci-thead-row"></tr></thead><tbody id="ci-tbody"></tbody></table>
+        <table id="site-table"><thead><tr id="site-thead-row"></tr></thead><tbody id="site-tbody"></tbody></table>
       </div>
       </div>
     </div>
 
     <!-- TRACKER GLOBAL -->
     <div class="page" id="page-global">
-      <div class="page-title" style="margin-bottom:8px">Tracker Global</div>
-      <div class="page-sub" style="margin-bottom:20px">Combined view — Dakar (SN) + Abidjan (CI) · read-only</div>
+      <div class="page-title" style="margin-bottom:8px">All sites</div>
+      <div class="page-sub" style="margin-bottom:20px">Combined view of all sites · read-only</div>
       <div class="dash-panel tr-shell">
       <div class="tr-views" id="global-views" role="tablist" aria-label="Quick views"></div>
       <div class="tracker-filter-bar" id="global-filter-bar">
@@ -903,10 +826,8 @@
           </div>
         </div>
         <div class="tfb-row2">
-          <select class="filter-select" id="global-filter-site" onchange="filterTable('global');updateTrackerFilterBadges('global')">
+          <select class="filter-select" id="global-filter-site" data-sites="all" data-sites-lower onchange="filterTable('global');updateTrackerFilterBadges('global')">
             <option value="">All sites</option>
-            <option value="sn">SN — Dakar</option>
-            <option value="ci">CI — Abidjan</option>
           </select>
           <select class="filter-select" id="global-filter-status" onchange="filterTable('global');updateTrackerFilterBadges('global')"><option value="">All statuses</option></select>
           <select class="filter-select" id="global-filter-priority" onchange="filterTable('global');updateTrackerFilterBadges('global')"><option value="">All priorities</option></select>
@@ -967,9 +888,8 @@
           <option value="">Any priority</option>
           <option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
         </select>
-        <select class="gobs-select" id="obs-filter-source" onchange="renderObservations()" aria-label="Source">
-          <option value="">SN + CI</option>
-          <option>SN</option><option>CI</option>
+        <select class="gobs-select" id="obs-filter-source" data-sites="all" onchange="renderObservations()" aria-label="Site">
+          <option value="">All sites</option>
         </select>
         <!-- Conservé masqué : renderObservations() lit encore ce champ. -->
         <select id="obs-filter-status" hidden aria-hidden="true" tabindex="-1">
@@ -990,7 +910,7 @@
       <div class="fo-toolbar">
         <div>
           <div class="page-title">FO Dashboard</div>
-          <div class="page-sub" style="margin-bottom:0">Performance by Front Office · SN + CI combined</div>
+          <div class="page-sub" style="margin-bottom:0">Performance by agent · all sites</div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <div class="fo-seg" id="fo-dash-period-seg">
@@ -999,15 +919,12 @@
             <button data-val="week" onclick="_setFoPeriod('week')">Semaine</button>
             <button data-val="month" onclick="_setFoPeriod('month')">Mois</button>
           </div>
-          <div class="fo-seg" id="fo-dash-tracker-seg">
-            <button data-val="both" class="active" onclick="_setFoTracker('both')">SN + CI</button>
-            <button data-val="sn" onclick="_setFoTracker('sn')">SN</button>
-            <button data-val="ci" onclick="_setFoTracker('ci')">CI</button>
-          </div>
+          <!-- Rempli par _renderFoTrackerSeg (fo-dashboard.js) : tous, puis un bouton par site. -->
+          <div class="fo-seg" id="fo-dash-tracker-seg"></div>
           <button class="btn btn-ghost btn-sm" onclick="openKpiConfigModal()" title="Configure visible KPIs">Configure KPIs</button>
           <!-- hidden inputs kept so existing logic that reads .value still works -->
           <select id="fo-dash-period" style="display:none"><option value="all" selected></option><option value="today"></option><option value="week"></option><option value="month"></option></select>
-          <select id="fo-dash-tracker" style="display:none"><option value="both" selected></option><option value="sn"></option><option value="ci"></option></select>
+          <select id="fo-dash-tracker" style="display:none" data-sites="all" data-sites-lower data-sites-all-value="both"><option value="both" selected></option></select>
         </div>
       </div>
 
@@ -1069,10 +986,6 @@
       </div>
     </div>
 
-    <!-- LOG ANALYZER -->
-    <div class="page" id="page-log-analyzer" style="margin:-28px -28px -32px">
-      <iframe src="/log-analyzer.html" style="width:100%;height:calc(100vh - 56px);border:none;display:block"></iframe>
-    </div>
 
     <!-- Formation DigitalView. L'iframe n'est chargée qu'à la première
          ouverture (formation.js) : 190 Ko que personne ne télécharge
@@ -1163,10 +1076,10 @@
         <div class="rpt-actions">
           <button class="btn btn-ghost btn-sm" onclick="exportWeeklyExcel()">Export Excel</button>
           <button class="btn btn-primary btn-sm" id="weekly-pptx-btn" onclick="exportWeeklyPptx()">PPTX preview</button>
-          <!-- Revue commune Dakar × Abidjan : disponible quel que soit le
-               site sélectionné, puisqu'elle couvre les deux. -->
+          <!-- Revue commune de tous les sites : disponible quel que soit le
+               site sélectionné, puisqu'elle les couvre tous. -->
           <button class="btn btn-secondary btn-sm" id="weekly-combined-btn" onclick="openWeeklyCombined()"
-                  title="Weekly performance deck presented to both teams">Dakar × Abidjan deck</button>
+                  title="Weekly performance deck covering every site">All-sites deck</button>
         </div>
       </div>
       <!-- Plus de panneau latéral : le récap occupe toute la largeur. -->
@@ -1309,11 +1222,11 @@
           </div>
           <div class="myperf-lock-t">Personal access</div>
           <div class="myperf-lock-d">
-            Enter your Huawei ID and the personal code given to you by your
+            Enter your Employee ID and the personal code given to you by your
             manager. You will only ever see your own review.
           </div>
           <div class="myperf-form">
-            <input class="form-control idt-mono" id="myperf-id" placeholder="Huawei ID (e.g. h50056630)"
+            <input class="form-control idt-mono" id="myperf-id" placeholder="Employee ID (e.g. h50056630)"
                    autocomplete="off" onkeydown="if(event.key==='Enter')myPerfLogin()">
             <input class="form-control idt-mono" id="myperf-code" placeholder="Personal code" type="password"
                    autocomplete="off" onkeydown="if(event.key==='Enter')myPerfLogin()">
@@ -1493,7 +1406,7 @@
       <div class="qz-header">
         <div class="qz-header-id">
           <div class="qz-title">Quiz</div>
-          <div class="qz-sub">EMOC procedures, SLA and tools — at your own pace</div>
+          <div class="qz-sub">Procedures, SLAs and tools — at your own pace</div>
         </div>
         <div class="qz-header-actions">
           <div class="qz-search">
@@ -1784,9 +1697,9 @@
         <div class="idt-suggest" id="identity-suggest"></div>
       </div>
       <div class="form-group idt-field idt-field-last">
-        <label class="form-label" for="identity-huawei-input">ID Huawei <span class="req">*</span></label>
+        <label class="form-label" for="identity-employee-input">ID employé <span class="req">*</span></label>
         <div class="idt-input-wrap">
-          <input class="form-control idt-mono" id="identity-huawei-input" placeholder="ex : hw12345678" autocomplete="off"
+          <input class="form-control idt-mono" id="identity-employee-input" placeholder="ex : e12345" autocomplete="off"
             oninput="updateIdentityPreview()" onkeydown="if(event.key==='Enter')saveIdentity()">
           <!-- Le format valide se signale par un check dans le champ, pas
                par une ligne de texte : l'info tient au même endroit que la
@@ -1859,13 +1772,13 @@
           <div class="sp-section-label">Identifiants</div>
 
           <div class="form-group">
-            <label class="form-label">Oceane TT# <span class="req">*</span></label>
+            <label class="form-label">Ticket # <span class="req">*</span></label>
             <input class="form-control" name="sn_tt" required maxlength="15" placeholder="Ex: ALRS-2M5P1"
               style="font-family:'JetBrains Mono',monospace">
           </div>
           <div class="form-group">
-            <label class="form-label">IMOC TT#</label>
-            <input class="form-control" name="imoc_tt" placeholder="IMOC number"
+            <label class="form-label">External ref.</label>
+            <input class="form-control" name="imoc_tt" placeholder="Référence externe"
               style="font-family:'JetBrains Mono',monospace">
           </div>
 
@@ -2059,10 +1972,10 @@
         </div>
         <div class="form-group">
           <label class="form-label">Source</label>
-          <select class="form-control" name="source"><option>SN</option><option>CI</option></select>
+          <select class="form-control" name="source" data-sites="only"></select>
         </div>
         <div class="form-group">
-          <label class="form-label">OCEANE TT# <span style="color:var(--mute);font-weight:400">(optional)</span></label>
+          <label class="form-label">Ticket # <span style="color:var(--mute);font-weight:400">(optional)</span></label>
           <input class="form-control" name="tracker_tt" placeholder="Ex: ALRS-2M5P1">
         </div>
         <div class="form-group full">
@@ -2309,10 +2222,8 @@
           </div>
           <div class="form-group" style="max-width:130px">
             <label class="form-label">Site</label>
-            <select class="form-control" id="holiday-country-input">
-              <option value="">Both</option>
-              <option value="SN">Senegal</option>
-              <option value="CI">Ivory Coast</option>
+            <select class="form-control" id="holiday-country-input" data-sites="all">
+              <option value="">All sites</option>
             </select>
           </div>
         </div>
@@ -2511,9 +2422,7 @@
 
         <div class="form-group">
           <label class="form-label">Site</label>
-          <select class="form-control sp-narrow" name="tracker" id="progress-tracker-select" onchange="_updateProgressPreview()">
-            <option value="SN">Dakar (SN)</option>
-            <option value="CI">Abidjan (CI)</option>
+          <select class="form-control sp-narrow" name="tracker" id="progress-tracker-select" data-sites="only" onchange="_updateProgressPreview()">
           </select>
         </div>
 
@@ -2570,7 +2479,7 @@
 
         <div class="form-group">
           <label class="form-label">Name <span class="req">*</span></label>
-          <input class="form-control" name="name" required placeholder="e.g. EMOC Basics">
+          <input class="form-control" name="name" required placeholder="e.g. Onboarding basics">
         </div>
 
         <div class="form-group">
@@ -2752,6 +2661,7 @@
      CDN : les exports Excel doivent fonctionner sur une VM sans Internet. -->
 <!-- Connexion d'équipe : avant tout appel à l'API (voir server/auth/team-gate.js). -->
 <script src="/js/core/team-gate.js"></script>
+<script src="/js/core/branding.js"></script>
 <script src="/vendor/exceljs.min.js"></script>
 <!-- Coquille : thème, barre latérale, bascule Simple/Admin, langue/pays,
      identité. Autrefois en ligne ici ; chargés avant app.js, dans cet ordre. -->
@@ -2770,6 +2680,7 @@
      enveloppes successives de window.renderPage et les `const` lus au
      chargement supposent que les fichiers précédents sont déjà évalués. -->
 <script src="/js/core/state.js"></script>
+<script src="/js/core/sites.js"></script>
 <script src="/js/core/init.js"></script>
 <script src="/js/core/utils.js"></script>
 <script src="/js/pages/dashboard/dashboard.js"></script>
@@ -2787,6 +2698,8 @@
 <script src="/js/pages/fo-dashboard/fo-activity.js"></script>
 <script src="/js/components/kpi-config-modal.js"></script>
 <script src="/js/pages/config/config.js"></script>
+<script src="/js/pages/config/sites-admin.js"></script>
+<script src="/js/pages/config/org-admin.js"></script>
 <script src="/js/pages/config/team-objectives.js"></script>
 <script src="/js/pages/perf/perf.js"></script>
 <script src="/js/pages/perf/perf-comments.js"></script>
@@ -2805,7 +2718,6 @@
 <script src="/js/pages/audit.js"></script>
 <script src="/js/pages/ai/ai.js"></script>
 <script src="/js/pages/ai/ai-cockpit.js"></script>
-<script src="/js/pages/imoc/imoc.js"></script>
 <script src="/js/pages/indicateurs/indicateurs.js"></script>
 <script src="/js/pages/config/parties.js"></script>
 <script src="/js/pages/reports/reports-common.js"></script>

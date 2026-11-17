@@ -98,7 +98,7 @@ function mlAddSchedule() {
     group_id: (mlState.groups[0] || {}).id || '', freq: 'daily', hour: 8, minute: 0,
     day: 1, date: _mlTodayTZ(0), enabled: true,
     // Pays affiché à l'écran par défaut ; « Global » devient « les deux ».
-    country: typeof getActiveCountry === 'function' ? getActiveCountry() : 'SN' });
+    country: typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL' });
   mlUI.open.add(mlState.schedules.length - 1);
   _mlDirty('sched', true);
   _mlRenderSchedules(); _mlRenderStatus();
@@ -157,7 +157,7 @@ async function mlSave(opts) {
 async function mlTest(btn) {
   const to = document.getElementById('ml-test-to')?.value.trim();
   const report = document.getElementById('ml-test-report')?.value || 'daily';
-  const country = document.getElementById('ml-test-country')?.value || 'SN';
+  const country = document.getElementById('ml-test-country')?.value || defaultSite();
   const st = document.getElementById('ml-test-state');
   const say = (txt, tone) => { if (st) { st.textContent = txt; st.dataset.tone = tone || ''; } };
   if (!to || !_ML_EMAIL.test(to)) { say('Indiquez une adresse valide.', 'bad'); return; }

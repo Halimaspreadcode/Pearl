@@ -113,7 +113,7 @@
 #page-indicateurs .ix-tab th:not(:first-child),#page-indicateurs .ix-tab td:not(:first-child){text-align:right;white-space:nowrap}
 #page-indicateurs .ix-tab td.is-na{color:var(--ix-mute)}
 
-/* Colonne Big Brother + définition */
+/* Colonne Pearl AI + définition */
 #page-indicateurs .ix-side{position:sticky;top:0;display:flex;flex-direction:column;gap:14px}
 #page-indicateurs .ix-bb,#page-indicateurs .ix-fiche{padding:16px;border-radius:20px;border:1px solid var(--ix-line);background:var(--ix-bg)}
 #page-indicateurs .ix-fil{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;scrollbar-width:thin;margin-bottom:10px}

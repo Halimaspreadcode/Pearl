@@ -7,7 +7,7 @@ const crypto      = require('crypto');
 // valide. On délivre maintenant un jeton de session à durée limitée ;
 // le mot de passe ne quitte le client qu'une seule fois.
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 h — une journée de travail
-const sessions = new Map(); // token -> { expires }
+const sessions = require('../core/scoped').scopedMap(); // token -> { expires }
 
 // Nom du cookie de session admin. Une seule valeur à lire : on l'extrait
 // à la main plutôt que d'ajouter cookie-parser aux dépendances.
@@ -26,7 +26,7 @@ function readCookie(req, name) {
 }
 // Les absences ont leur propre registre : un jeton admin ne doit pas
 // ouvrir les dossiers RH, ni l'inverse. Deux secrets, deux Map.
-const absenceSessions = new Map();
+const absenceSessions = require('../core/scoped').scopedMap();
 
 function issueSession(store = sessions) {
   const token = crypto.randomBytes(32).toString('hex');
@@ -51,7 +51,7 @@ function sessionValid(token, store = sessions) {
 // Durée courte : ces notes sont consultées ponctuellement, pas gardées
 // ouvertes toute la journée sur un poste partagé.
 const FO_SESSION_TTL_MS = 30 * 60 * 1000; // 30 min
-const foSessions = new Map(); // token -> { fo, expires }
+const foSessions = require('../core/scoped').scopedMap(); // token -> { fo, expires }
 
 function issueFoSession(fo) {
   const token = crypto.randomBytes(32).toString('hex');

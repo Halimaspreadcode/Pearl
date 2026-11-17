@@ -441,12 +441,12 @@ function _mesRenderContent() {
 }
 
 // Formulaire d'accès de My Performance : l'agent est déjà identifié, son
-// ID Huawei est repris du profil (ou de sa fiche) et seul le code reste
+// ID employé est repris du profil (ou de sa fiche) et seul le code reste
 // à saisir. Le serveur vérifie toujours la paire ID + code.
 function _mesPrepGate(node) {
   const u = _mesUser();
   const me = mesMe();
-  const id = (u && /^[a-zA-Z]{1,2}\d{7,8}$/.test(u.huaweiId || '') && u.huaweiId)
+  const id = (u && /^[a-zA-Z]{1,2}\d{7,8}$/.test(u.employeeId || '') && u.employeeId)
     || (me && typeof foIdOf === 'function' && foIdOf(me)) || '';
   const inp = _mesEl('myperf-id');
   let who = _mesEl('mes-gate-who');
@@ -627,12 +627,12 @@ function _mxTodoCol(items, urgent) {
 
 function _mxTicketsCol(me) {
   const clos = t => t.status === 'Resolved' || t.status === 'Closed';
-  const list = [...(state.sn || []).map(t => ({ ...t, _tr: 'sn' })), ...(state.ci || []).map(t => ({ ...t, _tr: 'ci' }))]
+  const list = ticketsInScope('ALL').map(t => ({ ...t, _tr: t._tracker }))
     .filter(t => (t.fo_owner === me || t.assigned_to === me) && !clos(t));
   const left = t => (typeof t.time_left_ms === 'number' ? t.time_left_ms : Infinity);
   const br = t => t.sla_status === 'Breach' || left(t) < 0;
   list.sort((a, b) => (br(b) - br(a)) || String(a.priority || 'P9').localeCompare(String(b.priority || 'P9')) || left(a) - left(b));
-  const tr = _mesTracker(me).toLowerCase() === 'ci' ? 'ci' : 'sn';
+  const tr = String(_mesTracker(me) || defaultSite()).toLowerCase();
   const rows = list.slice(0, 5).map(t => {
     const prio = String(t.priority || '').toUpperCase();
     const tl = typeof formatTimeLeft === 'function' && typeof t.time_left_ms === 'number' ? formatTimeLeft(t.time_left_ms, t.status) : (t.status || '');
@@ -696,10 +696,10 @@ function _mxTiles(g) {
 // Avant : une carte « Who are you? » et un bouton qui ouvrait une fenêtre.
 // Maintenant : ce que l'espace apporte, à gauche ; le formulaire, à
 // droite, directement dans la page. Trois cas :
-//   · codes personnels délivrés → ID Huawei + code : une seule saisie
+//   · codes personnels délivrés → ID employé + code : une seule saisie
 //     ouvre à la fois le profil et la note (même appel que Performance) ;
 //   · verrou d'équipe sans codes → bouton « Sign in » (fenêtre d'équipe) ;
-//   · sinon → son nom (puces des FO) et son ID Huawei.
+//   · sinon → son nom (puces des FO) et son ID employé.
 function _mesPerksHtml(list) {
   return `<ul class="mes-perks">${list.map(([ico, t, d]) => `<li>
       <span class="mes-perk-i">${_mesSvg(ico, 18)}</span>
@@ -717,8 +717,8 @@ function _mesWelcomeHtml() {
   if (t.codes) {
     form = `<form class="mes-si" onsubmit="event.preventDefault();mesSignIn()">
       <div class="mes-si-t">Sign in</div>
-      <div class="mes-si-d">With your Huawei ID and the personal code your manager gave you.</div>
-      <label class="mes-fl"><span>Huawei ID</span><input id="mes-si-1" class="mes-in" autocomplete="username" placeholder="h50056630" spellcheck="false"></label>
+      <div class="mes-si-d">With your Employee ID and the personal code your manager gave you.</div>
+      <label class="mes-fl"><span>Employee ID</span><input id="mes-si-1" class="mes-in" autocomplete="username" placeholder="h50056630" spellcheck="false"></label>
       <label class="mes-fl"><span>Personal code</span><input id="mes-si-2" class="mes-in" type="password" autocomplete="current-password" placeholder="••••••"></label>
       <div class="mes-si-err" id="mes-si-err" role="alert"></div>
       <button class="mes-si-btn" id="mes-si-go" type="submit">Open my space${_mesSvg('arrow', 16)}</button>
@@ -739,7 +739,7 @@ function _mesWelcomeHtml() {
       ${fos.length ? `<div class="mes-chips" role="group" aria-label="Front Office">${fos.slice(0, 8).map(n =>
         `<button type="button" class="mes-chip" onclick="_mesChip(this)" data-n="${esc(n)}">${esc(n)}</button>`).join('')}</div>
         <datalist id="mes-si-names">${fos.map(n => `<option value="${esc(n)}">`).join('')}</datalist>` : ''}
-      <label class="mes-fl"><span>Huawei ID</span><input id="mes-si-2" class="mes-in" autocomplete="username" placeholder="h50056630" spellcheck="false"></label>
+      <label class="mes-fl"><span>Employee ID</span><input id="mes-si-2" class="mes-in" autocomplete="username" placeholder="h50056630" spellcheck="false"></label>
       <div class="mes-si-err" id="mes-si-err" role="alert"></div>
       <button class="mes-si-btn" type="submit">Continue${_mesSvg('arrow', 16)}</button>
     </form>`;
@@ -771,9 +771,9 @@ function mesPickMe() {
   const name = (_mesEl('mes-si-1')?.value || '').trim();
   const id = (_mesEl('mes-si-2')?.value || '').trim();
   if (!name) { _mesSiErr('Enter your name.'); _mesEl('mes-si-1')?.focus(); return; }
-  if (!/^[a-zA-Z]{1,2}\d{7,8}$/.test(id)) { _mesSiErr('Huawei ID format: h50056630 or wx1488808.'); _mesEl('mes-si-2')?.focus(); return; }
+  if (!/^[a-zA-Z]{1,2}\d{7,8}$/.test(id)) { _mesSiErr('Employee ID format: h50056630 or wx1488808.'); _mesEl('mes-si-2')?.focus(); return; }
   const n = document.getElementById('identity-name-input');
-  const h = document.getElementById('identity-huawei-input');
+  const h = document.getElementById('identity-employee-input');
   if (!n || !h || typeof saveIdentity !== 'function') { openUserModal(true); return; }
   n.value = name; h.value = id;
   saveIdentity();
@@ -784,18 +784,18 @@ function mesPickMe() {
 async function mesSignIn() {
   const id = (_mesEl('mes-si-1')?.value || '').trim();
   const code = (_mesEl('mes-si-2')?.value || '').trim();
-  if (!id || !code) { _mesSiErr('Enter your Huawei ID and your code.'); return; }
+  if (!id || !code) { _mesSiErr('Enter your Employee ID and your code.'); return; }
   const btn = _mesEl('mes-si-go');
   if (btn) btn.disabled = true;
   _mesSiErr('');
   try {
     const res = await fetch(`${API}/api/fo-access/login`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ huaweiId: id, code }),
+      body: JSON.stringify({ employeeId: id, code }),
     });
     const data = await res.json().catch(() => ({}));
     if (res.status === 429) throw new Error(data.error || 'Too many attempts — try again in 15 minutes.');
-    if (!res.ok) throw new Error(data.error || 'Wrong Huawei ID or code.');
+    if (!res.ok) throw new Error(data.error || 'Wrong Employee ID or code.');
     MyPerf.set(data.token);
     location.reload();
   } catch (e) {
@@ -811,13 +811,13 @@ async function mesSignIn() {
 // ouvre la fiche ; le lien du bas ouvre le tracker filtré sur lui.
 function _mesMyTicketsHtml(me) {
   const clos = t => t.status === 'Resolved' || t.status === 'Closed';
-  const list = [...(state.sn || []).map(t => ({ ...t, _tr: 'sn' })), ...(state.ci || []).map(t => ({ ...t, _tr: 'ci' }))]
+  const list = ticketsInScope('ALL').map(t => ({ ...t, _tr: t._tracker }))
     .filter(t => (t.fo_owner === me || t.assigned_to === me) && !clos(t));
   const left = t => (typeof t.time_left_ms === 'number' ? t.time_left_ms : Infinity);
   const br = t => t.sla_status === 'Breach' || left(t) < 0;
   list.sort((a, b) => (br(b) - br(a)) || String(a.priority || 'P9').localeCompare(String(b.priority || 'P9')) || left(a) - left(b));
   const nBr = list.filter(br).length;
-  const tr = _mesTracker(me).toLowerCase() === 'ci' ? 'ci' : 'sn';
+  const tr = String(_mesTracker(me) || defaultSite()).toLowerCase();
   const rows = list.slice(0, 5).map(t => {
     const prio = String(t.priority || '').toUpperCase();
     const tl = typeof formatTimeLeft === 'function' && typeof t.time_left_ms === 'number' ? formatTimeLeft(t.time_left_ms, t.status) : '';

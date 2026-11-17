@@ -5,7 +5,7 @@
 // re-render (déclenché à chaque frappe) perdait les sélections.
 // ══════════════════════════════════════════════════════════════
 const dqUI = {
-  tracker : '',      // '' | 'SN' | 'CI'
+  tracker : '',      // '' | code de site
   severity: '',      // '' | 'error' | 'warning' | 'info'
   category: '',      // '' | nom de catégorie
   scope   : '',      // '' | 'open'  → anomalies corrigeables maintenant
@@ -135,7 +135,7 @@ function renderDataQuality() {
   }
 
   const issues = _dqFilteredIssues();
-  const allTk  = [...state.sn, ...state.ci];
+  const allTk  = allTicketsRaw();
 
   const errCount  = issues.filter(i => i.severity === 'error').length;
   const warnCount = issues.filter(i => i.severity === 'warning').length;
@@ -283,8 +283,7 @@ function renderDataQuality() {
     const catLbl = { Mandatory:'Champs obligatoires', Duplicates:'Doublons', Quality:'Quality' };
 
     chipEl.innerHTML =
-        chip('tracker','SN','SN', countBy('tracker', i => i.ticket._tracker === 'SN'))
-      + chip('tracker','CI','CI', countBy('tracker', i => i.ticket._tracker === 'CI'))
+        siteCodes().map(c => chip('tracker', c, c, countBy('tracker', i => i.ticket._tracker === c))).join('')
       + '<span class="dq-chip-sep"></span>'
       + cats.map(c => {
           const n = countBy('category', i => i.rule.category === c);

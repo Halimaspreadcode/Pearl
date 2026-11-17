@@ -11,7 +11,7 @@ test('ai-pdf : produit un PDF valide avec tous les types de blocs', () => {
       { t: 'kpis', items: [{ v: '21', l: 'ouverts' }, { v: '12', l: 'ruptures', ton: 'bad' }] },
       { t: 'ul', items: ['Réaffecter les P3', 'RCA Transmission'] },
       { t: 'card', titre: 'Faut-il rééquilibrer ?', badge: 'Haute', ton: 'bad', blocs: [{ t: 'p', text: '27 tickets sur 60.' }] },
-      { t: 'table', head: ['Agent', 'Tickets'], rows: [['Fatime NDOYE', '27'], ['Moussa SALL', '9']] },
+      { t: 'table', head: ['Agent', 'Tickets'], rows: [['Jeanne DUPONT', '27'], ['Moussa SALL', '9']] },
     ],
   });
   assert.equal(buf.slice(0, 5).toString(), '%PDF-');

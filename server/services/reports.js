@@ -1,4 +1,4 @@
-const { readCfg, readObs, readShiftsPlan, readWeeklyProgress } = require('../core/store');
+const { readCfg, readObs, readShiftsPlan, readWeeklyProgress, normScope } = require('../core/store');
 const { reportTZ, tzEndOfDay, tzParts, tzStartOfDay, tzStartOfWeek } = require('../core/time');
 const { allEnriched, inRange, isOpen, periodKpis } = require('../core/enrich');
 const { holidaySetFor } = require('./absences');
@@ -84,7 +84,7 @@ function buildDailyReport(dateQuery, country) {
 // ── WEEKLY REPORT ─────────────────────────────────────────────
 // Extrait en fonction pour que l'export PPTX parte exactement des mêmes
 // chiffres que la page — un deck qui contredit l'écran ne sert à rien.
-// Une observation porte son pays dans `source` ('SN' | 'CI'). Le registre
+// Une observation porte son site dans `source` (code du site). Le registre
 // n'était pas filtré : un rapport SN listait les observations ivoiriennes.
 // Une source absente est conservée — c'est une saisie ancienne, pas une
 // donnée d'un autre pays.
@@ -105,7 +105,7 @@ function buildWeeklyReport(dateQuery, country) {
   // sur SN — seul site opéré par le Front Office — mais du coup basculer
   // sur CI ou Global ne changeait rien à l'écran, ce qui se lisait comme
   // un bug. SN reste le défaut quand aucun pays n'est transmis.
-  const scope   = country || 'SN';
+  const scope   = normScope(country, 'first', cfg);
   // Clé de semaine au format du client (« YYYY-MM-DD » du lundi). On la
   // dérive des composantes locales et non de toISOString() : wkStart est un
   // instant UTC, et sous un fuseau à l'est de Greenwich sa date UTC est

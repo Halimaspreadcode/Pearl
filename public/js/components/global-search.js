@@ -69,7 +69,7 @@
         const k = CLES[norm(kv[1])], v = norm(kv[2]);
         if (k === 'status') { f.status = STATUTS[v.replace(/\s/g, '')] || kv[2]; chips.push('statut : ' + f.status); }
         else if (k === 'priority') { f.priority = /^p?\d$/.test(v) ? 'P' + v.replace('p', '') : kv[2]; chips.push('priorité : ' + f.priority); }
-        else if (k === 'site') { f.site = v.startsWith('c') ? 'ci' : 'sn'; chips.push(f.site.toUpperCase()); }
+        else if (k === 'site') { const c = siteCodes().find(x => x.toLowerCase().startsWith(String(v).toLowerCase())); if (c) { f.site = c.toLowerCase(); chips.push(c); } }
         else { f[k] = v; chips.push(kv[1] + ' : ' + kv[2]); }
         return;
       }
@@ -78,7 +78,7 @@
       if (['ouvert', 'ouverts', 'open', 'actif', 'actifs'].includes(t)) { f.open = true; chips.push('non clos'); return; }
       if (['onhold', 'hold', 'attente'].includes(t)) { f.status = 'On Hold'; chips.push('statut : On Hold'); return; }
       if (['mes', 'moi', 'mine'].includes(t) && me()) { f.fo = norm(me()); chips.push('mes tickets'); return; }
-      if ((t === 'sn' || t === 'ci') && mode !== '>') { f.site = t; chips.push(t.toUpperCase()); return; }
+      if (isSiteCode(t) && mode !== '>') { f.site = t.toLowerCase(); chips.push(t.toUpperCase()); return; }
       mots.push(t);
     });
     return { mode, f, mots, chips, brut: q };
@@ -87,9 +87,9 @@
   // ── Tickets : filtres puis pertinence ──
   function tickets(r) {
     const f = r.f, out = [];
-    ['sn', 'ci'].forEach(site => {
+    siteCodes().map(c => c.toLowerCase()).forEach(site => {
       if (f.site && f.site !== site) return;
-      (state[site] || []).forEach(t => {
+      ticketsOf(site).forEach(t => {
         if (f.status && t.status !== f.status) return;
         if (f.open && CLOS(t)) return;
         if (f.priority && String(t.priority || '').toUpperCase() !== f.priority) return;
@@ -139,11 +139,9 @@
   function actions() {
     const A = [];
     const add = (label, sub, mots, run, ok = true) => { if (ok) A.push({ label, sub, mots, run }); };
-    add('Nouveau ticket SN', 'Créer un ticket dans le tracker Dakar', 'creer ajouter new ticket incident sn dakar', () => openNewTicket('sn'), typeof openNewTicket === 'function');
-    add('Nouveau ticket CI', 'Créer un ticket dans le tracker Abidjan', 'creer ajouter new ticket incident ci abidjan', () => openNewTicket('ci'), typeof openNewTicket === 'function');
+    siteList().forEach(s => add(`Nouveau ticket ${s.code}`, `Créer un ticket sur le site ${siteName(s.code)}`, `creer ajouter new ticket incident ${s.code} ${s.name} ${s.city}`.toLowerCase(), () => openNewTicket(s.code.toLowerCase()), typeof openNewTicket === 'function'));
     add('Périmètre : Global', 'Voir SN et CI ensemble', 'global tous pays perimetre', () => setActiveCountry('ALL'), typeof setActiveCountry === 'function');
-    add('Périmètre : Sénégal (SN)', 'Ne voir que Dakar', 'senegal dakar sn pays perimetre', () => setActiveCountry('SN'), typeof setActiveCountry === 'function');
-    add('Périmètre : Côte d\'Ivoire (CI)', 'Ne voir qu\'Abidjan', 'cote ivoire abidjan ci pays perimetre', () => setActiveCountry('CI'), typeof setActiveCountry === 'function');
+    siteList().forEach(s => add(`Périmètre : ${siteLabel(s.code)}`, `Ne voir que ${siteName(s.code)}`, `${s.code} ${s.name} ${s.city} ${s.country} site perimetre`.toLowerCase(), () => setActiveCountry(s.code), typeof setActiveCountry === 'function'));
     add('Changer de thème', 'Clair ou sombre', 'theme sombre clair dark light nuit', () => toggleTheme(), typeof toggleTheme === 'function');
     add(window.FoSky && FoSky.actif() ? 'Ciel en arrière-plan : désactiver' : 'Ciel en arrière-plan : activer', 'Fond animé selon l\'heure, ou fond uni', 'ciel fond nuages etoiles arriere plan decor sky', () => FoSky.basculer(), !!window.FoSky);
     add('Replier ou déplier le menu', 'Ctrl+B', 'menu barre laterale replier deplier sidebar', () => toggleSidebarRail(), typeof toggleSidebarRail === 'function');
@@ -238,11 +236,11 @@
 
   // ── Vers le tracker, filtré ──
   function trackerFiltre(r) {
-    const f = r.f || r, site = f.site || ((state.sn || []).length >= (state.ci || []).length ? 'sn' : 'ci');
+    const f = r.f || r, site = f.site || activeSiteKey();
     const nav = document.querySelector(`.nav-item[data-page="${site}"]`);
     if (nav) nav.click(); else if (typeof renderPage === 'function') renderPage(site);
     setTimeout(() => {
-      const set = (id, v) => { const el = document.getElementById(`${site}-${id}`); if (!el || v == null) return; if (el.tagName === 'SELECT') { const o = [...el.options].find(o => norm(o.value) === norm(v)); if (o) el.value = o.value; } else el.value = v; };
+      const set = (id, v) => { const el = document.getElementById(`site-${id}`); if (!el || v == null) return; if (el.tagName === 'SELECT') { const o = [...el.options].find(o => norm(o.value) === norm(v)); if (o) el.value = o.value; } else el.value = v; };
       set('filter-status', f.status); set('filter-priority', f.priority);
       const texte = [...(r.mots || []), f.fo || '', f.bo || '', f.domain || ''].filter(Boolean).join(' ');
       set('search', texte);
@@ -332,15 +330,15 @@
   window.cmdSearch = { lire, tickets };
 })();
 
-// Ouvre le tracker SN ou CI (celui qui a le plus de tickets de ce BO), filtré sur lui.
+// Ouvre le tracker du site où ce BO a le plus de tickets, filtré sur lui.
 function navigateToBoTickets(boName) {
-  const snCount = (state.sn || []).filter(t => (t.bo_handling || '').includes(boName)).length;
-  const ciCount = (state.ci || []).filter(t => (t.bo_handling || '').includes(boName)).length;
-  const tracker = (ciCount > snCount) ? 'ci' : 'sn';
+  // Le site où ce BO a le plus de tickets.
+  const tracker = (siteCodes().map(c => [c, ticketsOf(c).filter(t => (t.bo_handling || '').includes(boName)).length])
+    .sort((a, b) => b[1] - a[1])[0] || [defaultSite()])[0].toLowerCase();
   const navEl = document.querySelector(`.nav-item[data-page="${tracker}"]`);
   if (navEl) navEl.click(); else renderPage(tracker);
   setTimeout(() => {
-    const search = document.getElementById(`${tracker}-search`);
+    const search = document.getElementById('site-search');
     if (search) { search.value = boName; filterTable(tracker); }
   }, 80);
 }

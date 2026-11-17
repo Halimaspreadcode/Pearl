@@ -20,7 +20,7 @@ function _holYears() {
     .map(h => String(h.date || '').slice(0, 4)).filter(Boolean))].sort();
 }
 
-const HOL_COUNTRY_LABEL = { SN: 'Senegal', CI: "Ivory Coast" };
+const HOL_COUNTRY_LABEL = new Proxy({}, { get: (_, c) => (typeof c === 'string' ? siteName(c) : undefined) });
 
 function renderHolidaysList() {
   const el = document.getElementById('holidays-list');
@@ -109,7 +109,7 @@ function _holEditRow(h) {
              placeholder="Holiday name"
              onkeydown="if(event.key==='Enter')holSave('${h.id}');if(event.key==='Escape')holCancel()">
       <select class="form-control hol-edit-country" id="hol-e-country">
-        ${opt('', 'Both')}${opt('SN', 'Senegal')}${opt('CI', "Ivory Coast")}
+        ${opt('', 'All sites')}${siteList().map(s => opt(s.code, siteName(s.code))).join('')}
       </select>
     </div>
     <div class="hol-actions">

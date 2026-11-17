@@ -4,7 +4,7 @@
    · Quand un mot de passe d'équipe est défini, l'API répond 401 avec
      l'en-tête X-Team-Auth à toute requête sans session : on affiche
      l'écran de connexion.
-   · L'identité vient de la session (ID Huawei + code personnel), plus d'un
+   · L'identité vient de la session (ID employé + code personnel), plus d'un
      choix fait dans le navigateur. Le mot de passe d'équipe ne donne que la
      consultation : une écriture répond 403 + X-Identity, et on propose la
      connexion par code. */
@@ -17,7 +17,7 @@
     return fetchOrig.apply(null, arguments).then(function (r) {
       if (r.status === 401 && r.headers.get('X-Team-Auth') === 'required') afficher(false);
       else if (r.status === 403 && r.headers.get('X-Identity') === 'required')
-        afficher(true, 'To make changes, sign in with your Huawei ID and personal code.');
+        afficher(true, 'To make changes, sign in with your Employee ID and personal code.');
       return r;
     });
   };
@@ -91,12 +91,12 @@
           '<div class="tg-brand"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round"/>' +
           '<path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round" opacity=".7"/>' +
           '<path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round" opacity=".45"/>' +
-          '<circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg><span>FOps<small>FRONT OFFICE</small></span></div>' +
+          '<circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg><span>Pearl<small>FRONT OFFICE</small></span></div>' +
           '<div><h2 class="tg-hero">Every ticket, every shift, <em>one place.</em></h2>' +
-          '<ul class="tg-feat"><li><i>⚡</i>Trackers SN, CI and global, with live SLA countdowns</li>' +
+          '<ul class="tg-feat"><li><i>⚡</i>Tickets for every site, with live SLA countdowns</li>' +
           '<li><i>✦</i>Your space: tasks, requests, score and quizzes</li>' +
           '<li><i>💡</i>Reports, academy and the team idea box</li></ul></div>' +
-          '<div class="tg-side-foot">EMOC · Dakar &amp; Abidjan</div>' +
+          '<div class="tg-side-foot">Pearl</div>' +
         '</aside>' +
         '<main class="tg-main">' +
         (fermable ? '<button type="button" class="tg-x" aria-label="Back">← Back</button>' : '') +
@@ -104,7 +104,7 @@
         '<div class="tg-logo">FO</div>' +
         '<h1>Sign in</h1>' +
         '<p class="tg-intro"></p>' +
-        '<div class="tg-id"><label for="tg-id">Huawei ID</label>' +
+        '<div class="tg-id"><label for="tg-id" class="tg-id-lbl">Employee ID</label>' +
         '<input id="tg-id" name="username" autocomplete="username" placeholder="e.g. a00123456" spellcheck="false"></div>' +
         '<label for="tg-pw" class="tg-lbl"></label>' +
         '<input id="tg-pw" type="password" name="password" autocomplete="current-password" required>' +
@@ -117,19 +117,38 @@
       var bloc = ov.querySelector('.tg-id'), lbl = ov.querySelector('.tg-lbl'), err = ov.querySelector('.tg-err');
       var lien = ov.querySelector('.tg-lien'), btn = ov.querySelector('.tg-btn'), intro = ov.querySelector('.tg-intro');
       var perso = true;
+      // Comptes (SaaS) : email + mot de passe. Le code personnel reste
+      // disponible pour les équipes qui l'utilisent déjà.
+      var compte = !!(window.TeamIdentity && window.TeamIdentity.accounts);
+      var idLbl = ov.querySelector('.tg-id-lbl');
       var mode = function () {
-        bloc.hidden = !perso;
+        bloc.hidden = !perso && !compte;
+        if (compte) {
+          idLbl.textContent = 'Email';
+          id.type = 'email'; id.placeholder = 'you@company.com'; id.autocomplete = 'username';
+          lbl.textContent = 'Password';
+          intro.textContent = message || 'Sign in with your account. Ask your administrator for an invitation.';
+          lien.textContent = window.TeamIdentity && window.TeamIdentity.codes ? 'I have a personal code' : '';
+          lien.hidden = !(window.TeamIdentity && window.TeamIdentity.codes);
+          err.textContent = '';
+          return;
+        }
+        idLbl.textContent = 'Employee ID';
+        id.type = 'text'; id.placeholder = 'e.g. a00123456';
         lbl.textContent = perso ? 'Personal code' : 'Team password';
         intro.textContent = message || (perso
-          ? 'Use your Huawei ID and the personal code your manager gave you. They sign your changes.'
-          : 'The team password opens FOps in view-only mode. To make changes, sign in with your personal code.');
+          ? 'Use your Employee ID and the personal code your manager gave you. They sign your changes.'
+          : 'The team password opens Pearl in view-only mode. To make changes, sign in with your personal code.');
         lien.textContent = perso ? 'View only, with the team password' : 'I have a personal code';
         // Sans mot de passe d'équipe, le lien « consulter seulement » ne mène à rien.
         lien.hidden = (fermable && !perso) || !(window.TeamIdentity && window.TeamIdentity.actif);
         err.textContent = '';
       };
       mode();
-      lien.addEventListener('click', function () { perso = !perso; mode(); (perso ? id : pw).focus(); });
+      lien.addEventListener('click', function () {
+        if (compte) { compte = false; perso = true; } else perso = !perso;
+        mode(); (perso ? id : pw).focus();
+      });
       var x = ov.querySelector('.tg-x');
       // « Plus tard » : on ne redemande pas à chaque chargement de cette
       // session ; la pastille « Sign in » reste là pour qui veut se connecter.
@@ -138,8 +157,10 @@
         e.preventDefault();
         btn.disabled = true; err.textContent = '';
         var corps = { password: pw.value };
-        if (perso) corps.huaweiId = id.value.trim();
-        fetchOrig('/api/team/auth', {
+        var url = '/api/team/auth';
+        if (compte) { corps.email = id.value.trim(); url = '/api/team/account-login'; }
+        else if (perso) corps.employeeId = id.value.trim();
+        fetchOrig(url, {
           method: 'POST', credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corps),
         }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { r: r, j: j }; }); })
@@ -179,7 +200,7 @@
     .then(function (r) { return r.json(); })
     .then(function (j) {
       window.TeamIdentity = { actif: !!j.actif, exige: !!j.exige, codes: !!j.codes, user: j.user || null,
-        lecture: !!j.lecture, admin: !!j.admin, pret: true };
+        lecture: !!j.lecture, admin: !!j.admin, accounts: !!j.accounts, pret: true };
       if (j && j.actif && !j.ok) { afficher(false); return; }
       if (!j.user && !j.admin && (j.exige || (j.actif && j.lecture))) bandeauLecture();
       if (typeof window.applyServerIdentity === 'function') window.applyServerIdentity(window.TeamIdentity);
@@ -192,7 +213,8 @@
   window.teamLogin = function () { afficher(true); };
   window.teamLogout = function () {
     try { localStorage.removeItem('fo-user'); } catch (e) {}
-    return fetchOrig('/api/team/logout', { method: 'POST', credentials: 'same-origin' })
+    var url = window.TeamIdentity && window.TeamIdentity.accounts ? '/api/team/account-logout' : '/api/team/logout';
+    return fetchOrig(url, { method: 'POST', credentials: 'same-origin' })
       .then(function () { location.reload(); });
   };
 })();

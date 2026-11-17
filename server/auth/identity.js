@@ -7,7 +7,7 @@ const { ADMIN_COOKIE, readCookie, sessionValid, foSessionOwner } = require('./se
 // (modified_by, user, requested_by…). N'importe qui pouvait agir au nom d'un
 // collègue. Désormais, dès que le verrou d'équipe est actif :
 //
-//   · l'identité vient de la session, ouverte avec l'ID Huawei et le code
+//   · l'identité vient de la session, ouverte avec l'ID employé et le code
 //     personnel (auth/team-gate.js) — jamais du corps de la requête ;
 //   · la session ouverte avec le mot de passe d'équipe est en lecture seule ;
 //   · les champs qui désignent l'auteur d'une écriture sont réécrits par le
@@ -28,17 +28,17 @@ function estAdmin(req) {
   return sessionValid(req.get('X-Admin-Token')) || sessionValid(readCookie(req, ADMIN_COOKIE));
 }
 
-// { name, huaweiId, role, admin, lecture } ou null.
+// { name, employeeId, role, admin, lecture } ou null.
 function identiteDe(req) {
   const team = require('./team-gate');
   const s = team.sessionEquipe(req);
   const nominative = s && s.qui && typeof s.qui === 'object' && s.qui.name ? s.qui : null;
-  if (estAdmin(req)) return { ...(nominative || { name: 'Admin', huaweiId: '', role: 'Admin' }), admin: true };
+  if (estAdmin(req)) return { ...(nominative || { name: 'Admin', employeeId: '', role: 'Admin' }), admin: true };
   if (nominative) return { ...nominative, admin: false };
   const fo = foSessionOwner(req.get('X-FO-Token'));
   if (fo) {
     const code = (readCfg().fo_access_codes || {})[fo] || {};
-    return { name: fo, huaweiId: code.huawei_id || '', role: roleDe(fo), admin: false };
+    return { name: fo, employeeId: code.employee_id || '', role: roleDe(fo), admin: false };
   }
   if (s) return { lecture: true, admin: false };
   return null;
@@ -92,9 +92,9 @@ function idsDe(qui) {
   const cfg = readCfg();
   const out = new Set();
   const add = v => { const x = String(v || '').trim().toLowerCase(); if (x) out.add(x); };
-  add(qui.huaweiId);
+  add(qui.employeeId);
   add((cfg.fo_ids || {})[qui.name]);
-  add(((cfg.fo_access_codes || {})[qui.name] || {}).huawei_id);
+  add(((cfg.fo_access_codes || {})[qui.name] || {}).employee_id);
   add(qui.name);
   return out;
 }
@@ -130,7 +130,7 @@ function identite(req, res, next) {
   // Préférences d'affichage : chacun les siennes.
   const pref = /^\/user-prefs\/([^/]+)$/.exec(req.path);
   if (pref && req.qui && !req.qui.admin && !req.qui.lecture
-      && decodeURIComponent(pref[1]).toLowerCase() !== String(req.qui.huaweiId || '').toLowerCase())
+      && decodeURIComponent(pref[1]).toLowerCase() !== String(req.qui.employeeId || '').toLowerCase())
     return refuser(res, 403, 'Préférences d\'une autre personne.');
 
   const reservee = horsReservation(req);
@@ -144,24 +144,24 @@ function identite(req, res, next) {
   if (/^\/ideas(\/|$)/.test(req.path)) return next();
   if (SANS_AUTEUR.has(req.path)) {
     if (req.qui && !req.qui.lecture && !req.qui.admin && req.body && typeof req.body === 'object') {
-      req.body.name = req.qui.name; req.body.huaweiId = req.qui.huaweiId;
+      req.body.name = req.qui.name; req.body.employeeId = req.qui.employeeId;
     }
     return next();
   }
   if (!req.qui || req.qui.lecture)
-    return refuser(res, 403, 'Connecte-toi avec ton identifiant Huawei et ton code personnel pour modifier.');
+    return refuser(res, 403, 'Connecte-toi avec ton identifiant employé et ton code personnel pour modifier.');
   if (req.qui.admin) return next();
 
   const moi = req.qui.name;
   const b = req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body) ? req.body : null;
   if (b) {
     for (const k of CHAMPS_AUTEUR) if (k in b) b[k] = moi;
-    if ('_operator_id' in b) b._operator_id = req.qui.huaweiId;
+    if ('_operator_id' in b) b._operator_id = req.qui.employeeId;
     if (/^\/shift-requests$/.test(req.path) && req.method === 'POST') b.requested_by = moi;
   }
 
   // Tickets : modified_by est l'auteur de la modification.
-  if (b && /^\/(sn|ci)(\/[^/]+)?$/.test(req.path)) b.modified_by = moi;
+  if (b && /^\/tickets\/[^/]+(\/[^/]+)?$/.test(req.path)) b.modified_by = moi;
 
   // Tâches : un agent crée les siennes et ne touche qu'aux siennes.
   if (req.path === '/weekly-progress' && req.method === 'POST' && b) {

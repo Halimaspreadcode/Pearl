@@ -23,8 +23,10 @@ const _ML_EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 const _mlLabel = id => (mlState.reports.find(r => r.id === id) || {}).label || id || 'Rapport';
 // Pays d'un envoi : le code sert au serveur et à l'objet du mail.
-const _ML_PAYS = { SN: { code: 'SN', fr: 'Sénégal (Dakar)' }, CI: { code: 'CI', fr: 'Côte d’Ivoire (Abidjan)' }, ALL: { code: 'SN + CI', fr: 'Les deux (SN + CI)' } };
-const _mlPays = sc => _ML_PAYS[sc && sc.country] ? sc.country : 'SN';
+// Périmètres d'un envoi : chaque site, puis tous.
+const _ML_PAYS = new Proxy({}, { get: (_, k) => (typeof k !== 'string' ? undefined : k === 'ALL' ? { code: scopeCodes('ALL'), fr: `Tous les sites (${scopeCodes('ALL')})` } : isSiteCode(k) ? { code: k, fr: siteLabel(k) } : undefined) });
+const _ML_PAYS_KEYS = () => [...siteCodes(), 'ALL'];
+const _mlPays = sc => _ML_PAYS[sc && sc.country] ? sc.country : defaultSite();
 const _mlGroup = id => mlState.groups.find(g => g.id === id);
 const _mlPad = n => String(n).padStart(2, '0');
 
@@ -261,7 +263,7 @@ function _mlRenderSchedules() {
           <span></span>
         </label>
         <div class="ml-sc-sum" onclick="mlToggleEdit(${i})">
-          <div class="ml-sc-title">${esc(_mlLabel(sc.report))} <span class="ml-pill ml-pill-pays" title="${esc(_ML_PAYS[_mlPays(sc)].fr)}">${esc(_ML_PAYS[_mlPays(sc)].code)}</span></div>
+          <div class="ml-sc-title">${esc(_mlLabel(sc.report))} <span class="ml-pill ml-pill-pays" title="${esc((_ML_PAYS[_mlPays(sc)] || {}).fr || '')}">${esc((_ML_PAYS[_mlPays(sc)] || {}).code || '')}</span></div>
           <div class="ml-sc-sub">${esc(_mlFreqText(sc))} → <b>${esc(g ? g.name : 'groupe manquant')}</b>
             <span class="ml-muted">· ${nb} destinataire${nb > 1 ? 's' : ''}</span></div>
           <div class="ml-sc-subj" title="Objet du mail">✉ ${esc(_mlSubjectPreview(sc))}</div>
@@ -296,7 +298,7 @@ function _mlScheduleForm(sc, i) {
         </select></label>
       <label class="ml-f">Pays
         <select class="form-control" ${set('country', 'this.value', true)}>
-          ${Object.entries(_ML_PAYS).map(([k, p]) => `<option value="${k}"${k === _mlPays(sc) ? ' selected' : ''}>${esc(p.fr)}</option>`).join('')}
+          ${_ML_PAYS_KEYS().map(k => [k, _ML_PAYS[k]]).map(([k, p]) => `<option value="${k}"${k === _mlPays(sc) ? ' selected' : ''}>${esc(p.fr)}</option>`).join('')}
         </select></label>
       <label class="ml-f">Destinataires
         <select class="form-control" ${set('group_id', 'this.value', true)}>
@@ -335,7 +337,7 @@ function _mlScheduleForm(sc, i) {
 // que l'aperçu affiché soit exactement l'objet reçu.
 const _ML_LABEL_EN = { daily: 'Daily Report', weekly: 'Weekly Report', monthly: 'Monthly Report',
   absences: 'Absence Report', weekly_pptx: 'Weekly Review' };
-function _mlSubjectDefault(sc) { return `${_ML_LABEL_EN[sc.report] || sc.report} ${_ML_PAYS[_mlPays(sc)].code} — {date}`; }
+function _mlSubjectDefault(sc) { return `${_ML_LABEL_EN[sc.report] || sc.report} ${(_ML_PAYS[_mlPays(sc)] || {}).code || ''} — {date}`; }
 function _mlSubjectPreview(sc) {
   const date = _mlTodayTZ(0);
   const [y, m, d] = date.split('-').map(Number);
@@ -346,7 +348,7 @@ function _mlSubjectPreview(sc) {
   const label = _ML_LABEL_EN[sc.report] || sc.report;
   const tpl = String(sc.subject || '').trim() || `${label} {country} — {date}`;
   return tpl.replace(/\{report\}/gi, label).replace(/\{date\}/gi, date)
-            .replace(/\{country\}/gi, _ML_PAYS[_mlPays(sc)].code)
+            .replace(/\{country\}/gi, (_ML_PAYS[_mlPays(sc)] || {}).code || '')
             .replace(/\{week\}/gi, `W${String(wk).padStart(2, '0')}`).replace(/\{month\}/gi, month);
 }
 

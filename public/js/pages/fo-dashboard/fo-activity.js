@@ -64,7 +64,7 @@ function _foActivityStats(ranked) {
   const today = new Date().toISOString().slice(0, 10);
   const chk = (state.foTasks || []).filter(t =>
     !(!t.is_occurrence && t.status === 'Recurring') &&
-    (country === 'ALL' || (trackers[t.assigned_to] || 'SN') === country) &&
+    (country === 'ALL' || personInScope(t.assigned_to, country)) &&
     inPeriod(t.due_date || t.created_at));
   const assigned = (state.weeklyProgress || []).filter(p => p.admin_task &&
     (country === 'ALL' || p.tracker === country) &&

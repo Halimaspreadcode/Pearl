@@ -23,7 +23,7 @@
 
 const PptxGenJS = require('pptxgenjs');
 
-// Palette : rouge de marque Huawei en accent, sur une structure Material
+// Palette : couleur de marque en accent, sur une structure Material
 // (surfaces claires, neutres gris, ombres douces). Sans le '#' :
 // PptxGenJS attend des hex nus.
 //
@@ -32,7 +32,7 @@ const PptxGenJS = require('pptxgenjs');
 //   · `red`   (#D93025) porte le signal d'alerte — SLA rompu, breach.
 // Les confondre ferait lire toute slide de marque comme une alerte.
 const C = {
-  brand:     'CF0A2C',  // rouge Huawei, accent d'identité
+  brand:     'CF0A2C',  // accent d'identité
   brandDark: '9E0821',
   brandSoft: 'FDE8EC',
   blue:      '1A73E8',  // conservé pour les séries de données neutres
@@ -64,7 +64,7 @@ const SEV_C    = { critical: C.red, major: C.amber, minor: C.blue, warning: C.fa
 // Rang de tri : P1 avant P2, etc. Une priorité absente passe en dernier.
 const PRIO_RANK = { P1: 0, P2: 1, P3: 2, P4: 3 };
 // Séquence catégorielle : le rouge de marque ouvre la série (la catégorie
-// dominante porte l'accent Huawei), puis des teintes distinctes en teinte
+// dominante porte l’accent de marque), puis des teintes distinctes en teinte
 // et en clarté pour rester lisibles côte à côte et en niveaux de gris.
 const DOMAIN_C = [C.brand, '1A73E8', '12B5CB', 'F9AB00', '1E8E3E', '9334E6'];
 
@@ -391,7 +391,7 @@ function slideFooter(slide, n, total, ville) {
   slide.addShape('rect', {
     x: M, y: 6.9, w: CW, h: 0.01, fill: { color: C.line }, line: { type: 'none' },
   });
-  slide.addText(`EMOC · Front Office · ${ville || VILLE} · Internal distribution`, {
+  slide.addText(`Pearl · ${ville || VILLE} · Internal distribution`, {
     x: M, y: 7.0, w: 8, h: 0.24,
     fontSize: 8, color: C.faint, fontFace: FONT, valign: 'middle',
   });
@@ -1096,7 +1096,7 @@ function ticketTable(slide, { x, y, w, rows, total, rowH }) {
   // Ligne d'en-tête, en petites capitales grises : même grammaire que les
   // libellés de colonnes du reste du deck.
   const head = [
-    ['Oceane TT#', colX.tt, cTT], ['Title', colX.title, cTitle],
+    ['Ticket #', colX.tt, cTT], ['Title', colX.title, cTitle],
     ['Domain', colX.dom, cDom], ['Prio', colX.pri, cPri],
     ['Severity', colX.sev, cSev],
   ];
@@ -1465,23 +1465,24 @@ function paginateFo(fo) {
   return out.length ? out : [[]];
 }
 
-// Le deck est un rapport Sénégal. Tout ce qui porte explicitement un autre
+// Le deck porte sur un site (ou tous). Tout ce qui porte explicitement un autre
 // pays est écarté ici, en plus du filtrage côté serveur : les sections
 // rédigées (highlights, risques) viennent du brouillon client, où rien
 // n'empêchait de saisir une ligne « CI ».
 //
 // Un champ pays vide est conservé : c'est une saisie qui ne le renseigne
 // pas, pas une donnée d'un autre pays.
-// Périmètre du deck en cours de génération : 'SN' (défaut), 'CI' ou 'ALL'.
+// Périmètre du deck en cours de génération : un code de site ou 'ALL'.
 // Posé par buildWeeklyPptx à l'entrée ; la génération des slides est
 // synchrone, deux decks ne se construisent donc pas en même temps.
-let SCOPE = 'SN';
-let VILLE = 'Dakar';
-const NOMS_PAYS = { SN: ['SN', 'SENEGAL', 'SÉNÉGAL'], CI: ['CI', "COTE D'IVOIRE", "CÔTE D'IVOIRE", 'CIV'] };
+let SCOPE = 'ALL';
+let VILLE = '';
+// Noms acceptés pour le site du périmètre : son code, son nom, sa ville.
+let NOMS_SITE = [];
 function inScope(v) {
   if (SCOPE === 'ALL') return true;
   const c = String(v == null ? '' : v).trim().toUpperCase();
-  return !c || (NOMS_PAYS[SCOPE] || [SCOPE]).includes(c);
+  return !c || c === SCOPE || NOMS_SITE.includes(c);
 }
 
 function buildPagedSections(data, form = {}) {
@@ -1576,7 +1577,7 @@ function buildPagedSections(data, form = {}) {
 
   const breaches = (data.active_tickets || [])
     .filter(t => t.sla_status === 'Breach')
-    // `tracker` est posé par allEnriched() : 'SN' ou 'CI'.
+    // `tracker` est posé par allEnriched() : le code du site.
     .filter(t => inScope(t.tracker || t.country))
     .sort((a, b) => new Date(a.open_date) - new Date(b.open_date))
     .map(t => ({
@@ -1719,11 +1720,11 @@ function buildPagedSections(data, form = {}) {
 }
 
 
-// Réduit le jeu de données au seul périmètre Sénégal. Le serveur le fait
-// déjà (buildWeeklyReport est appelé avec 'SN'), mais l'export accepte
-// aussi un appel direct à l'API : sans cette reprise, un `data` construit
-// en 'ALL' produirait un deck estampillé Dakar contenant des tickets CI.
-function scopeToSenegal(data) {
+// Réduit le jeu de données au périmètre du deck. Le serveur le fait déjà
+// (buildWeeklyReport reçoit le périmètre), mais l'export accepte aussi un
+// appel direct : sans cette reprise, un `data` construit sur tous les
+// sites produirait un deck d'un site contenant les tickets des autres.
+function scopeData(data) {
   if (SCOPE === 'ALL') return { ...(data || {}) };
   const d = { ...(data || {}) };
   const keep = t => inScope(t && (t.tracker || t.country));
@@ -1739,12 +1740,14 @@ function scopeToSenegal(data) {
   // historique compris — on ne peut donc pas le recomposer depuis les
   // seuls tickets de la semaine sans perdre les agents dont l'activité est
   // entièrement soldée. On le restreint plutôt aux agents du roster FO,
-  // qui est déjà le roster Sénégal.
-  // Hors Sénégal, le roster est celui des agents rattachés au pays
-  // (fo_trackers) : fo_list est la liste de l'équipe de Dakar.
-  const parPays = Object.entries(d.fo_trackers || {})
-    .filter(([, tr]) => [].concat(tr).map(x => String(x).toUpperCase()).includes(SCOPE)).map(([n]) => n);
-  const roster = new Set((SCOPE === 'SN' ? (d.fo_list || []) : parPays).map(n => String(n).trim()));
+  // Le roster est celui des agents rattachés au site (fo_trackers) ; un
+  // agent sans rattachement compte pour le premier site.
+  const premier = (d.site_codes || [])[0];
+  const parSite = (d.fo_list || []).filter(n => {
+    const tr = [].concat((d.fo_trackers || {})[n] || premier || []).map(x => String(x).toUpperCase());
+    return tr.includes(SCOPE);
+  });
+  const roster = new Set(parSite.map(n => String(n).trim()));
   if (roster.size) {
     d.by_fo = Object.fromEntries(
       Object.entries(d.by_fo || {}).filter(([fo]) => roster.has(String(fo).trim())));
@@ -1757,18 +1760,21 @@ function scopeToSenegal(data) {
    `form`  : sections rédigées côté client {author, site, highlights,
              risks, actions, notes} ; facultatif. */
 async function buildWeeklyPptx(rawData, form = {}) {
-  // Périmètre Sénégal appliqué une fois, à l'entrée : toutes les lectures
-  // en aval (KPI, graphiques, listes) partent donc d'un jeu déjà filtré,
-  // plutôt que de dépendre d'un filtre répété à chaque point d'usage.
-  SCOPE = ['SN', 'CI', 'ALL'].includes(form.country) ? form.country : 'SN';
-  VILLE = { SN: 'Dakar', CI: 'Abidjan', ALL: 'Dakar + Abidjan' }[SCOPE];
-  const data = scopeToSenegal({ ...(rawData || {}), fo_trackers: (rawData && rawData.fo_trackers) || form.fo_trackers || {} });
+  // Périmètre appliqué une fois, à l'entrée : toutes les lectures en aval
+  // (KPI, graphiques, listes) partent d'un jeu déjà filtré.
+  const { normScope, scopeLabel, siteByCode, siteCodes } = require('../core/store');
+  SCOPE = normScope(form.country, 'ALL');
+  VILLE = scopeLabel(SCOPE);
+  const site = SCOPE === 'ALL' ? null : siteByCode(SCOPE);
+  NOMS_SITE = site ? [site.name, site.city, site.country].filter(Boolean).map(x => x.toUpperCase()) : [];
+  const data = scopeData({ ...(rawData || {}), site_codes: siteCodes(),
+    fo_trackers: (rawData && rawData.fo_trackers) || form.fo_trackers || {} });
 
   const pptx = new PptxGenJS();
   pptx.layout = 'LAYOUT_WIDE';           // 13.33 x 7.5 pouces
-  pptx.author  = form.author || 'EMOC Front Office';
-  pptx.company = 'EMOC';
-  pptx.title   = 'EMOC Weekly Report';
+  pptx.author  = form.author || 'Pearl';
+  pptx.company = 'Pearl';
+  pptx.title   = 'Weekly Report';
 
   const k   = data.kpis || {};
   const period = `${fmtDate(data.week_start)} to ${fmtDate(data.week_end)}`;
@@ -1818,7 +1824,7 @@ async function buildWeeklyPptx(rawData, form = {}) {
   cover.background = { color: C.wash };
 
   // Colonne gauche : le contexte, en petit corps, haut de page.
-  cover.addText(`EMOC · Front Office · ${VILLE}`, {
+  cover.addText(`Pearl · ${VILLE}`, {
     x: M, y: 0.72, w: 5.2, h: 0.24,
     fontSize: 10, color: '4A6169', fontFace: FONT,
   });
@@ -2735,7 +2741,7 @@ async function buildWeeklyPptx(rawData, form = {}) {
   const sEnd = pptx.addSlide();
   statement(sEnd, {
     bg: C.brand, on: 'FFFFFF', onMute: 'F0AFB8', rule: 'E8737F',
-    eyebrow: `EMOC · Front Office · ${VILLE}`,
+    eyebrow: `Pearl · ${VILLE}`,
     lead: 'Thanks to the Front Office team for the shifts covered, the tickets closed '
         + 'and the escalations handled this week. Questions on any figure in this deck '
         + 'are welcome; the underlying tickets are all traceable in the tracker.',
@@ -2753,7 +2759,7 @@ async function buildWeeklyPptx(rawData, form = {}) {
     if (!encre) { slideFooter(slide, n, total); return; }
     // Pied sur fond coloré : même géométrie que slideFooter(), sans le
     // filet — ces slides n'en portent pas — et dans l'encre de la slide.
-    slide.addText(`EMOC · Front Office · ${VILLE} · Internal distribution`, {
+    slide.addText(`Pearl · ${VILLE} · Internal distribution`, {
       x: M, y: 7.0, w: 8, h: 0.24,
       fontSize: 8, color: encre.mute, fontFace: FONT, valign: 'middle',
     });

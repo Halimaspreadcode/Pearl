@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 
-// Weekday-only rotation (Abidjan EMOC logic): Mon–Fri, no rest days, 3 teams
+// Weekday-only rotation (rotation en semaine): Mon–Fri, no rest days, 3 teams
 // rotate across 3 shifts. Each working day (weekends skipped), every team's
 // shift index shifts by +1: team on shift[k] today moves to shift[k-1] tomorrow,
 // i.e. pattern(day n)[k] = pattern(day 0)[(k + workdayIndex) % teamCount].

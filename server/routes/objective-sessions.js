@@ -1,6 +1,6 @@
 const express     = require('express');
 const OBJ          = require('../services/objectives');
-const { readCfg } = require('../core/store');
+const { readCfg, personSiteCodes, normScope } = require('../core/store');
 const { addAudit } = require('../core/audit');
 const { requireAdmin } = require('../auth/guards');
 const { ExcelJSSrv } = require('../services/report-build');
@@ -8,14 +8,13 @@ const { commitObjectives, readSessions } = require('../services/objectives-store
 
 const router = express.Router();
 
-// Équipe d'un agent (fo_trackers, Sénégal par défaut) et filtre ?team= des
-// exports : une session se lit pour SN, pour CI ou pour les deux.
+// Site d'un agent (fo_trackers, premier site par défaut) et filtre ?team=
+// des exports : une session se lit pour un site ou pour tous.
 function equipeDe(cfg, fo) {
-  return [].concat((cfg.fo_trackers || {})[fo] || 'SN').map(x => String(x).toUpperCase());
+  return personSiteCodes(fo, cfg);
 }
 function filtreEquipe(req) {
-  const t = String(req.query.team || 'ALL').toUpperCase();
-  return ['SN', 'CI'].includes(t) ? t : 'ALL';
+  return normScope(req.query.team, 'ALL');
 }
 function dansEquipe(cfg, fo, team) { return team === 'ALL' || equipeDe(cfg, fo).includes(team); }
 

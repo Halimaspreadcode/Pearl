@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 process.env.CONFIG_PW_HASH = bcrypt.hashSync('admin-pw', 4);
 delete process.env.TEAM_PW_HASH;
 useTempDataDir({
-  'config.json': { fo_list: ['Awa'], fo_access_codes: { Awa: { hash: bcrypt.hashSync('CODEAWA2', 4), huawei_id: 'A00000001' } } },
+  'config.json': { fo_list: ['Awa'], fo_access_codes: { Awa: { hash: bcrypt.hashSync('CODEAWA2', 4), employee_id: 'A00000001' } } },
   'sn.json': [], 'ci.json': [], 'observations.json': [], 'audit.json': [],
   'weekly_progress.json': [], 'fo_tasks.json': [],
 });
@@ -30,7 +30,7 @@ after(() => srv.close());
 
 let cookie;
 test('le code de Ma performance ouvre une session nominative, ID en minuscules ou majuscules', async () => {
-  const r = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"huaweiId":"a00000001","password":"CODEAWA2"}' });
+  const r = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"employeeId":"a00000001","password":"CODEAWA2"}' });
   assert.equal(r.status, 200);
   cookie = r.headers.get('set-cookie').split(';')[0];
   const s = await (await fetch(`${base}/api/team/session`, { headers: { cookie } })).json();
@@ -60,14 +60,14 @@ test('code exigé : écriture anonyme refusée, lecture ouverte', async () => {
 });
 
 test('code saisi en minuscules ou avec espaces accepté', async () => {
-  const r = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"huaweiId":"a00000001","password":"code awa2"}' });
+  const r = await fetch(`${base}/api/team/auth`, { method: 'POST', headers: json, body: '{"employeeId":"a00000001","password":"code awa2"}' });
   assert.equal(r.status, 200);
-  const f = await fetch(`${base}/api/fo-access/login`, { method: 'POST', headers: json, body: '{"huaweiId":"a00000001","code":"codeawa2"}' });
+  const f = await fetch(`${base}/api/fo-access/login`, { method: 'POST', headers: json, body: '{"employeeId":"a00000001","code":"codeawa2"}' });
   assert.equal(f.status, 200);
 });
 
 test('connexion à Ma performance : ouvre aussi la session nominative', async () => {
-  const f = await fetch(`${base}/api/fo-access/login`, { method: 'POST', headers: json, body: '{"huaweiId":"a00000001","code":"CODEAWA2"}' });
+  const f = await fetch(`${base}/api/fo-access/login`, { method: 'POST', headers: json, body: '{"employeeId":"a00000001","code":"CODEAWA2"}' });
   const c = (f.headers.get('set-cookie') || '').split(';')[0];
   assert.match(c, /^fo_team=/);
   const s = await (await fetch(`${base}/api/team/session`, { headers: { cookie: c } })).json();

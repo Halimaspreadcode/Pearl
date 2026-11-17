@@ -37,7 +37,7 @@ function _acIsAdmin() { return typeof AdminSession !== 'undefined' && AdminSessi
 function _acMe() {
   try { return JSON.parse(localStorage.getItem('fo-user') || 'null') || {}; } catch { return {}; }
 }
-function _acUid() { const m = _acMe(); return m.huaweiId ? String(m.huaweiId).trim().toLowerCase() : ''; }
+function _acUid() { const m = _acMe(); return m.employeeId ? String(m.employeeId).trim().toLowerCase() : ''; }
 
 // ── Barre latérale ────────────────────────────────────────────
 // Dans l'Academy, la barre de l'app reste là mais repliée en icônes par
@@ -440,7 +440,7 @@ async function academyBack() {
 function academyExit() {
   academyFocus(false);
   let last = 'dashboard';
-  try { last = localStorage.getItem('emoc-last-page') || 'dashboard'; } catch {}
+  try { last = localStorage.getItem('pearl-last-page') || 'dashboard'; } catch {}
   if (last === 'academy' || last === 'digitalview' || last === 'process-training') last = 'dashboard';
   window.renderPage(last);
 }

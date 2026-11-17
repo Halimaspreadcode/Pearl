@@ -22,7 +22,7 @@ const NVP_PROFILS_BASE = [
   { key: 'FO',       label: 'Front Office', desc: 'Saisit les tickets, tient les rotations' },
   { key: 'BO',       label: 'Back Office',  desc: 'Traite ce que le FO escalade' },
   { key: 'Observer', label: 'Observateur',  desc: 'Consultation seule' },
-  // Ceux qui ont ouvert FOps avec le mot de passe d'équipe, sans code
+  // Ceux qui ont ouvert Pearl avec le mot de passe d'équipe, sans code
   // personnel : ils ne sont personne en particulier, on choisit ce qu'on
   // leur montre.
   { key: 'Guest',    label: 'Non connecté', desc: 'Mot de passe d’équipe, sans code personnel' },
@@ -56,9 +56,8 @@ const NVP_PAGES = [
     { id: 'quiz',            l: 'Quiz',        alias: 'onglet de My Space' },
   ]},
   { grp: 'Trackers', items: [
-    { id: 'sn',          l: 'Tracker SN' },
-    { id: 'ci',          l: 'Tracker CI' },
-    { id: 'global',      l: 'Tracker Global' },
+    { id: 'site',        l: 'Tracker du site' },
+    { id: 'global',      l: 'Tracker tous sites' },
   ]},
   { grp: 'Opérationnel', items: [
     { id: 'observations',    l: 'Observations' },
@@ -81,7 +80,6 @@ const NVP_PAGES = [
     { id: 'export',     l: 'Exports',    admin: true },
   ]},
   { grp: 'Outils', items: [
-    { id: 'log-analyzer', l: 'Analyseur' },
     { id: 'academy',      l: 'Academy (formations)' },
     { id: 'ideas',        l: 'Idea box' },
   ]},
@@ -93,7 +91,7 @@ const NVP_PAGES = [
     { id: 'cfg-annonces',    l: 'Annonces',       admin: true },
     { id: 'data-quality',    l: 'Data Quality',   admin: true },
     { id: 'audit',           l: 'Audit Trail',    admin: true },
-    { id: 'ai',              l: 'Big Brother',    admin: true },
+    { id: 'ai',              l: 'Pearl AI',    admin: true },
     { id: 'shift-approvals', l: 'Approbations',   admin: true },
   ]},
 ];
@@ -101,7 +99,7 @@ const NVP_PAGES = [
 // Ce que la barre fait de ces cases, pour que l'écran ne surprenne pas.
 const NVP_NOTES = {
   'My Space': 'Une seule entrée « My Space » dans la barre, avec les onglets cochés.',
-  'Trackers': 'Un seul tracker dans la barre : celui du pays choisi en haut. S\'il n\'est pas coché, c\'est un tracker coché qui s\'affiche à la place.',
+  'Trackers': 'Un seul tracker dans la barre : celui du site choisi en haut. S\'il n\'est pas coché, c\'est un tracker coché qui s\'affiche à la place.',
   'Rapports': 'Une seule entrée « Rapports » dans la barre, avec les rapports cochés en onglets.',
 };
 
@@ -115,11 +113,11 @@ function _nvpResItems(g) { return g.items.filter(i => !i.admin); }
 // Elle ne s'applique pas toute seule : c'est un point de départ à
 // accepter, pas une décision prise à la place de l'admin.
 const NVP_DEFAUTS = {
-  FO: ['dashboard', 'sn', 'ci', 'observations', 'fo-dashboard', 'fo-handover',
+  FO: ['dashboard', 'site', 'observations', 'fo-dashboard', 'fo-handover',
        'shift-planning', 'my-requests', 'my-perf', 'absences',
-       'weekly-progress', 'quiz', 'daily-report', 'log-analyzer', 'academy', 'ideas'],
-  BO: ['dashboard', 'sn', 'ci', 'global', 'observations', 'absences',
-       'daily-report', 'weekly-report', 'log-analyzer', 'ideas'],
+       'weekly-progress', 'quiz', 'daily-report', 'academy', 'ideas'],
+  BO: ['dashboard', 'site', 'global', 'observations', 'absences',
+       'daily-report', 'weekly-report', 'ideas'],
   Observer: ['dashboard', 'global', 'fo-dashboard', 'daily-report',
              'weekly-report', 'monthly-report'],
   Guest: ['dashboard', 'global', 'daily-report', 'academy', 'ideas'],
@@ -291,7 +289,7 @@ function _nvpRenderReserved() {
             </div>
             <div class="nvp-res-add">
               <input class="form-control" id="nvp-res-in-${it.id}"
-                     placeholder="ID Huawei (ex. wx1234567)"
+                     placeholder="ID employé (ex. wx1234567)"
                      onkeydown="if(event.key==='Enter'){event.preventDefault();nvpResAddId('${it.id}')}">
               <button type="button" class="nvp-mini" onclick="nvpResAddId('${it.id}')">Ajouter</button>
             </div>
@@ -306,7 +304,7 @@ function _nvpRenderReserved() {
       <div class="gsla-card-head">
         <h3 class="gsla-card-t">Pages réservées</h3>
         <p class="gsla-card-d">
-          Cochez une page pour la réserver, puis inscrivez les ID Huawei
+          Cochez une page pour la réserver, puis inscrivez les ID employé
           autorisés. Elle disparaît alors de la barre de tout le monde,
           sauf de la vôtre — l'administrateur en session voit toujours tout —
           et de celle des ID inscrits, qui la voient même si la vue de leur

@@ -21,14 +21,12 @@ async function buildWeeklyPptxBlob() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       date: weeklyAnchorDate,
-      // Le deck hebdomadaire est un rapport Sénégal, quel que soit le
-      // sélecteur de site de l'en-tête : il est diffusé comme tel, et le
-      // serveur impose ce périmètre de toute façon.
-      country: 'SN',
+      // Le deck porte le périmètre de l'en-tête : un site ou tous.
+      country: typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL',
       form: {
         ...collectWeeklyForm(),
         author: weeklyForm.author || rptDefaultAuthor(),
-        site: 'Dakar',
+        site: scopeLabel(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL'),
       },
     }),
   });
@@ -45,18 +43,10 @@ function weeklyPptxFilename() {
   const day = (lastWeeklyReport?.week_start
     ? new Date(lastWeeklyReport.week_start)
     : new Date()).toISOString().slice(0, 10);
-  return `EMOC_Weekly_Report_${day}.pptx`;
+  return `Pearl_Weekly_Report_${day}.pptx`;
 }
 
 async function exportWeeklyPptx() {
-  // Reprise du garde-fou côté action : le bouton est désactivé hors
-  // Sénégal, mais la fonction reste appelable (raccourci, autre bouton).
-  // Générer ici produirait un deck estampillé Dakar sur un écran Abidjan.
-  const scope = typeof getActiveCountry === 'function' ? getActiveCountry() : 'SN';
-  if (scope !== 'SN') {
-    toast('The weekly report only covers the Senegal scope', 'error');
-    return;
-  }
 
   const btn   = document.getElementById('weekly-pptx-btn');
   const label = btn ? btn.textContent : '';
@@ -141,7 +131,7 @@ async function exportWeeklyExcel() {
 
   ws.mergeCells(1, 1, 1, 10);
   const t1 = ws.getCell(1, 1);
-  t1.value = 'FRONT OFFICE WEEKLY REPORT - EMOC';
+  t1.value = 'WEEKLY REPORT';
   xlFill(t1, XL_RED);
   xlFont(t1, { bold: true, color: { argb: XL_WHITE }, size: 14 });
   xlCenter(t1);
@@ -150,7 +140,7 @@ async function exportWeeklyExcel() {
   ws.mergeCells(2, 1, 2, 3);
   ws.mergeCells(2, 4, 2, 7);
   ws.mergeCells(2, 8, 2, 10);
-  [[wkLabel], [weeklyForm.author || rptDefaultAuthor()], ['Dakar']].forEach(([txt], i) => {
+  [[wkLabel], [weeklyForm.author || rptDefaultAuthor()], [scopeLabel(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL')]].forEach(([txt], i) => {
     const c = ws.getCell(2, [1, 4, 8][i]);
     c.value = txt;
     xlFill(c, XL_BLACK);
@@ -347,7 +337,7 @@ async function exportWeeklyExcel() {
   a.href = URL.createObjectURL(blob);
   // Période = la date du jour et non le début de semaine : c'est sur
   // elle que le serveur vérifie la fraîcheur au moment de l'envoi.
-  a.download = `EMOC_Weekly_Report_${new Date(data.week_start).toISOString().slice(0, 10)}.xlsx`;
+  a.download = `Pearl_Weekly_Report_${new Date(data.week_start).toISOString().slice(0, 10)}.xlsx`;
   a.click();
   _uploadReportFile('weekly', buf, a.download, new Date().toISOString().slice(0, 10));
   toast('Excel export generated', 'success');
@@ -358,7 +348,7 @@ function printReport(containerId) {
   if (!el) return;
   const html = `<!DOCTYPE html>
     <html><head>
-      <title>EMOC Report</title>
+      <title>Report</title>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
       <style>
         body{font-family:'DM Sans',sans-serif;margin:24px;color:#111;font-size:13px}

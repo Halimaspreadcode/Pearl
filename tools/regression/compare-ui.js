@@ -16,7 +16,7 @@ async function open(browser, base) {
   await p.evaluate(async () => {
     const r = await fetch('/api/config/auth', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: 'x' }) });
     sessionStorage.setItem('fo-admin-token', (await r.json()).token);
-    localStorage.setItem('fo-identity', JSON.stringify({ name: 'Fatim NDOYE', huawei_id: 'hw123' }));
+    localStorage.setItem('fo-identity', JSON.stringify({ name: 'Fatim NDOYE', employee_id: 'hw123' }));
   });
   await p.goto(base + '/admin/app');
   await p.waitForTimeout(2500);

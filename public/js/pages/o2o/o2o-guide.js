@@ -406,7 +406,7 @@ function _ogSmartBody() {
           <input class="form-control" maxlength="400" value="${esc(s.title)}" placeholder="Ex. Réduire le MTTR des tickets P2 du domaine MMC"
                  oninput="o2oGuideSmart('title',this.value)"></label>
         <label class="og-f">Périmètre
-          <input class="form-control" maxlength="200" value="${esc(s.scope)}" placeholder="Ex. tickets P2 MMC, site de Dakar"
+          <input class="form-control" maxlength="200" value="${esc(s.scope)}" placeholder="Ex. tickets P2 MMC, site principal"
                  oninput="o2oGuideSmart('scope',this.value)"></label>`,
     M: `<div class="og-f-row">
           <label class="og-f">Indicateur<input class="form-control" maxlength="200" value="${esc(s.kpi.name)}" placeholder="MTTR P2 MMC" oninput="o2oGuideSmart('kpi.name',this.value)"></label>

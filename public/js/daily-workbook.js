@@ -193,7 +193,7 @@ function formatTimeLeft(ms, status) {
 let slaTargetText = () => '-';
 
 async function buildDailyWorkbook(ExcelJS, data, form, opts) {
-  const { locale = 'fr-FR', tz = 'UTC', author = '', sections, slaText, lieu = 'Dakar' } = opts || {};
+  const { locale = 'fr-FR', tz = 'UTC', author = '', sections, slaText, lieu = '' } = opts || {};
   // Un highlight clôturé n'a plus rien à signaler : il reste dans la page
   // mais sort du classeur (et du mail, voir services/mail/bodies.js).
   const HL_CLOS = /^(closed|clos|close|clôturé|cloturé|fermé|done|resolved|résolu)$/i;
@@ -221,7 +221,7 @@ async function buildDailyWorkbook(ExcelJS, data, form, opts) {
   // Row 1 - titre
   ws.mergeCells(1, 1, 1, 10);
   const t1 = ws.getCell(1, 1);
-  t1.value = 'FRONT OFFICE DAILY REPORT - EMOC';
+  t1.value = 'DAILY REPORT';
   xlFill(t1, XL_RED);
   xlFont(t1, { bold: true, color: { argb: XL_WHITE }, size: 14 });
   xlCenter(t1);

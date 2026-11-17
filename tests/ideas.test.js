@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 process.env.CONFIG_PW_HASH = bcrypt.hashSync('admin-pw', 4);
 delete process.env.TEAM_PW_HASH;
 useTempDataDir({
-  'config.json': { fo_list: ['Awa'], fo_access_codes: { Awa: { hash: bcrypt.hashSync('CODEAWA2', 4), huawei_id: 'a00000001' } } },
+  'config.json': { fo_list: ['Awa'], fo_access_codes: { Awa: { hash: bcrypt.hashSync('CODEAWA2', 4), employee_id: 'a00000001' } } },
   'ideas.json': [],
 });
 const { test, before, after } = require('node:test');
@@ -56,7 +56,7 @@ test('consultation seule : on peut poster, anonyme ou signé, et aimer une fois'
 });
 
 test('la signature d\'une session nominative est son vrai nom', async () => {
-  const cookie = await login({ huaweiId: 'a00000001', password: 'CODEAWA2' });
+  const cookie = await login({ employeeId: 'a00000001', password: 'CODEAWA2' });
   const r = await (await fetch(`${base}/api/ideas`, { method: 'POST', headers: { ...J, cookie, 'X-Voter': 'voter-cccccccc' },
     body: JSON.stringify({ text: 'Idée', signed: true, author: 'Quelqu\'un d\'autre' }) })).json();
   assert.equal(r.author, 'Awa');

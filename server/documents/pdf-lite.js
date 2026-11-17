@@ -331,7 +331,7 @@ class PdfDoc {
     const d = new Date();
     const pad = v => String(v).padStart(2, '0');
     const date = `D:${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
-    obj(5, `<< /Title ${pdfString(toWinAnsi(this.title))} /Author ${pdfString(toWinAnsi(this.author))} /Producer (EMOC pdf-lite) /CreationDate (${date}) >>`);
+    obj(5, `<< /Title ${pdfString(toWinAnsi(this.title))} /Author ${pdfString(toWinAnsi(this.author))} /Producer (Pearl pdf-lite) /CreationDate (${date}) >>`);
 
     this.pages.forEach((pg, i) => {
       const id = pageId(i);

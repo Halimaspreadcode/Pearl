@@ -20,7 +20,7 @@ const router = express.Router();
 const iaLimit = rateLimit({
   windowMs: 60 * 1000, max: 20,
   standardHeaders: true, legacyHeaders: false,
-  message: { error: 'Trop de requêtes vers Big Brother : attendez une minute.' },
+  message: { error: 'Trop de requêtes vers Pearl AI : attendez une minute.' },
 });
 
 router.use('/api/ai', requireAdmin, (_req, res, next) => {
@@ -294,7 +294,7 @@ router.post('/api/ai/pdf', (req, res) => {
 
 // ── Tableau de bord IA ──
 // Signaux opérationnels calculés par le serveur, sans appel au modèle.
-const pays = v => (['SN', 'CI'].includes(String(v || '').toUpperCase()) ? String(v).toUpperCase() : 'ALL');
+const pays = v => require('../core/store').normScope(v, 'ALL');
 router.get('/api/ai/cockpit', (req, res) => {
   try { res.json(require('../services/ai-team').signauxOps(pays(req.query.country))); }
   catch (e) { res.status(500).json({ error: e.message }); }

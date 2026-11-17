@@ -23,8 +23,8 @@ describe('mailSubject', () => {
 
   // Tous les jetons, insensibles à la casse.
   test('jetons {report} {date} {week} {month}', () => {
-    assert.equal(mailSubject('weekly', '[EMOC] {Report} {DATE} {week} ({month})', MON),
-      '[EMOC] Weekly Report 2026-03-02 W10 (March 2026)');
+    assert.equal(mailSubject('weekly', '[Pearl] {Report} {DATE} {week} ({month})', MON),
+      '[Pearl] Weekly Report 2026-03-02 W10 (March 2026)');
   });
 
   // Semaine ISO : le 1er janvier 2027 (vendredi) appartient à 2026-W53.

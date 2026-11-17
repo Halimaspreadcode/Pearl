@@ -1,5 +1,5 @@
 const express     = require('express');
-const { readAudit, readCI, readCfg, readObs, readSN } = require('../core/store');
+const { readAudit, readCfg, readObs, readSites, readTracker } = require('../core/store');
 const { allEnriched } = require('../core/enrich');
 const { requireAdmin } = require('../auth/guards');
 
@@ -107,11 +107,12 @@ router.get('/api/export', requireAdmin, (req, res) => {
     approval_password_hash, absence_password_hash, fo_access_codes, ...config
   } = readCfg();
   const data = {
-    sn: readSN(), ci: readCI(),
+    sites: readSites(),
+    tickets: Object.fromEntries(readSites().map(s => [s.code, readTracker(s.code)])),
     observations: readObs(), audit: readAudit(), config
   };
   const date = new Date().toISOString().slice(0,10);
-  res.setHeader('Content-Disposition', `attachment; filename="emoc-data-${date}.json"`);
+  res.setHeader('Content-Disposition', `attachment; filename="pearl-data-${date}.json"`);
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(data, null, 2));
 });

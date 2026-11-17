@@ -2,7 +2,7 @@ const express     = require('express');
 const { buildWeeklyPptx } = require('../documents/weekly-pptx');
 const { buildCombinedPptx, missingExplanations } = require('../documents/weekly-combined-pptx');
 const { buildCombinedAnalysis } = require('../services/weekly-combined');
-const { readCfg, readObs } = require('../core/store');
+const { readCfg, readObs, normScope } = require('../core/store');
 const {
   isoWeekNumber, reportTZ, tzEndOfDay, tzParts, tzStartOfWeek, zonedTimeToUtc,
 } = require('../core/time');
@@ -25,17 +25,17 @@ router.get('/api/reports/weekly', (req, res) => {
 // stocke pas. Elles voyagent donc dans le corps de la requête.
 router.post('/api/reports/weekly.pptx', async (req, res) => {
   try {
-    // Le deck hebdomadaire porte strictement le périmètre Sénégal. Le pays
-    // transmis par le client est ignoré : avec 'ALL' ou 'CI', les tickets
-    // et observations de Côte d'Ivoire se retrouvaient dans un document
-    // diffusé comme un rapport SN.
-    const data = buildWeeklyReport(req.body?.date, 'SN');
-    const buf  = await buildWeeklyPptx(data, req.body?.form || {});
+    // Le deck porte le périmètre choisi (un site ou tous) : les mêmes
+    // chiffres que l'écran, filtrés côté serveur.
+    const form  = req.body?.form || {};
+    const scope = normScope(req.body?.country || form.country, 'first');
+    const data  = buildWeeklyReport(req.body?.date, scope);
+    const buf   = await buildWeeklyPptx(data, { ...form, country: scope });
     const day  = new Date(data.week_start).toISOString().slice(0, 10);
     res.setHeader('Content-Type',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation');
     res.setHeader('Content-Disposition',
-      `attachment; filename="EMOC_Weekly_Report_${day}.pptx"`);
+      `attachment; filename="Pearl_Weekly_Report_${day}.pptx"`);
     res.send(buf);
   } catch (err) {
     console.error('PPTX generation failed:', err);
@@ -43,7 +43,7 @@ router.post('/api/reports/weekly.pptx', async (req, res) => {
   }
 });
 
-// ── WEEKLY PERFORMANCE — DAKAR × ABIDJAN ──────────────────────
+// ── WEEKLY PERFORMANCE — TOUS LES SITES ───────────────────────
 // Deck présenté aux deux équipes. GET renvoie l'analyse (pics, absences,
 // incidents) pour que le client demande les explications avant de
 // générer ; POST produit le PPTX avec les textes saisis.
@@ -71,7 +71,7 @@ router.post('/api/reports/weekly-combined.pptx', async (req, res) => {
     res.setHeader('Content-Type',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation');
     res.setHeader('Content-Disposition',
-      `attachment; filename="EMOC_Weekly_Performance_Dakar_Abidjan_${day}.pptx"`);
+      `attachment; filename="Pearl_Weekly_Performance_${day}.pptx"`);
     res.send(buf);
   } catch (err) {
     console.error('Combined PPTX generation failed:', err);

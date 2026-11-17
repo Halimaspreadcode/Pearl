@@ -11,7 +11,7 @@ window.renderPage = function(page) {
   // d'entrée de menu, et .nav-item.active reste alors sur « Vue
   // d'ensemble ». Sans cette trace, tout ce qui relit la page courante —
   // le sélecteur Global/SN/CI, la présence — y renvoyait l'utilisateur.
-  try { if (page) localStorage.setItem('emoc-last-page', page); } catch (_) {}
+  try { if (page) localStorage.setItem('pearl-last-page', page); } catch (_) {}
   // Signale la nouvelle page à la présence. Après _origRenderPage : la
   // classe .active de la barre latérale doit être posée avant la lecture.
   try { notePresencePage(); } catch (_) {}
@@ -46,7 +46,6 @@ const CFG_ICO = {
   'cfg-sla': '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>',
   rapports: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 17v-3M12 17v-6M15 17v-2"/>',
   indicateurs: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>',
-  imoc: '<path d="M2 9a3 3 0 0 0 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 0 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 17v2M13 11v2"/>',
   ai: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>',
   'cfg-general': '<path d="M4 6h16M4 12h16M4 18h10"/>',
   'cfg-rota': '<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/>',
@@ -86,17 +85,15 @@ const CFG_RUBRIQUES = [
     desc: 'Daily, Weekly, Monthly, Ops Review, diffusion par mail et exports',
     kw: 'Diffusion envoi mail SMTP groupes planification Export Excel PowerPoint JSON sauvegarde' },
   { page: 'indicateurs',  grp: 'pilot', titre: 'Indicateurs',
-    desc: 'KPI et PI décrits à Big Brother, suivis automatiquement', kw: 'KPI PI MTTD MTTR SLA indicateur formule degradation' },
-  { page: 'imoc',         grp: 'pilot', titre: 'Tickets IMOC',
-    desc: 'Tickets relevés dans IMOC, à la demande', kw: 'eticket ticketing oceane imoc import' },
-  { page: 'ai',           grp: 'pilot', titre: 'Big Brother',
+    desc: 'KPI et PI décrits à Pearl AI, suivis automatiquement', kw: 'KPI PI MTTD MTTR SLA indicateur formule degradation' },
+  { page: 'ai',           grp: 'pilot', titre: 'Pearl AI',
     desc: 'L\'assistant IA, ses outils et sa base de connaissances', kw: 'IA AI assistant knowledge documents cle API modele' },
 
   // ── Paramétrage ──
   { page: 'cfg-general',  grp: 'outil', titre: 'Général',
     desc: 'Domaines, équipe FO, statuts' },
   { page: 'cfg-parties',  grp: 'outil', titre: 'Rôles et parties prenantes',
-    desc: 'FO, BO, SMC, DRPS… : rôles, personnes et noms reconnus dans IMOC', kw: 'role stakeholder SMC DRPS initiator partie prenante' },
+    desc: 'FO, BO, SMC, DRPS… : rôles, personnes et noms reconnus dans vos autres outils', kw: 'role stakeholder SMC DRPS initiator partie prenante' },
   { page: 'cfg-rota',     grp: 'outil', titre: 'Shift Rota',
     desc: 'Sites, créneaux, génération de la rota' },
   { page: 'cfg-quiz',     grp: 'outil', titre: 'Quiz',
@@ -253,6 +250,8 @@ async function _renderCfgSubPage(page) {
   // renderConfig() remplit domaines, équipe, SLA, BO et rota d'un coup :
   // ces rubriques partagent la même passe de rendu.
   if (page === 'cfg-general' || page === 'cfg-sla' || page === 'cfg-data' || page === 'cfg-rota') renderConfig();
+  if (page === 'cfg-general' && typeof renderSitesAdmin === 'function') { _sitesDraft = null; renderSitesAdmin(); }
+  if (page === 'cfg-general' && typeof renderOrgAdmin === 'function') renderOrgAdmin();
   if (page === 'cfg-goals')    renderGoalsConfig();
   if (page === 'cfg-vues')     renderNavProfiles();
   if (page === 'cfg-parties')  renderParties();

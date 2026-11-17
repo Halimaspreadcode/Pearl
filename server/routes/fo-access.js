@@ -27,13 +27,13 @@ router.post('/api/fo-access/:fo', authLimiter, requireAdmin, (req, res) => {
   if (!fo || fo.length > 80 || /[<>"]/.test(fo))
     return res.status(400).json({ error: 'Invalid name.' });
 
-  const huaweiId = String(req.body?.huaweiId || '').trim();
-  if (!/^[a-zA-Z]{1,2}\d{7,8}$/.test(huaweiId))
-    return res.status(400).json({ error: 'Invalid Huawei ID.' });
+  const employeeId = String(req.body?.employeeId || '').trim();
+  if (!/^[a-zA-Z]{1,2}\d{7,8}$/.test(employeeId))
+    return res.status(400).json({ error: 'Invalid Employee ID.' });
   // Un ID = une personne : sinon la connexion ne saurait pas qui ouvrir.
   const pris = Object.entries(readCfg().fo_access_codes || {})
-    .find(([n, v]) => n !== fo && String(v?.huawei_id || '').toLowerCase() === huaweiId.toLowerCase());
-  if (pris) return res.status(409).json({ error: `This Huawei ID already belongs to ${pris[0]}.` });
+    .find(([n, v]) => n !== fo && String(v?.employee_id || '').toLowerCase() === employeeId.toLowerCase());
+  if (pris) return res.status(409).json({ error: `This Employee ID already belongs to ${pris[0]}.` });
 
   // Alphabet sans I, O, 0, 1 : ces codes se lisent et se recopient à la
   // main, et la confusion se paierait en tentatives échouées.
@@ -46,7 +46,7 @@ router.post('/api/fo-access/:fo', authLimiter, requireAdmin, (req, res) => {
     const codes = { ...(cur.fo_access_codes || {}) };
     codes[fo] = {
       hash: bcrypt.hashSync(code, 10),
-      huawei_id: huaweiId,
+      employee_id: employeeId,
       updated_at: new Date().toISOString(),
     };
     writeCfg({ ...cur, fo_access_codes: codes });
@@ -58,9 +58,9 @@ router.post('/api/fo-access/:fo', authLimiter, requireAdmin, (req, res) => {
 
     // Un nouveau code repart de zéro : l'éventuel blocage pour essais
     // ratés sur cet identifiant est levé.
-    debloquerCompte(huaweiId);
-    addAudit('perf', fo, 'admin', 'code-generate', { huawei_id: huaweiId });
-    res.json({ ok: true, fo, code, huawei_id: huaweiId });
+    debloquerCompte(employeeId);
+    addAudit('perf', fo, 'admin', 'code-generate', { employee_id: employeeId });
+    res.json({ ok: true, fo, code, employee_id: employeeId });
   }).catch(e => res.status(500).json({ error: e.message }));
 });
 
@@ -70,7 +70,7 @@ router.post('/api/fo-access/:fo/unlock', requireAdmin, (req, res) => {
   const fo = String(req.params.fo || '').trim();
   const v = (readCfg().fo_access_codes || {})[fo];
   if (!v) return res.status(404).json({ error: 'No code for this person.' });
-  debloquerCompte(v.huawei_id);
+  debloquerCompte(v.employee_id);
   addAudit('perf', fo, 'admin', 'code-unlock', {});
   res.json({ ok: true });
 });
@@ -95,7 +95,7 @@ router.delete('/api/fo-access/:fo', requireAdmin, (req, res) => {
 router.get('/api/fo-access', requireAdmin, (req, res) => {
   const codes = foAccessCodes();
   res.json(Object.entries(codes).map(([fo, v]) => ({
-    fo, huawei_id: v.huawei_id || '', updated_at: v.updated_at || '',
+    fo, employee_id: v.employee_id || '', updated_at: v.updated_at || '',
     sessions: [...foSessions.values()].filter(s => s.fo === fo).length,
   })));
 });

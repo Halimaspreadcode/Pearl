@@ -294,7 +294,7 @@ function _wpRenderWeekBar(weekStart, weekEnd) {
 
   const country = getActiveCountry();
   const sub = document.getElementById('wp-subtitle');
-  if (sub) sub.textContent = `What the team delivered · ${country === 'ALL' ? 'Dakar + Abidjan' : (country === 'CI' ? 'Abidjan (CI)' : 'Dakar (SN)')}`;
+  if (sub) sub.textContent = `What the team delivered · ${country === 'ALL' ? scopeLabel('ALL') : siteLabel(country)}`;
 }
 
 // La liste des FO se construit à partir des données réelles : pas de

@@ -822,13 +822,13 @@ function perfScore(card) {
 
 // Les agents du périmètre courant. La page suit le sélecteur Global/SN/CI
 // de la barre du haut, comme le FO Dashboard : sur « SN », noter un agent
-// d'Abidjan n'a pas de sens et brouille la lecture d'équipe.
+// d'un autre site n'a pas de sens et brouille la lecture d'équipe.
 // Un seul accesseur pour toute la page — la liste et la fiche notée
 // doivent voir exactement les mêmes agents.
 function _perfFoList() {
   const scope = (typeof getActiveCountry === 'function') ? getActiveCountry() : 'ALL';
   return (state.config.fo_list || []).filter(fo =>
-    scope === 'ALL' || ((state.config.fo_trackers || {})[fo] || 'SN') === scope);
+    scope === 'ALL' || personInScope(fo, scope));
 }
 
 function renderPerfPage() {

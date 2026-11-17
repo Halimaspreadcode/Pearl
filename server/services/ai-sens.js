@@ -10,19 +10,19 @@
 // Facultatif : il faut que le service IA propose un modèle d'embeddings
 // (route /embeddings). Sans lui, la base reste en mots-clés.
 //
-// Stockage : un fichier binaire par document (data/ai_kb_vec/<id>.bin),
+// Stockage : un blob binaire par document (ai_kb_vec/<id>.<modèle>.bin),
 // vecteurs normalisés puis quantifiés sur 8 bits (4 fois moins de place,
 // précision largement suffisante pour classer des passages).
 // L'indexation tourne en arrière-plan après chaque ajout.
 // ══════════════════════════════════════════════════════════════
-const fs = require('fs');
 const path = require('path');
 const { FILES } = require('../config/paths');
+const { backend } = require('../core/backend');
 
 const LOT = 32;            // passages envoyés par appel
 const ENTETE = 16;         // octets : 'KBV1', dim (u32), n (u32), réservé
-const _vec = new Map();    // doc → { model, dim, n, data: Int8Array }
-const etat = { actif: false, fait: 0, total: 0, doc: '', erreur: '', modele: '' };
+const _vec = require('../core/scoped').scopedMap();    // doc → { model, dim, n, data: Int8Array }
+const etat = require('../core/scoped').scopedObject(() => ({ actif: false, fait: 0, total: 0, doc: '', erreur: '', modele: '' }));
 
 const modele = () => { try { return require('./ai').lireFichier().embed_model || ''; } catch { return ''; } };
 const fichier = (id, m) => path.join(FILES.ai_kb_vec, `${id}.${String(m).replace(/[^\w.-]+/g, '_')}.bin`);
@@ -35,33 +35,40 @@ function normaliserQuantifier(v) {
   return q;
 }
 
+// Lecture depuis le cache seulement (synchrone). `chargerTous` remplit le
+// cache depuis le stockage avant chaque usage ; `false` = blob absent.
 function charger(id, m) {
-  const k = `${id}|${m}`;
-  if (_vec.has(k)) return _vec.get(k);
-  let buf;
-  try { buf = fs.readFileSync(fichier(id, m)); } catch { return null; }
-  if (buf.length < ENTETE || buf.toString('ascii', 0, 4) !== 'KBV1') return null;
+  const v = _vec.get(`${id}|${m}`);
+  return v || null;
+}
+function decoder(buf, m) {
+  if (!buf || buf.length < ENTETE || buf.toString('ascii', 0, 4) !== 'KBV1') return false;
   const dim = buf.readUInt32LE(4), n = buf.readUInt32LE(8);
-  if (buf.length !== ENTETE + dim * n) return null;
-  const v = { model: m, dim, n, data: new Int8Array(buf.buffer, buf.byteOffset + ENTETE, dim * n) };
-  _vec.set(k, v);
-  return v;
+  if (buf.length !== ENTETE + dim * n) return false;
+  return { model: m, dim, n, data: new Int8Array(buf.buffer, buf.byteOffset + ENTETE, dim * n) };
+}
+async function chargerTous(ids, m) {
+  for (const id of ids) {
+    const k = `${id}|${m}`;
+    if (_vec.has(k)) continue;
+    let buf = null;
+    try { buf = await backend().getBlob(fichier(id, m)); } catch { buf = null; }
+    _vec.set(k, decoder(buf, m));
+  }
 }
 
-function ecrire(id, m, vecteurs) {
+async function ecrire(id, m, vecteurs) {
   const dim = vecteurs[0].length, n = vecteurs.length;
   const buf = Buffer.alloc(ENTETE + dim * n);
   buf.write('KBV1', 0, 'ascii'); buf.writeUInt32LE(dim, 4); buf.writeUInt32LE(n, 8);
   vecteurs.forEach((q, i) => Buffer.from(q.buffer, q.byteOffset, q.length).copy(buf, ENTETE + i * dim));
-  fs.mkdirSync(FILES.ai_kb_vec, { recursive: true });
-  const f = fichier(id, m), tmp = f + '.tmp';
-  fs.writeFileSync(tmp, buf); fs.renameSync(tmp, f);
-  _vec.delete(`${id}|${m}`);
+  await backend().putBlob(fichier(id, m), buf);
+  _vec.set(`${id}|${m}`, decoder(buf, m));
 }
 
 function oublier(id) {
   for (const k of [..._vec.keys()]) if (k.startsWith(id + '|')) _vec.delete(k);
-  try { for (const f of fs.readdirSync(FILES.ai_kb_vec)) if (f.startsWith(id + '.')) fs.unlinkSync(path.join(FILES.ai_kb_vec, f)); } catch {}
+  backend().removeBlobs(FILES.ai_kb_vec, id + '.').catch(() => {});
 }
 
 // Texte envoyé au modèle pour un passage : le nom du document aide à le
@@ -79,6 +86,7 @@ async function indexer(lireKb) {
   etat.actif = true; etat.erreur = ''; etat.modele = m;
   try {
     const kb = lireKb();
+    await chargerTous(kb.docs.map(d => d.id), m);
     const parDoc = new Map();
     kb.chunks.forEach(c => { const l = parDoc.get(c.doc) || []; l.push(c); parDoc.set(c.doc, l); });
     const aFaire = kb.docs.filter(d => { const v = charger(d.id, m); return !v || v.n !== (parDoc.get(d.id) || []).length; });
@@ -97,7 +105,7 @@ async function indexer(lireKb) {
         etat.fait += lot.length;
       }
       // Le document a pu être retiré pendant l'indexation.
-      if (lireKb().docs.some(x => x.id === d.id)) ecrire(d.id, m, out);
+      if (lireKb().docs.some(x => x.id === d.id)) await ecrire(d.id, m, out);
     }
   } catch (e) {
     etat.erreur = e.message;
@@ -114,6 +122,7 @@ async function proches(texte, lireKb, k = 150) {
   const m = modele();
   if (!m) return null;
   const kb = lireKb();
+  await chargerTous(kb.docs.map(d => d.id), m);
   const blocs = kb.docs.map(d => ({ d, v: charger(d.id, m) })).filter(x => x.v);
   if (!blocs.length) return null;
   let q;

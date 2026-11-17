@@ -1,9 +1,9 @@
 // ══════════════════════════════════════════════════════════════
 // INSIGHT DE PERFORMANCE (page My Performance, agent)
 //
-// Une carte sous l'en-tête de la fiche : la lecture de Big Brother sur
+// Une carte sous l'en-tête de la fiche : la lecture de Pearl AI sur
 // la fiche de l'agent. N'apparaît que si l'admin l'a activé pour lui
-// (Big Brother › Réglages › Insights des agents). Les insights sont
+// (Pearl AI › Réglages › Insights des agents). Les insights sont
 // générés automatiquement par le serveur : l'agent ne fait que les lire.
 // En vue admin d'une fiche (_adminPerfFo), la carte montre en lecture
 // seule le dernier insight généré par l'agent.
@@ -120,7 +120,7 @@ function _insPaint() {
     </div>
     ${d.next_step ? `<div class="mins-week"><span class="mins-week-ico">${_insIco('target')}</span><div><span class="mins-k">This week</span><p>${esc(d.next_step)}</p></div></div>` : ''}
     ${d.encouragement ? `<p class="mins-enc">${esc(d.encouragement)}</p>` : ''}
-    <footer class="mins-foot"><span>Big Brother can be wrong: talk it through with your manager.</span>${actu}</footer>
+    <footer class="mins-foot"><span>Pearl AI can be wrong: talk it through with your manager.</span>${actu}</footer>
     ${err}
   </section>`;
 }

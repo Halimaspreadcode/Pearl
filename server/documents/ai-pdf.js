@@ -1,5 +1,5 @@
 /**
- * Rapport PDF d'une réponse de Big Brother.
+ * Rapport PDF d'une réponse de Pearl AI.
  *
  * La page envoie la réponse déjà mise en forme sous forme de blocs
  * simples (titres, paragraphes, listes, chiffres clés, tableaux,
@@ -140,7 +140,7 @@ function table(doc, b, x, y, w, dessiner) {
 
 // ── Mise en page ──────────────────────────────────────────────
 function rapportPdf({ titre, sousTitre, meta, blocs } = {}) {
-  const doc = new PdfDoc({ title: propre(titre) || 'Rapport Big Brother', author: 'Big Brother · FOps' });
+  const doc = new PdfDoc({ title: propre(titre) || 'Rapport Pearl AI', author: 'Pearl AI · Pearl' });
   const items = nettoyer(blocs);
   let y = 0;
   const page = () => { doc.addPage(); y = HAUT; };
@@ -148,7 +148,7 @@ function rapportPdf({ titre, sousTitre, meta, blocs } = {}) {
 
   // En-tête de la première page.
   page();
-  doc.text('BIG BROTHER · FOPS', M, y, { size: 8, bold: true, color: C.accent, charSpace: 1.2 });
+  doc.text('PEARL AI · PEARL', M, y, { size: 8, bold: true, color: C.accent, charSpace: 1.2 });
   y += 26;
   y += doc.paragraph(propre(titre) || 'Rapport', M, y, LARG, { size: 20, bold: true, color: C.ink, leading: 1.25 });
   if (sousTitre) y += 2 + doc.paragraph(propre(sousTitre), M, y + 2, LARG, { size: 10.5, color: C.mute, leading: LEAD });
@@ -231,7 +231,7 @@ function rapportPdf({ titre, sousTitre, meta, blocs } = {}) {
   for (let i = 0; i < n; i++) {
     doc.usePage(i);
     doc.line(M, H - 40, M + LARG, H - 40, { color: C.line, width: 0.5 });
-    doc.text(`Généré par Big Brother le ${quand} · chiffres calculés par FOps · à relire avant diffusion`, M, H - 26, { size: 7.5, color: C.faint, maxWidth: LARG - 60 });
+    doc.text(`Généré par Pearl AI le ${quand} · chiffres calculés par Pearl · à relire avant diffusion`, M, H - 26, { size: 7.5, color: C.faint, maxWidth: LARG - 60 });
     doc.text(`${i + 1} / ${n}`, M + LARG, H - 26, { size: 7.5, color: C.faint, align: 'right' });
   }
   return doc.toBuffer();

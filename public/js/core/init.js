@@ -13,7 +13,7 @@ async function init() {
   // directement la Configuration plutôt que la dernière page visitée.
   let lastPage = location.pathname.startsWith('/admin')
     ? 'config'
-    : (localStorage.getItem('emoc-last-page') || 'dashboard');
+    : (localStorage.getItem('pearl-last-page') || 'dashboard');
   // Une dernière page devenue réservée à l'admin renverrait aussitôt vers
   // /admin à l'ouverture de l'app publique : on retombe sur le tableau
   // de bord plutôt que d'imposer le mot de passe au démarrage.
@@ -63,9 +63,8 @@ function showSkeletons() {
 }
 
 async function loadAll() {
-  const [sn, ci, obs, dash, bo, shiftsPlan, foTasks, rotaConfig, holidays, shiftRequests, quizzes, quizResults, weeklyProgress, quizProgress] = await Promise.all([
-    fetch(`${API}/api/sn`).then(r => r.json()),
-    fetch(`${API}/api/ci`).then(r => r.json()),
+  const [st, obs, dash, bo, shiftsPlan, foTasks, rotaConfig, holidays, shiftRequests, quizzes, quizResults, weeklyProgress, quizProgress] = await Promise.all([
+    fetchSitesAndTickets().catch(() => ({ sites: [], tickets: {} })),
     fetch(`${API}/api/observations`).then(r => r.json()),
     fetch(`${API}/api/dashboard`).then(r => r.json()),
     fetch(`${API}/api/bo`).then(r => r.json()),
@@ -82,7 +81,10 @@ async function loadAll() {
   // Une liste refusée (connexion requise, page réservée) arrive en objet
   // { error } : on la traite comme vide plutôt que de casser les écrans.
   const L = v => Array.isArray(v) ? v : [];
-  state.sn = L(sn); state.ci = L(ci);
+  state.sites = L(st.sites); state.tickets = st.tickets || {};
+  for (const c of siteCodes()) state.tickets[c] = L(state.tickets[c]);
+  fillSiteSelects();
+  if (typeof renderCountryToggle === 'function') renderCountryToggle();
   state.observations = L(obs); state.dashboard = dash; state.boList = L(bo);
   state.shiftsPlan = L(shiftsPlan); state.foTasks = L(foTasks); state.rotaConfig = rotaConfig;
   state.holidays = L(holidays); state.shiftRequests = L(shiftRequests);
@@ -181,7 +183,7 @@ function initNav() {
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       item.classList.add('active');
       window.renderPage(item.dataset.page);
-      localStorage.setItem('emoc-last-page', item.dataset.page);
+      localStorage.setItem('pearl-last-page', item.dataset.page);
       closeSidebar();
     });
   });
@@ -206,8 +208,7 @@ function renderPage(page) {
   const el = document.getElementById(`page-${page}`);
   if (el) el.classList.add('active');
   if (page === 'dashboard')      renderDashboard();
-  if (page === 'sn')             renderTracker('sn');
-  if (page === 'ci')             renderTracker('ci');
+  if (page === 'site')           renderTracker(activeSiteKey());
   if (page === 'global')         renderGlobalTracker();
   if (page === 'observations')   renderObservations();
   if (page === 'fo-dashboard')   renderFoDashboard();
@@ -277,8 +278,8 @@ function _rafraichirCompteurs() {
   // Temps écoulé depuis la dernière synchronisation : on le retranche des
   // échéances reçues, sans rien redemander au serveur.
   const ecoule = Date.now() - _dernierSync;
-  ['sn', 'ci'].forEach(tracker => {
-    (state[tracker] || []).forEach(t => {
+  siteCodes().forEach(code => {
+    ticketsOf(code).forEach(t => {
       const el = document.getElementById(`tl-${t.id}`);
       if (!el) return;                       // ligne non affichée : rien à faire
       // Ticket On Hold : SLA gelé, le temps restant ne défile pas.

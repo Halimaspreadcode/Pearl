@@ -32,7 +32,7 @@ async function _aiFetch(path, opts = {}) {
   if (res.status === 401) throw new Error('Session admin expirée : reconnectez-vous.');
   // 404 de l'appli elle-même (pas du modèle, qui revient en 502) : le
   // serveur tourne encore sur une version sans les routes /api/ai.
-  if (res.status === 404) throw new Error("Le serveur EMOC ne connaît pas encore Big Brother : mettez-le à jour puis redémarrez-le.");
+  if (res.status === 404) throw new Error("Le serveur Pearl ne connaît pas encore Pearl AI : mettez-le à jour puis redémarrez-le.");
   if (!res.ok) throw new Error(data.error || `Erreur ${res.status}`);
   return data;
 }
@@ -92,7 +92,7 @@ function _aiPaint() {
   const conf = `
     <section class="ai-card ai-conf"${aiUI.showConf ? '' : ' hidden'}>
       <div class="b3-conn ${c.has_key ? 'is-on' : 'is-off'}"><i></i><div><b>${c.has_key ? 'Connecté' : 'Non connecté'}</b>
-        <span>${c.has_key ? `Modèle ${esc(c.model || '?')} · clé ${esc(c.key_hint || '')}` : 'Colle ta clé ci-dessous pour activer Big Brother.'}</span></div></div>
+        <span>${c.has_key ? `Modèle ${esc(c.model || '?')} · clé ${esc(c.key_hint || '')}` : 'Colle ta clé ci-dessous pour activer Pearl AI.'}</span></div></div>
       <details class="ai-quick b3-det"${c.has_key ? '' : ' open'}>
         <summary class="ai-card-h">Connexion rapide (via ton PC)</summary>
         <ol class="ai-steps">
@@ -110,7 +110,7 @@ function _aiPaint() {
       <div class="ai-field ai-field-wide">
         <label class="bb-switch"><input type="checkbox" ${c.academy_open ? 'checked' : ''} onchange="aiAcademyOpen(this.checked)"><span></span>Academy : les agents peuvent poser leurs questions dans les cours</label>
         <div class="ai-note">${c.academy_open
-          ? 'Ouvert : tout agent identifié (ID Huawei et code) peut interroger Big Brother depuis une leçon, 8 questions par minute au plus.'
+          ? 'Ouvert : tout agent identifié (ID employé et code) peut interroger Pearl AI depuis une leçon, 8 questions par minute au plus.'
           : 'Fermé : seul l\'admin voit le bouton « Poser une question » dans les cours.'} Les questions ne sont pas enregistrées ; l\'audit garde seulement qui, quand et quelle formation.</div>
       </div>
       <div class="ai-field ai-field-wide">
@@ -157,7 +157,7 @@ function _aiPaint() {
         <summary>Certificat de l'entreprise ${(c.ca_custom || []).length
           ? `<em>· ${(c.ca_custom).map(x => esc(x.sujet)).join(', ')}</em>` : '<em>· facultatif, en cas d\'erreur de certificat</em>'}</summary>
         <div class="ai-note">Sur ton PC : touche Windows › « certmgr.msc » › Autorités de certification racines de confiance › Certificats ›
-          clic droit sur le certificat de l'entreprise (ex. « Huawei Web Secure Internet Gateway CA ») › Toutes les tâches › Exporter › format
+          clic droit sur le certificat de l'entreprise (ex. « Corporate Web Gateway CA ») › Toutes les tâches › Exporter › format
           « Base 64 X.509 (.cer) ». Ouvre le fichier avec le Bloc-notes et colle tout son contenu ici.</div>
         <textarea id="ai-ca" rows="4" spellcheck="false" placeholder="-----BEGIN CERTIFICATE-----&#10;…&#10;-----END CERTIFICATE-----"></textarea>
         ${(c.ca_custom || []).length ? '<button type="button" class="ai-btn is-ghost" onclick="aiClearCa()">Retirer le certificat</button>' : ''}
@@ -197,11 +197,11 @@ function _aiPaint() {
   root.dataset.vue = `${accueil}|${drawerR}|${aiUI.cur}`;
   root.innerHTML = `<div class="b3${accueil ? ' is-home' : ' is-chat'}${aiUI.sideOpen ? ' has-hist' : ''}${drawerR ? ' has-right' : ''}">
     <header class="b3-bar">
-      <button class="b3-brand" onclick="aiAccueil()" title="Accueil de Big Brother">
-        <span class="b3-mark">BB</span><b>Big Brother</b></button>
+      <button class="b3-brand" onclick="aiAccueil()" title="Accueil de Pearl AI">
+        <span class="b3-mark">BB</span><b>Pearl AI</b></button>
       <span class="b3-status ${c.has_key ? 'is-on' : 'is-off'}" title="${c.has_key ? esc(c.model || '') : ''}"><i></i>${c.has_key ? 'Connecté' : 'Non connecté'}</span>
       <span class="b3-sp"></span>
-      <div class="b3-seg" role="tablist" aria-label="Périmètre">${[['ALL', 'Global'], ['SN', 'Dakar'], ['CI', 'Abidjan']].map(([v, l]) =>
+      <div class="b3-seg" role="tablist" aria-label="Périmètre">${[['ALL', 'Global'], ...siteList().map(s => [s.code, siteName(s.code)])].map(([v, l]) =>
         `<button class="${pays === v ? 'is-on' : ''}" role="tab" aria-selected="${pays === v}" onclick="aicPays('${v}')">${l}</button>`).join('')}</div>
       <button class="b3-btn${aiUI.sideOpen ? ' is-on' : ''}" onclick="aiSide(!aiUI.sideOpen)" aria-label="Historique">${_aiIco('chat')}<span>Historique</span>${convs.length ? `<em>${convs.length}</em>` : ''}${enCours ? '<i class="b3-run" title="Tâche en cours"></i>' : ''}</button>
       <button class="b3-btn${aiUI.showKb ? ' is-on' : ''}" onclick="aiKbToggle()" aria-label="Documents">${_aiIco('book')}<span>Documents</span>${nDocs ? `<em>${nDocs}</em>` : ''}</button>
@@ -225,7 +225,7 @@ function _aiPaint() {
       </div>`}
     </div>
     ${accueil ? '' : `<footer class="b3-foot"><div class="b3-foot-in">${_aiComposer(c)}
-      <p class="b3-note">Big Brother peut se tromper : vérifie les chiffres importants. Pas de mots de passe ni de données clients.</p></div></footer>`}
+      <p class="b3-note">Pearl AI peut se tromper : vérifie les chiffres importants. Pas de mots de passe ni de données clients.</p></div></footer>`}
 
     <aside class="b3-hist" aria-hidden="${!aiUI.sideOpen}">
       <div class="b3-dr-h"><b>Historique</b><button class="b3-icon is-sm" onclick="aiSide(false)" aria-label="Fermer">×</button></div>
@@ -238,7 +238,7 @@ function _aiPaint() {
     <aside class="b3-right" aria-hidden="${!drawerR}">
       ${drawerR === 'skill' ? _aiSkillPanel(c)
         : drawerR === 'kb' ? _aiKbHtml()
-        : drawerR === 'conf' ? `<div class="b3-dr-h"><b>Réglages de Big Brother</b><button class="b3-icon is-sm" onclick="aiToggleConf()" aria-label="Fermer">×</button></div>
+        : drawerR === 'conf' ? `<div class="b3-dr-h"><b>Réglages de Pearl AI</b><button class="b3-icon is-sm" onclick="aiToggleConf()" aria-label="Fermer">×</button></div>
           <div class="b3-conf">${conf}${_aiInsHtml()}</div>` : ''}
     </aside>
     <div class="b3-scrim" onclick="aiCloseDrawers()"></div>
@@ -366,7 +366,7 @@ function aiSlashClose() {
 function _aiConnectCard(c) {
   return `<section class="bb-connect">
       <span class="bb-connect-i">${_aiIco('spark')}</span>
-      <div class="bb-connect-t"><b>Connecte Big Brother</b>
+      <div class="bb-connect-t"><b>Connecte Pearl AI</b>
         <span>Colle ta clé API : l'adresse, le modèle et le proxy se règlent tout seuls. L'accueil ci-dessous marche déjà sans.</span></div>
       <form class="bb-connect-f" onsubmit="event.preventDefault();aiQuickConnect()">
         <input id="ai-quick-key" type="password" placeholder="${c.has_key ? 'Clé actuelle ' + esc(c.key_hint) : 'Clé API (sk-…)'}" autocomplete="new-password" spellcheck="false">
@@ -401,8 +401,8 @@ function _aiWelcomeHtml(c) {
   ];
   return `<div class="bb-welcome">
       <div class="bb-logo">BB</div>
-      <h2>${c.has_key ? 'Comment puis-je t\'aider ?' : 'Big Brother n\'est pas encore connecté'}</h2>
-      ${c.has_key ? '<p class="bb-sub">Choisis un outil, ou pose ta question en bas.</p>' : '<button class="bb-cta" onclick="aiToggleConf()">Connecter Big Brother</button>'}
+      <h2>${c.has_key ? 'Comment puis-je t\'aider ?' : 'Pearl AI n\'est pas encore connecté'}</h2>
+      ${c.has_key ? '<p class="bb-sub">Choisis un outil, ou pose ta question en bas.</p>' : '<button class="bb-cta" onclick="aiToggleConf()">Connecter Pearl AI</button>'}
       <div class="bb-gal">${cats.map(g => `<section class="bb-gal-g">
         <div class="bb-gal-h"><b>${esc(g.cat)}</b>${g.sous ? `<span>${esc(g.sous)}</span>` : ''}</div>
         <div class="bb-gal-l">${g.items.map(x => `<button class="bb-tool" onclick="aiPick('${x.id}')" ${c.has_key ? '' : 'disabled'}>
@@ -427,7 +427,7 @@ function _aiMsgHtml(m, i) {
         <button class="bb-ibtn is-sm" onclick="aiCopyMsg(${i})" title="Copier" aria-label="Copier">${_aiIco('copy')}</button>
         ${m.vide || m.test ? '' : `<button class="bb-ibtn is-sm bb-pdf" onclick="aiPdfMsg(${i})" title="Télécharger en PDF" aria-label="Télécharger en PDF">${_aiIco('doc')}<span>PDF</span></button>`}
         ${m.skill && !m.test && !m.vide ? `<button class="bb-ibtn is-sm bb-pdf${m.epingle ? ' is-on' : ''}" onclick="aiEpingler(${i})" ${m.epingle ? 'disabled' : ''}
-            title="${m.epingle ? 'Épinglé sur l\'accueil' : 'Épingler sur l\'accueil de Big Brother'}" aria-label="Épingler">${_aiIco('pin')}<span>${m.epingle ? 'Épinglé' : 'Épingler'}</span></button>` : ''}
+            title="${m.epingle ? 'Épinglé sur l\'accueil' : 'Épingler sur l\'accueil de Pearl AI'}" aria-label="Épingler">${_aiIco('pin')}<span>${m.epingle ? 'Épinglé' : 'Épingler'}</span></button>` : ''}
         ${dernier && !aiUI.busy && !m.test ? `<button class="bb-ibtn is-sm" onclick="aiRegen()" title="Régénérer" aria-label="Régénérer">${_aiIco('regen')}</button>` : ''}
         ${m.meta ? `<span class="bb-meta">${esc(m.meta)}</span>` : ''}
       </div></div></div>`;
@@ -439,10 +439,10 @@ function _aiComposer(c, hero) {
       ${aiUI.plus ? _aiToolsPop('') : ''}
       <div class="bb-pop bb-slash" id="ai-slash" hidden></div>
       <button class="bb-plus${aiUI.plus ? ' is-on' : ''}" onclick="aiPlus()" title="Outils" aria-label="Outils">${_aiIco('spark')}<span>Outils</span></button>
-      ${!aiUI.kbStrict && (aiUI.kb?.docs || []).length && aiUI.kb.enabled ? `<button type="button" class="b3-kbchip${aiUI.kbOn ? ' is-on' : ''}" onclick="aiUI.kbOn=!aiUI.kbOn;_aiPaint()" title="${aiUI.kbOn ? 'Big Brother s\'appuie sur tes documents' : 'Documents ignorés pour cette conversation'}">${_aiIco('book')}<span>${aiUI.kbOn ? 'Docs' : 'Sans docs'}</span></button>` : ''}
+      ${!aiUI.kbStrict && (aiUI.kb?.docs || []).length && aiUI.kb.enabled ? `<button type="button" class="b3-kbchip${aiUI.kbOn ? ' is-on' : ''}" onclick="aiUI.kbOn=!aiUI.kbOn;_aiPaint()" title="${aiUI.kbOn ? 'Pearl AI s\'appuie sur tes documents' : 'Documents ignorés pour cette conversation'}">${_aiIco('book')}<span>${aiUI.kbOn ? 'Docs' : 'Sans docs'}</span></button>` : ''}
       ${aiUI.kbStrict ? `<button type="button" class="b3-mode" onclick="aiKnowledge(false)" title="Quitter le mode Knowledge">${_aiIco('book')}<span>Knowledge</span><i>×</i></button>` : ''}
       <textarea id="ai-input" rows="1" maxlength="${c.limits?.chars_message || 8000}" oninput="aiGrow(this);aiSlash(this)" onkeydown="aiKey(event)"
-        placeholder="${!c.has_key ? 'Connecte Big Brother pour commencer' : aiUI.kbStrict ? 'Pose ta question aux documents…' : 'Écris à Big Brother, ou tape / pour choisir un outil'}" ${c.has_key ? '' : 'disabled'}></textarea>
+        placeholder="${!c.has_key ? 'Connecte Pearl AI pour commencer' : aiUI.kbStrict ? 'Pose ta question aux documents…' : 'Écris à Pearl AI, ou tape / pour choisir un outil'}" ${c.has_key ? '' : 'disabled'}></textarea>
       ${aiUI.busy ? `<button class="bb-send is-stop" onclick="aiStopAsk()" title="Arrêter la réponse" aria-label="Arrêter"><i></i></button>`
         : `<button class="bb-send" onclick="aiSend()" ${on ? '' : 'disabled'} title="Envoyer" aria-label="Envoyer">${_aiIco('up')}</button>`}
     </div>`;
@@ -472,7 +472,7 @@ function _aiSkillPanel(c) {
         <button class="bb-ibtn" onclick="aiPick('')" aria-label="Fermer">×</button></header>
       <p class="bb-sheet-d">${esc(sk.desc)}</p>
       ${sk.champs.length ? `<div class="ai-form bb-sheet-f">${sk.champs.map(champ).join('')}</div>` : ''}
-      <details class="bb-sheet-data"><summary>${_aiIco('search')}Ce qui est envoyé à Big Brother</summary><p>${esc(sk.donnees)}</p></details>
+      <details class="bb-sheet-data"><summary>${_aiIco('search')}Ce qui est envoyé à Pearl AI</summary><p>${esc(sk.donnees)}</p></details>
       ${aiUI.err ? `<div class="bb-err is-in">${esc(aiUI.err)}</div>` : ''}
       <footer class="bb-sheet-b">
         <span class="bb-sheet-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd> pour lancer · <kbd>Échap</kbd> pour fermer</span>
@@ -631,7 +631,7 @@ async function _aiTickJobs() {
 // Prévenir quand le résultat arrive ailleurs que sous les yeux.
 function _aiPrevenir(m, texte, erreur) {
   const visible = document.getElementById('page-ai')?.classList.contains('active') && aiUI.cur === m.conv;
-  if (!visible && typeof toast === 'function') toast(`Big Brother : ${texte}`, erreur ? 'error' : 'success');
+  if (!visible && typeof toast === 'function') toast(`Pearl AI : ${texte}`, erreur ? 'error' : 'success');
 }
 async function aiStopJob(id) {
   const m = _aiJobsEnCours().find(x => x.job === id);
@@ -657,12 +657,12 @@ function aiRelancerJob(id) {
 }
 
 // Lance un outil depuis une autre page (ex. le Tableau de bord Big
-// Brother) : ouvre Big Brother sur une nouvelle conversation et l'exécute.
+// Brother) : ouvre Pearl AI sur une nouvelle conversation et l'exécute.
 async function aiLaunchSkill(id, f) {
   if (typeof renderPage === 'function') renderPage('ai');
   for (let n = 0; n < 40 && !(aiUI.skills || []).length; n++) await new Promise(r => setTimeout(r, 150));
   const sk = (aiUI.skills || []).find(x => x.id === id);
-  if (!sk) { if (typeof toast === 'function') toast('Big Brother n\'est pas disponible', 'error'); return; }
+  if (!sk) { if (typeof toast === 'function') toast('Pearl AI n\'est pas disponible', 'error'); return; }
   aiUI.cur = null;
   return aiRunSkill({ sk, f: f || {} });
 }
@@ -914,7 +914,7 @@ async function aiTest() {
 }
 
 // Une question qui cherche dans les données (« trouve… », « qui… »,
-// « combien… ») part au skill « Rechercher dans FOps » : le chat seul ne
+// « combien… ») part au skill « Rechercher dans Pearl » : le chat seul ne
 // voit pas les données, il répondrait à côté.
 const AI_RECHERCHE_RE = /^\s*(trouve|cherche|recherche|liste|montre|affiche|donne[- ]moi la liste|qui\b|quel(le)?s?\b|combien|y a[- ]t[- ]il|est[- ]ce que quelqu'un)/i;
 async function aiSend() {
@@ -1020,8 +1020,8 @@ function _aiVue(r) {
   return `<div class="ai-md">${_aiFormat(r.content)}</div>`;
 }
 
-// ── Recherche dans FOps ──
-// Big Brother a lu la question ; FOps a exécuté la recherche. On montre la
+// ── Recherche dans Pearl ──
+// Pearl AI a lu la question ; Pearl a exécuté la recherche. On montre la
 // lecture (pour la vérifier) puis les lignes trouvées, telles quelles.
 const _AI_COLS = {
   ticket: 'Ticket', titre: 'Titre', pays: 'Pays', type: 'Type', priorite: 'Priorité', statut: 'Statut', ferme: 'Fermé',
@@ -1037,7 +1037,7 @@ function _aiVueRecherche(r) {
   const d = r.data || {}, x = d.resultat || {};
   const tete = `<p class="ai-rech-q"><b>Lecture de ta question :</b> ${esc(d.interpretation || '—')}</p>`;
   if (!r.data) return `<div class="ai-vue">${_aiBrut(r)}</div>`;
-  if (d.impossible) return `<div class="ai-vue">${tete}<div class="ai-empty2"><b>Les données de FOps ne permettent pas d'y répondre.</b><span>${esc(d.impossible)}</span></div></div>`;
+  if (d.impossible) return `<div class="ai-vue">${tete}<div class="ai-empty2"><b>Les données de Pearl ne permettent pas d'y répondre.</b><span>${esc(d.impossible)}</span></div></div>`;
   if (x.erreur) return `<div class="ai-vue">${tete}<div class="ai-empty2"><b>Recherche impossible.</b><span>${esc(x.erreur)}</span></div></div>`;
   const cols = x.colonnes || [];
   const n = (x.lignes || []).length;
@@ -1057,9 +1057,9 @@ const _aiBrut = r => {
   if (r.data) return r.data._tronque ? `<div class="ai-trunc">${_aiIco('regen')}<span>Réponse coupée par le modèle : les derniers éléments manquent.
       <button class="bb-link" onclick="aiRegen()">Régénérer</button></span></div>` : '';
   if (!r.content || r.vide) return '';
-  if (_aiResteJson(r.content)) return `<div class="ai-trunc is-bad">${_aiIco('regen')}<span>La réponse de Big Brother est incomplète et n'a pas pu être mise en forme.
+  if (_aiResteJson(r.content)) return `<div class="ai-trunc is-bad">${_aiIco('regen')}<span>La réponse de Pearl AI est incomplète et n'a pas pu être mise en forme.
       <button class="bb-link" onclick="aiRegen()">Régénérer</button></span></div>`;
-  return `<div class="ai-box"><div class="ai-box-t">Lecture de Big Brother</div><div class="ai-md">${_aiFormat(r.content)}</div></div>`;
+  return `<div class="ai-box"><div class="ai-box-t">Lecture de Pearl AI</div><div class="ai-md">${_aiFormat(r.content)}</div></div>`;
 };
 
 function _aiVueBilan(r) {
@@ -1076,7 +1076,7 @@ function _aiVueBilan(r) {
     ${d.synthese ? `<p class="ai-syn">${esc(d.synthese)}</p>` : ''}
     <div class="ai-box-t">L'équipe agent par agent${f.session ? ` · ${esc(f.session)}` : ''}</div>
     <div class="ai-tbl-w"><table class="ai-tbl">
-      <thead><tr><th>Agent</th><th>Note</th><th>Objectifs</th><th>Dernier One-to-One</th><th>Tâches en retard</th><th>Tickets du mois</th><th>Big Brother</th></tr></thead>
+      <thead><tr><th>Agent</th><th>Note</th><th>Objectifs</th><th>Dernier One-to-One</th><th>Tâches en retard</th><th>Tickets du mois</th><th>Pearl AI</th></tr></thead>
       <tbody>${(f.lignes || []).map(l => {
         const a = lecture.get(l.agent);
         const delta = l.score != null && l.precedent != null ? l.score - l.precedent : null;
@@ -1119,7 +1119,7 @@ function _aiVueRecap(r) {
       </tr>`).join('')}</tbody></table></div>`;
   if (r.vide) return `<div class="ai-vue">
       <div class="ai-empty2"><b>${esc(r.content)}</b>
-        <span>Le récap se base sur les comptes rendus enregistrés dans Équipe › One-to-One. Sans entretien, il n'y a rien à résumer : Big Brother n'a pas été appelé.</span></div>
+        <span>Le récap se base sur les comptes rendus enregistrés dans Équipe › One-to-One. Sans entretien, il n'y a rien à résumer : Pearl AI n'a pas été appelé.</span></div>
       ${lignes.length ? table : ''}</div>`;
   return `<div class="ai-vue">
     <div class="ai-box-t">Depuis le ${esc(_aiDate(f.depuis))}</div>${table}
@@ -1163,7 +1163,7 @@ function _aiVuePrep(r) {
 }
 
 // ── Rapport de décision ──────────────────────────────────────
-// À gauche de la lecture, les chiffres calculés par FOps : chaque
+// À gauche de la lecture, les chiffres calculés par Pearl : chaque
 // recommandation se vérifie sans quitter l'écran.
 function _aiTendance(v, avant, inverse) {
   if (v == null || avant == null || v === avant) return '';
@@ -1182,8 +1182,8 @@ function _aiVueDecision(r) {
   ].filter(Boolean);
   const top = (l) => (l || []).length ? `<ul>${l.map(x => `<li>${esc(x.valeur)} : <b>${x.nombre}</b>${x.part_pct != null ? ` (${x.part_pct} %)` : ''}</li>`).join('')}</ul>` : '<p class="ai-na">aucune rupture sur la période</p>';
   return `<div class="ai-vue ai-dec">
-    ${d._secours ? `<div class="ai-trunc">${_aiIco('regen')}<span>Big Brother n'a pas pu répondre${d._raison ? ` (${esc(d._raison)})` : ''}. Voici la version calculée par FOps avec les mêmes chiffres, sans recommandation rédigée.
-      <button class="bb-link" onclick="aiRegen()">Réessayer avec Big Brother</button></span></div>` : ''}
+    ${d._secours ? `<div class="ai-trunc">${_aiIco('regen')}<span>Pearl AI n'a pas pu répondre${d._raison ? ` (${esc(d._raison)})` : ''}. Voici la version calculée par Pearl avec les mêmes chiffres, sans recommandation rédigée.
+      <button class="bb-link" onclick="aiRegen()">Réessayer avec Pearl AI</button></span></div>` : ''}
     <div class="ai-box-t">${esc(f.perimetre || '')} · ${esc(f.periode || '')}</div>
     <div class="ai-tiles">
       ${tuile(k.tickets_ouverts?.valeur, 'tickets ouverts', _aiTendance(k.tickets_ouverts?.valeur, k.tickets_ouverts?.avant, true))}
@@ -1316,9 +1316,9 @@ function _aiInsHtml() {
   return `<section class="bb-ins">
       <div class="bb-ins-h"><b>Insights des agents</b>
         <label class="bb-switch"><input type="checkbox" ${d.enabled ? 'checked' : ''} onchange="aiInsSet({ enabled: this.checked })"><span></span>${d.enabled ? 'Activé' : 'Désactivé'}</label></div>
-      <p class="bb-ins-d">Big Brother prépare tout seul l'insight de chaque agent coché, un par un : dès que tu l'actives, puis toutes les 20 minutes
+      <p class="bb-ins-d">Pearl AI prépare tout seul l'insight de chaque agent coché, un par un : dès que tu l'actives, puis toutes les 20 minutes
         pour ceux dont l'insight du mois manque ou dont la fiche a changé (au plus un par jour). L'agent le lit sur sa page My Performance, sans rien demander.
-        Il faut que Big Brother soit allumé (<code>ia on</code>) : sinon les agents restent « en attente » jusqu'à la passe suivante.</p>
+        Il faut que Pearl AI soit allumé (<code>ia on</code>) : sinon les agents restent « en attente » jusqu'à la passe suivante.</p>
       <div class="bb-ins-run">
         ${p.encours
           ? `<div class="bb-prog"><span>Passe en cours : ${p.fait} / ${p.total}${p.courant ? ` · ${esc(p.courant)}` : ''}</span><i><b style="width:${p.total ? Math.round(p.fait / p.total * 100) : 0}%"></b></i></div>`
@@ -1349,10 +1349,10 @@ function _aiInsHtml() {
 // champ « Pays » (marqué `pays` côté serveur), pré-rempli avec le pays
 // actif de l'appli. La réponse garde un sélecteur : changer de pays
 // relance le skill avec les mêmes réglages et remplace la réponse.
-const AI_PAYS = ['Global', 'Dakar (SN)', 'Abidjan (CI)'];
+// Mêmes libellés que le serveur (ai-skills.js) : « Global », « Ville (CODE) ».
 function _aiPaysActif() {
   const c = typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL';
-  return c === 'SN' ? AI_PAYS[1] : c === 'CI' ? AI_PAYS[2] : AI_PAYS[0];
+  return c !== 'ALL' && isSiteCode(c) ? siteLabel(c) : 'Global';
 }
 function _aiChampPays(sk) { return sk && (sk.champs || []).find(ch => ch.pays); }
 // Réglages d'une réponse de skill : gardés sur la réponse (un skill lancé
@@ -1368,8 +1368,9 @@ function _aiFiltrePays(m, i) {
   const ch = _aiChampPays(sk);
   // Un agent précis choisi : le pays ne change rien, pas de filtre.
   if (!ch || (inp.fo && sk.champs.some(c => c.id === 'fo'))) return '';
-  const cur = inp[ch.id] || AI_PAYS[0];
-  return `<div class="bb-pays" role="group" aria-label="Pays">${AI_PAYS.map(p => `<button class="${p === cur ? 'is-on' : ''}"
+  const cur = inp[ch.id] || 'Global';
+  const AI_PAYS = ['Global', ...siteList().map(s => siteLabel(s.code))];
+  return `<div class="bb-pays" role="group" aria-label="Site">${AI_PAYS.map(p => `<button class="${p === cur ? 'is-on' : ''}"
       ${p === cur || aiUI.busy ? 'disabled' : ''} onclick="aiRefiltre(${i}, '${p.replace(/'/g, "\\'")}')">${esc(p.replace(/ \(.+\)/, ''))}</button>`).join('')}</div>`;
 }
 async function aiRefiltre(i, pays) {
@@ -1477,7 +1478,7 @@ async function aiPdfMsg(i) {
   const meta = [pays, inp.periode || '',
     new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })].filter(Boolean);
   const corps = {
-    titre: sk ? sk.titre : 'Réponse de Big Brother',
+    titre: sk ? sk.titre : 'Réponse de Pearl AI',
     sousTitre: q && q.role === 'user' ? String(q.content || '').slice(0, 300) : '',
     meta, blocs: _aiBlocs(box),
   };
@@ -1575,7 +1576,7 @@ function _aiApercu(r) {
 // ══ Base de connaissances ══════════════════════════════════════
 // Les documents sont lus ici (PDF, texte) ou sur le serveur (Word,
 // PowerPoint, Excel), découpés en passages et cherchés à chaque question
-// (server/services/ai-kb.js). Big Brother cite ensuite ses sources.
+// (server/services/ai-kb.js). Pearl AI cite ensuite ses sources.
 const AI_KB_EXT = ['pdf', 'docx', 'pptx', 'xlsx', 'txt', 'md', 'csv', 'json'];
 function aiKbToggle() { _aiReadForm(); aiUI.skill = ''; aiUI.showConf = false; aiUI.showKb = !aiUI.showKb; aiUI.sideOpen = false; if (aiUI.showKb) { aiUI.kbUp = []; aiUI.kbRes = null; aiUI.kbDoc = null; } _aiPaint(); if (aiUI.showKb) aiKbLoad(); }
 async function aiKbLoad() {
@@ -1627,7 +1628,7 @@ function _aiKbSensHtml() {
     </div>` : '';
   if (!e.modele) return `<section class="b3-sens">
       <div class="b3-sens-h"><b>Recherche par le sens</b><span class="b3-sens-st">non activée</span></div>
-      <p>Big Brother comprend ta question, cherche dans les documents puis relit les passages trouvés avant de répondre. Pour qu'il retrouve aussi un passage écrit avec d'autres mots (« plus d'internet » ↔ « coupure du service data »), active un modèle d'embeddings de ton service IA.</p>
+      <p>Pearl AI comprend ta question, cherche dans les documents puis relit les passages trouvés avant de répondre. Pour qu'il retrouve aussi un passage écrit avec d'autres mots (« plus d'internet » ↔ « coupure du service data »), active un modèle d'embeddings de ton service IA.</p>
       ${M ? choix : `<button type="button" class="b3-ghost" ${busy ? 'disabled' : ''} onclick="aiKbSensModeles()">${busy ? 'Recherche…' : 'Chercher un modèle d\'embeddings'}</button>`}
       ${aiUI.kbSensErr ? `<p class="b3-sens-err">${esc(aiUI.kbSensErr)}</p>` : ''}
     </section>`;
@@ -1643,7 +1644,7 @@ function _aiKbSensHtml() {
       <div class="b3-sens-a">
         ${!e.actif && pct < 100 ? `<button type="button" class="b3-ghost" onclick="aiKbSensReindexer()">Reprendre</button>` : ''}
         <button type="button" class="b3-link" onclick="aiKbSensModeles()">Changer de modèle</button>
-        <button type="button" class="b3-link" onclick="if(confirm('Couper la recherche par le sens ? Big Brother cherchera de nouveau par mots-clés.'))aiKbSensActiver('')">Couper</button>
+        <button type="button" class="b3-link" onclick="if(confirm('Couper la recherche par le sens ? Pearl AI cherchera de nouveau par mots-clés.'))aiKbSensActiver('')">Couper</button>
       </div>
       ${M ? choix : ''}
     </section>`;
@@ -1654,11 +1655,11 @@ function _aiKbHtml() {
   const kb = aiUI.kb || { docs: [], enabled: true, chars: 0, limits: {} };
   const up = aiUI.kbUp || [];
   const res = aiUI.kbRes;
-  return `<div class="b3-dr-h"><b>Documents de Big Brother</b><button class="b3-icon is-sm" onclick="aiKbToggle()" aria-label="Fermer">×</button></div>
+  return `<div class="b3-dr-h"><b>Documents de Pearl AI</b><button class="b3-icon is-sm" onclick="aiKbToggle()" aria-label="Fermer">×</button></div>
     <div class="b3-kb">
-      <p class="b3-kb-intro">Importe tes procédures, guides et comptes rendus : Big Brother s'appuie dessus pour répondre et cite le document utilisé.</p>
+      <p class="b3-kb-intro">Importe tes procédures, guides et comptes rendus : Pearl AI s'appuie dessus pour répondre et cite le document utilisé.</p>
       <label class="bb-switch b3-kb-on"><input type="checkbox" ${kb.enabled ? 'checked' : ''} onchange="aiKbActiver(this.checked)"><span></span>
-        ${kb.enabled ? 'Big Brother utilise ces documents' : 'Documents ignorés par Big Brother'}</label>
+        ${kb.enabled ? 'Pearl AI utilise ces documents' : 'Documents ignorés par Pearl AI'}</label>
       ${_aiKbSensHtml()}
       <label class="b3-drop" id="ai-kb-drop" ondragover="event.preventDefault();this.classList.add('is-over')" ondragleave="this.classList.remove('is-over')"
           ondrop="event.preventDefault();this.classList.remove('is-over');aiKbFichiers(event.dataTransfer.files)">
@@ -1674,7 +1675,7 @@ function _aiKbHtml() {
           <button class="b3-icon is-sm" onclick="aiKbRetirer('${d.id}')" title="Retirer" aria-label="Retirer">×</button></li>`).join('')}</ul>`
         : '<p class="b3-empty">Aucun document pour l\'instant.</p>'}
       ${kb.docs.length ? `<form class="b3-kb-q" onsubmit="event.preventDefault();aiKbChercher(this.q.value)">
-          <input name="q" value="${esc(aiUI.kbQ || '')}" placeholder="Tester : que trouve Big Brother pour… ?">
+          <input name="q" value="${esc(aiUI.kbQ || '')}" placeholder="Tester : que trouve Pearl AI pour… ?">
           <button class="b3-ghost" type="submit">Chercher</button></form>
         ${res ? (res.length ? `<ol class="b3-kb-res">${res.map(r => `<li><b>${esc(r.name)}</b> <small>passage ${r.part}${r.via ? ` · trouvé par ${esc(r.via)}` : ''}</small><p>${esc(r.text.slice(0, 260))}…</p></li>`).join('')}</ol>`
           : '<p class="b3-empty">Aucun passage ne correspond.</p>') : ''}` : ''}

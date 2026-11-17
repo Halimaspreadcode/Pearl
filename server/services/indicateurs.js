@@ -378,7 +378,7 @@ async function traduire({ demande, def, historique }, progres = () => {}) {
   }
   const actuelle = def ? nettoyer(def).def : null;
   msgs.push({ role: 'user', content: (actuelle ? `Définition actuelle :\n${JSON.stringify({ ...actuelle, id: undefined })}\n\n` : '') + `Demande : ${q}` });
-  progres('Big Brother traduit ta demande en indicateur…', ['Choix des champs des trackers…', 'Choix de la mesure et de la période…', 'Préparation des vues…']);
+  progres('Pearl AI traduit ta demande en indicateur…', ['Choix des champs des trackers…', 'Choix de la mesure et de la période…', 'Préparation des vues…']);
   let r = await ai.chat(msgs, { system: consigne(), temperature: 0.1, fond: true });
   let j = extraireJson(r.content);
   if (!j || !j.definition) {
@@ -386,7 +386,7 @@ async function traduire({ demande, def, historique }, progres = () => {}) {
     r = await ai.chat([...msgs, { role: 'assistant', content: String(r.content).slice(0, 2000) }, { role: 'user', content: 'Réponds uniquement par l\'objet JSON demandé, sans aucun texte autour.' }], { system: consigne(), temperature: 0, fond: true });
     j = extraireJson(r.content);
   }
-  if (!j || !j.definition) { const e = new Error('Big Brother n\'a pas rendu de définition exploitable. Reformule ou pars d\'un modèle.'); e.status = 502; throw e; }
+  if (!j || !j.definition) { const e = new Error('Pearl AI n\'a pas rendu de définition exploitable. Reformule ou pars d\'un modèle.'); e.status = 502; throw e; }
   const { def: propre, avertissements } = nettoyer({ ...j.definition, id: actuelle ? actuelle.id : null });
   if (actuelle) { // l'IA ne doit pas perdre les vues existantes
     for (const v of actuelle.vues) if (!propre.vues.some(x => x.id === v.id || (x.type === v.type && x.par === v.par && x.filtre === v.filtre))) propre.vues.unshift(v);

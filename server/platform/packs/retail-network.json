@@ -1,0 +1,14 @@
+{
+  "id": "retail-network",
+  "label": "Réseau d'agences / magasins",
+  "desc": "Remontées des points de vente, plannings par agence, absences, objectifs commerciaux, rapports consolidés.",
+  "modules": ["core", "tickets", "planning", "absences", "objectives", "academy", "reporting", "mailing", "ideas"],
+  "config": {
+    "domains": ["Caisse", "Stock", "Sécurité", "Client", "Locaux"],
+    "ticket_statuses": ["Open", "In Progress", "On Hold", "Resolved", "Closed"],
+    "ticket_priorities": ["P1", "P2", "P3"],
+    "sla_hours": { "Remontée P1": 4, "Remontée P2": 24, "Remontée P3": 72 },
+    "leave_entitlement_days": 25
+  },
+  "sites": [{ "code": "AG01", "name": "Agence 1" }]
+}

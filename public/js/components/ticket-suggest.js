@@ -127,7 +127,7 @@ const TicketSuggest = (() => {
     ctrl = new AbortController();
     const my = ++seq;
     try {
-      const r = await fetch(`${API}/api/${tracker}/suggest?${new URLSearchParams(q)}`, { signal: ctrl.signal });
+      const r = await fetch(`${API}/api/tickets/${tracker}/suggest?${new URLSearchParams(q)}`, { signal: ctrl.signal });
       if (!r.ok) return;
       const data = await r.json();
       if (my !== seq || !active) return;       // réponse périmée

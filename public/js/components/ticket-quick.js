@@ -17,7 +17,7 @@
   };
   // Mêmes puces pour le formulaire d'observation.
   const OBS_GROUPS = {
-    source:   [['SN', 'SN'], ['CI', 'CI']],
+    get source() { return siteList().map(s => [s.code, s.code]); },
     priority: [['Critical', 'Critical'], ['High', 'High'], ['Medium', 'Medium'], ['Low', 'Low']],
     status:   [['Open', 'Open'], ['In Progress', 'In progress'], ['Closed', 'Closed']],
   };

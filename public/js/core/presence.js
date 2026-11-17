@@ -13,7 +13,7 @@ let _presenceTimers = null;
 // déjà foi, et une entrée renommée reste automatiquement cohérente.
 function currentPageInfo() {
   let page = '';
-  try { page = localStorage.getItem('emoc-last-page') || ''; } catch (_) {}
+  try { page = localStorage.getItem('pearl-last-page') || ''; } catch (_) {}
   const active = document.querySelector('.nav-item.active');
   if (active?.dataset.page) page = active.dataset.page;
   if (!page) return { page: '', pageLabel: '' };
@@ -29,8 +29,8 @@ function currentPageInfo() {
 
 function presencePayload() {
   if (typeof currentUser === 'undefined' || !currentUser) return null;
-  const { name, huaweiId, initials, color, role } = currentUser;
-  return { name, huaweiId, initials, color, role, ...currentPageInfo() };
+  const { name, employeeId, initials, color, role } = currentUser;
+  return { name, employeeId, initials, color, role, ...currentPageInfo() };
 }
 
 async function pingPresence() {

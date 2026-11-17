@@ -2,7 +2,8 @@
 // déposé rangé par pays, cible SLA calculée côté serveur.
 const { useTempDataDir, writeFixture } = require('./helpers/data-dir');
 const DIR = useTempDataDir({
-  'config.json': { timezone: 'Africa/Dakar', sla_hours: { 'Incident P1': 4, 'Incident P2': { hours: 48, mode: 'business' } } },
+  'config.json': { timezone: 'Africa/Dakar', sla_hours: { 'Incident P1': 4, 'Incident P2': { hours: 48, mode: 'business' } },
+    sites: [{ code: 'SN', name: 'Sénégal', city: 'Dakar', country: 'Senegal' }, { code: 'CI', name: "Côte d'Ivoire", city: 'Abidjan', country: "Côte d'Ivoire" }] },
 });
 
 const { test } = require('node:test');
@@ -11,7 +12,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const ExcelJS = require('exceljs');
 const { mailSubject, corpsDaily, highlightsOuverts, normPays } = require('../server/services/mail/bodies');
-const { readReportFile, REPORTS_DIR } = require('../server/services/report-store');
+const { readReportFile, reportsDir } = require('../server/services/report-store');
 const { slaTargetLabel } = require('../server/core/sla');
 const { buildDailyWorkbook } = require('../public/js/daily-workbook.js');
 
@@ -23,7 +24,7 @@ const DAILY = {
   breach_tickets: [],
 };
 const BR = {
-  author: 'Fatim NDOYE',
+  author: 'Jean DUPONT',
   highlights: [
     { source: 'NOC', observation: 'Toujours en cours', priority: 'P1', status: 'Open' },
     { source: 'NOC', observation: 'Réglé hier', priority: 'P3', status: 'Closed' },
@@ -45,7 +46,7 @@ test('highlights clôturés retirés, quelle que soit l\'écriture', () => {
 
 test('corps du daily : ville du pays, highlights clôturés absents, cible SLA remplie', () => {
   const html = corpsDaily(DAILY, BR, '', 'CI');
-  assert.match(html, /FRONT OFFICE DAILY REPORT - EMOC/);
+  assert.match(html, /DAILY REPORT/);
   assert.match(html, />Abidjan</);
   assert.doesNotMatch(html, />Dakar</);
   assert.match(html, /Toujours en cours/);
@@ -71,7 +72,8 @@ test('classeur : ville en en-tête et highlights clôturés absents', async () =
   assert.ok(!texte.includes('Réglé hier'));
 });
 
-test('classeur déposé : un par pays, l\'ancien dépôt sans pays est ignoré', () => {
+test('classeur déposé : un par pays, l\'ancien dépôt sans pays est ignoré', async () => {
+  const REPORTS_DIR = reportsDir();
   fs.mkdirSync(REPORTS_DIR, { recursive: true });
   fs.writeFileSync(path.join(REPORTS_DIR, 'daily-SN.xlsx'), 'sn');
   fs.writeFileSync(path.join(REPORTS_DIR, 'daily.xlsx'), 'ancien');
@@ -79,7 +81,7 @@ test('classeur déposé : un par pays, l\'ancien dépôt sans pays est ignoré',
     daily: { filename: 'ancien.xlsx', period: '2026-03-02' },
     'daily:SN': { filename: 'sn.xlsx', period: '2026-03-02', country: 'SN' },
   });
-  assert.equal(String(readReportFile('daily', '2026-03-02', 'SN').content), 'sn');
-  assert.equal(readReportFile('daily', '2026-03-02', 'CI'), null);
-  assert.equal(readReportFile('daily', '2026-03-03', 'SN'), null);
+  assert.equal(String((await readReportFile('daily', '2026-03-02', 'SN')).content), 'sn');
+  assert.equal(await readReportFile('daily', '2026-03-02', 'CI'), null);
+  assert.equal(await readReportFile('daily', '2026-03-03', 'SN'), null);
 });

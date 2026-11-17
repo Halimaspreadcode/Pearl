@@ -49,7 +49,7 @@ function formateur(tz) {
 // calculée qu'une fois. Borné pour ne pas grossir indéfiniment.
 const _decalages = new Map();
 function offsetMs(ms, tz) {
-  // UTC n'a ni décalage ni changement d'heure : cas de Dakar, le plus courant.
+  // UTC n'a ni décalage ni changement d'heure : cas le plus courant.
   if (tz === 'UTC' || tz === 'Etc/UTC') return 0;
   const heure = Math.floor(ms / 3600000);
   const cle = `${tz}|${heure}`;

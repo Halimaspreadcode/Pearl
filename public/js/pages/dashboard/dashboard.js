@@ -1,6 +1,6 @@
 // ── DASHBOARD ────────────────────────────────────────────────
 // Recomputes the same shape as /api/dashboard but scoped to a single country
-// (or both, like the server). Tickets from state.sn/state.ci are already
+// (or all, like the server). Tickets from state.tickets are already
 // fully enriched (sla_status, time_left_ms, etc.) by the API.
 // ── Dashboard period state ────────────────────────────────────
 window._dashPeriod = 'all';
@@ -87,8 +87,7 @@ function _utcDayKey(d) {
 
 function _computeDashboardKpis(country, dateRange) {
   let tickets = [
-    ...(country !== 'CI' ? state.sn.map(t => ({ ...t, tracker: 'SN' })) : []),
-    ...(country !== 'SN' ? state.ci.map(t => ({ ...t, tracker: 'CI' })) : []),
+    ...ticketsInScope(country).map(t => ({ ...t, tracker: t._tracker.toUpperCase() })),
   ];
   if (dateRange) {
     tickets = tickets.filter(t => {
@@ -289,7 +288,7 @@ function renderDashboard() {
   const labelEl = document.getElementById('dash-period-label');
   if (labelEl) labelEl.textContent = range ? _dashPeriodLabel(range) : '';
   const d = _computeDashboardKpis(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL', range);
-  const cfg2 = typeof getLangConfig === 'function' ? getLangConfig() : { locale:'en-GB', tz:'Africa/Dakar' };
+  const cfg2 = typeof getLangConfig === 'function' ? getLangConfig() : { locale:'en-GB', tz:'UTC' };
   const today = new Date().toLocaleDateString(cfg2.locale, {timeZone:cfg2.tz, weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const el = document.getElementById('dash-date');
   if (el) el.textContent = today;
@@ -300,12 +299,10 @@ function renderDashboard() {
   if (qEl) qEl.innerHTML = `"${q.text}" <span class="dash-quote-author">— ${q.author}</span>`;
 
   // Sidebar counts
-  const snEl = document.getElementById('sb-count-sn');
-  const ciEl = document.getElementById('sb-count-ci');
-  if (snEl) snEl.textContent = state.sn.length;
-  if (ciEl) ciEl.textContent = state.ci.length;
+  const siteEl = document.getElementById('sb-count-site');
+  if (siteEl) siteEl.textContent = ticketsOf(activeSiteKey()).length;
   const globalEl = document.getElementById('sb-count-global');
-  if (globalEl) globalEl.textContent = state.sn.length + state.ci.length;
+  if (globalEl) globalEl.textContent = allTicketsRaw().length;
   // DQ badge — run checks silently to update count
   const dqBadge = document.getElementById('sb-count-dq');
   if (dqBadge) {
@@ -495,7 +492,7 @@ function renderDashboard() {
 
   // trend subtitles
   const activeCountry = typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL';
-  set('dc-total-sub',  activeCountry === 'ALL' ? `SN: ${state.sn.length} · CI: ${state.ci.length}` : `${activeCountry} only`);
+  set('dc-total-sub',  activeCountry === 'ALL' ? siteCodes().map(c => `${c}: ${ticketsOf(c).length}`).join(' · ') : `${activeCountry} only`);
   // « Total » et « Ouverts aujourd'hui » n'ont plus de carte : ils
   // deviennent la ligne de contexte de la carte des tickets ouverts.
   set('dc-open-sub',   `${todayCt} new today · ${total} total`);

@@ -148,7 +148,7 @@ function _mrqDefaultAgent() {
 
   /* The roster is "Firstname LASTNAME"; a profile name is typed by hand
      and drifts — case, accents, extra spaces, or the parts reversed
-     ("NDIAYE Mamadou"). Compare on a sorted bag of normalised words so
+     ("DUPONT Jean"). Compare on a sorted bag of normalised words so
      all of those still resolve to the same agent. */
   const norm = s => String(s || '')
     .normalize('NFD').replace(/[̀-ͯ]/g, '')

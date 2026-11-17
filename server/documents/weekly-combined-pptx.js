@@ -1,5 +1,5 @@
 /**
- * Weekly Performance — Dakar × Abidjan.
+ * Weekly Performance — tous les sites (jusqu'à 4 côte à côte).
  *
  * Deck de revue hebdomadaire présenté aux deux équipes. Il reprend le
  * système visuel du Weekly Report (weekly-pptx.js › design) et ses
@@ -9,7 +9,7 @@
  *     qui se compare (indicateurs, tendance, incidents) ;
  *   · une zone « Explanation » sur chaque page de données : la revue
  *     commente, elle ne se contente pas de lire des chiffres ;
- *   · ce qui sort de l'ordinaire — pic d'activité, absences à Dakar,
+ *   · ce qui sort de l'ordinaire — pic d'activité, absences,
  *     incident de plateforme — DOIT être expliqué. Une explication
  *     manquante s'affiche en rouge sur la slide plutôt que de disparaître.
  *
@@ -27,7 +27,12 @@ const {
   hBars, groupedCols, stackedCols, fmtDur, fmtDate, MTTD_TARGET_MS,
 } = design;
 
-const SITE_C = { SN: C.brand, CI: C.blue };
+// Couleur d'un site : dans l'ordre de la configuration.
+const PALETTE = [C.brand, C.blue, C.green || '2E7D32', C.red || 'C62828'];
+let SITE_ORDER = [];
+const SITE_C = new Proxy({}, { get: (_, code) => PALETTE[Math.max(0, SITE_ORDER.indexOf(code)) % PALETTE.length] });
+// Largeur d'une colonne quand n sites se partagent la largeur utile.
+const colWidth = (n, total = CW, gap = 0.3) => (total - gap * (Math.max(1, n) - 1)) / Math.max(1, n);
 
 // Un « \n » en fin de segment ne coupe pas la ligne dans tous les
 // lecteurs (l'aperçu de l'app, Google Slides) : PptxGenJS attend
@@ -39,7 +44,8 @@ const brk = runs => runs.map(r => (typeof r.text === 'string' && r.text.endsWith
 // Lignes pointillées à remplir, autant que la hauteur en laisse.
 const blankLines = h => Array.from({ length: Math.max(2, Math.floor(h / 0.34)) },
   () => '……………………………………………………………………………………………').join('\n');
-const VILLES = 'Dakar × Abidjan';
+// Libellé des sites du deck (« Lyon × Paris »), posé à chaque génération.
+let VILLES = '';
 
 /* ── Explications ─────────────────────────────────────────────
    Texte saisi > proposition tirée des Observations. Une clé présente mais
@@ -255,7 +261,7 @@ function activitySlide(pptx, s, form, period) {
 function breakdownSlide(pptx, sites, form, period) {
   const sl = pptx.addSlide();
   slideHeader(sl, 'Where the load came from', period, `${VILLES.toUpperCase()} · BREAKDOWN`);
-  const colW = (CW - 0.3) / 2;
+  const colW = colWidth(sites.length);
   sites.forEach((s, i) => {
     const x = M + i * (colW + 0.3);
     const doms = s.by_domain.slice(0, 6);
@@ -301,10 +307,10 @@ function trendSlide(pptx, sites, form, period) {
   return sl;
 }
 
-// Assiduité de Dakar, agrégée : aucun nom, aucun motif.
+// Assiduité de l'équipe, agrégée : aucun nom, aucun motif.
 function attendanceSlide(pptx, a, form, period) {
   const sl = pptx.addSlide();
-  slideHeader(sl, 'Dakar: team attendance', period, 'SITE · DAKAR · ATTENDANCE');
+  slideHeader(sl, 'Team attendance', period, `${VILLES.toUpperCase()} · ATTENDANCE`);
   const cards = [
     ['Presence rate', a.presence_rate == null ? 'n/a' : `${a.presence_rate}%`,
       `${a.headcount} agents · ${a.working_days} working days`],
@@ -362,11 +368,8 @@ function attendanceSlide(pptx, a, form, period) {
 // Les incidents d'abord ; chacun porte son explication (impact, action)
 // ou la mention rouge qui la réclame.
 const OBS_PER_COL = 4;
-function observationSlides(pptx, obs, form, period) {
-  const cols = [
-    { code: 'SN', ville: 'Dakar', rows: obs.filter(o => o.site === 'SN' || o.site === 'ALL') },
-    { code: 'CI', ville: 'Abidjan', rows: obs.filter(o => o.site === 'CI' || o.site === 'ALL') },
-  ];
+function observationSlides(pptx, obs, form, period, sites) {
+  const cols = sites.map(s => ({ code: s.code, ville: s.ville, rows: obs.filter(o => o.site === s.code || o.site === 'ALL') }));
   const pages = Math.max(1, ...cols.map(c => Math.ceil(c.rows.length / OBS_PER_COL)));
   const out = [];
   const nOut = obs.filter(o => o.outage).length;
@@ -374,7 +377,7 @@ function observationSlides(pptx, obs, form, period) {
     const sl = pptx.addSlide();
     slideHeader(sl, `Platform incidents & observations${p ? ' (cont.)' : ''}`,
       period, `${VILLES.toUpperCase()} · ${nOut} INCIDENT${nOut > 1 ? 'S' : ''} · ${obs.length} OBSERVATION${obs.length > 1 ? 'S' : ''}`);
-    const colW = (CW - 0.3) / 2;
+    const colW = colWidth(cols.length);
     cols.forEach((c, ci) => {
       const x = M + ci * (colW + 0.3);
       sl.addShape('rect', { x, y: 1.6, w: colW, h: 0.05, fill: { color: SITE_C[c.code] }, line: { type: 'none' } });
@@ -393,7 +396,7 @@ function observationSlides(pptx, obs, form, period) {
         const col = o.outage ? C.red : C.brand;
         sl.addShape('rect', { x, y: y + 0.04, w: 0.04, h: rh - 0.16, fill: { color: col }, line: { type: 'none' } });
         const tag = [o.outage ? 'PLATFORM INCIDENT' : 'OBSERVATION', o.date, o.priority, o.status,
-          o.site === 'ALL' ? 'both sites' : ''].filter(Boolean).join(' · ');
+          o.site === 'ALL' ? 'all sites' : ''].filter(Boolean).join(' · ');
         sl.addText(brk([
           { text: `${tag}\n`, options: { fontSize: 7.5, bold: true, color: col } },
           { text: `${clip(o.text)}\n`, options: { fontSize: 10, color: C.ink } },
@@ -412,11 +415,11 @@ function observationSlides(pptx, obs, form, period) {
 }
 
 // Prochaine semaine : un espace par site, rempli ou à remplir en séance.
-function nextStepsSlide(pptx, form, period) {
+function nextStepsSlide(pptx, form, period, sites) {
   const sl = pptx.addSlide();
   slideHeader(sl, 'Next week: focus and actions', period, `${VILLES.toUpperCase()} · NEXT STEPS`);
-  const colW = (CW - 0.3) / 2;
-  [['SN', 'Dakar'], ['CI', 'Abidjan']].forEach(([code, ville], i) => {
+  const colW = colWidth(sites.length);
+  sites.map(s => [s.code, s.ville]).forEach(([code, ville], i) => {
     const x = M + i * (colW + 0.3);
     sl.addShape('rect', { x, y: 1.6, w: colW, h: 0.05, fill: { color: SITE_C[code] }, line: { type: 'none' } });
     explainBox(sl, { x, y: 1.75, w: colW, h: 4.75, title: ville, items: [
@@ -452,12 +455,14 @@ async function buildCombinedPptx(analysis, form = {}) {
   const pptx = new PptxGenJS();
   guardText(pptx);
   pptx.layout  = 'LAYOUT_WIDE';
-  pptx.author  = form.author || 'EMOC Front Office';
-  pptx.company = 'EMOC';
-  pptx.title   = 'EMOC Weekly Performance, Dakar × Abidjan';
+  pptx.author  = form.author || 'Pearl';
+  pptx.company = 'Pearl';
+  pptx.title   = 'Weekly Performance';
 
   const period = `${fmtDate(analysis.week_start)} to ${fmtDate(analysis.week_end)}`;
-  const sites = analysis.sites;
+  const sites = (analysis.sites || []).slice(0, 4);
+  SITE_ORDER = sites.map(s => s.code);
+  VILLES = sites.map(s => s.ville).join(' × ') || 'All sites';
   const numbered = [];
 
   // Combien de points requis restent sans explication : affiché en
@@ -467,13 +472,13 @@ async function buildCombinedPptx(analysis, form = {}) {
   /* Couverture */
   const cover = pptx.addSlide();
   cover.background = { color: C.wash };
-  cover.addText(`EMOC · Front Office · ${VILLES}`, { x: M, y: 0.72, w: 6, h: 0.24, fontSize: 10, color: '4A6169', fontFace: FONT });
+  cover.addText(`Pearl · ${VILLES}`, { x: M, y: 0.72, w: 6, h: 0.24, fontSize: 10, color: '4A6169', fontFace: FONT });
   cover.addText('Weekly performance review presented to both teams: activity, service level, '
     + 'attendance and platform incidents, with every peak and every absence explained.', {
     x: M, y: 1.1, w: 5.4, h: 1.2, fontSize: 13, color: '3E555C', fontFace: FONT, valign: 'top', lineSpacingMultiple: 1.4 });
   cover.addText('Weekly Performance', { x: M - 0.04, y: 2.6, w: CW, h: 1.0, fontSize: 48, bold: true, color: C.ink, fontFace: FONT });
   cover.addText(`${VILLES}   ·   ${period}`, { x: M, y: 3.6, w: CW, h: 0.4, fontSize: 16, color: '3E555C', fontFace: FONT });
-  const colW = CW / 2;
+  const colW = CW / Math.max(1, sites.length);
   sites.forEach((s, i) => {
     const x = M + i * colW;
     const k = s.kpis || {};
@@ -494,7 +499,7 @@ async function buildCombinedPptx(analysis, form = {}) {
 
   /* Indicateurs côte à côte */
   const s2 = pptx.addSlide();
-  slideHeader(s2, 'Dakar and Abidjan, side by side', period, `${VILLES.toUpperCase()} · KEY FIGURES`);
+  slideHeader(s2, sites.length > 1 ? 'Sites side by side' : 'Key figures', period, `${VILLES.toUpperCase()} · KEY FIGURES`);
   compareTable(s2, { x: M, y: 1.6, w: 7.3, sites });
   explainBox(s2, { x: M + 7.55, y: 1.6, w: CW - 7.55, h: 4.9, title: 'Key takeaways',
     items: [{ label: '', text: explanationOf(form, { key: 'summary' }), required: false }] });
@@ -505,14 +510,14 @@ async function buildCombinedPptx(analysis, form = {}) {
   numbered.push(breakdownSlide(pptx, sites, form, period));
   numbered.push(trendSlide(pptx, sites, form, period));
   numbered.push(attendanceSlide(pptx, analysis.attendance, form, period));
-  numbered.push(...observationSlides(pptx, analysis.observations || [], form, period));
-  numbered.push(nextStepsSlide(pptx, form, period));
+  numbered.push(...observationSlides(pptx, analysis.observations || [], form, period, sites));
+  numbered.push(nextStepsSlide(pptx, form, period, sites));
 
   /* Clôture */
   const end = pptx.addSlide();
   statement(end, {
     bg: C.ink, on: 'FFFFFF', onMute: 'B8BEC6', rule: '3A3F45',
-    eyebrow: `EMOC · Front Office · ${VILLES}`,
+    eyebrow: `Pearl · ${VILLES}`,
     lead: 'Questions, corrections and missing explanations: raise them now, '
       + 'or send them before the deck is shared.',
     title: 'Thank you', sub: period,

@@ -5,7 +5,7 @@ const { chat } = require('./ai');
 // SKILLS DE L'ASSISTANT IA
 //
 // Un skill = une tâche précise, avec ses consignes, ses champs et, au
-// besoin, les données d'EMOC qu'il lit lui-même côté serveur. La page
+// besoin, les données de Pearl qu'il lit lui-même côté serveur. La page
 // n'envoie que ce que l'admin a saisi ; le serveur ajoute le reste.
 //
 // Données envoyées au modèle : le strict nécessaire. Les noms d'agents
@@ -67,7 +67,7 @@ function reparerJson(s) {
   return null;
 }
 
-// ── Données d'EMOC ────────────────────────────────────────────
+// ── Données de Pearl ────────────────────────────────────────────
 
 function scoreLigne(l) {
   const n = (l && l.notes && l.notes[0]) || {};
@@ -156,12 +156,13 @@ function o2oPourIa(fo) {
 
 const SORTIE_MD = 'Réponds en Markdown simple : titres courts en **gras**, listes à puces, pas de tableau. Pas d\'introduction ni de formule de politesse.';
 
-// Le pays limite les données envoyées au modèle : sans lui, une
-// question sur Dakar ramène aussi le bruit d'Abidjan. La page le
-// pré-remplit avec le pays actif de l'appli.
-const PAYS_OPTIONS = ['Global', 'Dakar (SN)', 'Abidjan (CI)'];
-const CHAMP_PAYS = { id: 'pays', label: 'Pays', type: 'select', options: PAYS_OPTIONS, pays: true };
-const codePays = v => /SN/.test(v || '') ? 'SN' : /CI/.test(v || '') ? 'CI' : 'ALL';
+// Le site limite les données envoyées au modèle : sans lui, une question
+// sur un site ramène aussi le bruit des autres. La page le pré-remplit
+// avec le site actif de l'appli. Options : « Global » puis « Ville (CODE) ».
+const siteOption = s => `${s.city || s.name} (${s.code})`;
+const paysOptions = () => ['Global', ...require('../core/store').readSites().map(siteOption)];
+const CHAMP_PAYS = { id: 'pays', label: 'Site', type: 'select', get options() { return paysOptions(); }, pays: true };
+const codePays = v => { const m = /\(([A-Z0-9]{2,8})\)\s*$/.exec(String(v || '')); return m ? require('../core/store').normScope(m[1], 'ALL') : 'ALL'; };
 
 const SKILLS = [
   {
@@ -186,8 +187,8 @@ const SKILLS = [
   },
   {
     id: 'weekly', titre: 'Commentaire du weekly', icone: 'chart', categorie: 'Rapports',
-    desc: 'Analyse la semaine Dakar et Abidjan : faits marquants, explication des pics et écarts, actions. Prêt à coller dans le deck.',
-    donnees: 'Chiffres agrégés de la semaine par site (volumes, SLA, MTTD/MTTR, encours, présence Dakar) et les observations. Aucun nom d\'agent, aucun ticket détaillé.',
+    desc: 'Analyse la semaine de chaque site : faits marquants, explication des pics et écarts, actions. Prêt à coller dans le deck.',
+    donnees: 'Chiffres agrégés de la semaine par site (volumes, SLA, MTTD/MTTR, encours, présence) et les observations. Aucun nom d\'agent, aucun ticket détaillé.',
     champs: [
       { id: 'date', label: 'Semaine (un jour de la semaine)', type: 'date' },
       { id: 'contexte', label: 'Contexte à prendre en compte (facultatif)', type: 'textarea', max: 2000,
@@ -196,9 +197,9 @@ const SKILLS = [
     ],
     max_tokens: 3000, temperature: 0.3,
     system: [
-      'Tu prépares le commentaire du weekly performance Dakar × Abidjan d\'une équipe de supervision ITSM.',
+      'Tu prépares le commentaire du weekly performance multi-sites d\'une équipe opérationnelle.',
       'Appuie-toi uniquement sur les chiffres fournis ; n\'invente aucun chiffre ni cause. Si une explication manque, dis-le et propose la question à poser.',
-      'Structure : **Synthèse** (3 phrases max), **Dakar**, **Abidjan**, **Points à expliquer** (une ligne par élément de "a_expliquer", avec une explication plausible tirée des observations ou "à confirmer"), **Actions proposées**.',
+      'Structure : **Synthèse** (3 phrases max), une section en gras par site (son nom), **Points à expliquer** (une ligne par élément de "a_expliquer", avec une explication plausible tirée des observations ou "à confirmer"), **Actions proposées**.',
       'Phrases courtes, sans tiret long.',
     ].join('\n'),
     construire: (inp) => ({
@@ -290,7 +291,7 @@ const SKILLS = [
   },
   {
     id: 'bilan-equipe', titre: 'Bilan de l\'équipe', icone: 'team', categorie: 'Équipe', vue: 'bilan',
-    desc: 'Le tableau de l\'équipe agent par agent, puis la lecture de Big Brother : forces, vigilances, qui valoriser, qui accompagner, quoi faire.',
+    desc: 'Le tableau de l\'équipe agent par agent, puis la lecture de Pearl AI : forces, vigilances, qui valoriser, qui accompagner, quoi faire.',
     donnees: 'Indicateurs par agent (notes, objectifs de la session, One-to-One, tâches, tickets du mois) sous alias. Les vrais noms sont remis à l\'affichage.',
     champs: [
       CHAMP_PAYS,
@@ -320,9 +321,9 @@ const SKILLS = [
     },
   },
   {
-    id: 'recherche', titre: 'Rechercher dans FOps', icone: 'search', categorie: 'Outils', vue: 'recherche',
-    desc: 'Pose une question sur les données (tickets, absences, planning, tâches, One-to-One, observations) : Big Brother la traduit en recherche, FOps renvoie les lignes trouvées.',
-    donnees: 'Ta question (noms remplacés par des alias) et la liste des champs disponibles. Aucune donnée n\'est envoyée : la recherche tourne dans FOps.',
+    id: 'recherche', titre: 'Rechercher dans Pearl', icone: 'search', categorie: 'Outils', vue: 'recherche',
+    desc: 'Pose une question sur les données (tickets, absences, planning, tâches, One-to-One, observations) : Pearl AI la traduit en recherche, Pearl renvoie les lignes trouvées.',
+    donnees: 'Ta question (noms remplacés par des alias) et la liste des champs disponibles. Aucune donnée n\'est envoyée : la recherche tourne dans Pearl.',
     champs: [
       { id: 'question', label: 'Ta question', type: 'textarea', max: 600, required: true,
         placeholder: 'Ex. Qui n\'a pas fermé son ticket vendredi ? Combien d\'absences par agent en septembre ? Les P1 encore ouverts ?' },
@@ -342,7 +343,7 @@ const SKILLS = [
         json: true, versNom: ps.versNom, faits: { question: inp.question, perimetre: inp.pays || 'Global', date: auj },
       };
     },
-    // La requête lue (vrais noms remis) est exécutée par FOps.
+    // La requête lue (vrais noms remis) est exécutée par Pearl.
     apres: (plan, inp, faits) => {
       if (!plan || plan.impossible) return plan || {};
       const { executer } = require('./ai-recherche');
@@ -352,16 +353,16 @@ const SKILLS = [
   {
     id: 'decision', titre: 'Rapport de décision', icone: 'decision', categorie: 'Pilotage', vue: 'decision',
     desc: 'Les décisions à prendre sur la période : constat chiffré, options, recommandation, risque si rien n\'est fait. Plus ce qu\'il faut surveiller et ce qui n\'est pas sûr.',
-    donnees: 'Chiffres calculés par FOps sur la période et la précédente (flux, backlog, SLA, ruptures et leur origine, charge par agent, équipe, couverture du planning à 7 jours, qualité des données). Agents sous alias, vrais noms remis à l\'affichage. Aucun motif d\'absence, aucun ticket détaillé.',
+    donnees: 'Chiffres calculés par Pearl sur la période et la précédente (flux, backlog, SLA, ruptures et leur origine, charge par agent, équipe, couverture du planning à 7 jours, qualité des données). Agents sous alias, vrais noms remis à l\'affichage. Aucun motif d\'absence, aucun ticket détaillé.',
     champs: [
       { id: 'periode', label: 'Période', type: 'select', options: ['Semaine', 'Mois'] },
-      { id: 'perimetre', label: 'Pays', type: 'select', options: PAYS_OPTIONS, pays: true },
-      { id: 'contexte', label: 'Contexte que FOps ne connaît pas (facultatif)', type: 'textarea', max: 2000,
+      { id: 'perimetre', label: 'Site', type: 'select', get options() { return paysOptions(); }, pays: true },
+      { id: 'contexte', label: 'Contexte que Pearl ne connaît pas (facultatif)', type: 'textarea', max: 2000,
         placeholder: 'Ex. demande client de réduire le MTTR, 2 recrutements prévus en novembre, migration X la semaine prochaine…' },
     ],
     max_tokens: 6000, temperature: 0.2, max_chars: 30000,
     system: [
-      'Tu es l\'assistant de décision du manager d\'une équipe Front Office de supervision ITSM (Dakar et Abidjan).',
+      'Tu es l\'assistant de décision du manager d\'une équipe opérationnelle.',
       'On te donne des chiffres calculés par l\'outil. Tu aides à DÉCIDER, pas seulement à constater.',
       'Règles :',
       '- Chaque constat cite au moins un chiffre fourni. N\'invente aucun chiffre, aucune cause, aucun nom. Une cause non prouvée est une hypothèse, dis-le.',
@@ -382,7 +383,7 @@ const SKILLS = [
     secours: (f, raison) => require('./ai-decision').decisionSansIa(f, raison),
     construire: (inp) => {
       const { donneesDecision } = require('./ai-decision');
-      const perimetre = /SN/.test(inp.perimetre || '') ? 'SN' : /CI/.test(inp.perimetre || '') ? 'CI' : 'ALL';
+      const perimetre = codePays(inp.perimetre);
       const { donnees, faits, ps } = donneesDecision({ periode: inp.periode === 'Mois' ? 'mois' : 'semaine', perimetre });
       return {
         user: (inp.contexte ? `Contexte donné par le manager : ${ps.versAlias(inp.contexte)}\n` : '')
@@ -461,7 +462,7 @@ function entrees(skill, brut) {
   return out;
 }
 
-// ── Ce que Big Brother lit, en phrases ────────────────────────
+// ── Ce que Pearl AI lit, en phrases ────────────────────────
 // Pendant l'appel au modèle, la page affiche une phrase à la fois. Elles
 // décrivent les données réellement envoyées (chiffres compris), pas une
 // progression inventée.
@@ -480,7 +481,7 @@ const LECTURE = {
   decision: (f) => {
     const k = f.indicateurs || {};
     return [
-      `Big Brother compare les ${String(f.periode || 'derniers jours').split(' (')[0]} à la période précédente…`,
+      `Pearl AI compare les ${String(f.periode || 'derniers jours').split(' (')[0]} à la période précédente…`,
       k.ruptures_sla?.valeur ? `Il cherche d'où viennent les ${nb(k.ruptures_sla.valeur, 'rupture')} de SLA…` : 'Il vérifie la tenue du SLA…',
       (f.charge || []).length ? `Il regarde comment la charge se répartit entre ${nb(f.charge.length, 'agent')}…` : '',
       `Il vérifie la couverture du planning des 7 prochains jours${(f.creneaux_fragiles || []).length ? ` (${nb(f.creneaux_fragiles.length, 'créneau fragile', 'créneaux fragiles')})` : ''}…`,
@@ -492,7 +493,7 @@ const LECTURE = {
     const l = f.lignes || [];
     const retard = l.reduce((n, x) => n + (x.obj_retard || 0), 0);
     return [
-      `Big Brother lit les notes de ${nb(l.length, 'agent')}…`,
+      `Pearl AI lit les notes de ${nb(l.length, 'agent')}…`,
       retard ? `Il repère les ${nb(retard, 'objectif')} en retard…` : 'Il passe en revue les objectifs de la session…',
       'Il regarde depuis quand chacun n\'a pas eu de One-to-One…',
       'Il classe qui valoriser, qui accompagner, qui suivre…',
@@ -504,22 +505,22 @@ const LECTURE = {
     const total = a.reduce((n, x) => n + x.entretiens, 0);
     const ouvertes = a.reduce((n, x) => n + (x.actions_ouvertes || 0), 0);
     return [
-      `Big Brother lit ${nb(total, 'compte rendu', 'comptes rendus')} de One-to-One${a.length > 1 ? ` (${nb(a.length, 'agent')})` : ''}…`,
+      `Pearl AI lit ${nb(total, 'compte rendu', 'comptes rendus')} de One-to-One${a.length > 1 ? ` (${nb(a.length, 'agent')})` : ''}…`,
       ouvertes ? `Il fait le point sur les ${nb(ouvertes, 'engagement')} encore ouverts…` : 'Il fait le point sur les engagements pris…',
       'Il cherche les thèmes qui reviennent…',
       'Il note l\'humeur qui ressort des échanges…',
     ];
   },
   o2o: (f) => [
-    `Big Brother relit les objectifs de ${f.agent || 'l\'agent'}…`,
+    `Pearl AI relit les objectifs de ${f.agent || 'l\'agent'}…`,
     'Il regarde le dernier One-to-One et les actions ouvertes…',
     'Il prépare les questions à poser…',
     'Il propose un objectif SMART…',
   ],
-  weekly: () => ['Big Brother compare Dakar et Abidjan…', 'Il cherche une explication aux écarts de la semaine…', 'Il prépare les actions proposées…'],
-  rca: () => ['Big Brother remonte la chaîne des « pourquoi »…', 'Il classe les causes probables…', 'Il liste les données à collecter…'],
-  redaction: () => ['Big Brother relit ton texte…', 'Il ajuste le ton…'],
-  recherche: () => ['Big Brother traduit ta question en recherche…', 'Il choisit la source et les filtres…', 'Il résout les dates de ta question…'],
+  weekly: () => ['Pearl AI compare les sites…', 'Il cherche une explication aux écarts de la semaine…', 'Il prépare les actions proposées…'],
+  rca: () => ['Pearl AI remonte la chaîne des « pourquoi »…', 'Il classe les causes probables…', 'Il liste les données à collecter…'],
+  redaction: () => ['Pearl AI relit ton texte…', 'Il ajuste le ton…'],
+  recherche: () => ['Pearl AI traduit ta question en recherche…', 'Il choisit la source et les filtres…', 'Il résout les dates de ta question…'],
 };
 
 // Une réponse structurée utilisable : un objet avec au moins un champ réel.
@@ -530,18 +531,18 @@ async function lancer(id, brut, progres = () => {}, { fond = false } = {}) {
   const skill = parId(id);
   if (!skill) { const e = new Error('Skill inconnu.'); e.status = 404; throw e; }
   const inp = skill.interne ? (brut || {}) : entrees(skill, brut);
-  progres('Lecture des données de FOps…');
+  progres('Lecture des données de Pearl…');
   const { user, json, versNom, faits, court, system: sys } = skill.construire(inp);
   if (court) return { skill: skill.id, vue: skill.vue, faits: court.faits, vide: true, content: court.message, ms: 0, model: '' };
   const vu = apercu(faits);
-  const lecture = (LECTURE[skill.id] ? LECTURE[skill.id](faits || {}, inp) : ['Big Brother analyse ta demande…', 'Il structure sa réponse…']).filter(Boolean);
-  progres(`${vu ? `Données prêtes : ${vu}. ` : ''}Envoi à Big Brother${versNom ? ', noms remplacés par des alias' : ''}…`, lecture);
+  const lecture = (LECTURE[skill.id] ? LECTURE[skill.id](faits || {}, inp) : ['Pearl AI analyse ta demande…', 'Il structure sa réponse…']).filter(Boolean);
+  progres(`${vu ? `Données prêtes : ${vu}. ` : ''}Envoi à Pearl AI${versNom ? ', noms remplacés par des alias' : ''}…`, lecture);
   const opts = { system: `${sys || skill.system}\n${json ? '' : SORTIE_MD}`, max_tokens: skill.max_tokens, temperature: skill.temperature, max_chars: skill.max_chars, fond };
   // Le modèle ne répond pas (délai, service en panne) : un skill qui sait
   // se passer de lui rend sa version calculée plutôt qu'une erreur.
   const secours = (raison) => {
     if (!skill.secours) return null;
-    progres('Big Brother n\'a pas pu répondre : FOps calcule une version sans IA…');
+    progres('Pearl AI n\'a pas pu répondre : Pearl calcule une version sans IA…');
     console.warn(`[ai] ${skill.id} : version de secours (${raison})`);
     return { content: '', model: '', ms: 0, skill: skill.id, vue: skill.vue, faits, data: skill.secours(faits || {}, raison) };
   };
@@ -553,7 +554,7 @@ async function lancer(id, brut, progres = () => {}, { fond = false } = {}) {
   let data = json ? lireJson(r.content) : undefined;
   if (json && (r.finish_reason === 'length' || !utilisable(data))) {
     console.warn(`[ai] ${skill.id} : réponse ${r.finish_reason === 'length' ? 'coupée' : 'illisible'}, second essai plus concis`);
-    progres(`Réponse ${r.finish_reason === 'length' ? 'trop longue' : 'mal formée'} (${Math.round(r.ms / 1000)} s) : Big Brother recommence en plus concis…`,
+    progres(`Réponse ${r.finish_reason === 'length' ? 'trop longue' : 'mal formée'} (${Math.round(r.ms / 1000)} s) : Pearl AI recommence en plus concis…`,
       ['Il resserre chaque section…', 'Il garde l\'essentiel de chaque point…']);
     try {
       const r2 = await chat([{ role: 'user', content: user }], { ...opts, retry: true, max_tokens: 8000, system: `${opts.system}\n${CONCIS}` });
@@ -569,7 +570,7 @@ async function lancer(id, brut, progres = () => {}, { fond = false } = {}) {
   const { reidentifier } = require('./ai-team');
   const content = versNom ? versNom(r.content) : r.content;
   let lu = data && versNom ? reidentifier(data, versNom) : data;
-  if (skill.apres) { progres('FOps exécute la recherche…'); lu = skill.apres(lu, inp, faits || {}); }
+  if (skill.apres) { progres('Pearl exécute la recherche…'); lu = skill.apres(lu, inp, faits || {}); }
   return { ...r, content, skill: skill.id, vue: skill.vue, faits, data: lu };
 }
 
@@ -593,7 +594,7 @@ async function briefTableau(equipeBrut, country = 'ALL') {
   const ps = pseudonymes(readCfg().fo_list || []);
   const equipe = signauxEquipe(equipeBrut).map(a => ({ agent: ps.alias(a.fo), signaux: a.items.map(i => `[${i.lvl}] ${ps.versAlias(i.txt)}`) }));
   const ops = signauxOps(country);
-  const site = country === 'SN' ? 'Dakar (SN)' : country === 'CI' ? 'Abidjan (CI)' : 'Dakar et Abidjan';
+  const site = require('../core/store').scopeLabel(country);
   const user = `Date : ${new Date().toISOString().slice(0, 10)}\nPérimètre : ${site}\nSignaux opérationnels :\n${JSON.stringify({ resume: ops.resume, signaux: ops.items.map(i => `[${i.lvl}] ${i.txt}${i.detail ? ' : ' + i.detail : ''}`) })}`
     + `\nSignaux d'équipe :\n${JSON.stringify(equipe)}`;
   return lancer('cockpit-brief', { user, versNom: ps.versNom });

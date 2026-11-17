@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Prépare le HTTPS de FOps en une commande :  npm run https:setup
+// Prépare le HTTPS de Pearl en une commande :  npm run https:setup
 //
-// 1. Crée une petite autorité de certification locale (« EMOC CA ») et un
+// 1. Crée une petite autorité de certification locale (« Pearl CA ») et un
 //    certificat serveur signé par elle, valable pour les adresses IP et le
 //    nom de cette machine. Le tout dans data/tls/ (jamais dans git).
 // 2. Écrit TLS_CERT, TLS_KEY et HTTPS_PORT dans .env.
@@ -10,9 +10,9 @@
 //    de remplacer server.crt par le certificat rendu — plus rien à installer
 //    sur les postes.
 //
-// Sur chaque poste Windows, une fois : ouvrir https://<adresse>:3443/emoc-ca.crt,
+// Sur chaque poste Windows, une fois : ouvrir https://<adresse>:3443/pearl-ca.crt,
 // puis l'installer dans « Autorités de certification racines de confiance »
-// (ou : certutil -user -addstore Root emoc-ca.crt).
+// (ou : certutil -user -addstore Root pearl-ca.crt).
 //
 // Relancer le script régénère le certificat serveur (nouvelle IP, expiration)
 // sans toucher à l'autorité : les postes n'ont rien à refaire.
@@ -42,10 +42,10 @@ for (const extra of (process.env.TLS_EXTRA_NAMES || '').split(',').map(s => s.tr
   (/^\d+\.\d+\.\d+\.\d+$/.test(extra) ? ips : noms).push(extra);
 
 if (!fs.existsSync(f('ca.key'))) {
-  console.log('• Autorité locale « EMOC CA »…');
+  console.log('• Autorité locale « Pearl CA »…');
   ssl(['genrsa', '-out', f('ca.key'), '3072']);
   ssl(['req', '-x509', '-new', '-key', f('ca.key'), '-sha256', '-days', '3650',
-    '-subj', '/CN=EMOC CA/O=EMOC', '-addext', 'basicConstraints=critical,CA:TRUE',
+    '-subj', '/CN=Pearl CA/O=Pearl', '-addext', 'basicConstraints=critical,CA:TRUE',
     '-addext', 'keyUsage=critical,keyCertSign,cRLSign', '-out', f('ca.crt')]);
 }
 
@@ -58,7 +58,7 @@ fs.writeFileSync(f('server.ext'), [
   `subjectAltName=${san}`,
 ].join('\n') + '\n');
 ssl(['genrsa', '-out', f('server.key'), '2048']);
-ssl(['req', '-new', '-key', f('server.key'), '-subj', `/CN=${ips[1] || os.hostname()}/O=EMOC`,
+ssl(['req', '-new', '-key', f('server.key'), '-subj', `/CN=${ips[1] || os.hostname()}/O=Pearl`,
   '-addext', `subjectAltName=${san}`, '-out', f('server.csr')]);
 ssl(['x509', '-req', '-in', f('server.csr'), '-CA', f('ca.crt'), '-CAkey', f('ca.key'),
   '-CAcreateserial', '-days', '825', '-sha256', '-extfile', f('server.ext'), '-out', f('server.crt')]);
@@ -76,15 +76,15 @@ fs.writeFileSync(ENV, env);
 
 const ip = ips[1] || 'localhost';
 console.log(`
-✓ HTTPS prêt. Redémarre FOps (npm run service:restart), puis :
+✓ HTTPS prêt. Redémarre Pearl (npm run service:restart), puis :
 
   Adresse de l'équipe :  https://${ip}:${PORT}
   (l'ancienne adresse http://${ip}:${process.env.PORT || 3000} y renvoie toute seule)
 
   Sur chaque poste Windows, une seule fois, pour éviter l'avertissement :
-    1. ouvrir https://${ip}:${PORT}/emoc-ca.crt (accepter l'avertissement cette fois-ci)
+    1. ouvrir https://${ip}:${PORT}/pearl-ca.crt (accepter l'avertissement cette fois-ci)
     2. double-cliquer le fichier → Installer → « Autorités de certification racines de confiance »
-       ou en PowerShell :  certutil -user -addstore Root $env:USERPROFILE\\Downloads\\emoc-ca.crt
+       ou en PowerShell :  certutil -user -addstore Root $env:USERPROFILE\\Downloads\\pearl-ca.crt
     3. fermer et rouvrir le navigateur
 
   Mieux encore : faire signer data/tls/server.csr par l'informatique et remplacer

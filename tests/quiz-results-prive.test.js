@@ -6,7 +6,7 @@ process.env.CONFIG_PW_HASH = bcrypt.hashSync('admin-pw', 4);
 delete process.env.TEAM_PW_HASH;
 useTempDataDir({
   'config.json': { fo_list: ['Awa', 'Moussa'], fo_access_codes: {
-    Awa: { hash: bcrypt.hashSync('CODEAWA2', 4), huawei_id: 'a00000001' } } },
+    Awa: { hash: bcrypt.hashSync('CODEAWA2', 4), employee_id: 'a00000001' } } },
   'quiz_results.json': [
     { id: 'r1', user: 'Awa', quiz_name: 'Q', score: 8, total: 10 },
     { id: 'r2', user: 'Moussa', quiz_name: 'Q', score: 3, total: 10 },
@@ -38,7 +38,7 @@ before(async () => {
 after(() => srv.close());
 
 test('un agent ne reçoit que ses propres résultats', async () => {
-  const cookie = await login({ huaweiId: 'a00000001', password: 'CODEAWA2' });
+  const cookie = await login({ employeeId: 'a00000001', password: 'CODEAWA2' });
   assert.deepEqual(await ids({ cookie }), ['r1']);
 });
 

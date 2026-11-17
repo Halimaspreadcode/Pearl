@@ -35,7 +35,7 @@ async function buildReportFile(kind, countryIn) {
   const { PAYS, normPays } = require('./mail/bodies');
   const country = normPays(countryIn);
   const P = PAYS[country];
-  const code = country === 'ALL' ? 'SN-CI' : country;
+  const code = country === 'ALL' ? 'ALL' : country;
 
   // Priorité au classeur déposé par la page : c'est le rapport mis en
   // forme que l'équipe relit. À défaut d'un classeur du jour, on reprend
@@ -44,9 +44,9 @@ async function buildReportFile(kind, countryIn) {
   // ne sert que si la page n'a jamais été ouverte.
   // Le classeur déposé ne sert que s'il a été produit pour ce pays : la
   // page dépose celui du pays affiché à l'écran.
-  const frais = readReportFile(kind, jour, country);
+  const frais = await readReportFile(kind, jour, country);
   if (frais) return frais;
-  const dernier = readReportFile(kind, null, country);
+  const dernier = await readReportFile(kind, null, country);
   if (dernier) return dernier;
 
   const wb = new ExcelJSSrv.Workbook();
@@ -67,7 +67,7 @@ async function buildReportFile(kind, countryIn) {
     const cols = ['sn_tt', 'imoc_tt', 'title', 'status', 'priority', 'domain',
                   'fo_owner', 'open_date', 'close_date', 'sla_status'];
     ws.columns = cols.map(() => ({ width: 18 }));
-    xlsxHeader(ws, ['TT', 'IMOC', 'Titre', 'Statut', 'Priorité', 'Domaine',
+    xlsxHeader(ws, ['TT', 'Réf. externe', 'Titre', 'Statut', 'Priorité', 'Domaine',
                     'FO', 'Ouvert', 'Clôturé', 'SLA']);
     (liste || []).forEach((t, i) => {
       ws.getRow(i + 2).values = cols.map(c => t[c] ?? '');
@@ -120,7 +120,7 @@ async function buildReportFile(kind, countryIn) {
       slaText: t => require('../core/sla').slaTargetLabel(t, cfg),
     });
     return {
-      filename: `EMOC_Daily_Report_${code}_${jour}.xlsx`,
+      filename: `Pearl_Daily_Report_${code}_${jour}.xlsx`,
       content: Buffer.from(buffer),
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       period: jour,
@@ -163,7 +163,7 @@ async function buildReportFile(kind, countryIn) {
       fo_trackers: readCfg().fo_trackers || {},
     });
     return {
-      filename: `EMOC_Weekly_Review_${code}_${jour}.pptx`,
+      filename: `Pearl_Weekly_Review_${code}_${jour}.pptx`,
       content: Buffer.from(buf),
       type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       period: jour,
@@ -178,7 +178,7 @@ async function buildReportFile(kind, countryIn) {
     const absences = country === 'ALL' ? readAbsences() : readAbsences().filter(a => agents.has(a.fo_name));
     const buf = buildAbsencePdf({ summary, absences, generatedAt: new Date() });
     return {
-      filename: `EMOC_Absence_Report_${code}_${summary.from}_${summary.to}.pdf`,
+      filename: `Pearl_Absence_Report_${code}_${summary.from}_${summary.to}.pdf`,
       content: Buffer.from(buf),
       type: 'application/pdf',
       period: jour,

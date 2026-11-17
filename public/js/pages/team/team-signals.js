@@ -56,7 +56,7 @@ function _eqObjectivesOf(fo, ctx) {
   return src[fo] || [];
 }
 
-// L'audience d'une formation est un texte libre (« Awa DIOP, Adama BA »,
+// L'audience d'une formation est un texte libre (« Claire LEROY, Paul BERNARD »,
 // « Toute l'équipe »). On ne rattache une session à un agent que si son
 // nom y figure : un mot commun ne suffit pas, « BA » est dans trop de mots.
 function _eqTrainingConcerns(t, fo) {

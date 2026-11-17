@@ -1,7 +1,7 @@
-const fs          = require('fs');
 const path        = require('path');
-const { DATA_DIR, FILES } = require('../config/paths');
+const { FILES, dataDir } = require('../config/paths');
 const { readJSON } = require('../core/store');
+const { backend } = require('../core/backend');
 
 // ── CLASSEURS DÉPOSÉS PAR LA PAGE ─────────────────────────────
 // Le rapport de la page est mis en forme par ~10 000 caractères de code
@@ -9,25 +9,26 @@ const { readJSON } = require('../core/store');
 // Les réécrire ici produirait un second rapport, condamné à diverger du
 // premier. La page dépose donc son classeur, et l'envoi le réexpédie —
 // un seul générateur, aucun écart possible.
-const REPORTS_DIR = path.join(DATA_DIR, 'reports');
+// Dossier des classeurs du tenant courant (blobs).
+const reportsDir = () => path.join(dataDir(), 'reports');
 
 function readReportFiles() { return readJSON(FILES.report_files, {}); }
 
 // Le classeur déposé. `periodeAttendue` non nul exige qu'il corresponde
 // à la période demandée ; nul, on accepte ce qu'on a. Un classeur par
-// pays : la page dépose celui du pays affiché, et un envoi pour la Côte
-// d'Ivoire ne doit pas partir avec le classeur du Sénégal. Les dépôts
-// d'avant (sans pays) sont ignorés — le serveur reconstruit le rapport.
-function readReportFile(type, periodeAttendue, pays = 'SN') {
+// site : la page dépose celui du site affiché, et un envoi pour un site
+// ne doit pas partir avec le classeur d'un autre. Les dépôts d'avant
+// (sans site) sont ignorés — le serveur reconstruit le rapport.
+async function readReportFile(type, periodeAttendue, pays) {
   try {
     const meta = readReportFiles()[`${type}:${pays}`];
     if (!meta) return null;
     if (periodeAttendue && meta.period && meta.period !== periodeAttendue) return null;
-    const chemin = path.join(REPORTS_DIR, `${type}-${pays}.xlsx`);
-    if (!fs.existsSync(chemin)) return null;
+    const content = await backend().getBlob(path.join(reportsDir(), `${type}-${pays}.xlsx`));
+    if (!content) return null;
     return {
       filename: meta.filename || `${type}.xlsx`,
-      content: fs.readFileSync(chemin),
+      content,
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       period: meta.period || '',
     };
@@ -46,5 +47,5 @@ function readReportFile(type, periodeAttendue, pays = 'SN') {
 function readDrafts() { return readJSON(FILES.report_drafts, {}); }
 
 module.exports = {
-  REPORTS_DIR, readReportFiles, readReportFile, readDrafts,
+  reportsDir, readReportFiles, readReportFile, readDrafts,
 };

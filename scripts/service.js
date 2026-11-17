@@ -15,7 +15,7 @@
    macOS (agent de session). Chemins remplis d'office : dossier du projet,
    Node.js qui exécute cette commande (process.execPath — celui de nvm s'il
    y en a un), utilisateur. Rien à éditer à la main, contrairement aux
-   modèles de deploy/, gardés pour qui veut régler lui-même.
+   modèles de service générés par ce script.
 
    Linux demande `sudo` pour écrire dans /etc/systemd/system : la commande
    le lance elle-même et le mot de passe est demandé dans le terminal.
@@ -27,8 +27,8 @@ const http = require('http');
 const { spawnSync } = require('child_process');
 
 const ROOT  = path.join(__dirname, '..');
-const NAME  = 'fops';
-const LABEL = 'com.fops.watchdog';
+const NAME  = 'pearl';
+const LABEL = 'com.pearl.watchdog';
 const UNIT_PATH  = `/etc/systemd/system/${NAME}.service`;
 const PLIST_PATH = path.join(os.homedir(), 'Library', 'LaunchAgents', `${LABEL}.plist`);
 
@@ -51,7 +51,7 @@ function unitSystemd({ root, node, user }) {
   return `# Généré par « npm run service:install » — relancer la commande après
 # avoir déplacé le projet ou changé de version de Node.
 [Unit]
-Description=FOps (EMOC tracker) — serveur sous watchdog
+Description=Pearl — serveur sous watchdog
 After=network.target
 
 [Service]
@@ -244,7 +244,7 @@ async function install() {
   const v = await ui.etape('Accès GitHub pour les mises à jour', async () => ligneMaj(await verifierMaj()));
 
   const lignes = repond
-    ? [`${ui.VERT}●${ui.R} FOps tourne sur http://localhost:${p}`,
+    ? [`${ui.VERT}●${ui.R} Pearl tourne sur http://localhost:${p}`,
        '  redémarre avec la machine et après un plantage',
        '  se met à jour depuis GitHub toutes les 10 min',
        '', `${ui.GRIS}État     npm run service:status${ui.R}`, `${ui.GRIS}Journal  watchdog.log${ui.R}`]
@@ -303,7 +303,7 @@ async function stop() {
     else if (sys === 'launchd') await ui.etape('Arrêt du watchdog et du serveur', () => exec('launchctl', ['unload', PLIST_PATH]));
     else { ui.echec('Système non pris en charge.'); process.exit(1); }
   } catch { process.exit(1); }
-  ui.cadre('Service arrêté', ['FOps ne tourne plus.',
+  ui.cadre('Service arrêté', ['Pearl ne tourne plus.',
     `${ui.GRIS}Relancer     npm run service:start${ui.R}`,
     sys === 'systemd' ? `${ui.GRIS}Il repartira au prochain redémarrage de la machine.${ui.R}` : `${ui.GRIS}Il repartira à la prochaine ouverture de session.${ui.R}`,
     `${ui.GRIS}Pour de bon  npm run service:uninstall${ui.R}`], ui.JAUNE);

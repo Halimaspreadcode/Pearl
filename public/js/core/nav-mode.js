@@ -54,11 +54,11 @@ function _navRoleKey() {
   return r ? 'Observer' : '';
 }
 
-// Identifiant Huawei de l'utilisateur courant, normalisé. C'est la seule
+// Identifiant employé de l'utilisateur courant, normalisé. C'est la seule
 // donnée d'identité stable : le nom se saisit à la main et varie, l'ID
 // est validé à la saisie et sert déjà de clé pour les accès FO.
 function navUserId() {
-  const v = (typeof currentUser !== 'undefined' && currentUser && currentUser.huaweiId) || '';
+  const v = (typeof currentUser !== 'undefined' && currentUser && currentUser.employeeId) || '';
   return String(v).trim().toLowerCase();
 }
 

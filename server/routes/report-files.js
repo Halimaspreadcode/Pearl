@@ -1,9 +1,9 @@
 const express     = require('express');
-const fs          = require('fs');
 const path        = require('path');
 const { FILES } = require('../config/paths');
-const { withFileLock, writeJSON } = require('../core/store');
-const { REPORTS_DIR, readDrafts, readReportFiles } = require('../services/report-store');
+const { withFileLock, writeJSON, normScope } = require('../core/store');
+const { backend } = require('../core/backend');
+const { reportsDir, readDrafts, readReportFiles } = require('../services/report-store');
 
 const router = express.Router();
 
@@ -17,15 +17,12 @@ router.put('/api/report-file/:type', express.raw({ type: '*/*', limit: '25mb' })
   if (!req.body || !req.body.length)
     return res.status(400).json({ error: 'Fichier vide' });
 
-  const pays = ['SN', 'CI', 'ALL'].includes(String(req.query.country)) ? String(req.query.country) : 'SN';
-  withFileLock(FILES.report_files, () => {
-    fs.mkdirSync(REPORTS_DIR, { recursive: true });
+  const pays = normScope(req.query.country, 'first');
+  withFileLock(FILES.report_files, async () => {
     const nom = `${type}-${pays}.xlsx`;
-    // Écriture atomique : un envoi qui lirait le fichier au milieu d'une
-    // réécriture recevrait un classeur tronqué.
-    const tmp = path.join(REPORTS_DIR, `.${nom}.tmp`);
-    fs.writeFileSync(tmp, req.body);
-    fs.renameSync(tmp, path.join(REPORTS_DIR, nom));
+    // Écriture atomique (fichiers) ou en une requête (base) : un envoi ne
+    // lit jamais un classeur tronqué.
+    await backend().putBlob(path.join(reportsDir(), nom), req.body);
 
     const idx = readReportFiles();
     idx[`${type}:${pays}`] = {

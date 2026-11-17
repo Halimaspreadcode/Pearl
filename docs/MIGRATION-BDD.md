@@ -4,7 +4,7 @@
 
 ## Pourquoi
 
-Aujourd'hui, FOps range tout dans une vingtaine de fichiers JSON sous `data/` :
+Aujourd'hui, Pearl range tout dans une vingtaine de fichiers JSON sous `data/` :
 
 - **Chaque écriture réécrit le fichier entier.** `config.json` porte à la fois la configuration, les notes, les objectifs, les One-to-One et les codes d'accès. Une écriture sur un objectif réécrit donc aussi les codes d'accès.
 - **Pas de transaction.** Le renommage d'un agent touche une dizaine de fichiers l'un après l'autre. Une coupure au milieu laisse des données à moitié renommées. C'est pour ça qu'on fait une copie avant.
@@ -37,7 +37,7 @@ Tout l'accès aux données passe déjà par `readJSON(fichier)` et `writeJSON(fi
 - `npm run db:migrate` importe les JSON existants une fois et laisse les fichiers d'origine dans `data/backups/avant-bdd/`.
 - Sauvegarde quotidienne avec `VACUUM INTO` (copie cohérente à chaud).
 - Interrupteur `STORE=json|sqlite` dans `.env` : on peut revenir en arrière en une ligne.
-- `data/fops.db` hors de git. Le dépôt ne porte plus de données personnelles.
+- `data/pearl.db` hors de git. Le dépôt ne porte plus de données personnelles.
 
 ### 2. Vraies tables pour les données qui grossissent (1 semaine, route par route)
 - `tickets` (SN et CI), `audit`, `taches` (weekly_progress et fo_tasks), `observations`, `planning`, avec des index par agent, par date et par statut.
@@ -45,12 +45,12 @@ Tout l'accès aux données passe déjà par `readJSON(fichier)` et `writeJSON(fi
 - Le nom d'agent cesse d'être une clé : les données pointent vers `agents.id`. Renommer un agent devient la modification d'une seule ligne.
 
 ### 3. Comptes et droits (2–3 jours)
-- Une table `comptes(id, nom, huawei_id, role, code_hash, actif)` remplace `fo_access_codes` et les listes FO et BO pour l'identité.
+- Une table `comptes(id, nom, employee_id, role, code_hash, actif)` remplace `fo_access_codes` et les listes FO et BO pour l'identité.
 - Une table `droits(role, action)` permet de verrouiller par rôle les écritures encore ouvertes à toute personne connectée : planning, jours fériés, quiz, liste BO, mise en page des rapports.
 
 ## Ce qui ne change pas pour l'équipe
 
-Mêmes écrans, mêmes adresses, même mise à jour (`git pull` + redémarrage). L'updater devra seulement protéger `data/fops.db` comme il protège déjà `data/`.
+Mêmes écrans, mêmes adresses, même mise à jour (`git pull` + redémarrage). L'updater devra seulement protéger `data/pearl.db` comme il protège déjà `data/`.
 
 ## Risques et parades
 

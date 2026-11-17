@@ -2,7 +2,7 @@ const crypto      = require('crypto');
 
 // Message MIME. `attachments` : [{ filename, content: Buffer, type }].
 function buildMime({ from, to, subject, text, html, attachments }) {
-  const bnd = 'emoc_' + crypto.randomBytes(12).toString('hex');
+  const bnd = 'pearl_' + crypto.randomBytes(12).toString('hex');
   // En-tête encodé : un sujet accentué envoyé brut arrive illisible chez
   // les clients qui supposent de l'ASCII.
   const encHdr = v => /^[\x20-\x7E]*$/.test(String(v))
@@ -14,7 +14,7 @@ function buildMime({ from, to, subject, text, html, attachments }) {
   L.push(`To: ${to.join(', ')}`);
   L.push(`Subject: ${encHdr(subject || '')}`);
   L.push(`Date: ${new Date().toUTCString()}`);
-  L.push(`Message-ID: <${crypto.randomBytes(16).toString('hex')}@emoc>`);
+  L.push(`Message-ID: <${crypto.randomBytes(16).toString('hex')}@pearl>`);
   L.push('MIME-Version: 1.0');
   L.push(`Content-Type: multipart/mixed; boundary="${bnd}"`);
   L.push('');

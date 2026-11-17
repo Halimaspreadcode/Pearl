@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════════════════
 // INDICATEURS (Admin › Indicateurs)
 //
-// L'admin décrit un KPI ou un PI à Big Brother (« le MTTD c'est… », une
+// L'admin décrit un KPI ou un PI à Pearl AI (« le MTTD c'est… », une
 // formule, « montre-moi le FO qui s'est dégradé et de combien »). Big
 // Brother rend une définition que l'admin relit, ajuste et enregistre.
 // Ensuite le suivi est calculé par le serveur à chaque ouverture, sur les
@@ -68,7 +68,7 @@ function _indPaint() {
   if (fil) fil.scrollTop = fil.scrollHeight;
 }
 
-const _indPerim = () => ({ SN: 'Sénégal', CI: 'Côte d\'Ivoire' }[_indPays()] || 'SN + CI');
+const _indPerim = () => scopeLabel(_indPays());
 
 function _indListeHtml() {
   const items = IND.items || [];
@@ -92,7 +92,7 @@ function _indListeHtml() {
     ${IND.err ? `<div class="ix-alert">${esc(IND.err)}</div>` : ''}
     ${items.length ? `<section class="ix-grid">${cartes}</section>` : `
     <section class="ix-hero">
-      <h2>Décris ton indicateur, Big Brother le configure.</h2>
+      <h2>Décris ton indicateur, Pearl AI le configure.</h2>
       <p>Donne sa formule ou explique-le avec tes mots. Une fois validé, il se met à jour tout seul à partir des trackers : plus besoin de repasser par l'IA.</p>
       <form class="ix-hero-f" onsubmit="event.preventDefault();indNouveau(this.q.value)">
         <input name="q" placeholder="Ex. Le MTTD : temps entre l'occurrence et la détection, par semaine" autocomplete="off">
@@ -121,7 +121,7 @@ function _indAtelierHtml() {
       <div>
         <button type="button" class="ix-back" onclick="indRetour()">‹ Indicateurs</button>
         <h1 class="page-title">${d.sigle ? `${esc(d.sigle)} · ` : ''}${esc(d.nom || 'Nouvel indicateur')}</h1>
-        <p class="page-sub">${esc(d.description || 'Décris l\'indicateur à Big Brother, à droite.')}</p>
+        <p class="page-sub">${esc(d.description || 'Décris l\'indicateur à Pearl AI, à droite.')}</p>
       </div>
       <div class="ix-head-a">
         ${!neuf ? `<button type="button" class="ix-btn is-ghost" onclick="indSupprimer()">Supprimer</button>` : ''}
@@ -144,10 +144,10 @@ function _indAtelierHtml() {
       </main>
       <aside class="ix-side">
         <section class="ix-bb">
-          <h3>Big Brother</h3>
+          <h3>Pearl AI</h3>
           <div class="ix-fil">${IND.fil.length ? IND.fil.map(m => `<div class="ix-m is-${m.role}">${esc(m.content)}${m.avert?.length ? `<ul>${m.avert.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}</div>`).join('')
             : `<p class="ix-m is-assistant">${neuf ? 'Explique l\'indicateur ou donne sa formule. Je choisis les champs des trackers, la période et les vues ; tu valides.' : 'Demande-moi une vue en plus ou un changement : je modifie la définition, tu valides.'}</p>`}
-            ${IND.job ? `<div class="ix-m is-job"><i></i><span>${esc(IND.job.etape || 'Big Brother réfléchit…')}</span><button type="button" onclick="indStop()">Stop</button></div>` : ''}
+            ${IND.job ? `<div class="ix-m is-job"><i></i><span>${esc(IND.job.etape || 'Pearl AI réfléchit…')}</span><button type="button" onclick="indStop()">Stop</button></div>` : ''}
           </div>
           <div class="ix-idees">${(neuf && !IND.fil.length ? ['Le MTTD : temps entre l\'occurrence et la détection', 'Taux de tickets en breach SLA par semaine', 'Nombre de P1 par domaine'] : IND_IDEES)
             .map(s => `<button type="button" onclick="indDemander(${escAttrArg(s)})">${esc(s)}</button>`).join('')}</div>
@@ -387,7 +387,7 @@ const IND_NOUVELLES = [
   ['tableau', 'Carte de chaleur', { par: 'fo_owner', graphe: 'chaleur' }],
 ];
 function _indAjoutVueHtml() {
-  return `<article class="ix-v ix-v-add"><h4>Ajouter une vue</h4><p>Ou demande-la à Big Brother, à droite.</p>
+  return `<article class="ix-v ix-v-add"><h4>Ajouter une vue</h4><p>Ou demande-la à Pearl AI, à droite.</p>
     <div>${IND_NOUVELLES.map(([t, l], i) => `<button type="button" onclick="indAjouterVue(${i})">${esc(l)}</button>`).join('')}</div></article>`;
 }
 

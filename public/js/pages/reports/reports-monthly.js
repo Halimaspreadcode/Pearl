@@ -6,7 +6,7 @@ function fillMonthlyYears() {
   if (!sel) return;
   const now = new Date().getFullYear();
   const years = new Set([now - 1, now, now + 1, monthlyYear]);
-  [...(state.sn || []), ...(state.ci || [])].forEach(t => {
+  allTicketsRaw().forEach(t => {
     const y = t.open_date && new Date(t.open_date).getFullYear();
     if (y && !isNaN(y)) years.add(y);
   });
@@ -258,7 +258,7 @@ async function exportMonthlyExcel() {
   ws.mergeCells(2, 1, 2, 3);
   ws.mergeCells(2, 4, 2, 7);
   ws.mergeCells(2, 8, 2, 10);
-  [[`${mName} ${monthlyYear}`], [monthlyForm.author || rptDefaultAuthor()], ['Dakar']].forEach(([txt], i) => {
+  [[`${mName} ${monthlyYear}`], [monthlyForm.author || rptDefaultAuthor()], [scopeLabel(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL')]].forEach(([txt], i) => {
     const c = ws.getCell(2, [1, 4, 8][i]);
     c.value = txt;
     xlFill(c, XL_BLACK);
@@ -460,7 +460,7 @@ async function exportMonthlyExcel() {
   const blob = new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
   const a    = document.createElement('a');
   a.href     = URL.createObjectURL(blob);
-  a.download = `EMOC_Monthly_Report_${monthlyYear}-${String(monthlyMonth).padStart(2,'0')}.xlsx`;
+  a.download = `Pearl_Monthly_Report_${monthlyYear}-${String(monthlyMonth).padStart(2,'0')}.xlsx`;
   a.click();
   _uploadReportFile('monthly', buf, a.download, new Date().toISOString().slice(0, 10));
   toast('Excel export generated', 'success');

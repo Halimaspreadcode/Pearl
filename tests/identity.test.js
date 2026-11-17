@@ -4,11 +4,11 @@ const bcrypt = require('bcryptjs');
 process.env.CONFIG_PW_HASH = bcrypt.hashSync('admin-pw', 4);
 delete process.env.TEAM_PW_HASH;
 const dir = useTempDataDir({
-  'config.json': { fo_list: ['Awa', 'Fatime NDOYE'], fo_access_codes: {
-    Awa: { hash: bcrypt.hashSync('CODEAWA2', 4), huawei_id: 'a00000001' },
-    'Fatime NDOYE': { hash: bcrypt.hashSync('CODEYAR2', 4), huawei_id: 'a00000002' } } },
+  'config.json': { fo_list: ['Awa', 'Jeanne DUPONT'], fo_access_codes: {
+    Awa: { hash: bcrypt.hashSync('CODEAWA2', 4), employee_id: 'a00000001' },
+    'Jeanne DUPONT': { hash: bcrypt.hashSync('CODEYAR2', 4), employee_id: 'a00000002' } } },
   'sn.json': [{ id: 'T1', modified_by: 'x' }], 'ci.json': [], 'observations.json': [], 'audit.json': [],
-  'weekly_progress.json': [{ id: 'w1', modified_by: 'Fatime NDOYE', task: 'Sa tâche', status: 'Planned' }],
+  'weekly_progress.json': [{ id: 'w1', modified_by: 'Jeanne DUPONT', task: 'Sa tâche', status: 'Planned' }],
   'quiz_results.json': [],
 });
 const { test, before, after } = require('node:test');
@@ -46,16 +46,16 @@ test('mot de passe d\'équipe : consultation seule', async () => {
 });
 
 test('code personnel : identité renvoyée par le serveur', async () => {
-  const l = await login({ huaweiId: 'a00000001', password: 'CODEAWA2' });
+  const l = await login({ employeeId: 'a00000001', password: 'CODEAWA2' });
   assert.equal(l.body.user.name, 'Awa');
   const s = await (await fetch(`${base}/api/team/session`, { headers: { cookie: l.cookie } })).json();
-  assert.deepEqual(s.user, { name: 'Awa', huaweiId: 'a00000001', role: 'FO' });
+  assert.deepEqual(s.user, { name: 'Awa', employeeId: 'a00000001', role: 'FO' });
 });
 
 test('impossible d\'écrire au nom d\'un collègue', async () => {
-  const { cookie } = await login({ huaweiId: 'a00000001', password: 'CODEAWA2' });
+  const { cookie } = await login({ employeeId: 'a00000001', password: 'CODEAWA2' });
   const r = await fetch(`${base}/api/weekly-progress`, { method: 'POST', headers: { ...json, cookie },
-    body: JSON.stringify({ task: 'Usurpée', modified_by: 'Fatime NDOYE', admin_task: true }) });
+    body: JSON.stringify({ task: 'Usurpée', modified_by: 'Jeanne DUPONT', admin_task: true }) });
   assert.equal(r.status, 201);
   const cree = await r.json();
   assert.equal(cree.modified_by, 'Awa');
@@ -65,26 +65,26 @@ test('impossible d\'écrire au nom d\'un collègue', async () => {
   assert.equal(p.status, 403);
   assert.equal(readFixture(dir, 'weekly_progress.json').find(x => x.id === 'w1').status, 'Planned');
   // Ticket : l'auteur de la modification est celui de la session.
-  await fetch(`${base}/api/sn/T1`, { method: 'PUT', headers: { ...json, cookie }, body: '{"modified_by":"Fatime NDOYE","status":"Open"}' });
+  await fetch(`${base}/api/tickets/sn/T1`, { method: 'PUT', headers: { ...json, cookie }, body: '{"modified_by":"Jeanne DUPONT","status":"Open"}' });
   assert.equal(readFixture(dir, 'sn.json')[0].modified_by, 'Awa');
 });
 
 test('l\'admin assigne toujours au nom d\'un agent', async () => {
   const r = await fetch(`${base}/api/weekly-progress`, { method: 'POST',
     headers: { ...json, 'X-Admin-Token': issueSession().token },
-    body: JSON.stringify({ task: 'Assignée', modified_by: 'Fatime NDOYE', admin_task: true }) });
+    body: JSON.stringify({ task: 'Assignée', modified_by: 'Jeanne DUPONT', admin_task: true }) });
   const t = await r.json();
-  assert.equal(t.modified_by, 'Fatime NDOYE');
+  assert.equal(t.modified_by, 'Jeanne DUPONT');
   assert.equal(t.admin_task, true);
 });
 
 test('onglet My Space réservé : refusé aux autres ID, même côté serveur', async () => {
   const { readCfg, writeCfg } = require('../server/core/store');
   const cfg = readCfg(); cfg.nav_reserved = { 'weekly-progress': ['A00000002'] }; writeCfg(cfg);
-  const awa = await login({ huaweiId: 'a00000001', password: 'CODEAWA2' });
+  const awa = await login({ employeeId: 'a00000001', password: 'CODEAWA2' });
   const r = await fetch(`${base}/api/weekly-progress`, { method: 'POST', headers: { ...json, cookie: awa.cookie }, body: '{"task":"x"}' });
   assert.equal(r.status, 403);
-  const yar = await login({ huaweiId: 'a00000002', password: 'CODEYAR2' });
+  const yar = await login({ employeeId: 'a00000002', password: 'CODEYAR2' });
   const ok = await fetch(`${base}/api/weekly-progress`, { method: 'POST', headers: { ...json, cookie: yar.cookie }, body: '{"task":"x"}' });
   assert.equal(ok.status, 201);
   cfg.nav_reserved = {}; writeCfg(cfg);
@@ -93,13 +93,13 @@ test('onglet My Space réservé : refusé aux autres ID, même côté serveur', 
 test('réservation : reconnue par l\'ID de la fiche agent même si le code porte un autre ID', async () => {
   const { readCfg, writeCfg } = require('../server/core/store');
   const cfg = readCfg();
-  cfg.fo_ids = { 'Fatime NDOYE': 'wx1488808' };
+  cfg.fo_ids = { 'Jeanne DUPONT': 'wx1488808' };
   cfg.nav_reserved = { 'weekly-progress': ['WX1488808'] };
   writeCfg(cfg);
-  const yar = await login({ huaweiId: 'a00000002', password: 'CODEYAR2' });
+  const yar = await login({ employeeId: 'a00000002', password: 'CODEYAR2' });
   const ok = await fetch(`${base}/api/weekly-progress`, { method: 'POST', headers: { ...json, cookie: yar.cookie }, body: '{"task":"y"}' });
   assert.equal(ok.status, 201);
-  const awa = await login({ huaweiId: 'a00000001', password: 'CODEAWA2' });
+  const awa = await login({ employeeId: 'a00000001', password: 'CODEAWA2' });
   const ko = await fetch(`${base}/api/weekly-progress`, { method: 'POST', headers: { ...json, cookie: awa.cookie }, body: '{"task":"y"}' });
   assert.equal(ko.status, 403);
   assert.match((await ko.json()).error, /Tasks est réservé.*Awa/);

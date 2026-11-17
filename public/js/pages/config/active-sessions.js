@@ -1,5 +1,5 @@
 // ── SESSIONS ACTIVES (page Admin) ─────────────────────────────
-// Vue d'administration : le détail que /api/presence ne donne pas (ID Huawei,
+// Vue d'administration : le détail que /api/presence ne donne pas (ID employé,
 // page consultée) et la possibilité de fermer une session. Le rafraîchissement
 // s'arrête dès qu'on quitte la page — inutile d'interroger le serveur en fond.
 const SESSIONS_POLL_MS = 15000;
@@ -54,7 +54,7 @@ function renderSessionsAdmin(users) {
         ${presenceAvatar(u, u.secondsAgo < 60 ? 'is-fresh' : '')}
         <span style="font-weight:600">${esc(u.name)}</span>
       </td>
-      <td style="font-family:monospace;font-size:12px">${esc(u.huaweiId || '—')}</td>
+      <td style="font-family:monospace;font-size:12px">${esc(u.employeeId || '—')}</td>
       <td>${esc(u.role || 'Observer')}</td>
       <td>${u.pageLabel ? esc(u.pageLabel) : '<span style="color:var(--mute)">—</span>'}</td>
       <td style="white-space:nowrap">${esc(presenceAgo(u.secondsAgo))}</td>

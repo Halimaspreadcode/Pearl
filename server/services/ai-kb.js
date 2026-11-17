@@ -1,4 +1,4 @@
-// ── BASE DE CONNAISSANCES DE BIG BROTHER ──────────────────────
+// ── BASE DE CONNAISSANCES DE PEARL AI ──────────────────────
 // L'admin importe des documents (procédures, guides, comptes rendus…).
 // Chacun est réduit à son texte, découpé en passages d'environ un
 // paragraphe, puis gardé dans data/ai_kb.json.
@@ -13,10 +13,9 @@
 // Markdown, CSV, JSON. Le PDF est lu dans le navigateur (pdf.js) et arrive
 // déjà en texte.
 const crypto = require('crypto');
-const fs = require('fs');
 const JSZip = require('jszip');
 const { FILES } = require('../config/paths');
-const { readJSON, writeJSON, withFileLock } = require('../core/store');
+const { readJSON, writeJSON, withFileLock, docVersion } = require('../core/store');
 
 const LIM = {
   docs: 300,                 // documents au plus
@@ -37,14 +36,16 @@ const LIM = {
 // documents, relire et décoder des dizaines de Mo à chaque question
 // coûterait plus que la réponse. Copie superficielle : un appelant qui
 // réassigne docs ou chunks ne touche pas au cache.
-let _cache = null;
+// Un cache par tenant (clé = chemin du fichier, propre au tenant).
+const _caches = new Map();
 const lire = () => {
-  let st = null;
-  try { st = fs.statSync(FILES.ai_kb); } catch {}
-  const cle = st ? `${st.mtimeMs}|${st.size}` : 'vide';
+  const f = FILES.ai_kb;
+  const cle = docVersion(f) || 'vide';
+  let _cache = _caches.get(f);
   if (!_cache || _cache.cle !== cle) {
-    const kb = readJSON(FILES.ai_kb, null) || {};
+    const kb = readJSON(f, null) || {};
     _cache = { cle, kb: { enabled: kb.enabled !== false, docs: kb.docs || [], chunks: kb.chunks || [] } };
+    _caches.set(f, _cache);
   }
   const k = _cache.kb;
   return { enabled: k.enabled, docs: [...k.docs], chunks: [...k.chunks] };

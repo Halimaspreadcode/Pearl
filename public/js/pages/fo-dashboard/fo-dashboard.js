@@ -43,8 +43,7 @@ function _foFilterTickets(fo) {
   const tracker = (document.getElementById('fo-dash-tracker') || {}).value || 'both';
 
   let pool = [];
-  if (tracker !== 'ci') pool = pool.concat(state.sn.map(t => ({ ...t, _tracker: 'sn' })));
-  if (tracker !== 'sn') pool = pool.concat(state.ci.map(t => ({ ...t, _tracker: 'ci' })));
+  pool = pool.concat(ticketsInScope(tracker === 'both' ? 'ALL' : tracker.toUpperCase()));
   pool = pool.filter(t => t.fo_owner === fo || t.assigned_to === fo);
 
   if (period !== 'all') {
@@ -111,8 +110,7 @@ function _foScoreBreakdown(r) {
 function _foScoreHistory(fo, weeks = 8) {
   const tracker = (document.getElementById('fo-dash-tracker') || {}).value || 'both';
   let pool = [];
-  if (tracker !== 'ci') pool = pool.concat(state.sn);
-  if (tracker !== 'sn') pool = pool.concat(state.ci);
+  pool = pool.concat(tracker === 'both' ? allTicketsRaw() : ticketsOf(tracker));
   pool = pool.filter(t => t.fo_owner === fo || t.assigned_to === fo);
 
   const now = new Date();
@@ -150,11 +148,10 @@ function _foScoreHistory(fo, weeks = 8) {
 function _foWeeklyKudos(limit = 3) {
   const tracker = (document.getElementById('fo-dash-tracker') || {}).value || 'both';
   const foList  = (state.config.fo_list || []).filter(fo =>
-    getActiveCountry() === 'ALL' || ((state.config.fo_trackers || {})[fo] || 'SN') === getActiveCountry());
+    getActiveCountry() === 'ALL' || personInScope(fo, getActiveCountry()));
 
   let pool = [];
-  if (tracker !== 'ci') pool = pool.concat(state.sn);
-  if (tracker !== 'sn') pool = pool.concat(state.ci);
+  pool = pool.concat(tracker === 'both' ? allTicketsRaw() : ticketsOf(tracker));
 
   const from = new Date();
   from.setHours(0, 0, 0, 0);
@@ -284,8 +281,7 @@ function _renderFoEvolutionChart() {
 
   const tracker = (document.getElementById('fo-dash-tracker') || {}).value || 'both';
   let pool = [];
-  if (tracker !== 'ci') pool = pool.concat(state.sn);
-  if (tracker !== 'sn') pool = pool.concat(state.ci);
+  pool = pool.concat(tracker === 'both' ? allTicketsRaw() : ticketsOf(tracker));
   const resolved = pool.filter(t => ['Resolved','Closed'].includes(t.status) && t.close_date);
 
   const DAYS = 14;
@@ -425,7 +421,7 @@ function computeFoScores(d) {
   // dans la même grille fausserait la comparaison.
   const scope = (typeof getActiveCountry === 'function') ? getActiveCountry() : 'ALL';
   const foList = (state.config.fo_list || []).filter(fo =>
-    scope === 'ALL' || ((state.config.fo_trackers || {})[fo] || 'SN') === scope);
+    scope === 'ALL' || personInScope(fo, scope));
   const manualPerf = state.config.fo_performance || {};
   const manualEng  = state.config.fo_engagement  || {};
   const byFo = d.by_fo || {};

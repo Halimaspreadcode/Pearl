@@ -1,6 +1,7 @@
 const fs   = require('fs');
 const path = require('path');
-const { DATA_DIR, FILES } = require('../config/paths');
+const { dataDir, FILES } = require('../config/paths');
+const { backend } = require('../core/backend');
 const { readJSON, writeJSON, withFileLock, readCfg, writeCfg } = require('../core/store');
 const { foSessions } = require('../auth/sessions');
 
@@ -10,8 +11,8 @@ const { foSessions } = require('../auth/sessions');
 // tickets, brouillons de rapport, insights… Corriger une faute de frappe
 // dans la seule liste des agents détachait donc l'agent de tout son
 // historique. On réécrit ici chaque fichier de données : clés d'objet et
-// valeurs texte, le nom entier seulement (« Fatim NDOYE » dans
-// « Fatim NDOYE - FO » oui, « Fatim » seul non), sans tenir compte de la
+// valeurs texte, le nom entier seulement (« Jean DUPONT » dans
+// « Jean DUPONT - FO » oui, « Jean » seul non), sans tenir compte de la
 // casse.
 //
 // L'ancien nom est noté dans config.fo_renames : les navigateurs qui ont
@@ -44,9 +45,8 @@ function remplacerDans(valeur, re, nouveau, compte) {
 }
 
 function fichiersDeDonnees() {
-  return fs.readdirSync(DATA_DIR)
-    .filter(f => f.endsWith('.json'))
-    .map(f => path.join(DATA_DIR, f));
+  const dir = dataDir();
+  return backend().listDocs(dir).map(f => path.join(dir, f));
 }
 
 // `fusion` : si l'agent cible existe déjà (doublon créé à la main), ses
@@ -64,8 +64,8 @@ async function renommerAgent(ancien, nouveau, { fusion = false } = {}) {
     throw Object.assign(new Error('Un autre agent porte déjà ce nom.'), { status: 409, fusionPossible: true });
   if (cible) nouveau = cible;   // on garde l'écriture exacte de l'existant
 
-  // Nom entier, non collé à une autre lettre : « Fatim NDOYE » ne doit pas
-  // toucher « Fatim NDOYEUE ».
+  // Nom entier, non collé à une autre lettre : « Jean DUPONT » ne doit pas
+  // toucher « Jean DUPONTUE ».
   const re = new RegExp(`(?<![\\p{L}\\p{N}])${echapper(ancien)}(?![\\p{L}\\p{N}])`, 'giu');
   const detail = {};
   for (const fichier of fichiersDeDonnees()) {
@@ -94,23 +94,25 @@ async function renommerAgent(ancien, nouveau, { fusion = false } = {}) {
 // Appliquées une fois au démarrage, sur la machine où vivent les vraies
 // données (la VM), après la sauvegarde quotidienne. Rejouer est sans effet :
 // une fois l'ancien nom sorti de fo_list, il n'y a plus rien à faire.
-const CORRECTIONS = [
-  ['Fatim NDOYE', 'Fatime NDOYE'],
-];
+// Liste propre à chaque déploiement : vide par défaut.
+const CORRECTIONS = [];
 
-async function appliquerCorrections() {
-  for (const [ancien, nouveau] of CORRECTIONS) {
+async function appliquerCorrections(liste = CORRECTIONS) {
+  for (const [ancien, nouveau] of liste) {
     if (!(readCfg().fo_list || []).includes(ancien)) continue;
     try {
       // Copie complète juste avant : la sauvegarde du jour peut dater de
       // ce matin, celle-ci est l'état exact d'avant le renommage.
-      const dest = path.join(DATA_DIR, 'backups', `avant-renommage-${new Date().toISOString().replace(/[:.]/g, '-')}`);
-      fs.mkdirSync(dest, { recursive: true });
-      for (const f of fichiersDeDonnees()) fs.copyFileSync(f, path.join(dest, path.basename(f)));
+      // (En base, les sauvegardes sont celles de la base elle-même.)
+      if (backend().kind === 'fs') {
+        const dest = path.join(dataDir(), 'backups', `avant-renommage-${new Date().toISOString().replace(/[:.]/g, '-')}`);
+        fs.mkdirSync(dest, { recursive: true });
+        for (const f of fichiersDeDonnees()) fs.copyFileSync(f, path.join(dest, path.basename(f)));
+      }
       const r = await renommerAgent(ancien, nouveau, { fusion: true });
       require('../core/audit').addAudit('config', r.nouveau, 'system', 'fo-rename', { from: ancien, to: r.nouveau, total: r.total, fusion: r.fusion });
-      console.log(`[EMOC] Agent renommé : ${ancien} → ${r.nouveau} (${r.total} mention(s)${r.fusion ? ', fusion' : ''}).`);
-    } catch (e) { console.error(`[EMOC] Renommage ${ancien} → ${nouveau} : ${e.message}`); }
+      console.log(`[Pearl] Agent renommé : ${ancien} → ${r.nouveau} (${r.total} mention(s)${r.fusion ? ', fusion' : ''}).`);
+    } catch (e) { console.error(`[Pearl] Renommage ${ancien} → ${nouveau} : ${e.message}`); }
   }
 }
 

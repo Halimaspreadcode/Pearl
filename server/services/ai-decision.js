@@ -3,7 +3,7 @@ const { readCfg, readWeeklyProgress, readShiftsPlan, readObs } = require('../cor
 // ══════════════════════════════════════════════════════════════
 // RAPPORT D'AIDE À LA DÉCISION
 //
-// Le serveur calcule les faits ; Big Brother ne fait que les lire. Chaque
+// Le serveur calcule les faits ; Pearl AI ne fait que les lire. Chaque
 // décision qu'il propose doit pouvoir se vérifier dans ces chiffres, qui
 // sont aussi affichés tels quels à côté de sa lecture.
 //
@@ -152,7 +152,7 @@ function donneesDecision({ periode = 'semaine', perimetre = 'ALL' } = {}) {
 
   const donnees = {
     periode: `${periode === 'mois' ? '30 derniers jours' : '7 derniers jours'} (${iso(debut)} → ${iso(finP)})`,
-    perimetre: perimetre === 'ALL' ? 'Dakar et Abidjan' : perimetre === 'SN' ? 'Dakar (SN)' : 'Abidjan (CI)',
+    perimetre: require('../core/store').scopeLabel(perimetre),
     indicateurs,
     origine_des_ruptures: {
       par_type_priorite: top(cur._ruptures, t => `${t.type || '?'} ${t.priority || ''}`.trim()),

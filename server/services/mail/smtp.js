@@ -38,7 +38,7 @@ function smtpSend(cfg, { to, subject, text, html, attachments }) {
     // de l'exploitant, jamais la valeur par défaut.
     const rejectUnauthorized = cfg.reject_unauthorized !== false;
     const b64 = v => Buffer.from(String(v), 'utf8').toString('base64');
-    const salut = () => `EHLO ${os.hostname() || 'emoc'}`;
+    const salut = () => `EHLO ${os.hostname() || 'pearl'}`;
 
     let sock = secure
       ? tls.connect({ host, port, servername: host, rejectUnauthorized })

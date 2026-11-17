@@ -41,7 +41,7 @@ function degrade(ligne, decalage = 0) {
 
 async function banniere(sousTitre) {
   console.log('');
-  if (!TTY) { console.log(`FOps — ${sousTitre}`); return; }
+  if (!TTY) { console.log(`Pearl — ${sousTitre}`); return; }
   for (let i = 0; i < LOGO.length; i++) {
     process.stdout.write('  ' + degrade(LOGO[i], i * 0.12) + '\n');
     await pause(45);

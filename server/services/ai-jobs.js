@@ -1,9 +1,9 @@
 // ══════════════════════════════════════════════════════════════
-// TÂCHES DE BIG BROTHER EN ARRIÈRE-PLAN
+// TÂCHES DE PEARL AI EN ARRIÈRE-PLAN
 //
 // Un skill peut prendre une à deux minutes (gros modèle, second essai).
 // La page lance la tâche, récupère son identifiant et vient lire où elle
-// en est : une phrase à la fois (« Lecture des données… », « Big Brother
+// en est : une phrase à la fois (« Lecture des données… », « Pearl AI
 // cherche l'origine des 12 ruptures… »). L'admin peut changer de page ou
 // continuer à écrire pendant ce temps.
 //
@@ -17,7 +17,7 @@ const GARDE_MS = 60 * 60 * 1000;   // résultat gardé une heure
 const MAX = 30;                    // tâches gardées au plus
 const ROTATION_MS = 4500;          // une phrase d'attente toutes les 4,5 s
 
-const JOBS = new Map();
+const JOBS = require('../core/scoped').scopedMap();
 
 function purger() {
   const limite = Date.now() - GARDE_MS;
@@ -40,7 +40,7 @@ const vue = j => ({
  * Lance `travail(progres)` en arrière-plan et renvoie la tâche.
  * `progres(texte, attente)` pose l'étape courante ; `attente` (facultatif)
  * est une liste de phrases qui défilent tant que l'étape suivante n'arrive
- * pas — ce que Big Brother est en train de lire pendant l'appel au modèle.
+ * pas — ce que Pearl AI est en train de lire pendant l'appel au modèle.
  */
 function lancer({ skill, titre }, travail) {
   purger();

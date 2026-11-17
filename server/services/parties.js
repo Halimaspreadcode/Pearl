@@ -5,12 +5,12 @@
 // DRPS, l'exploitation réseau… ouvrent ou suivent des incidents. L'admin
 // crée ici d'autres rôles (« SMC — Service Management Center ») et y
 // range des personnes, avec le pays et les graphies sous lesquelles
-// elles apparaissent ailleurs (IMOC : « DRPS/DEX/SMC-N/QSM FAYE PAPA
-// TAHIROU »).
+// elles apparaissent ailleurs (outil externe : « DIR/OPS/SMC-N/QSM
+// MOREAU PIERRE ANTOINE »).
 //
 // Un rôle créé ici est un rôle à part entière : session nominative (le
 // code personnel), vue par profil de la barre latérale, présence,
-// reconnaissance dans IMOC.
+// reconnaissance dans les outils externes.
 //
 // Stockage : config.parties = { roles: [...], people: [...] }, écrit par
 // ses propres routes (jamais par PUT /api/config, qui l'écraserait).
@@ -23,7 +23,8 @@ const { readCfg, writeCfg, withFileLock, readBO } = require('../core/store');
 // Général) : ils figurent ici en lecture, pour l'affichage.
 const RESERVES = ['FO', 'BO', 'OBSERVER', 'GUEST', 'ADMIN', 'INVALID'];
 const COULEURS = ['#3D7FD9', '#8E5BD9', '#2E9E5B', '#E8833A', '#D64545', '#14B8A6', '#B8860B', '#EC4899'];
-const PAYS = { SN: 'Sénégal', CI: 'Côte d\'Ivoire', '': '—' };
+// Site de rattachement d'une partie prenante : un code de cfg.sites ou ''.
+const PAYS = new Proxy({ '': '—' }, { get: (t, k) => (k in t ? t[k] : (typeof k === 'string' ? ((require('../core/store').siteByCode(k) || {}).name || k) : undefined)) });
 
 const str = (v, n) => String(v ?? '').trim().replace(/\s+/g, ' ').slice(0, n);
 const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -50,7 +51,7 @@ async function majRole(b) {
   let key = str(b.key || label.split(/[\s—–-]/)[0], 16).toUpperCase().replace(/[^A-Z0-9_-]/g, '');
   if (!label) throw Object.assign(new Error('Donne un nom au rôle (ex. SMC — Service Management Center).'), { status: 400 });
   if (!key) throw Object.assign(new Error('Sigle du rôle invalide (lettres et chiffres).'), { status: 400 });
-  if (RESERVES.includes(key)) throw Object.assign(new Error(`« ${key} » est déjà un rôle de FOps : choisis un autre sigle.`), { status: 400 });
+  if (RESERVES.includes(key)) throw Object.assign(new Error(`« ${key} » est déjà un rôle de Pearl : choisis un autre sigle.`), { status: 400 });
   return ecrire(p => {
     const i = p.roles.findIndex(r => r.key === (b.ancien || key));
     if (i < 0 && p.roles.some(r => r.key === key)) throw Object.assign(new Error(`Le rôle ${key} existe déjà.`), { status: 409 });
@@ -86,7 +87,7 @@ async function majPersonne(b) {
     if (doublon) throw Object.assign(new Error(`${doublon.name} existe déjà.`), { status: 409 });
     if ((cfg.fo_list || []).some(f => norm(f) === norm(name))) throw Object.assign(new Error(`${name} est déjà dans la liste des FO.`), { status: 409 });
     const x = { id: i >= 0 ? p.people[i].id : crypto.randomBytes(5).toString('hex'), name, role: b.role,
-      country: ['SN', 'CI'].includes(b.country) ? b.country : '', aliases,
+      country: require('../core/store').siteCodes(cfg).includes(String(b.country || '').toUpperCase()) ? String(b.country).toUpperCase() : '', aliases,
       email: str(b.email, 120), phone: str(b.phone, 40), note: str(b.note, 200) };
     if (i >= 0) p.people[i] = x; else p.people.push(x);
     return x;
@@ -100,7 +101,7 @@ async function retirerPersonne(id) {
     return { ok: true };
   });
 }
-// Graphie vue ailleurs (IMOC…) rattachée à une personne : elle sera
+// Graphie vue ailleurs (outil externe…) rattachée à une personne : elle sera
 // reconnue d'office la prochaine fois.
 async function ajouterAlias(id, alias) {
   const a = str(alias, 120);
@@ -122,17 +123,17 @@ function roleDe(nom, cfg = readCfg()) {
 }
 
 // ── Reconnaissance d'un nom écrit ailleurs ──
-// « DRPS/DEX/SMC-N/QSM FAYE PAPA TAHIROU », « EMOC FO Huawei CI TETI
-// TETY WILFRIED Franck » : un chemin d'organisation (avec des « / ») ou un
+// « DIR/OPS/SMC-N/QSM MOREAU PIERRE ANTOINE », « EMOC FO Huawei CI TETI
+// GARNIER LUCAS Franck » : un chemin d'organisation (avec des « / ») ou un
 // préfixe EMOC, puis le nom. On sépare les deux, on cherche le nom parmi
 // tout le monde (FO, BO, parties prenantes, et leurs graphies connues).
 function decouper(texte) {
   let t = str(texte, 200);
   let org = '';
-  const m = /^(\S*\/\S*)\s+(.+)$/.exec(t);                    // DRPS/DEX/SMC-N/QSM NOM…
+  const m = /^(\S*\/\S*)\s+(.+)$/.exec(t);                    // DIR/OPS/SMC-N/QSM NOM…
   if (m) { org = m[1]; t = m[2]; }
-  const e = /^(EMOC\s+)?(FO|BO)\s+(Huawei\s+)?(CI|SN|OCI|OSN)?\s*(.+)$/i.exec(t);
-  if (e && (e[1] || e[3])) { org = [org, `${e[1] || ''}${e[2]} ${e[3] || ''}${e[4] || ''}`.trim()].filter(Boolean).join(' '); t = e[5]; }
+  const e = /^(FO|BO)\s+([A-Z]{2,3})\s+(.+)$/.exec(t);
+  if (e) { org = [org, `${e[1]} ${e[2]}`].filter(Boolean).join(' '); t = e[3]; }
   return { org, nom: t.trim() };
 }
 const titre = s => String(s).toLowerCase().replace(/(^|[\s'-])(\p{L})/gu, (_, a, b) => a + b.toUpperCase());

@@ -205,17 +205,19 @@ describe('doublons', () => {
 
 describe('cache de l\'index', () => {
   test('réutilisé tant que le fichier ne change pas, reconstruit sinon', () => {
+    // Le cache est rangé par fichier de tracker (donc par tenant et par site).
+    const K = require('../server/config/paths').siteFile('sn');
     S.suggest('sn', { title: 'x fibre' });
-    const first = S._cache.sn.index;
+    const first = S._cache[K].index;
     S.suggest('sn', { title: 'y fibre' });
-    assert.equal(S._cache.sn.index, first);
+    assert.equal(S._cache[K].index, first);
 
     const extra = [...TICKETS, { id: 'sn-new', title: 'Incendie local technique Kaolack', status: 'Open' }];
     writeFixture(dir, 'sn.json', extra);
     const future = new Date(Date.now() + 5000);
     fs.utimesSync(path.join(dir, 'sn.json'), future, future);
     const r = S.suggest('sn', { title: 'Incendie local technique Kaolack' });
-    assert.notEqual(S._cache.sn.index, first);
+    assert.notEqual(S._cache[K].index, first);
     assert.equal(r.indexed, extra.length);
     assert.equal(r.possible_duplicates[0].id, 'sn-new');
     writeFixture(dir, 'sn.json', TICKETS);
