@@ -93,7 +93,7 @@
           '<path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round" opacity=".45"/>' +
           '<circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg><span>Pearl<small>FRONT OFFICE</small></span></div>' +
           '<div><h2 class="tg-hero">Every ticket, every shift, <em>one place.</em></h2>' +
-          '<ul class="tg-feat"><li><i>⚡</i>Trackers SN, CI and global, with live SLA countdowns</li>' +
+          '<ul class="tg-feat"><li><i>⚡</i>Tickets for every site, with live SLA countdowns</li>' +
           '<li><i>✦</i>Your space: tasks, requests, score and quizzes</li>' +
           '<li><i>💡</i>Reports, academy and the team idea box</li></ul></div>' +
           '<div class="tg-side-foot">Pearl</div>' +
@@ -104,7 +104,7 @@
         '<div class="tg-logo">FO</div>' +
         '<h1>Sign in</h1>' +
         '<p class="tg-intro"></p>' +
-        '<div class="tg-id"><label for="tg-id">Employee ID</label>' +
+        '<div class="tg-id"><label for="tg-id" class="tg-id-lbl">Employee ID</label>' +
         '<input id="tg-id" name="username" autocomplete="username" placeholder="e.g. a00123456" spellcheck="false"></div>' +
         '<label for="tg-pw" class="tg-lbl"></label>' +
         '<input id="tg-pw" type="password" name="password" autocomplete="current-password" required>' +
@@ -117,8 +117,24 @@
       var bloc = ov.querySelector('.tg-id'), lbl = ov.querySelector('.tg-lbl'), err = ov.querySelector('.tg-err');
       var lien = ov.querySelector('.tg-lien'), btn = ov.querySelector('.tg-btn'), intro = ov.querySelector('.tg-intro');
       var perso = true;
+      // Comptes (SaaS) : email + mot de passe. Le code personnel reste
+      // disponible pour les équipes qui l'utilisent déjà.
+      var compte = !!(window.TeamIdentity && window.TeamIdentity.accounts);
+      var idLbl = ov.querySelector('.tg-id-lbl');
       var mode = function () {
-        bloc.hidden = !perso;
+        bloc.hidden = !perso && !compte;
+        if (compte) {
+          idLbl.textContent = 'Email';
+          id.type = 'email'; id.placeholder = 'you@company.com'; id.autocomplete = 'username';
+          lbl.textContent = 'Password';
+          intro.textContent = message || 'Sign in with your account. Ask your administrator for an invitation.';
+          lien.textContent = window.TeamIdentity && window.TeamIdentity.codes ? 'I have a personal code' : '';
+          lien.hidden = !(window.TeamIdentity && window.TeamIdentity.codes);
+          err.textContent = '';
+          return;
+        }
+        idLbl.textContent = 'Employee ID';
+        id.type = 'text'; id.placeholder = 'e.g. a00123456';
         lbl.textContent = perso ? 'Personal code' : 'Team password';
         intro.textContent = message || (perso
           ? 'Use your Employee ID and the personal code your manager gave you. They sign your changes.'
@@ -129,7 +145,10 @@
         err.textContent = '';
       };
       mode();
-      lien.addEventListener('click', function () { perso = !perso; mode(); (perso ? id : pw).focus(); });
+      lien.addEventListener('click', function () {
+        if (compte) { compte = false; perso = true; } else perso = !perso;
+        mode(); (perso ? id : pw).focus();
+      });
       var x = ov.querySelector('.tg-x');
       // « Plus tard » : on ne redemande pas à chaque chargement de cette
       // session ; la pastille « Sign in » reste là pour qui veut se connecter.
@@ -138,8 +157,10 @@
         e.preventDefault();
         btn.disabled = true; err.textContent = '';
         var corps = { password: pw.value };
-        if (perso) corps.employeeId = id.value.trim();
-        fetchOrig('/api/team/auth', {
+        var url = '/api/team/auth';
+        if (compte) { corps.email = id.value.trim(); url = '/api/team/account-login'; }
+        else if (perso) corps.employeeId = id.value.trim();
+        fetchOrig(url, {
           method: 'POST', credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corps),
         }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { r: r, j: j }; }); })
@@ -179,7 +200,7 @@
     .then(function (r) { return r.json(); })
     .then(function (j) {
       window.TeamIdentity = { actif: !!j.actif, exige: !!j.exige, codes: !!j.codes, user: j.user || null,
-        lecture: !!j.lecture, admin: !!j.admin, pret: true };
+        lecture: !!j.lecture, admin: !!j.admin, accounts: !!j.accounts, pret: true };
       if (j && j.actif && !j.ok) { afficher(false); return; }
       if (!j.user && !j.admin && (j.exige || (j.actif && j.lecture))) bandeauLecture();
       if (typeof window.applyServerIdentity === 'function') window.applyServerIdentity(window.TeamIdentity);
@@ -192,7 +213,8 @@
   window.teamLogin = function () { afficher(true); };
   window.teamLogout = function () {
     try { localStorage.removeItem('fo-user'); } catch (e) {}
-    return fetchOrig('/api/team/logout', { method: 'POST', credentials: 'same-origin' })
+    var url = window.TeamIdentity && window.TeamIdentity.accounts ? '/api/team/account-logout' : '/api/team/logout';
+    return fetchOrig(url, { method: 'POST', credentials: 'same-origin' })
       .then(function () { location.reload(); });
   };
 })();

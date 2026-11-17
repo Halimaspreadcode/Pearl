@@ -58,6 +58,8 @@ router.get('/api/team/session', (req, res) => {
     user: q && q.name && q.name !== 'Admin' ? { name: q.name, employeeId: q.employeeId || '', role: q.role || '' } : null,
     lecture: !!(q && q.lecture),
     admin: !!(q && q.admin),
+    // Connexion par compte (email + mot de passe) disponible.
+    accounts: require('../core/tenant').isMultiTenant() || process.env.ACCOUNTS === '1',
   });
 });
 

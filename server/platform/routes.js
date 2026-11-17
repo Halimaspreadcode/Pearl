@@ -230,6 +230,11 @@ tenantRouter.get('/api/platform/me', (req, res) => {
   });
 });
 
+// Catalogue des modules (cases de Configuration › Organisation).
+tenantRouter.get('/api/platform/modules-catalog', (req, res) => res.json(MODULES.map(m => ({
+  id: m.id, label: m.label, desc: m.desc, always: !!m.always, depends: m.depends || [],
+}))));
+
 tenantRouter.get('/api/platform/members', requireOrgAdmin, wrap(async (req, res) => {
   res.json(await registry().listMembers(req.tenant.slug));
 }));

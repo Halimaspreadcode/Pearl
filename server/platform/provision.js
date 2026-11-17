@@ -23,7 +23,7 @@ const TRIAL_DAYS = Number(process.env.PEARL_TRIAL_DAYS || 14);
 function listPacks() {
   return fs.readdirSync(PACKS_DIR).filter(f => f.endsWith('.json'))
     .map(f => JSON.parse(fs.readFileSync(path.join(PACKS_DIR, f), 'utf8')))
-    .sort((a, b) => (a.id === 'generic') - (b.id === 'generic') || a.label.localeCompare(b.label));
+    .sort((a, b) => (b.id === 'generic') - (a.id === 'generic') || a.label.localeCompare(b.label));
 }
 function getPack(id) {
   const p = listPacks().find(x => x.id === (id || 'generic'));

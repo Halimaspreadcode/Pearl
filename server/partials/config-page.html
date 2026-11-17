@@ -143,6 +143,12 @@
       <div class="page-title">General</div>
       <div class="page-sub">Sites, domains, team, statuses and time references</div>
         <div class="config-grid">
+        <!-- Organisation (comptes SaaS) : marque, modules, membres
+             (js/pages/config/org-admin.js). Masqué hors comptes. -->
+        <div class="config-card" style="grid-column:1/-1;display:none">
+          <h3>Organisation</h3>
+          <div id="org-admin"></div>
+        </div>
         <!-- Sites de l'organisation (js/pages/config/sites-admin.js) : un
              tracker de tickets par site. -->
         <div class="config-card" style="grid-column:1/-1">

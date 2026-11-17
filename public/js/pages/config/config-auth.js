@@ -251,6 +251,7 @@ async function _renderCfgSubPage(page) {
   // ces rubriques partagent la même passe de rendu.
   if (page === 'cfg-general' || page === 'cfg-sla' || page === 'cfg-data' || page === 'cfg-rota') renderConfig();
   if (page === 'cfg-general' && typeof renderSitesAdmin === 'function') { _sitesDraft = null; renderSitesAdmin(); }
+  if (page === 'cfg-general' && typeof renderOrgAdmin === 'function') renderOrgAdmin();
   if (page === 'cfg-goals')    renderGoalsConfig();
   if (page === 'cfg-vues')     renderNavProfiles();
   if (page === 'cfg-parties')  renderParties();

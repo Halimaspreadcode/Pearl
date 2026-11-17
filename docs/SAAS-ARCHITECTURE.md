@@ -1,7 +1,7 @@
 # Pearl SaaS — architecture cible et plan de migration
 
-État : **proposition à valider**. Rien de ce document n'est encore appliqué,
-sauf la phase 0 (nettoyage et renommage).
+État : **phases 0 à 3 en place** (voir « État d'avancement » à la fin). Ce
+document décrit la cible et ce qui a été construit pour l'atteindre.
 
 ## 1. Ce qu'on vend
 
@@ -237,3 +237,62 @@ instance.
 - **Hébergement.** Cloud managé (recommandé pour un SaaS) ou installation
   chez le client (option « on-premise » payante, possible avec la même
   image).
+
+## 9. État d'avancement
+
+### Fait
+
+| Phase | Élément | Où |
+|---|---|---|
+| 1 | Contexte de tenant (AsyncLocalStorage), résolution par sous-domaine ou domaine personnalisé | `server/core/tenant.js`, `server/platform/tenants.js` |
+| 1 | Données isolées par tenant ; états en mémoire (sessions, présence, tâches IA) isolés | `server/config/paths.js`, `server/core/scoped.js` |
+| 1 | **Sites configurables** : plus aucun site écrit en dur ; tickets par site (`/api/tickets/:site`) ; éditeur dans Configuration › General | `server/routes/sites.js`, `public/js/core/sites.js` |
+| 1 | Tâches de fond (diffusion, insights, corrections) exécutées tenant par tenant | `forEachTenant` |
+| 2 | Stockage interchangeable : fichiers, **Supabase en HTTPS**, PostgreSQL direct avec **RLS** | `server/core/backend/` |
+| 2 | Schéma SQL et migrations (connexion directe ou API Supabase) | `server/db/migrations/`, `npm run db:migrate` |
+| 2 | Comptes (Supabase Auth ou locaux), rôles owner/admin/manager/agent/observer, invitations | `server/platform/accounts.js`, `bridge.js` |
+| 2 | Inscription en libre-service (`/signup`), console super-admin (`/console`), CLI | `public/platform/`, `npm run tenant:create` |
+| 2 | Mots de passe partagés de `.env` désactivés en multi-tenant | `server/auth/guards.js`, `team-gate.js` |
+| 3 | Registre de modules (manifests), garde serveur, menu filtré, activation par organisation | `server/platform/modules.js`, `public/js/core/branding.js` |
+| 3 | Packs métier (support IT, centre de contact, maintenance terrain, réseau d'agences, générique) | `server/platform/packs/*.json` |
+| 3 | Marque blanche : nom, logo, couleur, slogan par organisation | Configuration › General › Organisation |
+
+Tests : isolation entre organisations, sessions croisées refusées, modules
+désactivés, inscription, console (`tests/multi-tenant.test.js`) ; RLS sur
+une vraie base PostgreSQL (`tests/pg-store.test.js`, avec
+`PEARL_TEST_PG_URL`) ; pilote Supabase (`tests/supabase-rest.test.js`).
+
+### Reste à faire
+
+- **Appliquer le schéma sur Supabase** : `npm run db:migrate -- --via=api`
+  avec un jeton d'accès personnel (`SUPABASE_ACCESS_TOKEN=sbp_…`), ou
+  `npm run db:migrate` depuis une machine qui joint le port Postgres.
+- **Facturation** : les champs `plan`, `status`, `trial_ends_at` et
+  `billing` existent ; il manque le branchement Stripe (checkout, webhooks
+  qui passent le tenant en `active` ou `suspended`) et la fin d'essai
+  automatique.
+- **Emails d'invitation** : le mot de passe provisoire est affiché à
+  l'administrateur, pas envoyé. À brancher sur l'envoi de mails (SMTP de
+  la plateforme ou invitations Supabase).
+- **Plusieurs instances du serveur** : le cache par tenant suppose un seul
+  processus. Au-delà, invalider le cache (PostgreSQL LISTEN/NOTIFY).
+- **Client** : le code reste en scripts globaux. La migration écran par
+  écran vers des modules ES, et le rangement physique du code serveur en
+  `modules/<id>/`, peuvent se faire progressivement : les frontières
+  existent déjà dans le registre de modules.
+- **Traduction** : l'interface mélange français et anglais.
+
+## 10. Mise en production (résumé)
+
+```bash
+cp .env.example .env              # puis remplir la section SAAS et STOCKAGE
+npm install
+npm run db:migrate -- --via=api   # ou npm run db:migrate (connexion directe)
+npm run tenant:create -- --platform-admin moi@exemple.com
+npm start
+```
+
+DNS : un enregistrement générique `*.pearl.app` (et `pearl.app`) vers le
+serveur, certificat TLS générique. Domaine personnalisé d'un client :
+un CNAME vers la plateforme, puis le domaine ajouté dans la console.
+

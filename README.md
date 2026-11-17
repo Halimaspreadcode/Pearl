@@ -4,11 +4,28 @@ Plateforme de pilotage d'équipe opérationnelle : tickets et délais (SLA),
 plannings et rotations, absences, objectifs et performance, formation et
 quiz, rapports diffusés par mail, assistant IA.
 
-Pearl est en cours de transformation en **SaaS marque blanche multi-tenant**.
-La cible et le plan de migration sont décrits dans
-[`docs/SAAS-ARCHITECTURE.md`](docs/SAAS-ARCHITECTURE.md). Ce README décrit
-l'application telle qu'elle tourne aujourd'hui (une instance = une
-organisation).
+Pearl fonctionne de deux façons :
+
+- **SaaS multi-tenant marque blanche** (`MULTI_TENANT=1`) : une
+  organisation par sous-domaine, inscription en libre-service, console
+  d'administration, comptes par email, modules et packs métier, stockage
+  Supabase ou PostgreSQL. Architecture, état d'avancement et mise en
+  production : [`docs/SAAS-ARCHITECTURE.md`](docs/SAAS-ARCHITECTURE.md).
+- **Mono-organisation** (par défaut) : une instance, données dans `data/`,
+  comme décrit dans la suite de ce README.
+
+### Démarrer en SaaS, en local
+
+```bash
+cp .env.example .env
+npm install
+MULTI_TENANT=1 AUTH_PROVIDER=local npm start
+```
+
+Puis http://localhost:3000/signup pour créer une organisation : elle est
+servie sur `http://<adresse>.localhost:3000`. La console est sur
+http://localhost:3000/console (compte créé par
+`npm run tenant:create -- --platform-admin moi@exemple.com`).
 
 ## Prérequis
 
