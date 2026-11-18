@@ -41,7 +41,7 @@ test('/o/<slug> retient l\'organisation ; /signup et /console restent la platefo
   const brand = await (await fetch(`${base}/api/platform/brand`, { headers: { cookie } })).json();
   assert.equal(brand.name, 'Acme');
   assert.equal(brand.switch_url, '/o/-');
-  assert.match(await (await fetch(`${base}/signup`, { headers: { cookie } })).text(), /Votre organisation/);
+  assert.match(await (await fetch(`${base}/signup`, { headers: { cookie } })).text(), /Comment s'appelle votre équipe/);
   const inconnu = await fetch(`${base}/o/nexistepas`, { redirect: 'manual' });
   assert.equal(inconnu.status, 404);
   const sortie = await fetch(`${base}/o/-`, { headers: { cookie }, redirect: 'manual' });
