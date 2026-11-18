@@ -17,6 +17,13 @@ const BOOT = (() => {
     commit = require('child_process').execFileSync('git', ['rev-parse', '--short', 'HEAD'],
       { cwd: require('path').join(__dirname, '..', '..'), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
   } catch { /* pas de git : l'heure de démarrage suffit */ }
+  // Serverless : plusieurs instances à la fois, chacune avec son heure de
+  // démarrage. La version est alors celle du déploiement, commune à toutes ;
+  // sinon les pages se rechargeraient à chaque requête servie ailleurs.
+  if (require('../config/runtime').isServerless()) {
+    const dep = process.env.VERCEL_DEPLOYMENT_ID || process.env.VERCEL_GIT_COMMIT_SHA || commit || 'serverless';
+    return { boot: dep, commit: (process.env.VERCEL_GIT_COMMIT_SHA || commit).slice(0, 7), started_at: null };
+  }
   return { boot: `${Date.now().toString(36)}-${process.pid}`, commit, started_at: new Date().toISOString() };
 })();
 router.get('/api/version', (req, res) => {

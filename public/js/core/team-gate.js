@@ -90,9 +90,9 @@
         '<aside class="tg-side">' +
           '<div class="tg-brand"><img src="/img/pear-logo.svg" alt="" aria-hidden="true" style="width:34px;height:34px"><span class="tg-org">Pear<small class="tg-org-sub"></small></span></div>' +
           '<div><h2 class="tg-hero">Every ticket, every shift, <em>one place.</em></h2>' +
-          '<ul class="tg-feat"><li><i>⚡</i>Tickets for every site, with live SLA countdowns</li>' +
-          '<li><i>✦</i>Your space: tasks, requests, score and quizzes</li>' +
-          '<li><i>💡</i>Reports, academy and the team idea box</li></ul></div>' +
+          '<ul class="tg-feat"><li><i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 0 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 0 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/></svg></i>Tickets for every site, with live SLA countdowns</li>' +
+          '<li><i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></i>Your space: tasks, requests, score and quizzes</li>' +
+          '<li><i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></i>Reports, academy and the team idea box</li></ul></div>' +
           '<div class="tg-side-foot">Pear</div>' +
         '</aside>' +
         '<main class="tg-main">' +
@@ -117,9 +117,18 @@
       var perso = true;
       // Comptes (SaaS) : email + mot de passe. Le code personnel reste
       // disponible pour les équipes qui l'utilisent déjà.
-      var compte = !!(window.TeamIdentity && window.TeamIdentity.accounts);
+      // Le mode « compte » peut n'être connu qu'après l'ouverture de l'écran
+      // (une requête refusée l'ouvre avant /api/team/session) : il est relu
+      // à chaque affichage et à l'envoi, sauf si l'utilisateur a choisi
+      // explicitement le code personnel.
+      var choixCode = false;
+      var comptesActifs = function () {
+        return !!((window.TeamIdentity && window.TeamIdentity.accounts) || (window.PearlOrg && window.PearlOrg.accounts));
+      };
+      var compte = comptesActifs();
       var idLbl = ov.querySelector('.tg-id-lbl');
       var mode = function () {
+        compte = !choixCode && comptesActifs();
         bloc.hidden = !perso && !compte;
         if (compte) {
           idLbl.textContent = 'Email';
@@ -155,7 +164,7 @@
         if (sub && j && j.branding && j.branding.tagline) sub.textContent = j.branding.tagline;
       }).catch(function () {});
       lien.addEventListener('click', function () {
-        if (compte) { compte = false; perso = true; } else perso = !perso;
+        if (compte) { choixCode = true; perso = true; } else perso = !perso;
         mode(); (perso ? id : pw).focus();
       });
       var x = ov.querySelector('.tg-x');
@@ -165,6 +174,7 @@
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         btn.disabled = true; err.textContent = '';
+        mode();
         var corps = { password: pw.value };
         var url = '/api/team/auth';
         if (compte) { corps.email = id.value.trim(); url = '/api/team/account-login'; }
@@ -181,6 +191,7 @@
           .catch(function () { err.textContent = 'Server unreachable.'; btn.disabled = false; });
       });
       (perso ? id : pw).focus();
+      window.__tgRemode = function () { if (document.body.contains(ov)) mode(); };
     };
     if (document.body) go(); else document.addEventListener('DOMContentLoaded', go);
   }
@@ -210,6 +221,7 @@
     .then(function (j) {
       window.TeamIdentity = { actif: !!j.actif, exige: !!j.exige, codes: !!j.codes, user: j.user || null,
         lecture: !!j.lecture, admin: !!j.admin, accounts: !!j.accounts, pret: true };
+      if (typeof window.__tgRemode === 'function') window.__tgRemode();
       if (j && j.actif && !j.ok) { afficher(false); return; }
       if (!j.user && !j.admin && (j.exige || (j.actif && j.lecture))) bandeauLecture();
       if (typeof window.applyServerIdentity === 'function') window.applyServerIdentity(window.TeamIdentity);

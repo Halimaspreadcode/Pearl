@@ -28,7 +28,7 @@ const {
 
 const TEAM_COOKIE = 'fo_team';
 const TEAM_TTL_MS = 12 * 60 * 60 * 1000;   // une journée de travail, garde comprise
-const teamSessions = require('../core/scoped').scopedMap();            // token -> { expires, qui }
+const teamSessions = require('./session-store').sessionStore('team');            // token -> { expires, qui }
 
 function lireSecret() {
   return readJSON(FILES.team_secret, {}) || {};
@@ -76,8 +76,7 @@ function etat() {
 }
 
 function ouvrirSession(res, req, qui) {
-  const token = crypto.randomBytes(32).toString('hex');
-  teamSessions.set(token, { expires: Date.now() + TEAM_TTL_MS, qui });
+  const token = teamSessions.mint({ qui }, TEAM_TTL_MS);
   res.cookie(TEAM_COOKIE, token, {
     httpOnly: true, sameSite: 'strict', secure: req.secure, maxAge: TEAM_TTL_MS, path: '/',
   });
