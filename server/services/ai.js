@@ -29,7 +29,7 @@ const DEFAUT = {
 };
 
 // ── Tunnel SSH depuis le poste ──
-// La VM qui héberge Pearl n'a pas accès au réseau de l'entreprise ; le
+// La VM qui héberge Pear n'a pas accès au réseau de l'entreprise ; le
 // poste de l'admin, si. Un tunnel lancé depuis le poste
 // (ssh -R PORT:<hôte du modèle>:80 utilisateur@VM) ouvre sur la VM
 // un port local qui mène au service. Réglages correspondants, posés d'un
@@ -68,7 +68,7 @@ const LIMITES = {
 };
 
 const SYSTEM = [
-  "Tu es Pearl AI, l'assistant de l'équipe (suivi d'activité : tickets,",
+  "Tu es Pear AI, l'assistant de l'équipe (suivi d'activité : tickets,",
   "délais, plannings, absences, objectifs, rapports). Réponds en français,",
   "de façon concise et concrète. Si une information te manque, dis-le plutôt",
   "que de l'inventer.",
@@ -433,7 +433,7 @@ function majConf(body) {
 }
 
 // `max` : les skills construisent leur message côté serveur (données
-// de Pearl) et peuvent dépasser la limite d'une saisie libre.
+// de Pear) et peuvent dépasser la limite d'une saisie libre.
 function nettoyerMessages(list, max = LIMITES.chars_message) {
   if (!Array.isArray(list) || !list.length) throw new Error('Aucun message.');
   const msgs = list.slice(-LIMITES.messages).map(m => {
@@ -686,12 +686,12 @@ async function diagnostiquer() {
   }
 
   // 3. Machine qui fait les appels. Ce n'est pas forcément le poste
-  // depuis lequel on regarde la page : si le serveur Pearl tourne ailleurs
+  // depuis lequel on regarde la page : si le serveur Pear tourne ailleurs
   // (VM, serveur Linux), il n'a ni le proxy ni le DNS du poste.
   const os = require('os');
   const dnsCb = require('dns');
   const plateforme = { win32: 'Windows', linux: 'Linux', darwin: 'macOS' }[process.platform] || process.platform;
-  info('Serveur Pearl', `${plateforme} · machine « ${os.hostname()} » · Node ${process.version} · DNS ${dnsCb.getServers().join(', ') || 'inconnu'}. C'est cette machine qui appelle le modèle, pas le navigateur.`);
+  info('Serveur Pear', `${plateforme} · machine « ${os.hostname()} » · Node ${process.version} · DNS ${dnsCb.getServers().join(', ') || 'inconnu'}. C'est cette machine qui appelle le modèle, pas le navigateur.`);
 
   // 4. DNS (avec un proxy, seul son nom à lui doit se résoudre ici)
   const dns = dnsCb.promises;
@@ -784,7 +784,7 @@ async function diagnostiquer() {
 }
 
 // ── Script du tunnel pour le poste Windows ──
-// Compte SSH à utiliser sur la VM : celui qui possède le dossier de Pearl
+// Compte SSH à utiliser sur la VM : celui qui possède le dossier de Pear
 // (le service peut tourner en root, mais on se connecte avec le compte
 // de l'utilisateur).
 function compteVm() {
@@ -832,7 +832,7 @@ function scriptTunnel(hoteVm) {
     // permitlisten limite -R au port du tunnel ; permitopen vers un port
     // fermé neutralise -L (« none » n'existe pas ici) ; command remplace
     // toute commande demandée. Vérifié sur un vrai sshd (tests manuels).
-    `l="restrict,port-forwarding,permitlisten=\\"${TUNNEL.port}\\",permitopen=\\"127.0.0.1:1\\",command=\\"echo Cle reservee au tunnel Pearl AI\\" $k"`,
+    `l="restrict,port-forwarding,permitlisten=\\"${TUNNEL.port}\\",permitopen=\\"127.0.0.1:1\\",command=\\"echo Cle reservee au tunnel Pear AI\\" $k"`,
     'touch ~/.ssh/authorized_keys',
     // Une réinstallation remplace la ligne de cette clé au lieu d'en ajouter une.
     'grep -vF "$k" ~/.ssh/authorized_keys > ~/.ssh/.ak.tmp || true',
@@ -847,21 +847,21 @@ function scriptTunnel(hoteVm) {
   const psOn = [
     "$key = Join-Path $env:USERPROFILE '.ssh\\pearl_ia'",
     "if (-not (Test-Path $key)) { Write-Host ' La commande n''est pas encore installee : double-clique sur ia.bat.'; exit 1 }",
-    `if (${trouve}) { Write-Host ' Pearl AI deja allume.'; exit 0 }`,
+    `if (${trouve}) { Write-Host ' Pear AI deja allume.'; exit 0 }`,
     `$a = @('-N','-i',('"' + $key + '"'),'-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=30','-o','ServerAliveCountMax=3','-o','StrictHostKeyChecking=accept-new','-R','${fwd}','${vm}')`,
     '$p = Start-Process ssh -ArgumentList $a -WindowStyle Hidden -PassThru',
     'Start-Sleep -Seconds 6',
     `if ($p.HasExited) { Write-Host (' Echec (code ' + $p.ExitCode + '). Souvent un ancien tunnel garde le port sur la VM. Sur la VM : sudo ss -ltnp | grep ${TUNNEL.port} puis sudo kill <pid>, et refais : ia on'); exit 1 }`,
-    "Write-Host ' Pearl AI allume. Pour eteindre : ia off'",
+    "Write-Host ' Pear AI allume. Pour eteindre : ia off'",
   ].join('\n');
   const psOff = [
     `$p = ${trouve}`,
-    "if (-not $p) { Write-Host ' Pearl AI deja eteint.'; exit 0 }",
+    "if (-not $p) { Write-Host ' Pear AI deja eteint.'; exit 0 }",
     '$p | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }',
-    "Write-Host ' Pearl AI eteint.'",
+    "Write-Host ' Pear AI eteint.'",
   ].join('\n');
   const psStatus = [
-    `if (${trouve}) { Write-Host ' Pearl AI allume (tunnel actif).' } else { Write-Host ' Pearl AI eteint. Pour allumer : ia on' }`,
+    `if (${trouve}) { Write-Host ' Pear AI allume (tunnel actif).' } else { Write-Host ' Pear AI eteint. Pour allumer : ia on' }`,
   ].join('\n');
   const lancer = code => `powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${ps(code)}`;
 
@@ -888,7 +888,7 @@ function scriptTunnel(hoteVm) {
     '',
     ':install',
     'echo.',
-    `echo  Installation de la commande "ia" pour Pearl (VM ${h})`,
+    `echo  Installation de la commande "ia" pour Pear (VM ${h})`,
     'echo.',
     'set "DEST=%LOCALAPPDATA%\\Microsoft\\WindowsApps\\ia.bat"',
     'if /i not "%~f0"=="%DEST%" copy /y "%~f0" "%DEST%" >nul',
@@ -907,8 +907,8 @@ function scriptTunnel(hoteVm) {
     // Si une stratégie d'entreprise a retiré WindowsApps du PATH, la
     // commande courte n'existe pas : on donne le chemin complet.
     'where ia >nul 2>nul || echo  (si "ia" n est pas reconnu, tape plutot : "%DEST%" on)',
-    'echo     ia on      allume Pearl AI (tunnel en arriere-plan, sans mot de passe)',
-    'echo     ia off     eteint Pearl AI',
+    'echo     ia on      allume Pear AI (tunnel en arriere-plan, sans mot de passe)',
+    'echo     ia off     eteint Pear AI',
     'echo     ia status  dit si elle est allumee',
     'echo.',
     'pause',

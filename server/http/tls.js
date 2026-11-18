@@ -28,7 +28,7 @@ if (CERT && KEY) {
   try {
     options = { cert: fs.readFileSync(CERT), key: fs.readFileSync(KEY), minVersion: 'TLSv1.2' };
   } catch (e) {
-    console.error(`[Pearl] HTTPS désactivé : certificat illisible (${e.message}).`);
+    console.error(`[Pear] HTTPS désactivé : certificat illisible (${e.message}).`);
   }
 }
 const actif = !!options;
@@ -55,7 +55,7 @@ function demarrer(app, host) {
   srv.listen(HTTPS_PORT, host, () => {
     console.log(`  HTTPS actif : https://<adresse>:${HTTPS_PORT}  (HTTP réservé à la machine locale)\n`);
   });
-  srv.on('error', e => console.error(`[Pearl] HTTPS : ${e.message}`));
+  srv.on('error', e => console.error(`[Pear] HTTPS : ${e.message}`));
   return srv;
 }
 

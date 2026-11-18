@@ -119,7 +119,7 @@ function tenantMiddleware() {
       if (STATIQUE.test(req.path)) return next();
       return wantsJson(req)
         ? res.status(404).json({ error: 'Organisation inconnue' })
-        : res.status(404).type('html').send(pageSimple('Organisation introuvable', "Cette adresse ne correspond à aucun espace Pearl. Vérifiez le lien reçu."));
+        : res.status(404).type('html').send(pageSimple('Organisation introuvable', "Cette adresse ne correspond à aucun espace Pear. Vérifiez le lien reçu."));
     }
     const t = r.tenant;
     req.tenant = t;
@@ -173,7 +173,7 @@ async function forEachTenant(fn) {
 function pageSimple(titre, texte) {
   const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(titre)} · Pearl</title><style>body{font-family:system-ui,sans-serif;background:#F6F7F9;color:#1B2430;display:grid;place-items:center;min-height:100vh;margin:0;padding:16px}
+<title>${esc(titre)} · Pear</title><style>body{font-family:system-ui,sans-serif;background:#F6F7F9;color:#1B2430;display:grid;place-items:center;min-height:100vh;margin:0;padding:16px}
 main{max-width:440px;background:#fff;border-radius:14px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,.06)}h1{font-size:20px;margin:0 0 8px}p{margin:0;color:#4A5563;line-height:1.5}
 @media (prefers-color-scheme:dark){body{background:#12161C;color:#E6E9EE}main{background:#1B2129}p{color:#A9B1BC}}</style></head>
 <body><main><h1>${esc(titre)}</h1><p>${esc(texte)}</p></main></body></html>`;

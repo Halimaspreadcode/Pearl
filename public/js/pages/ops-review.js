@@ -544,7 +544,7 @@ async function exportOpsReviewXLSX() {
   if (!rows.length) { toast('No ticket to export', 'warning'); return; }
 
   const wb = new ExcelJS.Workbook();
-  wb.creator = 'Pearl Ops Review';
+  wb.creator = 'Pear Ops Review';
   wb.created = new Date();
 
   const ws = wb.addWorksheet('Ops Review', { views: [{ state: 'frozen', ySplit: 1 }] });

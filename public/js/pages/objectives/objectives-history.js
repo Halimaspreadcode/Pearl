@@ -397,7 +397,7 @@ function _objRevRow(p) {
         </div>`
       : `<div class="or-acts">
           <button class="or-btn is-ai" onclick="objRevAiCheck('${esc(fo)}','${o.id}')"
-            ${ObjRev.ai?.[fo + '|' + o.id]?.busy ? 'disabled' : ''} title="Avis de Pearl AI sur cet objectif">
+            ${ObjRev.ai?.[fo + '|' + o.id]?.busy ? 'disabled' : ''} title="Avis de Pear AI sur cet objectif">
             ${ObjRev.ai?.[fo + '|' + o.id]?.busy ? 'Analyse…' : 'Check'}</button>
           <button class="or-btn is-rej" onclick="objRevAskReason('${esc(fo)}','${o.id}')">Ask for changes</button>
           <button class="or-btn is-ok" onclick="objRevApproveAll('${esc(fo)}','${o.id}')">
@@ -533,17 +533,17 @@ function _objRevFull(fo, o) {
 // à approuver ou à rédiger la demande de changements.
 function _objRevAiHtml(fo, o) {
   const st = ObjRev.ai?.[fo + '|' + o.id];
-  if (!st || st.busy) return st?.busy ? `<div class="or-ai is-busy">Pearl AI relit l'objectif…</div>` : '';
+  if (!st || st.busy) return st?.busy ? `<div class="or-ai is-busy">Pear AI relit l'objectif…</div>` : '';
   if (st.err) return `<div class="or-ai is-err">${esc(st.err)}
       <button class="or-btn is-ghost" onclick="objRevAiClose('${esc(fo)}','${o.id}')">Fermer</button></div>`;
   const d = st.data;
   const liste = (t, l) => (l && l.length) ? `<div class="or-ai-col"><div class="or-ai-st">${t}</div>
       <ul>${l.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : '';
-  if (!d) return `<div class="or-ai"><div class="or-ai-h"><b>Avis de Pearl AI</b></div>
+  if (!d) return `<div class="or-ai"><div class="or-ai-h"><b>Avis de Pear AI</b></div>
       <div class="or-ai-raw">${esc(st.content || '').replace(/\n/g, '<br>')}</div></div>`;
   const ok = d.verdict === 'approuver';
   return `<div class="or-ai">
-      <div class="or-ai-h"><b>Avis de Pearl AI</b>
+      <div class="or-ai-h"><b>Avis de Pear AI</b>
         <span class="or-ai-v ${ok ? 'is-ok' : 'is-warn'}">${ok ? 'Peut être approuvé' : 'À revoir'}</span>
         <button class="or-ai-x" onclick="objRevAiClose('${esc(fo)}','${o.id}')" aria-label="Fermer">×</button></div>
       ${d.resume ? `<p class="or-ai-r">${esc(d.resume)}</p>` : ''}
@@ -572,7 +572,7 @@ async function objRevAiCheck(fo, id) {
       body: JSON.stringify({ fo, id }),
     });
     const d = await res.json().catch(() => ({}));
-    if (res.status === 404 && !d.error) throw new Error("Pearl AI n'est pas disponible sur ce serveur.");
+    if (res.status === 404 && !d.error) throw new Error("Pear AI n'est pas disponible sur ce serveur.");
     if (!res.ok) throw new Error(d.error || `Erreur ${res.status}`);
     ObjRev.ai[k] = { data: d.data || null, content: d.content, meta: `${d.model} · ${(d.ms / 1000).toFixed(1)} s` };
   } catch (e) {

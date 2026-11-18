@@ -219,7 +219,7 @@ router.get('/api/absences/report.pdf', requireAbsence, (req, res) => {
     const pdf = buildAbsencePdf({ summary, absences: readAbsences(), generatedAt: new Date() });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition',
-      `attachment; filename="Pearl_Absence_Report_${summary.from}_${summary.to}.pdf"`);
+      `attachment; filename="Pear_Absence_Report_${summary.from}_${summary.to}.pdf"`);
     res.setHeader('Cache-Control', 'no-store');
     res.send(pdf);
   } catch (err) {

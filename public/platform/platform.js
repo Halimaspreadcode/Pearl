@@ -12,12 +12,7 @@ window.esc = function (v) {
   });
 };
 
-window.PEARL_LOGO = '<svg viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="pl-g" x1="0" y1="1" x2="1" y2="0">'
-  + '<stop offset="0" stop-color="#3FB7A0"/><stop offset="1" stop-color="#4F6A85"/></linearGradient></defs>'
-  + '<path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="url(#pl-g)" stroke-width="4.5" stroke-linecap="round"/>'
-  + '<path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="url(#pl-g)" stroke-width="4.5" stroke-linecap="round" opacity=".7"/>'
-  + '<path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="url(#pl-g)" stroke-width="4.5" stroke-linecap="round" opacity=".45"/>'
-  + '<circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg>';
+window.PEARL_LOGO = '<img src="/img/pear-logo.svg" alt="" aria-hidden="true" style="width:30px;height:30px">';
 
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('[data-logo]').forEach(function (el) { el.insertAdjacentHTML('afterbegin', window.PEARL_LOGO); });

@@ -19,7 +19,7 @@
     }
     document.querySelectorAll('.sidebar-brand-sub').forEach(el => { el.textContent = b.tagline || ''; });
     if (b.logo) {
-      document.querySelectorAll('svg.sidebar-logo').forEach(svg => {
+      document.querySelectorAll('.sidebar-logo').forEach(svg => {
         const img = document.createElement('img');
         img.className = 'sidebar-logo'; img.alt = ''; img.src = b.logo;
         img.style.objectFit = 'contain';

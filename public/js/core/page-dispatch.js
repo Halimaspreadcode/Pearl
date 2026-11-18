@@ -67,7 +67,7 @@ window.renderPage = function(page) {
   if (page === 'audit')           { _origRP(page); renderAudit();         return; }
   if (page === 'ai')              { _origRP(page); renderAiPage();        return; }
   if (page === 'indicateurs')     { _origRP(page); if (typeof renderIndicateursPage === 'function') renderIndicateursPage(); return; }
-  // Le tableau de bord est devenu l'accueil de Pearl AI.
+  // Le tableau de bord est devenu l'accueil de Pear AI.
   if (page === 'ai-cockpit')      { window.renderPage('ai'); if (typeof aiAccueil === 'function') aiAccueil(); return; }
   if (page === 'academy')         { _origRP(page); renderAcademy();       return; }
   if (page === 'ideas') {

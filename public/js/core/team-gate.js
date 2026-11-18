@@ -88,15 +88,12 @@
       ov.className = 'tg-ov' + (fermable ? ' soft' : '');
       ov.innerHTML =
         '<aside class="tg-side">' +
-          '<div class="tg-brand"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 34A28 28 0 0 1 34 6" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round"/>' +
-          '<path d="M13 34A21 21 0 0 1 34 13" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round" opacity=".7"/>' +
-          '<path d="M20 34A14 14 0 0 1 34 20" fill="none" stroke="#9EE6D5" stroke-width="4.5" stroke-linecap="round" opacity=".45"/>' +
-          '<circle cx="31" cy="31" r="4.5" fill="#F2A65A"/></svg><span class="tg-org">Pearl<small class="tg-org-sub"></small></span></div>' +
+          '<div class="tg-brand"><img src="/img/pear-logo.svg" alt="" aria-hidden="true" style="width:34px;height:34px"><span class="tg-org">Pear<small class="tg-org-sub"></small></span></div>' +
           '<div><h2 class="tg-hero">Every ticket, every shift, <em>one place.</em></h2>' +
           '<ul class="tg-feat"><li><i>⚡</i>Tickets for every site, with live SLA countdowns</li>' +
           '<li><i>✦</i>Your space: tasks, requests, score and quizzes</li>' +
           '<li><i>💡</i>Reports, academy and the team idea box</li></ul></div>' +
-          '<div class="tg-side-foot">Pearl</div>' +
+          '<div class="tg-side-foot">Pear</div>' +
         '</aside>' +
         '<main class="tg-main">' +
         (fermable ? '<button type="button" class="tg-x" aria-label="Back">← Back</button>' : '') +
@@ -139,7 +136,7 @@
         lbl.textContent = perso ? 'Personal code' : 'Team password';
         intro.textContent = message || (perso
           ? 'Use your Employee ID and the personal code your manager gave you. They sign your changes.'
-          : 'The team password opens Pearl in view-only mode. To make changes, sign in with your personal code.');
+          : 'The team password opens Pear in view-only mode. To make changes, sign in with your personal code.');
         lien.textContent = perso ? 'View only, with the team password' : 'I have a personal code';
         // Sans mot de passe d'équipe, le lien « consulter seulement » ne mène à rien.
         lien.hidden = (fermable && !perso) || !(window.TeamIdentity && window.TeamIdentity.actif);

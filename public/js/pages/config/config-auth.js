@@ -85,8 +85,8 @@ const CFG_RUBRIQUES = [
     desc: 'Daily, Weekly, Monthly, Ops Review, diffusion par mail et exports',
     kw: 'Diffusion envoi mail SMTP groupes planification Export Excel PowerPoint JSON sauvegarde' },
   { page: 'indicateurs',  grp: 'pilot', titre: 'Indicateurs',
-    desc: 'KPI et PI décrits à Pearl AI, suivis automatiquement', kw: 'KPI PI MTTD MTTR SLA indicateur formule degradation' },
-  { page: 'ai',           grp: 'pilot', titre: 'Pearl AI',
+    desc: 'KPI et PI décrits à Pear AI, suivis automatiquement', kw: 'KPI PI MTTD MTTR SLA indicateur formule degradation' },
+  { page: 'ai',           grp: 'pilot', titre: 'Pear AI',
     desc: 'L\'assistant IA, ses outils et sa base de connaissances', kw: 'IA AI assistant knowledge documents cle API modele' },
 
   // ── Paramétrage ──

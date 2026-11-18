@@ -9,7 +9,7 @@ async function renderFoAccess() {
   const sel = document.getElementById('foacc-fo');
   if (sel) {
     const cur = sel.value;
-    // Toute l'équipe : le code personnel est aussi la connexion à Pearl
+    // Toute l'équipe : le code personnel est aussi la connexion à Pear
     // (seule une session nominative peut modifier quand le verrou d'équipe
     // est actif). « Autre personne » couvre qui n'est ni FO ni BO.
     const fos = state.config.fo_list || [];

@@ -43,7 +43,7 @@ function weeklyPptxFilename() {
   const day = (lastWeeklyReport?.week_start
     ? new Date(lastWeeklyReport.week_start)
     : new Date()).toISOString().slice(0, 10);
-  return `Pearl_Weekly_Report_${day}.pptx`;
+  return `Pear_Weekly_Report_${day}.pptx`;
 }
 
 async function exportWeeklyPptx() {
@@ -337,7 +337,7 @@ async function exportWeeklyExcel() {
   a.href = URL.createObjectURL(blob);
   // Période = la date du jour et non le début de semaine : c'est sur
   // elle que le serveur vérifie la fraîcheur au moment de l'envoi.
-  a.download = `Pearl_Weekly_Report_${new Date(data.week_start).toISOString().slice(0, 10)}.xlsx`;
+  a.download = `Pear_Weekly_Report_${new Date(data.week_start).toISOString().slice(0, 10)}.xlsx`;
   a.click();
   _uploadReportFile('weekly', buf, a.download, new Date().toISOString().slice(0, 10));
   toast('Excel export generated', 'success');

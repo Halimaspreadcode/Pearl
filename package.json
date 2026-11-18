@@ -1,7 +1,7 @@
 {
-  "name": "pearl",
+  "name": "pear",
   "version": "0.1.0",
-  "description": "Pearl — plateforme SaaS marque blanche de pilotage d’équipe",
+  "description": "Pear — plateforme SaaS marque blanche de pilotage d’équipe",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",

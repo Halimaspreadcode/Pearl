@@ -7,13 +7,13 @@ const ai = require('../services/ai');
 const router = express.Router();
 
 // ── QUESTIONS DANS LES COURS (Academy) ───────────────────────
-// Depuis une leçon, l'apprenant pose une question à Pearl AI. Le pont
+// Depuis une leçon, l'apprenant pose une question à Pear AI. Le pont
 // des formations (public/formation/digitalview-bridge.js) envoie la
 // question et le passage de la leçon où il se trouve ; on en fait une
 // consigne de tuteur, puis le même appel que l'assistant (services/ai.js).
 //
 // Accès : l'admin, toujours ; les agents identifiés seulement si l'admin
-// l'a ouvert dans les réglages de Pearl AI (chaque appel coûte au
+// l'a ouvert dans les réglages de Pear AI (chaque appel coûte au
 // fournisseur et part hors de la maison). Comme pour l'assistant, le
 // contenu n'est ni stocké ni tracé : l'audit garde qui, quand, quelle
 // formation et la taille de l'échange.
@@ -26,7 +26,7 @@ function acces(req) {
   if (q && q.admin) return { ok: true, admin: true, qui: q.name || 'Admin' };
   const ouvert = !!ai.lireFichier().academy_open;
   if (ouvert && q && !q.lecture && q.name) return { ok: true, admin: false, qui: q.name };
-  return { ok: false, admin: false, raison: ouvert ? 'Identifie-toi (ID employé et code) pour poser une question.' : 'Les questions dans les cours ne sont pas ouvertes aux agents. L\'admin peut les ouvrir dans les réglages de Pearl AI.' };
+  return { ok: false, admin: false, raison: ouvert ? 'Identifie-toi (ID employé et code) pour poser une question.' : 'Les questions dans les cours ne sont pas ouvertes aux agents. L\'admin peut les ouvrir dans les réglages de Pear AI.' };
 }
 
 // Une limite par personne : la page peut être ouverte par plusieurs agents
@@ -42,14 +42,14 @@ router.use('/api/formation/ask', (_req, res, next) => { res.set('Cache-Control',
 // Le bouton ne s'affiche que si une question a une chance d'aboutir.
 router.get('/api/formation/ask/status', (req, res) => {
   const a = acces(req), c = ai.confPublique();
-  res.json({ on: a.ok && c.has_key, admin: a.admin, raison: !c.has_key ? 'Pearl AI n\'est pas configuré.' : a.raison || '' });
+  res.json({ on: a.ok && c.has_key, admin: a.admin, raison: !c.has_key ? 'Pear AI n\'est pas configuré.' : a.raison || '' });
 });
 
 const texte = (v, max) => String(v == null ? '' : v).replace(/\s+\n/g, '\n').trim().slice(0, max);
 
 function consigne(b) {
   return [
-    `Tu es le tuteur de la formation « ${COURS[b.course] || 'Pearl'} » de l'Academy Pearl.`,
+    `Tu es le tuteur de la formation « ${COURS[b.course] || 'Pear'} » de l'Academy Pear.`,
     "L'apprenant est en train de lire la leçon ci-dessous et te pose une question à partir de cet endroit.",
     'Réponds en français simple, comme à un collègue débutant : 3 à 8 phrases, une idée à la fois,',
     'avec un exemple concret ou une comparaison de la vie courante quand ça aide.',
@@ -86,7 +86,7 @@ router.post('/api/formation/ask', limite, async (req, res) => {
     // Un agent n'a que faire du détail réseau : un message clair suffit.
     const m = String(e.message || '');
     const eteint = /tunnel|injoignable|ECONN|délai|timeout|502/i.test(m) || e.status === 502;
-    res.status(e.status || 400).json({ error: a.admin ? m : (eteint ? 'Pearl AI ne répond pas pour le moment. Réessaie plus tard.' : m), eteint });
+    res.status(e.status || 400).json({ error: a.admin ? m : (eteint ? 'Pear AI ne répond pas pour le moment. Réessaie plus tard.' : m), eteint });
   }
 });
 

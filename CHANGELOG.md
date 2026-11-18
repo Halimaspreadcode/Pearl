@@ -1,10 +1,10 @@
 # Changelog
 
-## 0.1.0 — Pearl
+## 0.1.0 — Pear
 
-Point de départ de Pearl, issu d'un outil interne de pilotage d'équipe.
+Point de départ de Pear, issu d'un outil interne de pilotage d'équipe.
 
-- Renommage de l'application en **Pearl** (interface, documents générés,
+- Renommage de l'application en **Pear** (interface, documents générés,
   mails, scripts, service système).
 - Suppression de toutes les données et contenus propres à l'organisation
   d'origine : formations et banques de quiz métier, connecteur de ticketing

@@ -19,7 +19,7 @@ const {
 // code personnel d'un agent (identifiant + code). Les sessions admin,
 // absences et FO déjà ouvertes valent aussi.
 //
-// Le condensé vit dans data/team-access.secret : comme la clé Pearl AI,
+// Le condensé vit dans data/team-access.secret : comme la clé Pear AI,
 // hors de git (data/*.secret est ignoré) même si data/ est versionné.
 //
 // Tant qu'aucun mot de passe d'équipe n'est défini, le verrou laisse passer :

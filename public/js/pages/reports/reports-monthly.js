@@ -460,7 +460,7 @@ async function exportMonthlyExcel() {
   const blob = new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
   const a    = document.createElement('a');
   a.href     = URL.createObjectURL(blob);
-  a.download = `Pearl_Monthly_Report_${monthlyYear}-${String(monthlyMonth).padStart(2,'0')}.xlsx`;
+  a.download = `Pear_Monthly_Report_${monthlyYear}-${String(monthlyMonth).padStart(2,'0')}.xlsx`;
   a.click();
   _uploadReportFile('monthly', buf, a.download, new Date().toISOString().slice(0, 10));
   toast('Excel export generated', 'success');

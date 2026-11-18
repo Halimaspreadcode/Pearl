@@ -51,7 +51,7 @@ function unitSystemd({ root, node, user }) {
   return `# Généré par « npm run service:install » — relancer la commande après
 # avoir déplacé le projet ou changé de version de Node.
 [Unit]
-Description=Pearl — serveur sous watchdog
+Description=Pear — serveur sous watchdog
 After=network.target
 
 [Service]
@@ -244,7 +244,7 @@ async function install() {
   const v = await ui.etape('Accès GitHub pour les mises à jour', async () => ligneMaj(await verifierMaj()));
 
   const lignes = repond
-    ? [`${ui.VERT}●${ui.R} Pearl tourne sur http://localhost:${p}`,
+    ? [`${ui.VERT}●${ui.R} Pear tourne sur http://localhost:${p}`,
        '  redémarre avec la machine et après un plantage',
        '  se met à jour depuis GitHub toutes les 10 min',
        '', `${ui.GRIS}État     npm run service:status${ui.R}`, `${ui.GRIS}Journal  watchdog.log${ui.R}`]
@@ -303,7 +303,7 @@ async function stop() {
     else if (sys === 'launchd') await ui.etape('Arrêt du watchdog et du serveur', () => exec('launchctl', ['unload', PLIST_PATH]));
     else { ui.echec('Système non pris en charge.'); process.exit(1); }
   } catch { process.exit(1); }
-  ui.cadre('Service arrêté', ['Pearl ne tourne plus.',
+  ui.cadre('Service arrêté', ['Pear ne tourne plus.',
     `${ui.GRIS}Relancer     npm run service:start${ui.R}`,
     sys === 'systemd' ? `${ui.GRIS}Il repartira au prochain redémarrage de la machine.${ui.R}` : `${ui.GRIS}Il repartira à la prochaine ouverture de session.${ui.R}`,
     `${ui.GRIS}Pour de bon  npm run service:uninstall${ui.R}`], ui.JAUNE);

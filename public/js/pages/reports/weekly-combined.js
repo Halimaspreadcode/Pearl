@@ -218,7 +218,7 @@ async function generateWeeklyCombined() {
     // Même aperçu que le Weekly Report : on relit le vrai fichier avant
     // de le télécharger, sous son propre nom.
     weeklyPptxBlob = await res.blob();
-    weeklyPptxName = `Pearl_Weekly_Performance_${WkC.analysis.week_start.slice(0, 10)}.pptx`;
+    weeklyPptxName = `Pear_Weekly_Performance_${WkC.analysis.week_start.slice(0, 10)}.pptx`;
     closeModal('wkc-modal');
     const modal = document.getElementById('pptx-preview-modal');
     const body = document.getElementById('pptx-preview-body');

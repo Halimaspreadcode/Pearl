@@ -49,7 +49,7 @@
 //   WATCHDOG_LOG         fichier journal ('' = aucun)      (watchdog.log)
 if (parseInt(process.versions.node, 10) < 18) {
   // Sans ça, le serveur relancé mourrait aussitôt, en boucle : autant le dire.
-  console.error('Pearl demande Node.js 18 ou plus récent — installé : ' + process.version + '. Voir « Prérequis » dans le README.');
+  console.error('Pear demande Node.js 18 ou plus récent — installé : ' + process.version + '. Voir « Prérequis » dans le README.');
   process.exit(1);
 }
 const path = require('path');

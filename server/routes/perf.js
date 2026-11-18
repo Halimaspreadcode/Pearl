@@ -36,7 +36,7 @@ router.post('/api/fo-access/login', authLimiter, (req, res) => {
 
   const { token, expires_in } = issueFoSession(entry[0]);
   // Même code, même personne : la connexion à Ma performance ouvre aussi la
-  // session nominative de Pearl (auth/identity.js), sauf si une autre
+  // session nominative de Pear (auth/identity.js), sauf si une autre
   // personne est déjà connectée sur ce navigateur.
   const team = require('../auth/team-gate');
   const cur = team.sessionEquipe(req);

@@ -455,8 +455,8 @@ async function buildCombinedPptx(analysis, form = {}) {
   const pptx = new PptxGenJS();
   guardText(pptx);
   pptx.layout  = 'LAYOUT_WIDE';
-  pptx.author  = form.author || 'Pearl';
-  pptx.company = 'Pearl';
+  pptx.author  = form.author || 'Pear';
+  pptx.company = 'Pear';
   pptx.title   = 'Weekly Performance';
 
   const period = `${fmtDate(analysis.week_start)} to ${fmtDate(analysis.week_end)}`;
@@ -472,7 +472,7 @@ async function buildCombinedPptx(analysis, form = {}) {
   /* Couverture */
   const cover = pptx.addSlide();
   cover.background = { color: C.wash };
-  cover.addText(`Pearl · ${VILLES}`, { x: M, y: 0.72, w: 6, h: 0.24, fontSize: 10, color: '4A6169', fontFace: FONT });
+  cover.addText(`Pear · ${VILLES}`, { x: M, y: 0.72, w: 6, h: 0.24, fontSize: 10, color: '4A6169', fontFace: FONT });
   cover.addText('Weekly performance review presented to both teams: activity, service level, '
     + 'attendance and platform incidents, with every peak and every absence explained.', {
     x: M, y: 1.1, w: 5.4, h: 1.2, fontSize: 13, color: '3E555C', fontFace: FONT, valign: 'top', lineSpacingMultiple: 1.4 });
@@ -517,7 +517,7 @@ async function buildCombinedPptx(analysis, form = {}) {
   const end = pptx.addSlide();
   statement(end, {
     bg: C.ink, on: 'FFFFFF', onMute: 'B8BEC6', rule: '3A3F45',
-    eyebrow: `Pearl · ${VILLES}`,
+    eyebrow: `Pear · ${VILLES}`,
     lead: 'Questions, corrections and missing explanations: raise them now, '
       + 'or send them before the deck is shared.',
     title: 'Thank you', sub: period,

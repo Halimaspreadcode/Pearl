@@ -52,7 +52,7 @@ router.delete('/api/indicateurs/:id', async (req, res) => {
 });
 
 // Traduction par l'IA, en tâche de fond (même suivi et même Stop que
-// Pearl AI : /api/ai/jobs/:id).
+// Pear AI : /api/ai/jobs/:id).
 router.post('/api/indicateurs/ia', (req, res) => {
   const b = req.body || {};
   if (!String(b.demande || '').trim()) return res.status(400).json({ error: 'Décris l\'indicateur ou la vue voulue.' });

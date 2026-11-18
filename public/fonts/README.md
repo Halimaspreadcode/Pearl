@@ -1,6 +1,6 @@
 # Polices embarquées
 
-Servies par Pearl lui-même, pour s'afficher sans accès à Internet.
+Servies par Pear lui-même, pour s'afficher sans accès à Internet.
 
 - **Quicksand** (barre latérale) : `quicksand-latin.woff2`, `quicksand-latin-ext.woff2`,
   police variable (graisses 400 à 700). Auteurs : Andrew Paglinawan et The Quicksand

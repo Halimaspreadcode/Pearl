@@ -51,7 +51,7 @@ async function majRole(b) {
   let key = str(b.key || label.split(/[\s—–-]/)[0], 16).toUpperCase().replace(/[^A-Z0-9_-]/g, '');
   if (!label) throw Object.assign(new Error('Donne un nom au rôle (ex. SMC — Service Management Center).'), { status: 400 });
   if (!key) throw Object.assign(new Error('Sigle du rôle invalide (lettres et chiffres).'), { status: 400 });
-  if (RESERVES.includes(key)) throw Object.assign(new Error(`« ${key} » est déjà un rôle de Pearl : choisis un autre sigle.`), { status: 400 });
+  if (RESERVES.includes(key)) throw Object.assign(new Error(`« ${key} » est déjà un rôle de Pear : choisis un autre sigle.`), { status: 400 });
   return ecrire(p => {
     const i = p.roles.findIndex(r => r.key === (b.ancien || key));
     if (i < 0 && p.roles.some(r => r.key === key)) throw Object.assign(new Error(`Le rôle ${key} existe déjà.`), { status: 409 });

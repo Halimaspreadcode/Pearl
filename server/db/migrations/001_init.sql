@@ -1,4 +1,4 @@
--- Pearl : socle multi-tenant.
+-- Pear : socle multi-tenant.
 -- Toutes les tables ont la RLS activée. Les rôles publics de Supabase
 -- (anon, authenticated) n'ont AUCUNE politique : une clé publique ne lit
 -- rien. Le serveur accède aux données soit avec la clé service_role (API

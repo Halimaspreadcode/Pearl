@@ -391,7 +391,7 @@ function slideFooter(slide, n, total, ville) {
   slide.addShape('rect', {
     x: M, y: 6.9, w: CW, h: 0.01, fill: { color: C.line }, line: { type: 'none' },
   });
-  slide.addText(`Pearl · ${ville || VILLE} · Internal distribution`, {
+  slide.addText(`Pear · ${ville || VILLE} · Internal distribution`, {
     x: M, y: 7.0, w: 8, h: 0.24,
     fontSize: 8, color: C.faint, fontFace: FONT, valign: 'middle',
   });
@@ -1772,8 +1772,8 @@ async function buildWeeklyPptx(rawData, form = {}) {
 
   const pptx = new PptxGenJS();
   pptx.layout = 'LAYOUT_WIDE';           // 13.33 x 7.5 pouces
-  pptx.author  = form.author || 'Pearl';
-  pptx.company = 'Pearl';
+  pptx.author  = form.author || 'Pear';
+  pptx.company = 'Pear';
   pptx.title   = 'Weekly Report';
 
   const k   = data.kpis || {};
@@ -1824,7 +1824,7 @@ async function buildWeeklyPptx(rawData, form = {}) {
   cover.background = { color: C.wash };
 
   // Colonne gauche : le contexte, en petit corps, haut de page.
-  cover.addText(`Pearl · ${VILLE}`, {
+  cover.addText(`Pear · ${VILLE}`, {
     x: M, y: 0.72, w: 5.2, h: 0.24,
     fontSize: 10, color: '4A6169', fontFace: FONT,
   });
@@ -2741,7 +2741,7 @@ async function buildWeeklyPptx(rawData, form = {}) {
   const sEnd = pptx.addSlide();
   statement(sEnd, {
     bg: C.brand, on: 'FFFFFF', onMute: 'F0AFB8', rule: 'E8737F',
-    eyebrow: `Pearl · ${VILLE}`,
+    eyebrow: `Pear · ${VILLE}`,
     lead: 'Thanks to the Front Office team for the shifts covered, the tickets closed '
         + 'and the escalations handled this week. Questions on any figure in this deck '
         + 'are welcome; the underlying tickets are all traceable in the tracker.',
@@ -2759,7 +2759,7 @@ async function buildWeeklyPptx(rawData, form = {}) {
     if (!encre) { slideFooter(slide, n, total); return; }
     // Pied sur fond coloré : même géométrie que slideFooter(), sans le
     // filet — ces slides n'en portent pas — et dans l'encre de la slide.
-    slide.addText(`Pearl · ${VILLE} · Internal distribution`, {
+    slide.addText(`Pear · ${VILLE} · Internal distribution`, {
       x: M, y: 7.0, w: 8, h: 0.24,
       fontSize: 8, color: encre.mute, fontFace: FONT, valign: 'middle',
     });

@@ -22,7 +22,7 @@ const NVP_PROFILS_BASE = [
   { key: 'FO',       label: 'Front Office', desc: 'Saisit les tickets, tient les rotations' },
   { key: 'BO',       label: 'Back Office',  desc: 'Traite ce que le FO escalade' },
   { key: 'Observer', label: 'Observateur',  desc: 'Consultation seule' },
-  // Ceux qui ont ouvert Pearl avec le mot de passe d'équipe, sans code
+  // Ceux qui ont ouvert Pear avec le mot de passe d'équipe, sans code
   // personnel : ils ne sont personne en particulier, on choisit ce qu'on
   // leur montre.
   { key: 'Guest',    label: 'Non connecté', desc: 'Mot de passe d’équipe, sans code personnel' },
@@ -91,7 +91,7 @@ const NVP_PAGES = [
     { id: 'cfg-annonces',    l: 'Annonces',       admin: true },
     { id: 'data-quality',    l: 'Data Quality',   admin: true },
     { id: 'audit',           l: 'Audit Trail',    admin: true },
-    { id: 'ai',              l: 'Pearl AI',    admin: true },
+    { id: 'ai',              l: 'Pear AI',    admin: true },
     { id: 'shift-approvals', l: 'Approbations',   admin: true },
   ]},
 ];

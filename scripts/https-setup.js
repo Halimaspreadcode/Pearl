@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Prépare le HTTPS de Pearl en une commande :  npm run https:setup
+// Prépare le HTTPS de Pear en une commande :  npm run https:setup
 //
-// 1. Crée une petite autorité de certification locale (« Pearl CA ») et un
+// 1. Crée une petite autorité de certification locale (« Pear CA ») et un
 //    certificat serveur signé par elle, valable pour les adresses IP et le
 //    nom de cette machine. Le tout dans data/tls/ (jamais dans git).
 // 2. Écrit TLS_CERT, TLS_KEY et HTTPS_PORT dans .env.
@@ -42,10 +42,10 @@ for (const extra of (process.env.TLS_EXTRA_NAMES || '').split(',').map(s => s.tr
   (/^\d+\.\d+\.\d+\.\d+$/.test(extra) ? ips : noms).push(extra);
 
 if (!fs.existsSync(f('ca.key'))) {
-  console.log('• Autorité locale « Pearl CA »…');
+  console.log('• Autorité locale « Pear CA »…');
   ssl(['genrsa', '-out', f('ca.key'), '3072']);
   ssl(['req', '-x509', '-new', '-key', f('ca.key'), '-sha256', '-days', '3650',
-    '-subj', '/CN=Pearl CA/O=Pearl', '-addext', 'basicConstraints=critical,CA:TRUE',
+    '-subj', '/CN=Pear CA/O=Pear', '-addext', 'basicConstraints=critical,CA:TRUE',
     '-addext', 'keyUsage=critical,keyCertSign,cRLSign', '-out', f('ca.crt')]);
 }
 
@@ -58,7 +58,7 @@ fs.writeFileSync(f('server.ext'), [
   `subjectAltName=${san}`,
 ].join('\n') + '\n');
 ssl(['genrsa', '-out', f('server.key'), '2048']);
-ssl(['req', '-new', '-key', f('server.key'), '-subj', `/CN=${ips[1] || os.hostname()}/O=Pearl`,
+ssl(['req', '-new', '-key', f('server.key'), '-subj', `/CN=${ips[1] || os.hostname()}/O=Pear`,
   '-addext', `subjectAltName=${san}`, '-out', f('server.csr')]);
 ssl(['x509', '-req', '-in', f('server.csr'), '-CA', f('ca.crt'), '-CAkey', f('ca.key'),
   '-CAcreateserial', '-days', '825', '-sha256', '-extfile', f('server.ext'), '-out', f('server.crt')]);
@@ -76,7 +76,7 @@ fs.writeFileSync(ENV, env);
 
 const ip = ips[1] || 'localhost';
 console.log(`
-✓ HTTPS prêt. Redémarre Pearl (npm run service:restart), puis :
+✓ HTTPS prêt. Redémarre Pear (npm run service:restart), puis :
 
   Adresse de l'équipe :  https://${ip}:${PORT}
   (l'ancienne adresse http://${ip}:${process.env.PORT || 3000} y renvoie toute seule)

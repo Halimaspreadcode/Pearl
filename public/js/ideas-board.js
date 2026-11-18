@@ -101,7 +101,7 @@
   }
   function showLocked() {
     $('ib-empty').hidden = false;
-    $('ib-empty').innerHTML = '<div class="ib-empty-note">This board is private.<br><small>Open it from Pearl, or ask for a share link.</small></div>';
+    $('ib-empty').innerHTML = '<div class="ib-empty-note">This board is private.<br><small>Open it from Pear, or ask for a share link.</small></div>';
     $('ib-new-btn').hidden = true;
   }
 

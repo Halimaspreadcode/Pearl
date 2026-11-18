@@ -4,7 +4,7 @@
 
 ## Pourquoi
 
-Aujourd'hui, Pearl range tout dans une vingtaine de fichiers JSON sous `data/` :
+Aujourd'hui, Pear range tout dans une vingtaine de fichiers JSON sous `data/` :
 
 - **Chaque écriture réécrit le fichier entier.** `config.json` porte à la fois la configuration, les notes, les objectifs, les One-to-One et les codes d'accès. Une écriture sur un objectif réécrit donc aussi les codes d'accès.
 - **Pas de transaction.** Le renommage d'un agent touche une dizaine de fichiers l'un après l'autre. Une coupure au milieu laisse des données à moitié renommées. C'est pour ça qu'on fait une copie avant.

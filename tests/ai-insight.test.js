@@ -113,7 +113,7 @@ test('regénérer un agent depuis l\'admin, même à jour', async () => {
   assert.equal(fichier()['Awa Ndiaye'].length, 3);
 });
 
-test('Pearl AI injoignable : la passe s\'arrête, les suivants attendent', async () => {
+test('Pear AI injoignable : la passe s\'arrête, les suivants attendent', async () => {
   await asAdmin('PUT', '/api/ai/insights', { agents: { Moussa: true, Ba: true } });
   await finPasse();
   // Les deux viennent d'être faits ; on les force avec le tunnel coupé.

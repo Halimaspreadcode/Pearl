@@ -1,10 +1,10 @@
-# Pearl
+# Pear
 
 Plateforme de pilotage d'équipe opérationnelle : tickets et délais (SLA),
 plannings et rotations, absences, objectifs et performance, formation et
 quiz, rapports diffusés par mail, assistant IA.
 
-Pearl fonctionne de deux façons :
+Pear fonctionne de deux façons :
 
 - **SaaS multi-tenant marque blanche** (`MULTI_TENANT=1`) : une
   organisation par sous-domaine, inscription en libre-service, console
@@ -17,7 +17,7 @@ Pearl fonctionne de deux façons :
 ### Déployer sur Vercel (avec l'intégration Supabase)
 
 Rien à configurer à la main : `vercel.json` fait passer toutes les
-requêtes par le serveur (`api/index.js`), et Pearl se règle seul à partir
+requêtes par le serveur (`api/index.js`), et Pear se règle seul à partir
 des variables créées par l'intégration Supabase (`SUPABASE_URL`,
 `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`) : stockage Supabase,
 multi-tenant, espaces à l'adresse `/o/<organisation>`.
@@ -50,7 +50,7 @@ http://localhost:3000/console (compte créé par
 - Accès réseau local entre les postes FO et le serveur
 
 Sur un Node plus ancien, le serveur s'arrête au démarrage avec
-« Pearl demande Node.js 18 ou plus récent ». Les paquets `nodejs` d'Ubuntu
+« Pear demande Node.js 18 ou plus récent ». Les paquets `nodejs` d'Ubuntu
 sont souvent trop vieux (Node 10 ou 12). Mise à jour sur Ubuntu :
 
 ```bash

@@ -68,7 +68,7 @@ platform.get(/^\/o\/([^/]+)(\/.*)?$/, wrap(async (req, res) => {
   const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
   if (slug === '-') { res.clearCookie(tenants.ORG_COOKIE, { path: '/' }); return res.redirect('/'); }
   if (!SLUG_RE.test(slug) || !(await tenants.getTenant(slug)))
-    return res.status(404).type('html').send(tenants.pageSimple('Organisation introuvable', "Cette adresse ne correspond à aucun espace Pearl. Vérifiez le lien reçu."));
+    return res.status(404).type('html').send(tenants.pageSimple('Organisation introuvable', "Cette adresse ne correspond à aucun espace Pear. Vérifiez le lien reçu."));
   res.cookie(tenants.ORG_COOKIE, slug, { httpOnly: true, sameSite: 'lax', secure: req.secure, maxAge: 365 * 86400000, path: '/' });
   // Seuls des chemins internes : jamais de redirection vers un autre site.
   const cible = /^\/[^/\\]/.test(reste) || reste === '/' ? reste : '/';
@@ -222,7 +222,7 @@ platform.get('/api/cron/tick', wrap(async (req, res) => {
 platform.use((req, res, next) => {
   if (STATIQUE.test(req.path)) return next();
   if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'Not found' });
-  res.status(404).type('html').send(tenants.pageSimple('Page introuvable', "Cette page n'existe pas sur la plateforme Pearl."));
+  res.status(404).type('html').send(tenants.pageSimple('Page introuvable', "Cette page n'existe pas sur la plateforme Pear."));
 });
 
 router.use((req, res, next) => (req.platform ? platform(req, res, next) : next()));
@@ -235,7 +235,7 @@ tenantRouter.get('/api/platform/brand', (req, res) => {
   const t = req.tenant;
   const b = (t && t.branding) || {};
   const cfg = require('../core/store').readCfg();
-  res.json({ name: b.name || t.name || cfg.org_name || 'Pearl', branding: b, accounts: accountsEnabled(),
+  res.json({ name: b.name || t.name || cfg.org_name || 'Pear', branding: b, accounts: accountsEnabled(),
     // Mode chemin : lien pour changer d'organisation.
     switch_url: require('../config/runtime').tenantUrlMode() === 'path' ? '/o/-' : null });
 });

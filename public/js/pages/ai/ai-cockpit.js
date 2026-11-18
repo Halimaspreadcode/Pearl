@@ -1,10 +1,10 @@
 // ══════════════════════════════════════════════════════════════
-// ACCUEIL DE PEARL AI (affiché dans la page Pearl AI, ai.js)
+// ACCUEIL DE PEAR AI (affiché dans la page Pear AI, ai.js)
 //
 // Ce qui attend l'admin aujourd'hui, en widgets : sa journée (planning et
 // absents), ses sujets à décider (tickets, équipe, absences, One-to-One…),
 // les inquiétudes relevées en One-to-One à suivre, les absences, les
-// opérations, et ce que Pearl AI lit.
+// opérations, et ce que Pear AI lit.
 //
 // Deux couches :
 //   · les signaux, calculés sans IA et affichés tout de suite : ceux de
@@ -138,7 +138,7 @@ const AIC_PAYS_LIST = () => [['ALL', 'Global'], ...siteList().map(s => [s.code, 
 const _aicPerimetre = () => (_aicPays() === 'ALL' ? 'Global' : siteLabel(_aicPays()));
 function aicPays(v) {
   if (typeof setActiveCountry === 'function') setActiveCountry(v);
-  // La barre de Pearl AI porte le sélecteur : on la repeint avec l'accueil.
+  // La barre de Pear AI porte le sélecteur : on la repeint avec l'accueil.
   if (typeof _aiPaint === 'function') _aiPaint(); else renderAiCockpit();
 }
 const _aicTracker = () => (_aicPays() !== 'ALL' && isSiteCode(_aicPays()) ? _aicPays().toLowerCase() : 'global');

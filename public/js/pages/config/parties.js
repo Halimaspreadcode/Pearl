@@ -60,7 +60,7 @@ function _ptyPaint() {
   const r = PTY.res;
   const test = `<section class="pt-card pt-test">
     <h3>Reconnaître un nom vu ailleurs</h3>
-    <p class="pt-mute">Colle un nom tel qu'il apparaît dans vos autres outils (Initiator, Managing Owner technician…) : Pearl dit à qui il correspond.</p>
+    <p class="pt-mute">Colle un nom tel qu'il apparaît dans vos autres outils (Initiator, Managing Owner technician…) : Pear dit à qui il correspond.</p>
     <form onsubmit="event.preventDefault();ptyTester(this.q.value)"><input name="q" value="${esc(PTY.test)}" placeholder="ex. DIR/OPS/SMC-N/QSM MOREAU PIERRE ANTOINE" autocomplete="off"><button type="submit" class="pt-btn">Reconnaître</button></form>
     ${r ? (r.sur ? `<div class="pt-res is-ok"><span class="pt-tag" style="--c:${esc(r.color || '#141518')}"><i></i>${esc(r.role)}</span><b>${esc(r.name)}</b><small>${esc(r.role_label)}${r.country ? ` · ${_ptyPays(r.country)}` : ''} · reconnu par ${esc(r.via)}</small></div>`
       : `<div class="pt-res"><p>Nom lu : <b>${esc(r.nom)}</b>${r.org ? ` <small>· organisation « ${esc(r.org)} »</small>` : ''} — personne de connu.</p>

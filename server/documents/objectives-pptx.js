@@ -32,7 +32,7 @@ const {
 // buildObjectivesPptx selon sess.team (SN, CI ou les deux).
 let VILLE = '';
 let EQUIPE = 'Team';
-let FOOTER_TEXT = 'Pearl · Internal distribution';
+let FOOTER_TEXT = 'Pear · Internal distribution';
 const SMART_PASS = 70;
 const DAY = 86400000;
 
@@ -434,13 +434,13 @@ async function buildObjectivesPptx({ sess, lignes, cfg }) {
 
   const pptx = new PptxGenJS();
   pptx.layout = 'LAYOUT_WIDE';
-  pptx.author = 'Pearl';
-  pptx.company = 'Pearl';
+  pptx.author = 'Pear';
+  pptx.company = 'Pear';
   const { scopeLabel, normScope } = require('../core/store');
   const scope = normScope(sess.team, 'ALL');
   VILLE = scopeLabel(scope);
   EQUIPE = scope === 'ALL' ? 'Team' : `Team · ${VILLE}`;
-  FOOTER_TEXT = `Pearl · ${VILLE} · Internal distribution`;
+  FOOTER_TEXT = `Pear · ${VILLE} · Internal distribution`;
   pptx.title = `Objectives Review · ${clip(sess.name || sess.id || '')}`;
 
   const sessName = clip(sess.name || sess.id) || 'Objectives session';
@@ -460,7 +460,7 @@ async function buildObjectivesPptx({ sess, lignes, cfg }) {
   {
     const cover = pptx.addSlide();
     cover.background = { color: C.wash };
-    cover.addText(`Pearl · ${VILLE}`, {
+    cover.addText(`Pear · ${VILLE}`, {
       x: M, y: 0.72, w: 5.2, h: 0.24, fontSize: 10, color: '4A6169', fontFace: FONT,
     });
     cover.addText(
@@ -1268,7 +1268,7 @@ async function buildObjectivesPptx({ sess, lignes, cfg }) {
     const s = pptx.addSlide();
     statement(s, {
       bg: C.brand, on: 'FFFFFF', onMute: 'F0AFB8', rule: 'E8737F',
-      eyebrow: `Pearl · ${VILLE}`,
+      eyebrow: `Pear · ${VILLE}`,
       lead: 'Thanks to every agent for the objectives set, the milestones delivered and the '
           + 'discipline of keeping them up to date. Every figure in this deck is traceable in '
           + 'the objectives module and its Excel export.',

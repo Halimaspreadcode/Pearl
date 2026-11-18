@@ -381,7 +381,7 @@ class Layout {
   newPage() {
     const d = this.doc;
     d.addPage();
-    d.text('PEARL', M, 30, { size: 8, bold: true, color: C.brand, charSpace: 0.8 });
+    d.text('PEAR', M, 30, { size: 8, bold: true, color: C.brand, charSpace: 0.8 });
     d.text('Absence report', M + 30, 30, { size: 8, color: C.mute });
     d.text(this.meta.periodLabel, PW - M, 30, { size: 8, color: C.mute, align: 'right' });
     d.line(M, 38, PW - M, 38, { color: C.line, width: 0.6 });
@@ -513,7 +513,7 @@ function drawCover(L, A, meta) {
   const d = L.doc, s = A.s;
   d.addPage();
   d.rect(0, 0, PW, 136, { fill: C.brand });
-  d.text('PEARL', M, 44, { size: 8, bold: true, color: '#F7C6C8', charSpace: 1.4 });
+  d.text('PEAR', M, 44, { size: 8, bold: true, color: '#F7C6C8', charSpace: 1.4 });
   d.text('Absence report', M, 80, { size: 30, bold: true, color: C.white });
   d.text(meta.periodLabel, M, 103, { size: 12, color: '#FFE1E2', maxWidth: 300 });
 
@@ -898,7 +898,7 @@ function buildAbsencePdf({ summary, absences, generatedAt, periodLabel } = {}) {
     generatedLabel: `${fmtDate(isoOf(new Date(Date.UTC(gen.getFullYear(), gen.getMonth(), gen.getDate()))))}, ${pad(gen.getHours())}:${pad(gen.getMinutes())}`,
   };
   const A = analyse(s, absences, gen);
-  const doc = new PdfDoc({ title: `Absence report ${s.from || ''} – ${s.to || ''}`, author: 'Pearl' });
+  const doc = new PdfDoc({ title: `Absence report ${s.from || ''} – ${s.to || ''}`, author: 'Pear' });
   const L = new Layout(doc, meta);
 
   drawCover(L, A, meta);
@@ -930,7 +930,7 @@ function buildAbsencePdf({ summary, absences, generatedAt, periodLabel } = {}) {
   for (let i = 0; i < N; i++) {
     doc.usePage(i);
     doc.line(M, PH - 36, PW - M, PH - 36, { color: C.line, width: 0.6 });
-    doc.text(`Pearl · Absence report — page ${i + 1} / ${N}`, M, PH - 22, { size: 7.5, color: C.mute });
+    doc.text(`Pear · Absence report — page ${i + 1} / ${N}`, M, PH - 22, { size: 7.5, color: C.mute });
     doc.text('Confidential — contains personal HR data', PW - M, PH - 22, { size: 7.5, color: C.faint, align: 'right' });
   }
   return doc.toBuffer();

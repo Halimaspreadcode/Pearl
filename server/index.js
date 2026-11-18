@@ -13,7 +13,7 @@
 // Ce fichier-ci reste donc écrit dans une syntaxe que tout Node comprend.
 var NODE_MIN = 18;
 if (parseInt(process.versions.node, 10) < NODE_MIN) {
-  console.error('\n  Pearl demande Node.js ' + NODE_MIN + ' ou plus récent (20 conseillé).');
+  console.error('\n  Pear demande Node.js ' + NODE_MIN + ' ou plus récent (20 conseillé).');
   console.error('  Version installée : ' + process.version + '  (' + process.execPath + ')');
   console.error('  Mise à jour : voir « Prérequis » dans le README.\n');
   process.exit(1);
@@ -41,11 +41,11 @@ const app = createApp();
 startScheduler();
 
 process.on('uncaughtException', err => {
-  console.error('[Pearl] Uncaught exception:', err);
+  console.error('[Pear] Uncaught exception:', err);
 });
 
 process.on('unhandledRejection', err => {
-  console.error('[Pearl] Unhandled rejection:', err);
+  console.error('[Pear] Unhandled rejection:', err);
 });
 
 // Une copie au démarrage — c'est le moment où l'on vient souvent de
@@ -58,13 +58,13 @@ setInterval(backupData, 24 * 60 * 60 * 1000).unref();
 // Corrections de nom d'agent demandées (services/rename-agent.js), après la
 // sauvegarde : en cas de souci, la copie du jour a l'état d'avant.
 require('./platform/tenants').forEachTenant(() => require('./services/rename-agent').appliquerCorrections())
-  .catch(e => console.error('[Pearl] Corrections :', e.message));
+  .catch(e => console.error('[Pear] Corrections :', e.message));
 
 // Insights des agents : passes automatiques (services/ai-insight.js).
-try { require('./services/ai-insight').demarrerAuto(); } catch (e) { console.error('[Pearl] Insights :', e.message); }
+try { require('./services/ai-insight').demarrerAuto(); } catch (e) { console.error('[Pear] Insights :', e.message); }
 
 const server = app.listen(PORT, HOST, () => {
-  console.log(`\n  Pearl running at http://localhost:${PORT}  (écoute ${HOST}:${PORT})`);
+  console.log(`\n  Pear running at http://localhost:${PORT}  (écoute ${HOST}:${PORT})`);
   const { backend } = require('./core/backend');
   console.log(`  stockage : ${backend().kind}${backend().kind === 'fs' ? ` (${DATA_DIR})` : ''} · ${require('./core/tenant').isMultiTenant() ? `multi-tenant (*.${require('./platform/tenants').baseDomain()})` : 'mono-tenant'}\n`);
 });
@@ -81,10 +81,10 @@ let shuttingDown = false;
 async function gracefulShutdown(signal) {
   if (shuttingDown) return;          // un second Ctrl-C ne doit pas relancer la séquence
   shuttingDown = true;
-  console.log(`[Pearl] ${signal} received — shutting down…`);
+  console.log(`[Pear] ${signal} received — shutting down…`);
 
   // On cesse d'accepter de nouvelles connexions ; celles en cours finissent.
-  server.close(() => console.log('[Pearl] HTTP server closed.'));
+  server.close(() => console.log('[Pear] HTTP server closed.'));
   if (serverTls) serverTls.close();
 
   // Les écritures passent toutes par withLock : attendre que les chaînes
@@ -102,8 +102,8 @@ async function gracefulShutdown(signal) {
   } catch { /* idem */ }
 
   if (getPendingWrites() > 0)
-    console.warn(`[Pearl] Shutting down with ${getPendingWrites()} write(s) still queued.`);
-  console.log('[Pearl] Shutdown complete.');
+    console.warn(`[Pear] Shutting down with ${getPendingWrites()} write(s) still queued.`);
+  console.log('[Pear] Shutdown complete.');
   process.exit(0);
 }
 

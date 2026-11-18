@@ -97,7 +97,7 @@ const apiRateLimit = rateLimit({
     const now = Date.now();
     if (now - _dernierAvis > 60 * 1000) {
       _dernierAvis = now;
-      console.warn(`[Pearl] Limite de requêtes atteinte (${cleSession(req) ? 'session' : 'adresse ' + req.ip}) sur ${req.originalUrl.split('?')[0]}.`);
+      console.warn(`[Pear] Limite de requêtes atteinte (${cleSession(req) ? 'session' : 'adresse ' + req.ip}) sur ${req.originalUrl.split('?')[0]}.`);
     }
     res.status(options.statusCode).json(options.message);
   },

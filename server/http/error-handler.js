@@ -27,7 +27,7 @@ const errorHandler = (err, req, res, _next) => {
     return res.status(code).json({ error: message });
   }
 
-  console.error('[Pearl] Unhandled error:', req.method, req.originalUrl, err);
+  console.error('[Pear] Unhandled error:', req.method, req.originalUrl, err);
   if (res.headersSent) return;
   // Le détail part dans le journal, pas au client : un message d'erreur
   // brut expose volontiers des chemins de fichiers.

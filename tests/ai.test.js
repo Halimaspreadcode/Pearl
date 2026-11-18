@@ -108,7 +108,7 @@ describe('routes', () => {
     assert.equal(recu[0].auth, `Bearer ${CLE}`);
     const msgs = recu[0].corps.messages;
     assert.equal(msgs[0].role, 'system');
-    assert.ok(msgs[0].content.includes('Pearl'));
+    assert.ok(msgs[0].content.includes('Pear'));
     // Un « system » venu du client n'en est pas un.
     assert.equal(msgs.filter(m => m.role === 'system').length, 1);
     assert.ok(recu[0].corps.max_tokens <= ai.LIMITES.max_tokens);
@@ -278,7 +278,7 @@ describe('diagnostic réseau', () => {
   test('proxy au nom inconnu : conseil de prendre son adresse IP', async () => {
     ai.majConf({ base_url: mockUrl, api_key: CLE, model: 'glm-5.3', proxy_mode: 'manual', proxy: 'http://proxy.nexiste-pas.invalid:8080', clear_proxy_auth: true });
     const d = await ai.diagnostiquer();
-    assert.ok(d.etapes.some(e => e.t === 'Serveur Pearl'));
+    assert.ok(d.etapes.some(e => e.t === 'Serveur Pear'));
     const k = d.etapes.find(e => e.ok === false);
     assert.equal(k.t, 'DNS du proxy');
     assert.match(k.d, /nslookup proxy\.nexiste-pas\.invalid/);

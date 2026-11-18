@@ -8,7 +8,7 @@ const parties = require('../server/services/parties');
 test('rôle créé, personne rangée, rôle reconnu par l\'identité', async () => {
   const r = await parties.majRole({ label: 'SMC — Service Management Center', key: 'smc' });
   assert.equal(r.key, 'SMC');
-  await assert.rejects(parties.majRole({ key: 'FO', label: 'x' }), /déjà un rôle de Pearl/);
+  await assert.rejects(parties.majRole({ key: 'FO', label: 'x' }), /déjà un rôle de Pear/);
   await assert.rejects(parties.majPersonne({ name: 'Awa Diop', role: 'SMC' }), /liste des FO/);
   const p = await parties.majPersonne({ name: 'Pierre Antoine Moreau', role: 'SMC', country: 'SN' });
   assert.equal(p.country, 'SN');

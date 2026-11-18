@@ -90,7 +90,7 @@ function migrateIfNeeded() {
   if (!docExists(FILES.legacy)) return;
   const allExist = ['sn','ci','observations','audit','config'].every(k => docExists(FILES[k]));
   if (allExist) return; // already migrated
-  console.log('[Pearl] Migrating tickets.json → split data files…');
+  console.log('[Pear] Migrating tickets.json → split data files…');
   const legacy = readJSON(FILES.legacy, null);
   if (!legacy) return;
   if (!docExists(FILES.sn))           writeJSON(FILES.sn,           legacy.sn           || []);
@@ -103,7 +103,7 @@ function migrateIfNeeded() {
   }
   writeJSON(FILES.legacy.replace(/\.json$/, '.bak.json'), legacy);
   removeDoc(FILES.legacy);
-  console.log('[Pearl] Migration done. tickets.json → tickets.bak.json');
+  console.log('[Pear] Migration done. tickets.json → tickets.bak.json');
 }
 
 // One-time migration: plaintext approval_password → bcrypt hash
@@ -114,7 +114,7 @@ function migratePasswordsIfNeeded() {
     cfg.approval_password_hash = bcrypt.hashSync(cfg.approval_password, 10);
     delete cfg.approval_password;
     writeJSON(FILES.config, cfg);
-    console.log('[Pearl] Migrated approval_password → approval_password_hash (hashed).');
+    console.log('[Pear] Migrated approval_password → approval_password_hash (hashed).');
   }
 }
 
@@ -201,7 +201,7 @@ function migrateHoldPeriodsIfNeeded() {
       if (x.hold_periods.length) n++;
     }
     writeTracker(t, tickets);
-    console.log(`[Pearl] Périodes On Hold reconstituées (${t.toUpperCase()}) : ${n} ticket(s) concerné(s).`);
+    console.log(`[Pear] Périodes On Hold reconstituées (${t.toUpperCase()}) : ${n} ticket(s) concerné(s).`);
   }
 }
 // ── SITES ─────────────────────────────────────────────────────
@@ -272,10 +272,10 @@ function initTenant() {
   const t = currentTenant();
   if (_initialised.has(t)) return;
   _initialised.add(t);
-  try { migrateIfNeeded(); } catch (e) { console.error(`[Pearl] ${t} : migration tickets.json échouée :`, e.message); }
-  try { migratePasswordsIfNeeded(); } catch (e) { console.error(`[Pearl] ${t} : migration mot de passe échouée :`, e.message); }
-  try { migrateSitesIfNeeded(); } catch (e) { console.error(`[Pearl] ${t} : migration des sites échouée :`, e.message); }
-  try { migrateHoldPeriodsIfNeeded(); } catch (e) { console.error(`[Pearl] ${t} : migration On Hold échouée :`, e.message); }
+  try { migrateIfNeeded(); } catch (e) { console.error(`[Pear] ${t} : migration tickets.json échouée :`, e.message); }
+  try { migratePasswordsIfNeeded(); } catch (e) { console.error(`[Pear] ${t} : migration mot de passe échouée :`, e.message); }
+  try { migrateSitesIfNeeded(); } catch (e) { console.error(`[Pear] ${t} : migration des sites échouée :`, e.message); }
+  try { migrateHoldPeriodsIfNeeded(); } catch (e) { console.error(`[Pear] ${t} : migration On Hold échouée :`, e.message); }
 }
 // Les installations d'avant les sites configurables avaient deux trackers
 // fixes (sn.json, ci.json) : on les déclare comme sites, avec leurs
@@ -288,7 +288,7 @@ function migrateSitesIfNeeded() {
   if (docExists(siteFile('CI'))) sites.push({ code: 'CI', name: 'CI' });
   cfg.sites = sites;
   writeJSON(FILES.config, cfg);
-  if (sites.length) console.log(`[Pearl] Sites déclarés depuis les trackers existants : ${sites.map(s => s.code).join(', ')}.`);
+  if (sites.length) console.log(`[Pear] Sites déclarés depuis les trackers existants : ${sites.map(s => s.code).join(', ')}.`);
 }
 const _resetInit = () => _initialised.clear();
 

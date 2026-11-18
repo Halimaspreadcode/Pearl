@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Connexion · Pearl</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%234F6A85'/%3E%3Ctext x='16' y='17.5' dominant-baseline='middle' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='13' fill='%23FCFBF8'%3EFO%3C/text%3E%3C/svg%3E">
+<title>Connexion · Pear</title>
+<link rel="icon" type="image/svg+xml" href="/img/pear-icon.svg">
 <!--
-  Page de connexion de Pearl. Le serveur y renvoie toute visite de l'app
+  Page de connexion de Pear. Le serveur y renvoie toute visite de l'app
   sans session (server/http/shell.js). Trois portes, comme avant :
     · identifiant employé + code personnel : la seule qui permet d'écrire ;
     · mot de passe d'équipe : consultation seule ;
@@ -96,7 +96,7 @@
 <div class="wrap">
   <aside class="side">
     <img id="photo" src="/img/login.jpg" alt="" decoding="async">
-    <div class="brand"><span class="logo">P</span><span><b>Pearl</b><small>Gestion d’équipe</small></span></div>
+    <div class="brand"><img class="logo" src="/img/pear-logo.svg" alt="" aria-hidden="true" style="background:none"><span><b>Pear</b><small>Gestion d’équipe</small></span></div>
     <div class="quote"><b>Bon retour parmi nous.</b><span>Tickets, passations, planning et formations du Front Office, au même endroit.</span></div>
   </aside>
 
@@ -141,7 +141,7 @@
       </form>
     </div>
 
-    <div class="bottom"><span>Code oublié ? Demande-le à ton responsable.</span><span>Pearl</span></div>
+    <div class="bottom"><span>Code oublié ? Demande-le à ton responsable.</span><span>Pear</span></div>
   </main>
 </div>
 <script>
@@ -173,7 +173,7 @@
     $('l-pw').textContent = perso ? 'Code personnel' : 'Mot de passe d\'équipe';
     $('intro').textContent = perso
       ? 'Entre ton identifiant employé et ton code personnel.'
-      : 'Le mot de passe d\'équipe ouvre Pearl en consultation seule.';
+      : 'Le mot de passe d\'équipe ouvre Pear en consultation seule.';
     [].forEach.call($('seg').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String((b.dataset.m === 'perso') === perso)); });
     erreur('');
   }

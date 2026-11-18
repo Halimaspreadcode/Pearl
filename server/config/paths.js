@@ -33,12 +33,12 @@ const NAMES = {
   formation_reseau_progress: 'formation_reseau_progress.json',
   // Clé de l'assistant IA : hors de git (.gitignore) et hors des
   // sauvegardes (qui ne copient que les .json). Voir services/ai.js.
-  // Insights Pearl AI des agents, gardés pour ne pas rappeler le modèle
+  // Insights Pear AI des agents, gardés pour ne pas rappeler le modèle
   // à chaque ouverture de la page.
   ai_insights:     'ai_insights.json',
-  // Résultats de skills épinglés sur l'accueil de Pearl AI.
+  // Résultats de skills épinglés sur l'accueil de Pear AI.
   ai_pins:         'ai_pins.json',
-  // Base de connaissances de Pearl AI : documents importés, découpés
+  // Base de connaissances de Pear AI : documents importés, découpés
   // en passages (services/ai-kb.js).
   ai_kb:           'ai_kb.json',
   // Vecteurs (embeddings) des passages, un fichier par document.

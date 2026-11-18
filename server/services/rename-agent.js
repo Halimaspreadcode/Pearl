@@ -111,8 +111,8 @@ async function appliquerCorrections(liste = CORRECTIONS) {
       }
       const r = await renommerAgent(ancien, nouveau, { fusion: true });
       require('../core/audit').addAudit('config', r.nouveau, 'system', 'fo-rename', { from: ancien, to: r.nouveau, total: r.total, fusion: r.fusion });
-      console.log(`[Pearl] Agent renommé : ${ancien} → ${r.nouveau} (${r.total} mention(s)${r.fusion ? ', fusion' : ''}).`);
-    } catch (e) { console.error(`[Pearl] Renommage ${ancien} → ${nouveau} : ${e.message}`); }
+      console.log(`[Pear] Agent renommé : ${ancien} → ${r.nouveau} (${r.total} mention(s)${r.fusion ? ', fusion' : ''}).`);
+    } catch (e) { console.error(`[Pear] Renommage ${ancien} → ${nouveau} : ${e.message}`); }
   }
 }
 

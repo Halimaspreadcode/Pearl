@@ -67,7 +67,7 @@ async function composerRapport(kind, sujetModele, paysIn) {
         + decale
         + corps
         + `<p style="color:#888;font-size:11.5px;margin-top:18px;border-top:1px solid #e0e0e0;
-             padding-top:8px">Full details in the attached file — automatic message from Pearl.</p></div>`,
+             padding-top:8px">Full details in the attached file — automatic message from Pear.</p></div>`,
     piece,
   };
 }
@@ -152,7 +152,7 @@ async function envoyerAlerte(m, sch, erreur) {
   try {
     await smtpSend(m.smtp, {
       to: [dest],
-      subject: `[Pearl] Scheduled report not sent: ${label}`,
+      subject: `[Pear] Scheduled report not sent: ${label}`,
       html: `<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1c1e;max-width:640px">
         <h2 style="font-size:16px;margin:0 0 8px;color:#C5221F">Scheduled report not sent</h2>
         <p>The <b>${esc(label)}</b> scheduled for <b>${esc(groupe)}</b> could not be sent${
@@ -161,7 +161,7 @@ async function envoyerAlerte(m, sch, erreur) {
         <p>Open <b>Admin › Diffusion</b> to check the mail server settings, then use
            <i>Send now</i> to resend it.</p>
         <p style="color:#888;font-size:11.5px;border-top:1px solid #e0e0e0;padding-top:8px">
-          Automatic alert from Pearl.</p></div>`,
+          Automatic alert from Pear.</p></div>`,
     });
     appendMailLog({ kind: sch.report, group: dest, to: [dest], ok: true, origin: 'alert', schedule_id: sch.id });
   } catch (e) {

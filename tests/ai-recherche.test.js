@@ -1,5 +1,5 @@
-// Recherche en langage naturel : la requête lue par Pearl AI est
-// exécutée par Pearl sur les vraies données.
+// Recherche en langage naturel : la requête lue par Pear AI est
+// exécutée par Pear sur les vraies données.
 const { useTempDataDir } = require('./helpers/data-dir');
 useTempDataDir({
   'config.json': { fo_list: ['Claire LEROY', 'Paul BERNARD', 'Marc PETIT'], fo_trackers: { 'Marc PETIT': 'CI' } },

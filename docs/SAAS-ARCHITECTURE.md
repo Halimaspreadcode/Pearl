@@ -1,12 +1,12 @@
-# Pearl SaaS — architecture cible et plan de migration
+# Pear SaaS — architecture cible et plan de migration
 
 État : **phases 0 à 3 en place** (voir « État d'avancement » à la fin). Ce
 document décrit la cible et ce qui a été construit pour l'atteindre.
 
 ## 1. Ce qu'on vend
 
-Pearl n'est pas un ERP généraliste. Copier Odoo (comptabilité, stock, CRM…)
-voudrait dire affronter Odoo sur son terrain. Pearl a un créneau plus net :
+Pear n'est pas un ERP généraliste. Copier Odoo (comptabilité, stock, CRM…)
+voudrait dire affronter Odoo sur son terrain. Pear a un créneau plus net :
 **le pilotage d'une équipe opérationnelle**. Cela couvre :
 
 - le travail entrant : tickets, demandes, tâches, avec leurs délais (SLA) ;
@@ -178,7 +178,7 @@ On ne réécrit pas 120 000 lignes d'un coup. On fait évoluer le code par
 ### Phase 0 — Nettoyage et renommage ✅
 
 Données et contenus de l'organisation d'origine retirés, application
-renommée Pearl. Les 302 tests passent.
+renommée Pear. Les 302 tests passent.
 
 ### Phase 1 — Multi-tenant « silo » sur le code actuel (≈ 3 à 4 semaines)
 
