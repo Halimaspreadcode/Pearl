@@ -2,21 +2,91 @@
 <html lang="fr" data-theme="dark">
 <head>
 <meta charset="utf-8">
+<script src="/js/core/i18n-fr.js"></script>
+<script src="/js/core/i18n-en.js"></script>
+<script src="/js/core/i18n.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/img/pear-icon.svg">
 <link rel="apple-touch-icon" href="/img/pear-icon-180.png">
 <title>Console · Pear</title>
 <script src="/platform/platform.js"></script>
 <link rel="stylesheet" href="/platform/platform.css">
+<style>
+  body{min-height:100vh}
+  .c-shell{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+  .c-side{border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+  .c-side .brand{margin:0 8px 22px}
+  .c-nav{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;color:var(--mute);font-weight:600;font-size:14px;cursor:pointer;border:0;background:none;text-align:left;font-family:inherit}
+  .c-nav:hover{background:var(--card);color:var(--ink)}
+  .c-nav.on{background:var(--card-hov);color:var(--ink)}
+  .c-nav svg{width:17px;height:17px;flex-shrink:0}
+  .c-nav .c-badge{margin-left:auto;font-size:11px;padding:1px 8px;border-radius:99px;background:var(--line-2)}
+  .c-side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px;padding:0 8px;font-size:12.5px;color:var(--mute)}
+  .c-side-foot .row{display:flex;align-items:center;gap:8px}
+  .c-main{padding:26px 32px 60px;min-width:0}
+  .c-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+  .c-head h1{margin:0;font-size:26px;font-weight:600;letter-spacing:-.02em}
+  .c-head p{margin:4px 0 0;color:var(--mute);font-size:14px}
+  .kpis5{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+  .k{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+  .k small{display:block;color:var(--mute);font-size:12px;font-weight:600;margin-bottom:6px}
+  .k strong{font-size:26px;font-weight:600;letter-spacing:-.02em}
+  .k em{font-style:normal;color:var(--mute);font-size:12.5px;margin-left:6px}
+  .bar{height:7px;border-radius:99px;background:var(--line-2);overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:var(--primary)}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:16px}
+  .box h2{margin:0 0 4px;font-size:16px;font-weight:650}
+  .box .sub{margin:0 0 14px;color:var(--mute);font-size:13px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .toolbar input,.toolbar select{height:40px;border-radius:11px;font-size:14px;width:auto}
+  .toolbar input[type=search]{flex:1;min-width:220px}
+  table.t{width:100%;border-collapse:collapse;font-size:14px}
+  table.t th{text-align:left;font-size:12px;color:var(--mute);font-weight:650;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:default}
+  table.t th[data-sort]{cursor:pointer}
+  table.t th[data-sort]:hover{color:var(--ink)}
+  table.t td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  table.t tr.click{cursor:pointer}
+  table.t tr.click:hover td{background:var(--card-hov)}
+  table.t td small{display:block;color:var(--mute);font-size:12px}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .seats{display:flex;align-items:center;gap:8px;min-width:110px}
+  .seats .bar{flex:1;margin:0}
+  .btn.sm{height:34px;padding:0 12px;font-size:13px}
+  .btn.danger{color:var(--err);border-color:color-mix(in srgb,var(--err) 40%,transparent)}
+  .drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;opacity:0;pointer-events:none;transition:opacity .2s}
+  .drawer-bg.on{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(760px,100%);background:var(--panel-solid);border-left:1px solid var(--line);z-index:21;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
+  .drawer.on{transform:none}
+  .d-head{padding:20px 24px 0;display:flex;justify-content:space-between;gap:12px}
+  .d-head h2{margin:0;font-size:21px}
+  .d-tabs{display:flex;gap:2px;padding:14px 24px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+  .d-tab{border:0;background:none;color:var(--mute);font:inherit;font-weight:650;font-size:13.5px;padding:10px 12px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+  .d-tab.on{color:var(--ink);border-bottom-color:var(--primary)}
+  .d-body{padding:20px 24px 40px;overflow-y:auto;flex:1}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .field label{margin-top:0}
+  .field input,.field select{height:44px;font-size:14.5px}
+  .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .inline input,.inline select{height:40px;width:auto;flex:1;min-width:140px;font-size:14px}
+  .log{list-style:none;margin:0;padding:0}
+  .log li{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .log time{color:var(--mute);font-size:12px;min-width:120px;font-variant-numeric:tabular-nums}
+  .empty{padding:24px;text-align:center;color:var(--mute);font-size:14px}
+  .code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;background:var(--input);border:1px solid var(--line-2);border-radius:8px;padding:6px 8px;word-break:break-all}
+  .note{font-size:13px;color:var(--mute);margin-top:8px;line-height:1.5}
+  .plans{display:flex;gap:8px;flex-wrap:wrap}
+  .plans .chip{padding:6px 12px;border-radius:99px;background:var(--line);font-size:13px}
+  .auth-wrap{max-width:520px;margin:10vh auto 0;padding:0 16px}
+  .auth-wrap .top{margin-bottom:20px}
+  @media (max-width:900px){.c-shell{grid-template-columns:1fr}.c-side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--line)}.c-side .brand{margin:0 12px 0 4px}.c-side-foot{margin:0 0 0 auto;flex-direction:row}.c-main{padding:20px 16px 60px}.grid2{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-<div class="wrap">
+<div class="auth-wrap" id="auth" hidden>
   <header class="top">
     <a class="brand" href="/" data-logo>Pear <span style="color:var(--mute);font-weight:600">Console</span></a>
-    <nav class="nav"><span id="who" style="display:flex;gap:8px;align-items:center"></span><button type="button" class="icon-btn" id="theme-btn"></button></nav>
+    <nav class="nav"><span data-lang-switch></span><button type="button" class="icon-btn" id="theme-btn"></button></nav>
   </header>
-
-  <form class="form-shell form-panel" id="login" hidden>
+  <form class="form-panel" id="login" hidden>
     <h2>Connexion à la console</h2>
     <p class="lead">Réservée aux administrateurs de la plateforme.</p>
     <label for="l-email">Email</label><input id="l-email" type="email" autocomplete="username" required>
@@ -24,8 +94,7 @@
     <div class="err" id="l-err" role="alert"></div>
     <button class="btn primary" style="margin-top:20px;width:100%">Se connecter</button>
   </form>
-
-  <form class="form-shell form-panel" id="setup" hidden>
+  <form class="form-panel" id="setup" hidden>
     <h2>Installation de la console</h2>
     <p class="lead">Première connexion : saisissez le code d'installation reçu, puis choisissez vos identifiants d'administrateur. Le code ne sert qu'une fois.</p>
     <label for="s-code">Code d'installation</label><input id="s-code" autocomplete="one-time-code" spellcheck="false" required>
@@ -34,158 +103,402 @@
     <div class="err" id="s-err" role="alert"></div>
     <button class="btn primary" style="margin-top:20px;width:100%">Créer mon compte administrateur</button>
   </form>
-
-  <main id="app" hidden>
-    <div class="stats">
-      <div class="stat"><small>Organisations</small><strong id="st-total">0</strong></div>
-      <div class="stat"><small>Actives</small><strong id="st-active">0</strong></div>
-      <div class="stat"><small>En essai</small><strong id="st-trial">0</strong></div>
-      <div class="stat"><small>Membres</small><strong id="st-members">0</strong></div>
-    </div>
-    <section class="panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-        <h2 style="margin:0">Organisations <span class="hint" id="count"></span></h2>
-        <button class="btn primary sm" id="new-btn">Nouvelle organisation</button>
-      </div>
-      <div class="table-wrap" style="margin-top:12px">
-        <table><thead><tr><th>Organisation</th><th>Pack</th><th>Statut</th><th>Membres</th><th>Créée</th><th></th></tr></thead><tbody id="rows"></tbody></table>
-      </div>
-    </section>
-
-    <section class="panel" id="new" hidden style="margin-top:14px">
-      <h2 style="margin:0 0 6px">Nouvelle organisation</h2>
-      <div class="row2">
-        <div><label for="n-name">Nom</label><input id="n-name" maxlength="80"></div>
-        <div><label for="n-slug">Adresse (slug)</label><input id="n-slug" maxlength="40" spellcheck="false"></div>
-      </div>
-      <div class="row2">
-        <div><label for="n-pack">Pack</label><select id="n-pack"></select></div>
-        <div><label for="n-plan">Offre</label><input id="n-plan" value="standard" maxlength="40"></div>
-      </div>
-      <div class="row2">
-        <div><label for="n-owner">Email du propriétaire</label><input id="n-owner" type="email"></div>
-        <div><label for="n-owner-name">Nom du propriétaire</label><input id="n-owner-name" maxlength="80"></div>
-      </div>
-      <div class="err" id="n-err" role="alert"></div>
-      <div id="n-ok"></div>
-      <button class="btn primary" id="n-create" style="margin-top:8px">Créer</button>
-    </section>
-
-    <section class="panel" id="edit" hidden style="margin-top:14px">
-      <h2 style="margin:0 0 6px" id="e-title"></h2>
-      <div class="row2">
-        <div><label for="e-status">Statut</label><select id="e-status"><option value="trial">Essai</option><option value="active">Active</option><option value="suspended">Suspendue</option></select></div>
-        <div><label for="e-plan">Offre</label><input id="e-plan" maxlength="40"></div>
-      </div>
-      <label for="e-domains">Domaines personnalisés (un par ligne, ex. ops.client.com)</label>
-      <textarea id="e-domains" rows="2"></textarea>
-      <label>Modules</label>
-      <div id="e-mods" class="checks"></div>
-      <div class="err" id="e-err" role="alert"></div>
-      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-        <button class="btn primary" id="e-save">Enregistrer</button>
-        <button class="btn" id="e-close">Fermer</button>
-        <span style="flex:1"></span>
-        <button class="btn" id="e-delete" style="color:var(--err)">Supprimer…</button>
-      </div>
-    </section>
-  </main>
 </div>
+
+<div class="c-shell" id="app" hidden>
+  <aside class="c-side">
+    <a class="brand" href="/" data-logo>Pear <span style="color:var(--mute);font-weight:600">Console</span></a>
+    <button class="c-nav on" data-view="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Vue d'ensemble</button>
+    <button class="c-nav" data-view="tenants"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>Organisations<span class="c-badge" id="nb-tenants">0</span></button>
+    <button class="c-nav" data-view="admins"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/></svg>Administrateurs</button>
+    <button class="c-nav" data-view="activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Journal</button>
+    <div class="c-side-foot">
+      <div class="row"><span data-lang-switch></span><button type="button" class="icon-btn" id="theme-btn-2" aria-label="Thème"></button></div>
+      <span id="who"></span>
+      <button class="btn sm" id="logout" style="width:max-content">Déconnexion</button>
+    </div>
+  </aside>
+  <main class="c-main" id="view"></main>
+</div>
+
+<div class="drawer-bg" id="dbg"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"></aside>
+
 <script>
 const $ = id => document.getElementById(id);
+const T = s => (window.pearTr ? window.pearTr(s) : s);
+const LOC = () => (window.PEAR_LANG === 'en' ? 'en-GB' : 'fr-FR');
+const money = (n, c) => new Intl.NumberFormat(LOC(), { style: 'currency', currency: c || 'EUR', maximumFractionDigits: n % 1 ? 2 : 0 }).format(n || 0);
+const day = iso => iso ? new Date(iso).toLocaleDateString(LOC(), { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+const when = iso => iso ? new Date(iso).toLocaleString(LOC(), { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
 const api = async (url, method = 'GET', body) => {
-  const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined, cache: 'no-store' });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw Object.assign(new Error(j.error || `HTTP ${r.status}`), { status: r.status });
   return j;
 };
-const C = { tenants: [], mods: [], packs: [], cur: null };
+const toastErr = e => alert(e.message || e);
 const STATUT = { trial: 'Essai', active: 'Active', suspended: 'Suspendue' };
+const ROLES = [['owner', 'Propriétaire'], ['admin', 'Administrateur'], ['manager', 'Manager'], ['agent', 'Membre'], ['observer', 'Lecture seule']];
+const roleL = r => (ROLES.find(x => x[0] === r) || [r, r])[1];
+const ACTIONS = {
+  'auth.login': 'Connexion', 'tenant.created': 'Organisation créée', 'tenant.updated': 'Organisation modifiée', 'tenant.deleted': 'Organisation supprimée',
+  'member.role': 'Rôle modifié', 'member.removed': 'Membre retiré', 'member.password_reset': 'Mot de passe réinitialisé', 'invite.sent': 'Invitation envoyée',
+  'invite.revoked': 'Invitation révoquée', 'admin.added': 'Administrateur ajouté', 'admin.removed': 'Administrateur retiré', 'org.created': "Création de l'espace",
+  'org.branding': 'Marque modifiée', 'org.modules': 'Modules modifiés', 'member.added': 'Membre ajouté', 'invite.accepted': 'Invitation acceptée',
+  'invite.renewed': 'Invitation renouvelée', 'billing.changed': 'Abonnement modifié',
+};
+const C = { view: 'overview', tenants: [], stats: null, mods: [], packs: [], q: '', fStatus: '', fPlan: '', sort: ['created_at', -1], cur: null, dtab: 'apercu' };
 
+// ── Démarrage, connexion ──
 async function start() {
   try {
     const me = await api('/api/platform/console/me');
-    $('who').innerHTML = `<span class="hint" style="margin:0">${esc(me.email)}</span> <button class="btn sm" id="logout">Déconnexion</button>`;
-    $('logout').onclick = async () => { await api('/api/platform/console/logout', 'POST'); location.reload(); };
-    $('login').hidden = true; $('app').hidden = false;
+    C.me = me;
+    $('auth').hidden = true; $('app').hidden = false;
+    $('who').textContent = me.email;
     [C.mods, C.packs] = await Promise.all([api('/api/platform/modules'), api('/api/platform/packs')]);
-    $('n-pack').innerHTML = C.packs.map(p => `<option value="${esc(p.id)}">${esc(p.label)}</option>`).join('');
-    await load();
+    await refresh();
+    const h = (location.hash || '').slice(1);
+    go(['overview', 'tenants', 'admins', 'activity'].includes(h) ? h : 'overview');
   } catch (e) {
-    $('app').hidden = true;
+    $('app').hidden = true; $('auth').hidden = false;
     const st = await api('/api/platform/console/setup').catch(() => ({ open: false }));
     $('setup').hidden = !st.open; $('login').hidden = !!st.open;
   }
 }
-$('setup').addEventListener('submit', async e => {
-  e.preventDefault(); $('s-err').textContent = '';
-  try {
-    await api('/api/platform/console/setup', 'POST', { code: $('s-code').value.trim(), email: $('s-email').value.trim(), password: $('s-pw').value });
-    $('setup').hidden = true; start();
-  } catch (er) { $('s-err').textContent = er.message; }
-});
-async function load() {
-  C.tenants = await api('/api/platform/console/tenants');
-  $('count').textContent = `(${C.tenants.length})`;
-  $('st-total').textContent = C.tenants.length;
-  $('st-active').textContent = C.tenants.filter(t => t.status === 'active').length;
-  $('st-trial').textContent = C.tenants.filter(t => t.status === 'trial').length;
-  $('st-members').textContent = C.tenants.reduce((n, t) => n + (t.members || 0), 0);
-  $('rows').innerHTML = C.tenants.map(t => `<tr>
-    <td><b>${esc(t.name)}</b><br><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.slug)}</a></td>
-    <td>${esc(t.pack || '—')}</td>
-    <td><span class="pill ${esc(t.status)}">${esc(STATUT[t.status] || t.status)}</span>${t.status === 'trial' && t.trial_ends_at ? `<div class="hint">jusqu'au ${esc(t.trial_ends_at.slice(0, 10))}</div>` : ''}</td>
-    <td>${t.members}</td>
-    <td>${esc(String(t.created_at || '').slice(0, 10))}</td>
-    <td><button class="btn sm" data-edit="${esc(t.slug)}">Gérer</button></td></tr>`).join('') || '<tr><td colspan="6" class="hint">Aucune organisation pour l’instant.</td></tr>';
-  document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => edit(b.dataset.edit));
-}
-function edit(slug) {
-  const t = C.tenants.find(x => x.slug === slug); C.cur = t;
-  $('edit').hidden = false; $('new').hidden = true;
-  $('e-title').textContent = `${t.name} (${t.slug})`;
-  $('e-status').value = t.status; $('e-plan').value = t.plan || '';
-  $('e-domains').value = (t.domains || []).join('\n');
-  const on = new Set(t.modules && t.modules.length ? t.modules : C.mods.map(m => m.id));
-  $('e-mods').innerHTML = C.mods.map(m => `<label><input type="checkbox" value="${esc(m.id)}" ${on.has(m.id) ? 'checked' : ''} ${m.always ? 'disabled' : ''}> ${esc(m.label)}</label>`).join('');
-  $('e-err').textContent = '';
-  $('edit').scrollIntoView({ behavior: 'smooth' });
-}
-$('e-close').onclick = () => { $('edit').hidden = true; };
-$('e-save').onclick = async () => {
-  try {
-    await api(`/api/platform/console/tenants/${encodeURIComponent(C.cur.slug)}`, 'PATCH', {
-      status: $('e-status').value, plan: $('e-plan').value.trim(),
-      domains: $('e-domains').value.split(/\s+/).filter(Boolean),
-      modules: [...$('e-mods').querySelectorAll('input:checked')].map(x => x.value),
-    });
-    $('edit').hidden = true; await load();
-  } catch (e) { $('e-err').textContent = e.message; }
-};
-$('e-delete').onclick = async () => {
-  const s = prompt(`Suppression définitive de « ${C.cur.name} » et de toutes ses données.\nRetapez « ${C.cur.slug} » pour confirmer :`);
-  if (s !== C.cur.slug) return;
-  try { await api(`/api/platform/console/tenants/${encodeURIComponent(C.cur.slug)}`, 'DELETE', { confirm: s }); $('edit').hidden = true; await load(); }
-  catch (e) { $('e-err').textContent = e.message; }
-};
-$('new-btn').onclick = () => { $('new').hidden = false; $('edit').hidden = true; $('n-ok').innerHTML = ''; $('n-err').textContent = ''; };
-$('n-create').onclick = async () => {
-  $('n-err').textContent = ''; $('n-ok').innerHTML = '';
-  try {
-    const j = await api('/api/platform/console/tenants', 'POST', {
-      name: $('n-name').value.trim(), slug: $('n-slug').value.trim() || undefined, pack: $('n-pack').value, plan: $('n-plan').value.trim(),
-      owner_email: $('n-owner').value.trim() || undefined, owner_name: $('n-owner-name').value.trim() || undefined,
-    });
-    $('n-ok').innerHTML = `<p class="ok">Créée : <a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.url)}</a></p>`
-      + (j.temp_password ? `<p>Mot de passe provisoire de ${esc(j.owner.email)}, à transmettre une seule fois : <code>${esc(j.temp_password)}</code></p>` : '');
-    await load();
-  } catch (e) { $('n-err').textContent = e.message; }
-};
 $('login').addEventListener('submit', async e => {
   e.preventDefault(); $('l-err').textContent = '';
   try { await api('/api/platform/console/login', 'POST', { email: $('l-email').value.trim(), password: $('l-pw').value }); start(); }
   catch (er) { $('l-err').textContent = er.message; }
 });
+$('setup').addEventListener('submit', async e => {
+  e.preventDefault(); $('s-err').textContent = '';
+  try { await api('/api/platform/console/setup', 'POST', { code: $('s-code').value.trim(), email: $('s-email').value.trim(), password: $('s-pw').value }); start(); }
+  catch (er) { $('s-err').textContent = er.message; }
+});
+$('logout').onclick = async () => { await api('/api/platform/console/logout', 'POST'); location.reload(); };
+const syncTheme = () => { $('theme-btn-2').innerHTML = $('theme-btn').innerHTML; };
+$('theme-btn-2').onclick = () => { $('theme-btn').click(); syncTheme(); };
+document.addEventListener('DOMContentLoaded', syncTheme);
+document.querySelectorAll('.c-nav').forEach(b => b.onclick = () => go(b.dataset.view));
+
+async function refresh() {
+  [C.tenants, C.stats] = await Promise.all([api('/api/platform/console/tenants'), api('/api/platform/console/stats')]);
+  $('nb-tenants').textContent = C.tenants.length;
+}
+function go(v) {
+  C.view = v; history.replaceState(null, '', '#' + v);
+  document.querySelectorAll('.c-nav').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+  ({ overview, tenants: tenantsView, admins: adminsView, activity: activityView })[v]();
+}
+
+// ── Vue d'ensemble ──
+function overview() {
+  const s = C.stats;
+  const pct = s.seats ? Math.round(s.seats_used / s.seats * 100) : 0;
+  const soon = C.tenants.filter(t => t.status === 'trial' && t.trial_ends_at).sort((a, b) => a.trial_ends_at.localeCompare(b.trial_ends_at)).slice(0, 6);
+  const recent = [...C.tenants].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))).slice(0, 6);
+  const top = [...C.tenants].sort((a, b) => b.mrr - a.mrr).filter(t => t.mrr > 0).slice(0, 6);
+  $('view').innerHTML = `
+    <div class="c-head"><div><h1>Vue d'ensemble</h1><p>${esc(T('Revenus, sièges et organisations de la plateforme'))}</p></div>
+      <button class="btn primary sm" onclick="newTenant()">Nouvelle organisation</button></div>
+    <div class="kpis5">
+      <div class="k"><small>Revenu mensuel récurrent</small><strong>${money(s.mrr)}</strong><em>${esc(T('ARR'))} ${money(s.mrr * 12)}</em></div>
+      <div class="k"><small>En essai (potentiel)</small><strong>${money(s.pipeline)}</strong><em>${s.trial} ${esc(T('org.'))}</em></div>
+      <div class="k"><small>Sièges vendus</small><strong>${s.seats}</strong><em>${s.seats_used} ${esc(T('occupés'))}</em><div class="bar"><i style="width:${pct}%"></i></div></div>
+      <div class="k"><small>Organisations</small><strong>${s.tenants}</strong><em>${s.active} ${esc(T('actives'))} · ${s.suspended} ${esc(T('suspendues'))}</em></div>
+      <div class="k"><small>Membres</small><strong>${s.members}</strong><em>+${s.new_30d} ${esc(T('org. en 30 j'))}</em></div>
+    </div>
+    <div class="grid2">
+      <div class="box"><h2>Essais à convertir</h2><p class="sub">${s.trial_ending} ${esc(T('se terminent dans les 7 jours'))}</p>
+        ${soon.length ? `<table class="t"><tbody>${soon.map(t => `<tr class="click" data-slug="${esc(t.slug)}"><td><b>${esc(t.name)}</b><small>${esc(t.owner_email || '—')}</small></td><td>${esc(day(t.trial_ends_at))}</td><td class="num">${money(t.price.monthly)}</td></tr>`).join('')}</tbody></table>` : `<div class="empty">Aucun essai en cours.</div>`}</div>
+      <div class="box"><h2>Plus gros comptes</h2><p class="sub">${esc(T('Par revenu mensuel'))}</p>
+        ${top.length ? `<table class="t"><tbody>${top.map(t => `<tr class="click" data-slug="${esc(t.slug)}"><td><b>${esc(t.name)}</b><small>${esc(planL(t.plan))} · ${t.seats} ${esc(T('sièges'))}</small></td><td class="num">${money(t.mrr)}</td></tr>`).join('')}</tbody></table>` : `<div class="empty">Aucun compte payant pour l'instant.</div>`}</div>
+    </div>
+    <div class="box"><h2>Dernières inscriptions</h2>
+      ${recent.length ? `<table class="t"><thead><tr><th>Organisation</th><th>Pack</th><th>Statut</th><th>Créée</th></tr></thead><tbody>${recent.map(t => `<tr class="click" data-slug="${esc(t.slug)}"><td><b>${esc(t.name)}</b><small>${esc(t.slug)}</small></td><td>${esc(t.pack || '—')}</td><td>${pill(t.status)}</td><td>${esc(day(t.created_at))}</td></tr>`).join('')}</tbody></table>` : `<div class="empty">Aucune organisation pour l'instant.</div>`}</div>
+    <div class="box"><h2>Offres</h2><p class="sub">${esc(T('Prix par siège et par mois, hors taxes. Réglables par variables d’environnement (PEARL_PRICE_*).'))}</p>
+      <div class="plans">${s.plans.map(p => `<span class="chip"><b>${esc(T(p.label))}</b> · ${money(p.price)} · ${s.by_plan[p.id] || 0} ${esc(T('org.'))}</span>`).join('')}</div></div>`;
+  bindRows();
+}
+const planL = id => T(((C.stats && C.stats.plans.find(p => p.id === id)) || {}).label || id || '—');
+const pill = st => `<span class="pill ${esc(st)}">${esc(T(STATUT[st] || st))}</span>`;
+function bindRows() { document.querySelectorAll('tr[data-slug]').forEach(r => r.onclick = () => openTenant(r.dataset.slug)); }
+
+// ── Organisations ──
+function tenantsView() {
+  $('view').innerHTML = `
+    <div class="c-head"><div><h1>Organisations</h1><p>${C.tenants.length} ${esc(T('espaces clients'))}</p></div>
+      <div class="inline"><button class="btn sm" onclick="exportCsv()">Exporter (CSV)</button><button class="btn primary sm" onclick="newTenant()">Nouvelle organisation</button></div></div>
+    <div class="box">
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Rechercher une organisation, un email, une adresse…" value="${esc(C.q)}">
+        <select id="f-status"><option value="">Tous les statuts</option>${Object.keys(STATUT).map(k => `<option value="${k}"${C.fStatus === k ? ' selected' : ''}>${esc(T(STATUT[k]))}</option>`).join('')}</select>
+        <select id="f-plan"><option value="">Toutes les offres</option>${C.stats.plans.map(p => `<option value="${p.id}"${C.fPlan === p.id ? ' selected' : ''}>${esc(T(p.label))}</option>`).join('')}</select>
+      </div>
+      <div style="overflow-x:auto"><table class="t"><thead><tr>
+        <th data-sort="name">Organisation</th><th data-sort="plan">Offre</th><th data-sort="status">Statut</th><th data-sort="seats_used">Sièges</th>
+        <th data-sort="mrr" class="num">Revenu mensuel</th><th data-sort="created_at">Créée</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </div>`;
+  $('q').oninput = e => { C.q = e.target.value; rows(); };
+  $('f-status').onchange = e => { C.fStatus = e.target.value; rows(); };
+  $('f-plan').onchange = e => { C.fPlan = e.target.value; rows(); };
+  document.querySelectorAll('th[data-sort]').forEach(th => th.onclick = () => { const k = th.dataset.sort; C.sort = [k, C.sort[0] === k ? -C.sort[1] : 1]; rows(); });
+  rows();
+}
+function filtered() {
+  const q = C.q.toLowerCase().trim();
+  const [k, d] = C.sort;
+  return C.tenants.filter(t => (!C.fStatus || t.status === C.fStatus) && (!C.fPlan || t.plan === C.fPlan)
+    && (!q || [t.name, t.slug, t.owner_email, ...(t.domains || [])].join(' ').toLowerCase().includes(q)))
+    .sort((a, b) => { const x = a[k], y = b[k]; return (typeof x === 'number' ? x - y : String(x || '').localeCompare(String(y || ''))) * d; });
+}
+function rows() {
+  const list = filtered();
+  $('rows').innerHTML = list.map(t => {
+    const pct = t.seats ? Math.min(100, Math.round(t.seats_used / t.seats * 100)) : 0;
+    return `<tr class="click" data-slug="${esc(t.slug)}">
+      <td><b>${esc(t.name)}</b><small>${esc(t.slug)}${t.owner_email ? ' · ' + esc(t.owner_email) : ''}</small></td>
+      <td>${esc(planL(t.plan))}<small>${esc(T(t.interval === 'year' ? 'annuel' : 'mensuel'))}</small></td>
+      <td>${pill(t.status)}${t.status === 'trial' && t.trial_ends_at ? `<small>${esc(T("jusqu'au"))} ${esc(day(t.trial_ends_at))}</small>` : ''}</td>
+      <td><div class="seats"><span>${t.seats_used}/${t.seats}</span><div class="bar"><i style="width:${pct}%"></i></div></div></td>
+      <td class="num">${money(t.mrr)}</td>
+      <td>${esc(day(t.created_at))}</td></tr>`;
+  }).join('') || `<tr><td colspan="6" class="empty">${esc(T('Aucune organisation ne correspond.'))}</td></tr>`;
+  bindRows();
+}
+function exportCsv() {
+  const head = ['slug', 'name', 'status', 'plan', 'interval', 'seats', 'seats_used', 'members', 'mrr', 'owner_email', 'created_at', 'trial_ends_at'];
+  const cell = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+  const csv = [head.join(';'), ...filtered().map(t => head.map(h => cell(t[h])).join(';'))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
+  a.download = `pear-organisations-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+}
+
+// ── Fiche d'une organisation (panneau latéral) ──
+function drawer(on) {
+  $('drawer').classList.toggle('on', on); $('dbg').classList.toggle('on', on);
+  $('drawer').setAttribute('aria-hidden', on ? 'false' : 'true');
+}
+$('dbg').onclick = () => drawer(false);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') drawer(false); });
+
+async function openTenant(slug, tab) {
+  try { C.cur = await api(`/api/platform/console/tenants/${encodeURIComponent(slug)}`); }
+  catch (e) { return toastErr(e); }
+  if (tab) C.dtab = tab;
+  paintDrawer(); drawer(true);
+}
+function paintDrawer() {
+  const t = C.cur;
+  const tabs = [['apercu', 'Résumé'], ['abonnement', 'Abonnement'], ['membres', 'Membres'], ['modules', 'Modules'], ['journal', 'Journal'], ['danger', 'Zone sensible']];
+  $('drawer').innerHTML = `
+    <div class="d-head"><div><h2>${esc(t.name)}</h2><div class="hint" style="margin-top:4px">${pill(t.status)} · <a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.url.replace(/^https?:\/\//, ''))}</a></div></div>
+      <button class="icon-btn" onclick="drawer(false)" aria-label="Fermer">✕</button></div>
+    <div class="d-tabs">${tabs.map(([k, l]) => `<button class="d-tab${C.dtab === k ? ' on' : ''}" data-t="${k}">${esc(T(l))}</button>`).join('')}</div>
+    <div class="d-body" id="dbody"></div>`;
+  $('drawer').querySelectorAll('.d-tab').forEach(b => b.onclick = () => { C.dtab = b.dataset.t; paintDrawer(); });
+  ({ apercu: dApercu, abonnement: dAbonnement, membres: dMembres, modules: dModules, journal: dJournal, danger: dDanger })[C.dtab]($('dbody'));
+}
+async function patchCur(body, okMsg) {
+  try {
+    await api(`/api/platform/console/tenants/${encodeURIComponent(C.cur.slug)}`, 'PATCH', body);
+    await refresh(); await openTenant(C.cur.slug);
+    if (C.view !== 'admins' && C.view !== 'activity') go(C.view);
+    if (okMsg) flash(okMsg);
+  } catch (e) { toastErr(e); }
+}
+function flash(msg) {
+  const el = document.createElement('div'); el.textContent = T(msg);
+  el.style.cssText = 'position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:650;z-index:40;font-size:14px';
+  document.body.appendChild(el); setTimeout(() => el.remove(), 2200);
+}
+
+function dApercu(b) {
+  const t = C.cur;
+  b.innerHTML = `
+    <div class="kpis5">
+      <div class="k"><small>Revenu mensuel</small><strong>${money(t.mrr)}</strong></div>
+      <div class="k"><small>Sièges</small><strong>${t.seats_used}</strong><em>/ ${t.seats}</em></div>
+      <div class="k"><small>Membres</small><strong>${t.members}</strong><em>${t.invites} ${esc(T('invitations'))}</em></div>
+    </div>
+    <div class="box">
+      <div class="grid2">
+        <div class="field"><label>Nom</label><input id="d-name" value="${esc(t.name)}" maxlength="80"></div>
+        <div class="field"><label>Statut</label><select id="d-status">${Object.keys(STATUT).map(k => `<option value="${k}"${t.status === k ? ' selected' : ''}>${esc(T(STATUT[k]))}</option>`).join('')}</select></div>
+      </div>
+      <div class="field" style="margin-top:12px"><label>Domaines personnalisés (un par ligne, ex. ops.client.com)</label><textarea id="d-domains" rows="2">${esc((t.domains || []).join('\n'))}</textarea></div>
+      <div class="inline" style="margin-top:14px;justify-content:flex-end"><button class="btn primary sm" id="d-save">Enregistrer</button></div>
+    </div>
+    <div class="box"><h2>Essai</h2><p class="sub">${t.status === 'trial' ? `${esc(T("Se termine le"))} ${esc(day(t.trial_ends_at))}` : esc(T("L'organisation n'est pas en essai."))}</p>
+      <div class="inline"><button class="btn sm" onclick="patchCur({extend_trial_days:7},'Essai prolongé')">+7 jours</button><button class="btn sm" onclick="patchCur({extend_trial_days:14},'Essai prolongé')">+14 jours</button><button class="btn sm" onclick="patchCur({extend_trial_days:30},'Essai prolongé')">+30 jours</button>
+      ${t.status === 'trial' ? `<button class="btn primary sm" onclick="patchCur({status:'active'},'Organisation activée')">Passer en payant</button>` : ''}</div></div>
+    <div class="box"><h2>Informations</h2><table class="t"><tbody>
+      <tr><td>Adresse</td><td><span class="code">${esc(t.slug)}</span></td></tr>
+      <tr><td>Pack</td><td>${esc(t.pack || '—')}</td></tr>
+      <tr><td>Propriétaire</td><td>${esc(t.owner_email || '—')}</td></tr>
+      <tr><td>Créée</td><td>${esc(day(t.created_at))}</td></tr></tbody></table></div>`;
+  $('d-save').onclick = () => patchCur({ name: $('d-name').value.trim(), status: $('d-status').value, domains: $('d-domains').value.split(/\s+/).filter(Boolean) }, 'Organisation enregistrée');
+}
+
+function dAbonnement(b) {
+  const t = C.cur, bi = t.billing;
+  b.innerHTML = `
+    <div class="box"><h2>Offre et sièges</h2><p class="sub">${esc(T('Sièges occupés'))} : ${bi.usage.used} (${bi.usage.members} ${esc(T('membres'))} + ${bi.usage.invites} ${esc(T('invitations'))}) · ${bi.free_observers} ${esc(T('en lecture seule (gratuits)'))}</p>
+      <div class="grid2">
+        <div class="field"><label>Offre</label><select id="b-plan">${bi.plans.map(p => `<option value="${p.id}"${p.id === bi.plan ? ' selected' : ''}>${esc(T(p.label))} · ${money(p.price)}</option>`).join('')}</select></div>
+        <div class="field"><label>Paiement</label><select id="b-int"><option value="month"${bi.interval === 'month' ? ' selected' : ''}>${esc(T('Mensuel'))}</option><option value="year"${bi.interval === 'year' ? ' selected' : ''}>${esc(T('Annuel'))}</option></select></div>
+        <div class="field"><label>Sièges</label><input id="b-seats" type="number" min="${Math.max(1, bi.usage.used)}" max="10000" value="${bi.seats}"></div>
+        <div class="field"><label>Total</label><input id="b-total" readonly></div>
+      </div>
+      <div class="inline" style="margin-top:14px;justify-content:flex-end"><button class="btn primary sm" id="b-save">Appliquer</button></div></div>
+    <div class="box"><h2>Historique</h2>${bi.history.length ? `<ul class="log">${bi.history.map(h => `<li><time>${esc(when(h.at))}</time><div><b>${esc(String(h.by).replace(/^console:/, 'Pear · '))}</b> · ${[h.plan && `${planL(h.plan[0])} → ${planL(h.plan[1])}`, h.seats && `${h.seats[0]} → ${h.seats[1]} ${T('sièges')}`, h.interval && `${T(h.interval[0] === 'year' ? 'annuel' : 'mensuel')} → ${T(h.interval[1] === 'year' ? 'annuel' : 'mensuel')}`].filter(Boolean).map(esc).join(' · ')}</div></li>`).join('')}</ul>` : `<div class="empty">Aucun changement pour l'instant.</div>`}</div>`;
+  const calc = () => {
+    const p = bi.plans.find(x => x.id === $('b-plan').value);
+    const unit = $('b-int').value === 'year' ? p.year_unit : p.price;
+    $('b-total').value = `${money(unit * Number($('b-seats').value || 0))} ${T('HT / mois')}`;
+  };
+  ['b-plan', 'b-int', 'b-seats'].forEach(id => $(id).oninput = calc); calc();
+  $('b-save').onclick = () => patchCur({ billing_plan: $('b-plan').value, interval: $('b-int').value, seats: Number($('b-seats').value) }, 'Abonnement mis à jour');
+}
+
+function dMembres(b) {
+  const t = C.cur;
+  b.innerHTML = `
+    <div class="box"><h2>Inviter</h2><p class="sub">Crée un lien d'invitation (7 jours) à transmettre, par exemple au propriétaire d'un nouveau client.</p>
+      <div class="inline"><input id="i-email" type="email" placeholder="prenom@client.com"><select id="i-role">${ROLES.map(([v, l]) => `<option value="${v}"${v === 'admin' ? ' selected' : ''}>${esc(T(l))}</option>`).join('')}</select><button class="btn primary sm" id="i-go">Créer le lien</button></div>
+      <div id="i-out"></div></div>
+    ${t.invite_list.length ? `<div class="box"><h2>Invitations en attente</h2><table class="t"><tbody>${t.invite_list.map(i => `<tr><td>${esc(i.email)}<small>${esc(T(roleL(i.role)))} · ${esc(T('expire'))} ${esc(day(i.expires_at))}</small></td><td class="num"><button class="btn sm" data-rev="${esc(i.id)}">Révoquer</button></td></tr>`).join('')}</tbody></table></div>` : ''}
+    <div class="box"><h2>Membres</h2><table class="t"><thead><tr><th>Personne</th><th>Rôle</th><th></th></tr></thead><tbody>
+      ${t.member_list.map(m => `<tr><td><b>${esc(m.person_name || m.email || m.user_id)}</b><small>${esc(m.email || '')}</small></td>
+        <td><select data-role="${esc(m.user_id)}" style="height:38px;font-size:13.5px">${ROLES.map(([v, l]) => `<option value="${v}"${v === m.role ? ' selected' : ''}>${esc(T(l))}</option>`).join('')}</select></td>
+        <td class="num"><div class="inline" style="justify-content:flex-end"><button class="btn sm" data-reset="${esc(m.user_id)}">Mot de passe</button><button class="btn sm danger" data-rm="${esc(m.user_id)}">Retirer</button></div></td></tr>`).join('')}
+    </tbody></table><div id="m-out"></div></div>`;
+  const base = `/api/platform/console/tenants/${encodeURIComponent(t.slug)}`;
+  $('i-go').onclick = async () => {
+    try {
+      const j = await api(`${base}/invites`, 'POST', { email: $('i-email').value.trim(), role: $('i-role').value });
+      C.cur = await api(base); paintDrawer();
+      $('i-out').innerHTML = `<p class="note">${esc(T('Lien à transmettre'))} :</p><div class="code">${esc(j.link)}</div>`;
+    } catch (e) { toastErr(e); }
+  };
+  b.querySelectorAll('[data-rev]').forEach(x => x.onclick = async () => { try { await api(`${base}/invites/${x.dataset.rev}`, 'DELETE'); openTenant(t.slug); } catch (e) { toastErr(e); } });
+  b.querySelectorAll('[data-role]').forEach(x => x.onchange = async () => { try { await api(`${base}/members/${x.dataset.role}`, 'PUT', { role: x.value }); flash('Rôle modifié'); openTenant(t.slug); } catch (e) { toastErr(e); openTenant(t.slug); } });
+  b.querySelectorAll('[data-rm]').forEach(x => x.onclick = async () => {
+    if (!confirm(T("Retirer ce membre de l'organisation ?"))) return;
+    try { await api(`${base}/members/${x.dataset.rm}`, 'DELETE'); await refresh(); openTenant(t.slug); } catch (e) { toastErr(e); }
+  });
+  b.querySelectorAll('[data-reset]').forEach(x => x.onclick = async () => {
+    if (!confirm(T('Générer un mot de passe provisoire pour ce compte ? L’ancien ne fonctionnera plus.'))) return;
+    try { const j = await api(`${base}/members/${x.dataset.reset}/reset-password`, 'POST'); $('m-out').innerHTML = `<p class="note">${esc(T('Mot de passe provisoire de'))} ${esc(j.email)}, ${esc(T('à transmettre une seule fois'))} :</p><div class="code">${esc(j.temp_password)}</div>`; }
+    catch (e) { toastErr(e); }
+  });
+}
+
+function dModules(b) {
+  const t = C.cur;
+  const on = new Set(t.modules && t.modules.length ? t.modules : C.mods.map(m => m.id));
+  b.innerHTML = `<div class="box"><h2>Modules</h2><p class="sub">Ce que l'organisation voit dans son menu.</p>
+    <div class="checks" id="d-mods">${C.mods.map(m => `<label title="${esc(m.desc || '')}"><input type="checkbox" value="${esc(m.id)}" ${on.has(m.id) ? 'checked' : ''} ${m.always ? 'disabled' : ''}> ${esc(T(m.label))}</label>`).join('')}</div>
+    <div class="inline" style="margin-top:14px;justify-content:flex-end"><button class="btn primary sm" id="d-msave">Enregistrer</button></div></div>`;
+  $('d-msave').onclick = () => patchCur({ modules: [...$('d-mods').querySelectorAll('input:checked')].map(x => x.value) }, 'Modules enregistrés');
+}
+
+function dJournal(b) {
+  const list = C.cur.activity || [];
+  b.innerHTML = `<div class="box"><h2>Journal de l'organisation</h2>${list.length ? `<ul class="log">${list.map(logLine).join('')}</ul>` : `<div class="empty">Rien à afficher pour l'instant.</div>`}</div>`;
+}
+function logLine(e) {
+  const d = e.details || {};
+  const extra = d.slug ? d.slug : d.email ? d.email : (d.emails || []).join(', ');
+  return `<li><time>${esc(when(e.at))}</time><div><b>${esc(String(e.actor).replace(/^console:/, 'Pear · '))}</b> · ${esc(T(ACTIONS[e.action] || e.action))}${extra ? ` · ${esc(extra)}` : ''}${d.to ? ` → ${esc(T(roleL(d.to)))}` : ''}</div></li>`;
+}
+
+function dDanger(b) {
+  const t = C.cur;
+  b.innerHTML = `
+    <div class="box"><h2>${esc(T(t.status === 'suspended' ? 'Réactiver' : 'Suspendre'))}</h2>
+      <p class="sub">${esc(T(t.status === 'suspended' ? "Les membres retrouvent l'accès à leur espace." : "Les membres ne peuvent plus se connecter ; les données sont conservées."))}</p>
+      <button class="btn sm ${t.status === 'suspended' ? 'primary' : 'danger'}" id="z-sus">${esc(T(t.status === 'suspended' ? 'Réactiver' : 'Suspendre'))}</button></div>
+    <div class="box"><h2>Supprimer définitivement</h2><p class="sub">Toutes les données de l'organisation sont effacées. Cette action est irréversible.</p>
+      <div class="inline"><input id="z-confirm" placeholder="${esc(T('Retapez'))} ${esc(t.slug)}"><button class="btn sm danger" id="z-del">Supprimer</button></div></div>`;
+  $('z-sus').onclick = () => patchCur({ status: t.status === 'suspended' ? 'active' : 'suspended' }, t.status === 'suspended' ? 'Organisation réactivée' : 'Organisation suspendue');
+  $('z-del').onclick = async () => {
+    if ($('z-confirm').value.trim() !== t.slug) return toastErr(new Error(T('Confirmation : retaper le slug du tenant.')));
+    try { await api(`/api/platform/console/tenants/${encodeURIComponent(t.slug)}`, 'DELETE', { confirm: t.slug }); drawer(false); await refresh(); go(C.view); flash('Organisation supprimée'); }
+    catch (e) { toastErr(e); }
+  };
+}
+
+// ── Nouvelle organisation ──
+function newTenant() {
+  $('drawer').innerHTML = `
+    <div class="d-head"><div><h2>Nouvelle organisation</h2><div class="hint">Créée active, avec son offre et ses sièges. Le propriétaire reçoit un mot de passe provisoire.</div></div>
+      <button class="icon-btn" onclick="drawer(false)" aria-label="Fermer">✕</button></div>
+    <div class="d-body"><div class="box">
+      <div class="grid2">
+        <div class="field"><label>Nom</label><input id="n-name" maxlength="80"></div>
+        <div class="field"><label>Adresse (slug)</label><input id="n-slug" maxlength="40" spellcheck="false"></div>
+        <div class="field"><label>Pack</label><select id="n-pack">${C.packs.map(p => `<option value="${esc(p.id)}">${esc(T(p.label))}</option>`).join('')}</select></div>
+        <div class="field"><label>Offre</label><select id="n-plan">${C.stats.plans.map(p => `<option value="${p.id}"${p.id === 'business' ? ' selected' : ''}>${esc(T(p.label))}</option>`).join('')}</select></div>
+        <div class="field"><label>Sièges</label><input id="n-seats" type="number" min="1" value="10"></div>
+        <div class="field"><label>Statut</label><select id="n-status"><option value="active">${esc(T('Active'))}</option><option value="trial">${esc(T('Essai'))}</option></select></div>
+        <div class="field"><label>Email du propriétaire</label><input id="n-owner" type="email"></div>
+        <div class="field"><label>Nom du propriétaire</label><input id="n-owner-name" maxlength="80"></div>
+      </div>
+      <div class="err" id="n-err" role="alert"></div><div id="n-ok"></div>
+      <div class="inline" style="margin-top:14px;justify-content:flex-end"><button class="btn primary" id="n-create">Créer</button></div>
+    </div></div>`;
+  drawer(true);
+  $('n-create').onclick = async () => {
+    $('n-err').textContent = ''; $('n-ok').innerHTML = '';
+    try {
+      const j = await api('/api/platform/console/tenants', 'POST', {
+        name: $('n-name').value.trim(), slug: $('n-slug').value.trim() || undefined, pack: $('n-pack').value, plan: $('n-plan').value,
+        seats: Number($('n-seats').value) || undefined, status: $('n-status').value,
+        owner_email: $('n-owner').value.trim() || undefined, owner_name: $('n-owner-name').value.trim() || undefined,
+      });
+      $('n-ok').innerHTML = `<p class="ok">${esc(T('Créée'))} : <a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.url)}</a></p>`
+        + (j.temp_password ? `<p class="note">${esc(T('Mot de passe provisoire de'))} ${esc(j.owner.email)}, ${esc(T('à transmettre une seule fois'))} :</p><div class="code">${esc(j.temp_password)}</div>` : '');
+      await refresh(); if (C.view !== 'admins' && C.view !== 'activity') go(C.view);
+    } catch (e) { $('n-err').textContent = e.message; }
+  };
+}
+
+// ── Administrateurs ──
+async function adminsView() {
+  $('view').innerHTML = `<div class="c-head"><div><h1>Administrateurs</h1><p>${esc(T('Les personnes qui ont accès à cette console.'))}</p></div></div><div class="box"><div class="empty">…</div></div>`;
+  let list = [];
+  try { list = await api('/api/platform/console/admins'); } catch (e) { return toastErr(e); }
+  $('view').innerHTML = `<div class="c-head"><div><h1>Administrateurs</h1><p>${esc(T('Les personnes qui ont accès à cette console.'))}</p></div></div>
+    <div class="box"><h2>Ajouter un administrateur</h2><p class="sub">Si la personne n'a pas encore de compte Pear, un mot de passe provisoire est créé.</p>
+      <div class="inline"><input id="a-email" type="email" placeholder="prenom@entreprise.com"><button class="btn primary sm" id="a-add">Ajouter</button></div><div id="a-out"></div></div>
+    <div class="box"><table class="t"><thead><tr><th>Email</th><th>Depuis</th><th></th></tr></thead><tbody>
+      ${list.map(a => `<tr><td><b>${esc(a.email || a.user_id)}</b>${a.me ? ` <span class="pill">${esc(T('vous'))}</span>` : ''}</td><td>${esc(day(a.created_at))}</td><td class="num">${a.me ? '' : `<button class="btn sm danger" data-rm="${esc(a.user_id)}">Retirer</button>`}</td></tr>`).join('')}
+    </tbody></table></div>`;
+  $('a-add').onclick = async () => {
+    try {
+      const j = await api('/api/platform/console/admins', 'POST', { email: $('a-email').value.trim() });
+      await adminsView();
+      if (j.temp_password) $('a-out').innerHTML = `<p class="note">${esc(T('Mot de passe provisoire de'))} ${esc(j.email)}, ${esc(T('à transmettre une seule fois'))} :</p><div class="code">${esc(j.temp_password)}</div>`;
+    } catch (e) { toastErr(e); }
+  };
+  document.querySelectorAll('#view [data-rm]').forEach(x => x.onclick = async () => {
+    if (!confirm(T('Retirer cet administrateur de la console ?'))) return;
+    try { await api(`/api/platform/console/admins/${x.dataset.rm}`, 'DELETE'); adminsView(); } catch (e) { toastErr(e); }
+  });
+}
+
+// ── Journal ──
+async function activityView() {
+  let list = [];
+  try { list = await api('/api/platform/console/activity'); } catch (e) { return toastErr(e); }
+  $('view').innerHTML = `<div class="c-head"><div><h1>Journal</h1><p>${esc(T('Connexions et actions effectuées depuis la console.'))}</p></div></div>
+    <div class="box">${list.length ? `<ul class="log">${list.map(logLine).join('')}</ul>` : `<div class="empty">Rien à afficher pour l'instant.</div>`}</div>`;
+}
+
 start();
 </script>
 </body>

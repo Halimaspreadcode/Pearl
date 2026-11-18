@@ -115,13 +115,13 @@ function _apRelative(iso) {
   if (h < 24)     return `il y a ${h} h`;
   const d = Math.round(h / 24);
   if (d < 30)     return `il y a ${d} j`;
-  return t.toLocaleDateString('en-GB');
+  return t.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'));
 }
 
 function _apDateLabel(dateStr) {
   const d = _apDaysUntil(dateStr);
   const pretty = dateStr
-    ? new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' })
+    ? new Date(`${dateStr}T00:00:00`).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday:'short', day:'numeric', month:'short' })
     : '-';
   if (d === 0)  return `${pretty} · today`;
   if (d === 1)  return `${pretty} · demain`;

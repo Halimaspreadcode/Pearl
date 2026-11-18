@@ -3,16 +3,8 @@
 // est maintenant une page, atteinte par renderPage('cfg-…').
 
 // ── GLOSSAIRE LOGS (localStorage) ──
-const LOG_ANALYZER_DEFAULT_GLOSSARY = {
-  "snmp": "Protocole de supervision reseau",
-  "sftp": "Protocole de transfert de fichiers securise",
-  "ftp": "Protocole de transfert de fichiers",
-  "cpu": "Unite centrale de traitement",
-  "mem": "Memoire",
-  "disk": "Disque de stockage",
-  "timeout": "Depassement de delai de reponse",
-  "auth": "Authentification"
-};
+// Aucun terme imposé : chaque organisation ajoute les siens.
+const LOG_ANALYZER_DEFAULT_GLOSSARY = {};
 const LOG_ANALYZER_GLOSSARY_KEY = 'logAnalyzer.customGlossary';
 
 function loadLogAnalyzerCustomGlossary() {
@@ -455,7 +447,7 @@ async function saveFoRatings() {
   toast('FO ratings saved', 'success');
 }
 async function saveTimeRef() {
-  const cfg = { ...state.config, tref_osn: document.getElementById('cfg-tref-osn').value, tref_oci: document.getElementById('cfg-tref-oci').value };
+  const cfg = { ...state.config, tref_osn: document.getElementById('cfg-tref-osn').value, tref_oci: document.getElementById('cfg-tref-osn').value };
   await fetch(`${API}/api/config`, { method:'PUT', headers: AdminSession.headers({'Content-Type':'application/json'}), credentials:'same-origin', body: JSON.stringify(cfg) });
   await loadConfig();
 }

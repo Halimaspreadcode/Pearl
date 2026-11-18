@@ -44,7 +44,7 @@ function _mlWhen(wall) {
   if (date === _mlTodayTZ(0)) return `aujourd’hui ${time}`;
   if (date === _mlTodayTZ(1)) return `demain ${time}`;
   const d = new Date(date + 'T12:00:00Z');
-  return d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
+  return d.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
        + ` ${time}`;
 }
 function _mlRel(iso) {
@@ -58,13 +58,13 @@ function _mlRel(iso) {
 }
 function _mlAbs(iso, opts) {
   try {
-    return new Date(iso).toLocaleString('fr-FR', Object.assign(
+    return new Date(iso).toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'), Object.assign(
       { timeZone: mlState.tz, hour: '2-digit', minute: '2-digit' }, opts || {}));
   } catch { return String(iso || '').replace('T', ' ').slice(0, 16); }
 }
 function _mlFreqText(sc) {
   const h = `${_mlPad(sc.hour ?? 8)}:${_mlPad(sc.minute ?? 0)}`;
-  if (sc.freq === 'once')    return `Le ${sc.date ? new Date(sc.date + 'T12:00:00Z').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'UTC' }) : '—'} à ${h}`;
+  if (sc.freq === 'once')    return `Le ${sc.date ? new Date(sc.date + 'T12:00:00Z').toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: 'numeric', month: 'long', timeZone: 'UTC' }) : '—'} à ${h}`;
   if (sc.freq === 'weekly')  return `Chaque ${_ML_JOURS[Number(sc.day) || 0]} à ${h}`;
   if (sc.freq === 'monthly') return `Le ${sc.day || 1} de chaque mois à ${h}`;
   return `Chaque jour à ${h}`;
@@ -344,7 +344,7 @@ function _mlSubjectPreview(sc) {
   const t = new Date(Date.UTC(y, m - 1, d));
   t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
   const wk = Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 86400000 + 1) / 7);
-  const month = new Date(Date.UTC(y, m - 1, 15)).toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const month = new Date(Date.UTC(y, m - 1, 15)).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { month: 'long', year: 'numeric', timeZone: 'UTC' });
   const label = _ML_LABEL_EN[sc.report] || sc.report;
   const tpl = String(sc.subject || '').trim() || `${label} {country} — {date}`;
   return tpl.replace(/\{report\}/gi, label).replace(/\{date\}/gi, date)

@@ -12,7 +12,7 @@
 const MyIns = { etat: null, busy: false, err: '', fo: null, vu: null };   // vu : insight passé affiché
 
 function _insDate(iso) {
-  try { return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); } catch { return ''; }
+  try { return new Date(iso).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: 'numeric', month: 'short' }); } catch { return ''; }
 }
 
 function _insHost() {

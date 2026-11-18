@@ -288,7 +288,7 @@ function renderDashboard() {
   const labelEl = document.getElementById('dash-period-label');
   if (labelEl) labelEl.textContent = range ? _dashPeriodLabel(range) : '';
   const d = _computeDashboardKpis(typeof getActiveCountry === 'function' ? getActiveCountry() : 'ALL', range);
-  const cfg2 = typeof getLangConfig === 'function' ? getLangConfig() : { locale:'en-GB', tz:'UTC' };
+  const cfg2 = typeof getLangConfig === 'function' ? getLangConfig() : { locale:(globalThis.PEAR_LOCALE || 'fr-FR'), tz:'UTC' };
   const today = new Date().toLocaleDateString(cfg2.locale, {timeZone:cfg2.tz, weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const el = document.getElementById('dash-date');
   if (el) el.textContent = today;

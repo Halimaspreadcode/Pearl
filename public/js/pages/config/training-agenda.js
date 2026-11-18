@@ -49,7 +49,7 @@ function renderTrainingList() {
 
   tb.innerHTML = list.map(t => {
     const d = new Date(t.date + 'T00:00:00');
-    const jour = d.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' });
+    const jour = d.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'short', day: '2-digit', month: 'short' });
     const horaire = t.start_time ? `${t.start_time}${t.end_time ? ' – ' + t.end_time : ''}` : '—';
     const passe = t.date < today;
     return `

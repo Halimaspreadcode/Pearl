@@ -40,7 +40,7 @@ function renderSessionsAdmin(users) {
   const count = document.getElementById('sess-count');
   if (count) count.textContent = users.length === 1 ? '1 session active' : `${users.length} sessions actives`;
   const upd = document.getElementById('sess-updated');
-  if (upd) upd.textContent = `updated at ${new Date().toLocaleTimeString('en-GB')}`;
+  if (upd) upd.textContent = `updated at ${new Date().toLocaleTimeString((globalThis.PEAR_LOCALE || 'fr-FR'))}`;
 
   if (!users.length) {
     tb.innerHTML = `<tr><td colspan="6" style="padding:18px;text-align:center;color:var(--mute)">

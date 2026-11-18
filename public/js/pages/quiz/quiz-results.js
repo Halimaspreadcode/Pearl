@@ -263,7 +263,7 @@ async function exportQuizHistoryExcel() {
 
   ws.mergeCells(2, 1, 2, 5);
   const sub = ws.getCell(2, 1);
-  sub.value = 'Generated on ' + new Date().toLocaleString('en-GB');
+  sub.value = 'Generated on ' + new Date().toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'));
   xlFill(sub, XL_BLACK);
   xlFont(sub, { color: { argb: XL_WHITE }, size: 9 });
   xlCenter(sub);

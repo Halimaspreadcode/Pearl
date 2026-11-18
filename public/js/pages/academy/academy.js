@@ -244,7 +244,7 @@ function _acHeatmap() {
       const d = new Date(start); d.setDate(start.getDate() + w * 7 + j);
       const k = iso(d), n = count[k] || 0;
       const fut = d > today;
-      col += `<i class="ac-hc l${Math.min(n, 2)}${fut ? ' is-fut' : ''}${k === iso(today) ? ' is-today' : ''}" title="${d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}${n ? ` · ${n} formation${n > 1 ? 's' : ''}` : ''}"></i>`;
+      col += `<i class="ac-hc l${Math.min(n, 2)}${fut ? ' is-fut' : ''}${k === iso(today) ? ' is-today' : ''}" title="${d.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long' })}${n ? ` · ${n} formation${n > 1 ? 's' : ''}` : ''}"></i>`;
     }
     cols += `<div class="ac-hcol">${col}</div>`;
   }

@@ -54,8 +54,8 @@ function renderObservations() {
   const PRIO_TONE = { Critical:'crit', High:'high', Medium:'med', Low:'low' };
 
   const fmtDate = v => v
-    ? new Date(v).toLocaleDateString('en-GB', { day:'2-digit', month:'short' })
-      + ' · ' + new Date(v).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })
+    ? new Date(v).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day:'2-digit', month:'short' })
+      + ' · ' + new Date(v).toLocaleTimeString((globalThis.PEAR_LOCALE || 'fr-FR'), { hour:'2-digit', minute:'2-digit' })
     : null;
 
   const rows = obs.map(o => {

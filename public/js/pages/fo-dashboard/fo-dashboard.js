@@ -353,7 +353,7 @@ function _renderFoEvolutionChart() {
                    : isBest  ? 'color-mix(in srgb,var(--m3-primary) 55%,transparent)'
                              : 'color-mix(in srgb,var(--m3-primary) 22%,transparent)';
     const dd       = new Date(days[i]+'T00:00:00');
-    const dayLbl   = dd.toLocaleDateString('en-GB',{weekday:'short'}).replace('.','');
+    const dayLbl   = dd.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'),{weekday:'short'}).replace('.','');
     const showDate = i % 2 === 0 || isToday;
     return `<div class="fo-evo-bar" onmouseenter="_showFoEvoTooltip(event,${i})" onmouseleave="_hideFoEvoTooltip()">
         <div class="fo-evo-bar-track">
@@ -382,7 +382,7 @@ function _showFoEvoTooltip(evt, i) {
   const count = counts[i];
   const breakdown = dayBreakdowns[i];
 
-  const dateLbl = new Date(date+'T00:00:00').toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+  const dateLbl = new Date(date+'T00:00:00').toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday:'short', day:'numeric', month:'short' });
   const who = breakdown.length
     ? breakdown.map(([fo,n]) => `<div class="fo-evo-tip-row"><span>${esc(fo)}</span><strong>${n}</strong></div>`).join('')
     : '<div class="fo-evo-tip-row"><span>No ticket resolved</span></div>';

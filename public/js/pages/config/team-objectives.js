@@ -25,7 +25,7 @@ const FO_GOAL_DEFS = [
     hint: 'Volume resolved in the displayed period.' },
   { id: 'tasks',     label: 'Tâches accomplies',     unit: '%',       dir: 'min', dflt: 80,
     group: 'Continuity', plan: 95,
-    hint: 'Share of assigned tasks completed — Daily Check-up and Équipe › Tâches.' },
+    hint: 'Part des tâches confiées réalisées (Équipe › Tâches).' },
   { id: 'progress',  label: 'Weekly progress delivered', unit: '%',       dir: 'min', dflt: 80,
     group: 'Continuity', plan: 100,
     hint: 'Share of the items agents plan themselves in “Done” (assigned tasks count above).' },

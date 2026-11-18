@@ -62,6 +62,8 @@ function makeFsRegistry({ dataDir }) {
     async getSetting(key) { return clone((read().settings || {})[key] ?? null); },
     async setSetting(key, value) { const d = read(); d.settings = { ...(d.settings || {}), [key]: value }; write(d); },
     async deleteSetting(key) { const d = read(); if (d.settings) delete d.settings[key]; write(d); },
+    async listPlatformAdmins() { return read().admins.map(user_id => ({ user_id })); },
+    async removePlatformAdmin(userId) { const d = read(); d.admins = d.admins.filter(x => x !== userId); write(d); },
     async addPlatformAdmin(userId) { const d = read(); if (!d.admins.includes(userId)) d.admins.push(userId); write(d); },
   };
 }

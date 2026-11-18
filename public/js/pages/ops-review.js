@@ -467,8 +467,8 @@ function renderOpsReviewTable() {
   if (!head || !body) return;
   if (title) title.textContent = `Tickets (${rows.length})`;
 
-  const fmtDate = v => v ? new Date(v).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' }) : '—';
-  const fmtDT   = v => v ? new Date(v).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '—';
+  const fmtDate = v => v ? new Date(v).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day:'2-digit', month:'short', year:'2-digit' }) : '—';
+  const fmtDT   = v => v ? new Date(v).toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'), { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '—';
 
   // La colonne Type ne sert que si les deux sources sont affichées.
   const showSrc = orUI.type === '';
@@ -549,8 +549,8 @@ async function exportOpsReviewXLSX() {
 
   const ws = wb.addWorksheet('Ops Review', { views: [{ state: 'frozen', ySplit: 1 }] });
 
-  const fmtDT  = v => v ? new Date(v).toLocaleString('en-GB',  { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
-  const fmtD   = v => v ? new Date(v).toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' }) : '';
+  const fmtDT  = v => v ? new Date(v).toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'),  { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+  const fmtD   = v => v ? new Date(v).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day:'2-digit', month:'2-digit', year:'numeric' }) : '';
   const getMttr = t => {
     if (t.close_date && (t.open_date || t.occur_time)) {
       const diff = new Date(t.close_date) - new Date(t.open_date || t.occur_time);

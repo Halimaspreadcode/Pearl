@@ -1,7 +1,7 @@
 {
   "id": "support-it",
-  "label": "Support IT / Service desk",
-  "desc": "Incidents et demandes avec SLA, astreintes, rapports quotidiens et hebdomadaires, base de connaissances IA.",
+  "label": "Support informatique",
+  "desc": "Incidents et demandes avec délais, astreintes, rapports quotidiens et hebdomadaires, base de connaissances IA.",
   "modules": ["core", "tickets", "planning", "absences", "objectives", "academy", "reporting", "mailing", "ai", "ideas"],
   "config": {
     "domains": ["Réseau", "Poste de travail", "Applications", "Serveurs", "Sécurité"],

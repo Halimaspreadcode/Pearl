@@ -234,7 +234,7 @@ async function previewRota() {
     // week headers
     for (let w = 0; w < weeks; w++) {
       const wd = new Date(start); wd.setDate(wd.getDate() + w*7);
-      html += `<th colspan="7" style="padding:3px 8px;text-align:center;color:var(--mute);font-weight:600;border-left:1px solid var(--line)">W${w+1} · ${wd.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}</th>`;
+      html += `<th colspan="7" style="padding:3px 8px;text-align:center;color:var(--mute);font-weight:600;border-left:1px solid var(--line)">W${w+1} · ${wd.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'),{day:'2-digit',month:'short'})}</th>`;
     }
     html += `</tr></thead><tbody>`;
 

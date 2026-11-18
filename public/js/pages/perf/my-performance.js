@@ -49,7 +49,7 @@ async function renderFoAccess() {
       <tr>
         <td style="font-weight:600">${esc(r.fo)}</td>
         <td style="font-family:monospace;font-size:12px">${esc(r.employee_id || '—')}</td>
-        <td>${r.updated_at ? esc(new Date(r.updated_at).toLocaleDateString('en-GB')) : '—'}</td>
+        <td>${r.updated_at ? esc(new Date(r.updated_at).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'))) : '—'}</td>
         <td>${r.sessions || 0}</td>
         <td style="text-align:right">
           <button class="btn btn-ghost btn-sm" onclick="unlockFoCode('${esc(r.fo).replace(/'/g, "\\'")}')"
@@ -342,7 +342,7 @@ function _myPerfMonthLabel(key, long) {
   const [y, m] = String(key || '').split('-');
   if (!y || !m) return String(key || '—');
   // Page de l'agent, en anglais : le mois long suit la même langue.
-  return long ? new Date(+y, +m - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : _MYPERF_M_ABBR[+m - 1];
+  return long ? new Date(+y, +m - 1, 1).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { month: 'long', year: 'numeric' }) : _MYPERF_M_ABBR[+m - 1];
 }
 
 // Une note se lit en couleur avant de se lire en chiffre : même barème

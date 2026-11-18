@@ -175,9 +175,9 @@
             <button class="btn btn-primary btn-sm" onclick="addFo()">Add</button>
           </div>
           <p style="font-size:11.5px;color:var(--mute);margin:8px 0 0;line-height:1.5">
-            The Employee ID identifies the agent when consulting their
-            performance. It can be added later by clicking the ID
-            d’un agent dans la liste.
+            L’identifiant employé sert à reconnaître la personne quand elle
+            consulte sa performance. Il peut être ajouté plus tard en cliquant
+            sur l’identifiant d’une personne dans la liste.
           </p>
         </div>
 
@@ -199,19 +199,14 @@
         </div>
 
         <div class="config-card">
-          <h3>Time Reference - Time Left</h3>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px">
+          <h3>Point de départ du délai</h3>
+          <p style="font-size:12.5px;color:var(--mute);margin:0 0 10px">Heure à partir de laquelle le temps restant d’un ticket est compté, pour tous les sites.</p>
+          <div style="max-width:260px">
             <div class="form-group">
-              <label class="form-label">TRACKER SN</label>
-              <select class="form-control" id="cfg-tref-osn" onchange="saveTimeRef()">
-                <option>Occur Time</option><option>Detection Time</option>
+              <select class="form-control" id="cfg-tref-osn" onchange="saveTimeRef()" aria-label="Point de départ du délai">
+                <option value="Occur Time">Heure de l’incident</option><option value="Detection Time">Heure de détection</option>
               </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">TRACKER CI</label>
-              <select class="form-control" id="cfg-tref-oci" onchange="saveTimeRef()">
-                <option>Occur Time</option><option>Detection Time</option>
-              </select>
+              <select id="cfg-tref-oci" hidden aria-hidden="true"><option>Occur Time</option><option>Detection Time</option></select>
             </div>
           </div>
         </div>
@@ -238,9 +233,9 @@
         <div class="gsla-card-head">
           <h3 class="gsla-card-t">Reference durations</h3>
           <p class="gsla-card-d">
-            The <strong>Problem Bug P1/P2</strong> types have two independent durations:
-            Workaround (contournement) et Final Resolution. Le statut SLA du ticket
-            reflects the more urgent of the two.
+            Les types <strong>Problème P1/P2</strong> ont deux délais indépendants :
+            contournement et résolution définitive. L’état du délai du ticket
+            suit le plus urgent des deux.
           </p>
         </div>
         <div id="config-sla" class="gsla-list"></div>
@@ -250,8 +245,8 @@
         <div class="gsla-card-head">
           <h3 class="gsla-card-t">Working mode</h3>
           <p class="gsla-card-d">
-            Determines the clock used to count down durations. The
-            <strong>Cal / Biz</strong> setting — whether weekends are included — is set
+            Détermine l’horloge qui décompte les délais. Le réglage
+            <strong>calendaire / ouvré</strong> (week-ends inclus ou non) se fait
             ligne par ligne ci-dessus.
           </p>
         </div>
@@ -309,17 +304,17 @@
           <h3 class="gsla-card-t">Team targets</h3>
           <p class="gsla-card-d">
             Quatre familles, reprises du plan trimestriel. Chaque cible est
-            shown on the FO Dashboard with its progress, measured over the
-            selected period. <strong>Leaving a field empty</strong> removes the
-            objective from the display — the row then turns dotted.
+            affichée dans le suivi des agents avec son avancement, mesuré sur la
+            période choisie. <strong>Laisser un champ vide</strong> retire
+            l’objectif de l’affichage : la ligne passe en pointillés.
           </p>
         </div>
         <div id="config-goals" class="gsla-list"></div>
         <div class="gsla-hint">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
           <span>La mention <strong>Plan</strong> en regard d'une ligne rappelle la cible
-          official target for the quarter. It is a reference point: the team can aim for
-          another value over a given period without changing it.</span>
+          officielle du trimestre. C’est un repère : l’équipe peut viser une autre
+          valeur sur une période donnée sans la modifier.</span>
         </div>
       </div>
     </div>
@@ -952,7 +947,7 @@
         <h3 id="trn-form-title">New session</h3>
         <input type="hidden" id="trn-id">
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-          <input class="form-control" id="trn-title" placeholder="Title (e.g. New SN tools)" style="flex:2;min-width:240px" maxlength="120">
+          <input class="form-control" id="trn-title" placeholder="Titre (ex. Nouveaux outils)" style="flex:2;min-width:240px" maxlength="120">
           <input class="form-control" id="trn-date" type="date" style="flex:1;min-width:150px">
           <input class="form-control" id="trn-start" type="time" style="width:120px">
           <input class="form-control" id="trn-end" type="time" style="width:120px">
@@ -960,7 +955,7 @@
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
           <input class="form-control" id="trn-trainer" placeholder="Formateur" style="flex:1;min-width:160px" maxlength="80">
           <input class="form-control" id="trn-location" placeholder="Lieu (salle, Teams…)" style="flex:1;min-width:160px" maxlength="80">
-          <input class="form-control" id="trn-audience" placeholder="Attendees (e.g. Night FO team)" style="flex:2;min-width:200px" maxlength="200">
+          <input class="form-control" id="trn-audience" placeholder="Participants (ex. équipe de nuit)" style="flex:2;min-width:200px" maxlength="200">
         </div>
         <textarea class="form-control" id="trn-notes" rows="2" placeholder="Notes (optional)" maxlength="1000" style="resize:vertical;margin-bottom:10px"></textarea>
         <div style="display:flex;gap:8px;align-items:center">
@@ -1107,7 +1102,7 @@
         <div class="dq-head">
           <div>
             <div class="page-title">Data Quality</div>
-            <div class="page-sub">Consistency check of SN &amp; CI tickets · restricted access</div>
+            <div class="page-sub">Cohérence des tickets de tous les sites · accès restreint</div>
           </div>
           <div class="dq-head-actions">
             <button class="dq-icon-btn" id="dq-refresh" title="Actualiser l'analyse" onclick="renderDataQuality()">
@@ -1384,7 +1379,7 @@
             <button type="button" class="exp-btn" aria-label="Télécharger Data Quality (CSV)" onclick="runExport(this,'data-quality')">Télécharger</button>
           </div>
           <div class="exp-row">
-            <div class="exp-row-b"><div class="exp-row-t">Sauvegarde complète</div><div class="exp-row-d">Tickets SN et CI, observations, configuration, audit</div></div>
+            <div class="exp-row-b"><div class="exp-row-t">Sauvegarde complète</div><div class="exp-row-d">Tickets de tous les sites, observations, configuration, historique</div></div>
             <span class="exp-fmt">JSON</span>
             <button type="button" class="exp-btn" aria-label="Télécharger Sauvegarde complète (JSON)" onclick="runExport(this,'json')">Télécharger</button>
           </div>

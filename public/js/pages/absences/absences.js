@@ -488,7 +488,7 @@ function _absRenderConflicts() {
 
 function _absFmtDay(iso) {
   return new Date(iso + 'T00:00:00Z')
-    .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+    .toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: '2-digit', month: 'short', timeZone: 'UTC' });
 }
 
 // ── Calendrier ─────────────────────────────────────────────────
@@ -570,7 +570,7 @@ function _absRenderCalendar() {
   const sub = document.getElementById('abs-cal-sub');
   if (sub) {
     const n = Object.keys(perDay).length;
-    sub.textContent = first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' })
+    sub.textContent = first.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { month: 'long', year: 'numeric', timeZone: 'UTC' })
       + ` · ${n} day${n > 1 ? 's' : ''} with absence`;
   }
 

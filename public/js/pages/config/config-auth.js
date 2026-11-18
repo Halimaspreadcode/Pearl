@@ -50,6 +50,7 @@ const CFG_ICO = {
   'cfg-general': '<path d="M4 6h16M4 12h16M4 18h10"/>',
   'cfg-rota': '<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/>',
   'cfg-quiz': '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/>',
+  'organisation': '<path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/>',
   'cfg-glossary': '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/>',
   'cfg-parties': '<circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.5 14.2A5 5 0 0 1 21.5 19"/>',
   'cfg-vues': '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
@@ -90,16 +91,16 @@ const CFG_RUBRIQUES = [
     desc: 'L\'assistant IA, ses outils et sa base de connaissances', kw: 'IA AI assistant knowledge documents cle API modele' },
 
   // ── Paramétrage ──
+  { page: 'organisation', grp: 'outil', titre: 'Organisation',
+    desc: 'Membres, invitations, sièges, abonnement, marque et modules', kw: 'membres invitation siege seat abonnement facturation logo marque modules journal' },
   { page: 'cfg-general',  grp: 'outil', titre: 'Général',
-    desc: 'Domaines, équipe FO, statuts' },
+    desc: 'Sites, domaines, équipe, statuts' },
   { page: 'cfg-parties',  grp: 'outil', titre: 'Rôles et parties prenantes',
-    desc: 'FO, BO, SMC, DRPS… : rôles, personnes et noms reconnus dans vos autres outils', kw: 'role stakeholder SMC DRPS initiator partie prenante' },
-  { page: 'cfg-rota',     grp: 'outil', titre: 'Shift Rota',
-    desc: 'Sites, créneaux, génération de la rota' },
+    desc: 'Rôles, personnes et noms reconnus dans vos autres outils', kw: 'role stakeholder initiator partie prenante' },
+  { page: 'cfg-rota',     grp: 'outil', titre: 'Rotations',
+    desc: 'Sites, créneaux, génération des rotations' },
   { page: 'cfg-quiz',     grp: 'outil', titre: 'Quiz',
     desc: 'Banque de questions et quiz de l\'équipe' },
-  { page: 'cfg-glossary', grp: 'outil', titre: 'Glossaire Logs',
-    desc: 'Termes reconnus par l\'Analyseur' },
 
   // ── Accès & données ──
   { page: 'cfg-vues',     grp: 'acces', titre: 'Vues par profil',
@@ -109,11 +110,9 @@ const CFG_RUBRIQUES = [
   { page: 'cfg-sessions', grp: 'acces', titre: 'Sessions actives',
     desc: 'Qui est connecté, depuis où, et déconnexion' },
   { page: 'cfg-data',     grp: 'acces', titre: 'Données',
-    desc: 'Équipe Back Office' },
-  { page: 'data-quality', grp: 'acces', titre: 'Data Quality',
-    desc: 'Contrôle de cohérence des tickets SN et CI' },
-  { page: 'audit',        grp: 'acces', titre: 'Audit Trail',
-    desc: 'Historique complet des modifications' },
+    desc: 'Équipe support' },
+  { page: 'data-quality', grp: 'acces', titre: 'Qualité des données',
+    desc: 'Tickets incomplets ou incohérents, sur tous les sites' },
 ];
 
 // Accents et casse ignorés : « securite » doit trouver « Accès & Sécurité »,

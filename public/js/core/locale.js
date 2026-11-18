@@ -5,8 +5,8 @@
 // Le sélecteur de langue n'existe plus dans la page ; on ignore donc une
 // préférence « fr » qui traînerait encore dans localStorage — sans quoi
 // les anciens postes resteraient en dates françaises indéfiniment.
-const LOCALE_MAP = { fr: 'en-GB', en: 'en-GB' };
-let currentLang      = 'en';
+const LOCALE_MAP = { fr: 'fr-FR', en: 'en-GB' };
+let currentLang      = window.PEAR_LANG || 'fr';
 const currentUTCOffset = '+0';
 
 function _currentTZ() {
@@ -121,13 +121,13 @@ function setActiveCountry(val, opts) {
 
 function getLangConfig() {
   const tz = _currentTZ() || 'UTC';
-  return { locale: LOCALE_MAP[currentLang] || 'en-GB', tz };
+  return { locale: LOCALE_MAP[currentLang] || 'fr-FR', tz };
 }
 
 // Format a date ISO string in UTC
 function _fmtWithOffset(iso, opts) {
   if (!iso) return '-';
-  const locale = LOCALE_MAP[currentLang] || 'en-GB';
+  const locale = LOCALE_MAP[currentLang] || 'fr-FR';
   return new Date(iso).toLocaleString(locale, { timeZone: 'UTC', ...opts });
 }
 

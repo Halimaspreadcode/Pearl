@@ -234,7 +234,7 @@ function _aicPaint() {
   // Sous le « Bonjour » : la date, le périmètre et ce qui attend.
   const hero = document.getElementById('aic-hero');
   if (hero) {
-    const date = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    const date = new Date().toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long' });
     hero.innerHTML = `${esc(date.charAt(0).toUpperCase() + date.slice(1))} · ${esc(_aicPerimetre())} · ${nDec
       ? `<b>${nDec} sujet${nDec > 1 ? 's' : ''} à décider</b>` : 'rien d\'urgent'}${AIC.loading ? ' · actualisation…' : ''}`;
   }
@@ -387,7 +387,7 @@ async function aicBrief() {
     const equipe = AIC.team.map(a => ({ fo: a.fo, items: a.items.map(i => ({ lvl: i.lvl, kind: i.kind, txt: i.txt })) }))
       .filter(a => a.items.length);
     AIC.brief = await _aicPost('/api/ai/cockpit/brief', { equipe, country: _aicPays() });
-    AIC.briefAt = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    AIC.briefAt = new Date().toLocaleTimeString((globalThis.PEAR_LOCALE || 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
   } catch (e) { AIC.briefErr = `Brief indisponible : ${e.message}`; }
   AIC.briefBusy = false; _aicPaint();
 }

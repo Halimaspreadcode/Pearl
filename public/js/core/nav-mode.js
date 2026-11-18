@@ -15,7 +15,7 @@
 // trois d'entre elles s'affichaient donc en mode Simple — exactement
 // l'inverse de ce qui était voulu. Une copie qu'il faut penser à mettre
 // à jour finit toujours par diverger ; on supprime la copie.
-const NAV_ADMIN_FALLBACK = ['config', 'audit', 'shift-approvals', 'data-quality', 'ops-review', 'export', 'mailing',
+const NAV_ADMIN_FALLBACK = ['organisation', 'config', 'audit', 'shift-approvals', 'data-quality', 'ops-review', 'export', 'mailing',
   'cfg-annonces', 'cfg-general', 'cfg-sla', 'cfg-goals', 'cfg-perf', 'cfg-rota',
   'cfg-security', 'cfg-data', 'cfg-quiz', 'cfg-glossary', 'cfg-sessions', 'cfg-training',
   'cfg-o2o', 'cfg-assign', 'cfg-myteam', 'cfg-objectifs', 'cfg-vues', 'equipe', 'ai', 'ai-cockpit'];
@@ -206,9 +206,15 @@ function applyNavMode() {
   // La bascule est toujours visible : c'est elle qui sert de porte
   // d'entrée vers l'admin. Sans session, cliquer « Admin » emmène à
   // l'écran de connexion — d'où le cadenas affiché sur le bouton.
-  if (sw) sw.hidden = false;
-
   const canAdmin = typeof AdminSession !== 'undefined' && AdminSession.active;
+  // Avec les comptes, la bascule n'existe que pour les rôles qui ont un
+  // accès admin (propriétaire, administrateur, manager) : les autres
+  // n'ont que l'interface simple. Sans comptes, elle reste la porte
+  // d'entrée vers l'écran de connexion admin.
+  const org = window.PearlOrg || {};
+  const roleAdmin = !!(org.account && ['owner', 'admin', 'manager'].includes(org.account.role));
+  const showSwitch = canAdmin || roleAdmin || (org.pret && !org.accounts);
+  if (sw) sw.hidden = !showSwitch;
   const adminBtn = sw?.querySelector('.nav-mode-btn[data-mode="admin"]');
   if (adminBtn) {
     adminBtn.classList.toggle('needs-auth', !canAdmin);

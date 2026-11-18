@@ -90,15 +90,14 @@
         '<aside class="tg-side">' +
           '<div class="tg-brand"><img src="/img/pear-logo.svg" alt="" aria-hidden="true" style="width:34px;height:34px"><span class="tg-org">Pear<small class="tg-org-sub"></small></span></div>' +
           '<div><h2 class="tg-hero">Every ticket, every shift, <em>one place.</em></h2>' +
-          '<ul class="tg-feat"><li><i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 0 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 0 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/></svg></i>Tickets for every site, with live SLA countdowns</li>' +
+          '<ul class="tg-feat"><li><i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 0 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 0 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/></svg></i>Tickets for every site, with live deadline countdowns</li>' +
           '<li><i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></i>Your space: tasks, requests, score and quizzes</li>' +
           '<li><i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></i>Reports, academy and the team idea box</li></ul></div>' +
           '<div class="tg-side-foot">Pear</div>' +
         '</aside>' +
-        '<main class="tg-main">' +
+        '<main class="tg-main"><span class="tg-lang" data-lang-switch style="position:absolute;top:18px;right:18px"></span>' +
         (fermable ? '<button type="button" class="tg-x" aria-label="Back">← Back</button>' : '') +
         '<form class="tg-card" autocomplete="on">' +
-        '<div class="tg-logo">FO</div>' +
         '<h1>Sign in</h1>' +
         '<p class="tg-intro"></p>' +
         '<div class="tg-id"><label for="tg-id" class="tg-id-lbl">Employee ID</label>' +

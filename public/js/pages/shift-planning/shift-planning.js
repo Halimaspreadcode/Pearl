@@ -38,7 +38,7 @@ function renderShiftPlanning() {
   const anchorMonth = new Date(today.getFullYear(), today.getMonth() + shiftWeekOffset, 1);
   const year  = anchorMonth.getFullYear();
   const month = anchorMonth.getMonth();
-  const monthLabel = anchorMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  const monthLabel = anchorMonth.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { month: 'long', year: 'numeric' });
 
   // Build all days in the month
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -306,7 +306,7 @@ function renderShiftPlanning() {
     ${weeks.map((wk, i) => {
       const isCur = wk.days.some(d => d.toDateString() === today.toDateString());
       const isAct = i === awi;
-      const range = `${wk.days[0].getDate()}–${wk.days[6].toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`;
+      const range = `${wk.days[0].getDate()}–${wk.days[6].toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: 'numeric', month: 'short' })}`;
       const cls   = ['sp-week', isAct ? 'active' : '', isCur && !isAct ? 'now' : ''].filter(Boolean).join(' ');
       return `<button class="${cls}" aria-pressed="${isAct}" onclick="window._shiftActiveWeek=${i};renderShiftPlanning()">
         S${i + 1}<span class="sp-week-range">${range}</span>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<script src="/js/core/i18n-fr.js"></script>
+<script src="/js/core/i18n-en.js"></script>
+<script src="/js/core/i18n.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/img/pear-icon.svg">
+<title>Invitation · Pear</title>
+<script src="/platform/platform.js"></script>
+<link rel="stylesheet" href="/platform/platform.css">
+<style>
+  .inv-logo{width:52px;height:52px;border-radius:14px;object-fit:contain;background:var(--panel-2,rgba(255,255,255,.04));padding:6px;margin-bottom:14px}
+  .inv-meta{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+  .inv-meta span{font-size:12.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--mute)}
+  .inv-email{font-weight:650;color:var(--text)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#" data-logo>Pear</a>
+    <nav class="nav"><span data-lang-switch></span><button type="button" class="icon-btn" id="theme-btn"></button></nav>
+  </header>
+
+  <form class="form-shell form-panel" id="form" hidden>
+    <img class="inv-logo" id="logo" alt="" hidden>
+    <h2 id="title"></h2>
+    <p class="lead" id="lead"></p>
+    <div class="inv-meta"><span id="m-email"></span><span id="m-role"></span></div>
+    <div id="name-row">
+      <label for="name">Votre nom</label><input id="name" maxlength="80" autocomplete="name">
+    </div>
+    <label for="pw" id="pw-label">Choisissez un mot de passe (10 caractères minimum)</label>
+    <input id="pw" type="password" autocomplete="new-password" minlength="10" required>
+    <div class="err" id="err" role="alert"></div>
+    <button class="btn primary" id="go" style="margin-top:20px;width:100%">Rejoindre l'espace</button>
+  </form>
+
+  <section class="form-shell form-panel" id="dead" hidden>
+    <h2>Invitation indisponible</h2>
+    <p class="lead" id="dead-msg"></p>
+  </section>
+</div>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const t = new URLSearchParams(location.search).get('t') || '';
+  const tr = s => (window.pearTr ? window.pearTr(s) : s);
+  fetch('/api/platform/invite?t=' + encodeURIComponent(t)).then(r => r.json().then(j => ({ ok: r.ok, j }))).then(({ ok, j }) => {
+    if (!ok) { $('dead').hidden = false; $('dead-msg').textContent = j.error || ''; return; }
+    $('form').hidden = false;
+    $('title').textContent = tr('Rejoindre') + ' ' + j.org;
+    $('lead').textContent = j.invited_by && !/^console:/.test(j.invited_by)
+      ? tr('Vous avez été invité par') + ' ' + j.invited_by + '.'
+      : tr("Vous avez été invité à rejoindre l'espace de votre équipe.");
+    $('m-email').innerHTML = '<span class="inv-email">' + esc(j.email) + '</span>';
+    $('m-role').textContent = j.role_label;
+    if (j.branding && j.branding.logo) { $('logo').src = j.branding.logo; $('logo').hidden = false; }
+    if (j.account_exists) {
+      $('name-row').hidden = true;
+      $('pw-label').textContent = 'Mot de passe de votre compte Pear';
+      $('pw').autocomplete = 'current-password'; $('pw').removeAttribute('minlength');
+    }
+    $('form').addEventListener('submit', async e => {
+      e.preventDefault(); $('err').textContent = ''; $('go').disabled = true;
+      try {
+        const r = await fetch('/api/platform/invite/accept', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ t, password: $('pw').value, name: $('name').value.trim() }) });
+        const k = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(k.error || 'Erreur');
+        location.href = k.url || '/';
+      } catch (er) { $('err').textContent = er.message; $('go').disabled = false; }
+    });
+  });
+})();
+</script>
+</body>
+</html>

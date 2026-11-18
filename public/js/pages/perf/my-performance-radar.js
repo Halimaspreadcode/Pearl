@@ -234,7 +234,7 @@ function _myPerfWhen(iso) {
   if (!iso) return '';
   const d = new Date(iso);
   if (isNaN(d)) return '';
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return d.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: 'numeric', month: 'short' });
 }
 
 // ── Actions convenues en entretien ────────────────────────────

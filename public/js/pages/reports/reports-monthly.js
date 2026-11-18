@@ -31,7 +31,7 @@ async function renderMonthlyReport() {
   monthlyForm.risks = seedRisksFromTickets(monthlyForm.risks);
   lastMonthlyReport = data;
   const k   = data.kpis;
-  const cfg = typeof getLangConfig === 'function' ? getLangConfig() : { locale:'en-GB' };
+  const cfg = typeof getLangConfig === 'function' ? getLangConfig() : { locale:(globalThis.PEAR_LOCALE || 'fr-FR') };
   // MONTH_NAMES_FR exists and the app has a language switch, so honour it
   // instead of pinning the month name to English.
   const isEN = (typeof currentLang === 'undefined') || currentLang !== 'fr';

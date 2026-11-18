@@ -59,7 +59,8 @@
         appliquerMarque(j.tenant && j.tenant.name, j.tenant && j.tenant.branding);
         appliquerModules();
       })
-      .catch(() => { window.PearlOrg.pret = true; });
+      .catch(() => { window.PearlOrg.pret = true; })
+      .then(() => { if (typeof window.applyNavMode === 'function') { try { window.applyNavMode(); } catch (e) {} } });
   }
   window.pearlReloadOrg = charger;
   const go = () => charger();

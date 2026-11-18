@@ -213,7 +213,7 @@ function _aiPaint() {
       ${accueil ? `<div class="b3-home">
         <section class="b3-hero">
           <h1>Bonjour${prenom ? ` ${esc(prenom)}` : ''}</h1>
-          <p id="aic-hero" class="b3-hero-sub">${esc(new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }))}</p>
+          <p id="aic-hero" class="b3-hero-sub">${esc(new Date().toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long' }))}</p>
           ${!c.has_key && !aiUI.showConf ? _aiConnectCard(c) : _aiComposer(c, true)}
         </section>
         <div id="aic-root"></div>
@@ -1322,7 +1322,7 @@ function _aiInsHtml() {
       <div class="bb-ins-run">
         ${p.encours
           ? `<div class="bb-prog"><span>Passe en cours : ${p.fait} / ${p.total}${p.courant ? ` · ${esc(p.courant)}` : ''}</span><i><b style="width:${p.total ? Math.round(p.fait / p.total * 100) : 0}%"></b></i></div>`
-          : `<span>${d.enabled ? `${faits} / ${actifs} à jour` : 'Désactivé : rien n\'est généré ni visible.'}${p.fin ? ` · dernière passe à ${esc(new Date(p.fin).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }))}` : ''}</span>`}
+          : `<span>${d.enabled ? `${faits} / ${actifs} à jour` : 'Désactivé : rien n\'est généré ni visible.'}${p.fin ? ` · dernière passe à ${esc(new Date(p.fin).toLocaleTimeString((globalThis.PEAR_LOCALE || 'fr-FR'), { hour: '2-digit', minute: '2-digit' }))}` : ''}</span>`}
         <button class="bb-run" onclick="aiInsRun()" ${d.enabled && actifs && !p.encours ? '' : 'disabled'}>Générer pour tous</button>
       </div>
       ${p.motif && !p.encours ? `<div class="bb-ins-warn">${esc(p.motif)}</div>` : ''}
@@ -1476,7 +1476,7 @@ async function aiPdfMsg(i) {
   const inp = _aiInputDe(m, i) || {};
   const pays = inp[_aiChampPays(sk)?.id] || '';
   const meta = [pays, inp.periode || '',
-    new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })].filter(Boolean);
+    new Date().toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: 'numeric', month: 'long', year: 'numeric' })].filter(Boolean);
   const corps = {
     titre: sk ? sk.titre : 'Réponse de Pear AI',
     sousTitre: q && q.role === 'user' ? String(q.content || '').slice(0, 300) : '',
@@ -1636,9 +1636,9 @@ function _aiKbSensHtml() {
   const cours = e.en_cours;
   return `<section class="b3-sens is-on">
       <div class="b3-sens-h"><b>Recherche par le sens</b><span class="b3-sens-st ${e.actif ? 'is-run' : pct === 100 ? 'is-ok' : ''}">${e.actif ? 'indexation…' : pct === 100 ? 'active' : 'incomplète'}</span></div>
-      <p>Modèle <b>${esc(e.modele)}</b> · ${(e.indexes || 0).toLocaleString('fr-FR')} / ${(e.total || 0).toLocaleString('fr-FR')} passages compris</p>
+      <p>Modèle <b>${esc(e.modele)}</b> · ${(e.indexes || 0).toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'))} / ${(e.total || 0).toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'))} passages compris</p>
       <div class="b3-sens-bar"><i style="width:${cours && cours.total ? Math.round(cours.fait / cours.total * 100) : pct}%"></i></div>
-      ${cours ? `<small>${esc(cours.doc || '')} · ${cours.fait.toLocaleString('fr-FR')} / ${cours.total.toLocaleString('fr-FR')}</small>` : ''}
+      ${cours ? `<small>${esc(cours.doc || '')} · ${cours.fait.toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'))} / ${cours.total.toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'))}</small>` : ''}
       ${e.erreur ? `<p class="b3-sens-err">Interrompue : ${esc(e.erreur)}</p>` : ''}
       ${aiUI.kbSensErr ? `<p class="b3-sens-err">${esc(aiUI.kbSensErr)}</p>` : ''}
       <div class="b3-sens-a">
@@ -1671,7 +1671,7 @@ function _aiKbHtml() {
       <div class="b3-kb-h"><b>${kb.docs.length} document${kb.docs.length > 1 ? 's' : ''}</b><small>${_aiTaille(kb.chars || 0)} caractères${kb.limits?.chars_total ? ` sur ${_aiTaille(kb.limits.chars_total)}` : ''}</small></div>
       ${kb.docs.length ? `<ul class="b3-docs">${kb.docs.map(d => `<li>
           <span class="b3-doc-t">${esc((d.type || '?').toUpperCase())}</span>
-          <button class="b3-doc-n" onclick="aiKbOuvrir('${d.id}')"><b>${esc(d.name)}</b><small>${d.chunks} passage${d.chunks > 1 ? 's' : ''} · ${_aiTaille(d.chars)} car. · ${esc(new Date(d.added_at).toLocaleDateString('fr-FR'))}</small></button>
+          <button class="b3-doc-n" onclick="aiKbOuvrir('${d.id}')"><b>${esc(d.name)}</b><small>${d.chunks} passage${d.chunks > 1 ? 's' : ''} · ${_aiTaille(d.chars)} car. · ${esc(new Date(d.added_at).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR')))}</small></button>
           <button class="b3-icon is-sm" onclick="aiKbRetirer('${d.id}')" title="Retirer" aria-label="Retirer">×</button></li>`).join('')}</ul>`
         : '<p class="b3-empty">Aucun document pour l\'instant.</p>'}
       ${kb.docs.length ? `<form class="b3-kb-q" onsubmit="event.preventDefault();aiKbChercher(this.q.value)">

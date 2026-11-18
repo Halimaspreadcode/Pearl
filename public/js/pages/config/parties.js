@@ -30,17 +30,17 @@ function _ptyPaint() {
   const nb = k => D.people.filter(p => p.role === k).length;
   const role = D.roles.find(r => r.key === PTY.sel);
   const rail = `
-    <button type="button" class="pt-r${PTY.sel === 'FO' ? ' is-on' : ''}" onclick="ptySel('FO')"><i style="background:var(--pt-ink)"></i><span><b>FO</b><small>Front Office</small></span><em>${D.fo}</em></button>
-    <button type="button" class="pt-r${PTY.sel === 'BO' ? ' is-on' : ''}" onclick="ptySel('BO')"><i style="background:var(--pt-mute)"></i><span><b>BO</b><small>Back Office</small></span><em>${D.bo}</em></button>
+    <button type="button" class="pt-r${PTY.sel === 'FO' ? ' is-on' : ''}" onclick="ptySel('FO')"><i style="background:var(--pt-ink)"></i><span><b>Agents</b><small>Équipe</small></span><em>${D.fo}</em></button>
+    <button type="button" class="pt-r${PTY.sel === 'BO' ? ' is-on' : ''}" onclick="ptySel('BO')"><i style="background:var(--pt-mute)"></i><span><b>Support</b><small>Équipe support</small></span><em>${D.bo}</em></button>
     ${D.roles.length ? '<div class="pt-sep">Autres rôles</div>' : ''}
     ${D.roles.map(r => `<button type="button" class="pt-r${PTY.sel === r.key ? ' is-on' : ''}" onclick="ptySel(${escAttrArg(r.key)})"><i style="background:${esc(r.color)}"></i><span><b>${esc(r.key)}</b><small>${esc(r.label)}</small></span><em>${nb(r.key)}</em></button>`).join('')}
     <button type="button" class="pt-add" onclick="ptyRoleEdit(null)">+ Nouveau rôle</button>`;
   let corps;
   if (PTY.editRole !== null) corps = _ptyRoleForm();
   else if (PTY.sel === 'FO' || PTY.sel === 'BO') corps = `<section class="pt-card">
-      <h2>${PTY.sel === 'FO' ? 'Front Office' : 'Back Office'}</h2>
-      <p class="pt-mute">Les ${PTY.sel} se gèrent dans leur liste habituelle : ${PTY.sel === 'FO' ? 'Configuration › Général (équipe FO) et la Shift Rota' : 'Configuration › Données (équipe Back Office)'}. Ils sont reconnus ici comme les autres rôles, notamment dans vos autres outils.</p>
-      <button type="button" class="pt-btn" onclick="renderPage('${PTY.sel === 'FO' ? 'cfg-general' : 'cfg-data'}')">Ouvrir la liste ${PTY.sel}</button></section>`;
+      <h2>${PTY.sel === 'FO' ? 'Agents' : 'Support'}</h2>
+      <p class="pt-mute">${PTY.sel === 'FO' ? 'Les agents' : 'Les membres du support'} se gèrent dans leur liste habituelle : ${PTY.sel === 'FO' ? 'Paramètres › Général (équipe) et les rotations' : 'Paramètres › Données (équipe support)'}. Ils sont reconnus ici comme les autres rôles, notamment dans vos autres outils.</p>
+      <button type="button" class="pt-btn" onclick="renderPage('${PTY.sel === 'FO' ? 'cfg-general' : 'cfg-data'}')">${PTY.sel === 'FO' ? "Ouvrir la liste de l'équipe" : 'Ouvrir la liste du support'}</button></section>`;
   else if (role) {
     const gens = D.people.filter(p => p.role === role.key).sort((a, b) => a.name.localeCompare(b.name));
     corps = `<section class="pt-card">

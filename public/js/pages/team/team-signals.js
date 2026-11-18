@@ -42,7 +42,7 @@ function _eqDm(iso) {
 function _eqMonthLabel(key) {
   try {
     return new Date(key + '-01T00:00:00Z')
-      .toLocaleDateString('fr-FR', { month: 'long', timeZone: 'UTC' });
+      .toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { month: 'long', timeZone: 'UTC' });
   } catch (_) { return key; }
 }
 

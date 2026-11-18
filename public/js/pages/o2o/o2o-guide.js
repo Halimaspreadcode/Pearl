@@ -147,7 +147,7 @@ function o2oGuideOpen(fo) {
   let draft = null;
   try { draft = JSON.parse(localStorage.getItem(_ogDraftKey(fo)) || 'null'); } catch { draft = null; }
   if (draft && draft.fo === fo
-      && confirm(`Une session guidée avec ${fo} est en cours (${new Date(draft.savedAt || draft.started).toLocaleString('fr-FR')}).\n\nOK : la reprendre\nAnnuler : en démarrer une nouvelle`)) {
+      && confirm(`Une session guidée avec ${fo} est en cours (${new Date(draft.savedAt || draft.started).toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'))}).\n\nOK : la reprendre\nAnnuler : en démarrer une nouvelle`)) {
     OG = draft;
   } else {
     OG = _ogNew(fo);
@@ -252,7 +252,7 @@ function _ogRender() {
         <span class="og-av" style="background:${foAvatarColor(fo)}">${foInitials(fo)}</span>
         <div class="og-who">
           <div class="og-who-n">${esc(fo)}</div>
-          <div class="og-who-s">Session guidée One-to-One · ${new Date(OG.started).toLocaleDateString('fr-FR')}</div>
+          <div class="og-who-s">Session guidée One-to-One · ${new Date(OG.started).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'))}</div>
         </div>
         <div class="og-clock" id="og-clock" title="Temps écoulé / durée prévue">0:00</div>
         <button class="og-x" onclick="o2oGuideClose()" title="Fermer (le brouillon est gardé)" aria-label="Fermer">✕</button>
@@ -486,7 +486,7 @@ function _ogSmartSentence() {
   const bits = [`<b>${esc(s.title.trim())}</b>`];
   if (s.scope) bits.push(`sur ${esc(s.scope)}`);
   if (k.target) bits.push(`: ${esc(k.name || 'indicateur')} à ${esc(k.target)}${k.unit ? ' ' + esc(k.unit) : ''}${k.source ? ` (source : ${esc(k.source)})` : ''}`);
-  if (s.due) bits.push(`d'ici le ${esc(new Date(s.due + 'T00:00:00').toLocaleDateString('fr-FR'))}`);
+  if (s.due) bits.push(`d'ici le ${esc(new Date(s.due + 'T00:00:00').toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR')))}`);
   const steps = s.steps.filter(x => x.label.trim());
   return bits.join(' ') + '.' + (steps.length ? `<br><span class="og-faint">${steps.length} jalon${steps.length > 1 ? 's' : ''}.</span>` : '')
     + (s.why ? `<br><span class="og-faint">Pourquoi : ${esc(s.why)}</span>` : '');

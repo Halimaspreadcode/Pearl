@@ -85,6 +85,8 @@ function makePgAdapter({ connectionString } = {}) {
     setSetting: (key, value) => q(`insert into pearl_settings (key, value) values ($1, $2::jsonb)
       on conflict (key) do update set value = excluded.value, updated_at = now()`, [key, JSON.stringify(value)]),
     deleteSetting: key => q('delete from pearl_settings where key = $1', [key]),
+    listPlatformAdmins: () => q('select user_id, created_at from pearl_platform_admins order by created_at'),
+    removePlatformAdmin: userId => q('delete from pearl_platform_admins where user_id = $1', [userId]),
     addPlatformAdmin: userId => q('insert into pearl_platform_admins (user_id) values ($1) on conflict do nothing', [userId]),
     end: () => pool.end(),
   };

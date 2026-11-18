@@ -36,7 +36,7 @@ function _mesDay(iso) {
   if (diff === 0) return 'today';
   if (diff === 1) return 'tomorrow';
   if (diff === -1) return 'yesterday';
-  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  return d.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
 function _mesSeen() {
@@ -320,7 +320,7 @@ function mesGlance(ctx) {
   const tickets = me ? allTicketsRaw().filter(t =>
     t.fo_owner === me && String(t.created_at || '').slice(0, 7) === mois).length : 0;
   return {
-    month: { label: new Date().toLocaleDateString('en-GB', { month: 'long' }), tickets },
+    month: { label: new Date().toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { month: 'long' }), tickets },
     shift: mesNextShift(me),
     week: { total: semaine.length, done: semaine.filter(p => p.status === 'Done').length },
     perf: ctx.perf ? { score: ctx.perf.score, niveau: ctx.perf.niveau, periode: ctx.perf.periode, evalue: ctx.perf.evalue } : null,

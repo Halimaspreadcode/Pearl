@@ -93,8 +93,8 @@ function _noteWhen(iso) {
   if (!iso) return 'No date';
   const d = new Date(iso);
   if (isNaN(d)) return 'No date';
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-    + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: 'numeric', month: 'short' })
+    + ', ' + d.toLocaleTimeString((globalThis.PEAR_LOCALE || 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
 }
 
 // Fil de commentaires réutilisable.

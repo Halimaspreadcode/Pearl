@@ -13,6 +13,8 @@
 
   // ── Titre, mot par mot ──
   const title = $('#title');
+  // Traduits d'un bloc avant d'être découpés en mots (core/i18n.js).
+  if (window.pearTranslate) ['#title', '#scrub'].forEach(sel => { const el = $(sel); if (el) window.pearTranslate(el); });
   if (title) {
     let i = 0;
     const wrap = node => {

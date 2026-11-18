@@ -32,7 +32,7 @@ async function renderIndicateursPage() {
 }
 
 // ── Mise en forme ──
-const _indNb = (v, d = 1) => v === null || v === undefined ? '—' : Number(v).toLocaleString('fr-FR', { maximumFractionDigits: d });
+const _indNb = (v, d = 1) => v === null || v === undefined ? '—' : Number(v).toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'), { maximumFractionDigits: d });
 function _indVal(v, def) {
   if (v === null || v === undefined) return '—';
   const u = def.unite;

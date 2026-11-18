@@ -20,7 +20,7 @@ function generateYearRota() {
 
   _genYearPending = { sites: rc.sites, startISO, weeks: GEN_YEAR_WEEKS };
 
-  const fmt = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  const fmt = iso => new Date(iso).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: 'numeric', month: 'long', year: 'numeric' });
   const recap = document.getElementById('genyear-recap');
   if (recap) recap.innerHTML = `
     <div class="genyear-recap-row"><span>Period</span><span>${fmt(startISO)} → ${fmt(endISO)}</span></div>

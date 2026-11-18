@@ -87,7 +87,7 @@ function slaTargetText(ticket) {
 function fmtDt(iso) {
   if (!iso) return '-';
   if (typeof fmtDtShort === 'function') return fmtDtShort(iso);
-  return new Date(iso).toLocaleString('en-GB', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  return new Date(iso).toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'), {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 }
 function toLocalDT(iso) {
   if (!iso) return '';

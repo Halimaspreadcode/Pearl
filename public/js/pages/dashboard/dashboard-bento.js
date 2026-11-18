@@ -144,7 +144,7 @@ function _bxRenderVolume(d, tickets) {
 
   const total = d.total || 0;
   const valEl = document.getElementById('bx-volume-val');
-  if (valEl) valEl.textContent = total.toLocaleString('en-GB');
+  if (valEl) valEl.textContent = total.toLocaleString((globalThis.PEAR_LOCALE || 'fr-FR'));
 
   const mode = document.getElementById('bx-volume-mode')?.value || 'tracker';
   const keyOf = t => mode === 'status'   ? (t.status   || '—')
@@ -188,7 +188,7 @@ function _bxRenderVolume(d, tickets) {
   const monthName = mk => {
     const [y, m] = mk.split('-').map(Number);
     return new Date(Date.UTC(y, m - 1, 1))
-      .toLocaleDateString('en-GB', { month: 'long', timeZone: 'UTC' });
+      .toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { month: 'long', timeZone: 'UTC' });
   };
 
   const allKeys = new Set();
@@ -283,7 +283,7 @@ function _bxRenderRecent(tickets) {
     return;
   }
 
-  const fmt = dt => new Date(dt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  const fmt = dt => new Date(dt).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: '2-digit', month: 'short' });
 
   rowsEl.innerHTML = recent.map(t => {
     // La priorité reste toujours visible ; la rupture SLA s'ajoute à côté
@@ -339,7 +339,7 @@ function _bxRenderForecast(d) {
         // en tête de ligne, sans passer par text-transform (qui
         // capitaliserait aussi le mois).
         const raw = new Date(days[i] + 'T00:00:00Z')
-          .toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'UTC' });
+          .toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'UTC' });
         const label = raw.charAt(0).toUpperCase() + raw.slice(1);
         const last = n === idx.length - 1;
         const none = !created && !resolved;

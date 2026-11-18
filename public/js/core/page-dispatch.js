@@ -3,7 +3,7 @@ const _origRP = window.renderPage;
 // elles ne sont pas dans le document, il faut y aller plutôt que de
 // rendre un écran vide.
 
-const ADMIN_ONLY_PAGES = ['config', 'audit', 'shift-approvals', 'data-quality', 'ops-review', 'export', 'mailing',
+const ADMIN_ONLY_PAGES = ['organisation', 'config', 'audit', 'shift-approvals', 'data-quality', 'ops-review', 'export', 'mailing',
   'cfg-annonces', 'cfg-general', 'cfg-sla', 'cfg-goals', 'cfg-perf', 'cfg-rota',
   'cfg-security', 'cfg-data', 'cfg-quiz', 'cfg-glossary', 'cfg-sessions', 'cfg-training', 'cfg-o2o',
   'cfg-assign', 'cfg-myteam', 'cfg-objectifs', 'cfg-vues', 'equipe', 'ai', 'ai-cockpit', 'indicateurs', 'cfg-parties'];
@@ -64,6 +64,7 @@ window.renderPage = function(page) {
     const wasActive = !!document.getElementById('page-rapports')?.classList.contains('active');
     _origRP(page); renderRapportsPage(wasActive); return;
   }
+  if (page === 'organisation')    { _origRP(page); renderOrganisation(); return; }
   if (page === 'audit')           { _origRP(page); renderAudit();         return; }
   if (page === 'ai')              { _origRP(page); renderAiPage();        return; }
   if (page === 'indicateurs')     { _origRP(page); if (typeof renderIndicateursPage === 'function') renderIndicateursPage(); return; }

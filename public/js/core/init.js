@@ -251,7 +251,7 @@ function startClock() {
     const el = document.getElementById('topbar-clock');
     if (!el) return;
     const now    = new Date();
-    const locale = (typeof LOCALE_MAP !== 'undefined' ? LOCALE_MAP[currentLang] : null) || 'en-GB';
+    const locale = (typeof LOCALE_MAP !== 'undefined' ? LOCALE_MAP[currentLang] : null) || (globalThis.PEAR_LOCALE || 'fr-FR');
     el.textContent = now.toLocaleTimeString(locale, { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' }) + ' UTC';
     el.title = now.toLocaleString(locale, { timeZone: 'UTC', weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' (UTC+0)';
   }

@@ -96,7 +96,7 @@ function _wkcRender() {
   const a = WkC.analysis;
   const body = document.getElementById('wkc-body');
   if (!a || !body) return;
-  const fmt = d => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  const fmt = d => new Date(d).toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { day: '2-digit', month: 'short' });
   document.getElementById('wkc-period').textContent = `${fmt(a.week_start)} → ${fmt(a.week_end)}`;
 
   const field = (key, title, hint, required) => {

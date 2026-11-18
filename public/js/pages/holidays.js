@@ -57,8 +57,8 @@ function renderHolidaysList() {
 
     const d = h.date ? new Date(h.date + 'T00:00:00') : null;
     const day = d ? String(d.getDate()).padStart(2, '0') : '--';
-    const mon = d ? d.toLocaleDateString('en-GB', { month: 'short' }).replace('.', '') : '--';
-    const wd  = d ? d.toLocaleDateString('en-GB', { weekday: 'long' }) : '';
+    const mon = d ? d.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { month: 'short' }).replace('.', '') : '--';
+    const wd  = d ? d.toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'long' }) : '';
     const cc  = String(h.country || '').toUpperCase();
     const tag = cc
       ? `<span class="hol-tag ${cc.toLowerCase()}">${HOL_COUNTRY_LABEL[cc] || cc}</span>`

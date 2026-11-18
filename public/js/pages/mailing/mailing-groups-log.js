@@ -232,7 +232,7 @@ function _mlRenderLog() {
   if (!el) return;
   const upd = document.getElementById('ml-log-upd');
   if (upd) upd.textContent = mlUI.logAt
-    ? `${mlState.log.length} entrée${mlState.log.length > 1 ? 's' : ''} · mis à jour à ${new Date(mlUI.logAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} · actualisation auto`
+    ? `${mlState.log.length} entrée${mlState.log.length > 1 ? 's' : ''} · mis à jour à ${new Date(mlUI.logAt).toLocaleTimeString((globalThis.PEAR_LOCALE || 'fr-FR'), { hour: '2-digit', minute: '2-digit' })} · actualisation auto`
     : 'Chargement…';
 
   const ko = mlState.log.filter(e => !e.ok).length;
@@ -258,7 +258,7 @@ function _mlRenderLog() {
     if (j !== cur) {
       cur = j;
       const titre = j === auj ? 'Aujourd’hui' : j === hier ? 'Hier'
-        : new Date(j + 'T12:00:00Z').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+        : new Date(j + 'T12:00:00Z').toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
       html += `<div class="ml-lg-day">${esc(titre)}</div>`;
     }
     const [olbl0, ocls] = ORIG[e.origin] || ORIG.auto;

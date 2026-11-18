@@ -302,7 +302,7 @@ function _mesRenderHead() {
   const h = new Date().getHours();
   const salut = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   const titre = u ? `${salut}, ${esc(first)}` : 'My Space';
-  const jour = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  const jour = new Date().toLocaleDateString((globalThis.PEAR_LOCALE || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long' });
   let etat = '';
   if (me) {
     const n = _mesUrgent(_mesItems(_mesCtx()));
