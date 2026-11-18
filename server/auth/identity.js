@@ -177,4 +177,4 @@ function identite(req, res, next) {
   return next();
 }
 
-module.exports = { identite, identiteDe, agentDe, roleDe, CHAMPS_AUTEUR, ROUTES_RESERVABLES };
+module.exports = { estAdmin, identite, identiteDe, agentDe, roleDe, CHAMPS_AUTEUR, ROUTES_RESERVABLES };

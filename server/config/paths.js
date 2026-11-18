@@ -45,6 +45,8 @@ const NAMES = {
   ai_kb_vec:       'ai_kb_vec',
   // Indicateurs (KPI / PI) définis avec l'IA puis suivis automatiquement.
   indicateurs:     'indicateurs.json',
+  // Tableau de bord composable : dispositions et indicateurs business.
+  home:            'home.json',
   ai_secret:       'ai.secret',
   team_secret:     'team-access.secret',
   quiz_published:  'quiz_published.json',

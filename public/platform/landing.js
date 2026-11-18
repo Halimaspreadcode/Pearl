@@ -37,12 +37,10 @@
   }
 
   // ── Bandeau des métiers (dupliqué pour une boucle sans couture) ──
-  // Pastille de couleur devant chaque métier (palette de l'application).
-  const COLORS = ['#93AFCB', '#9EE6D5', '#F2A65A', '#6DD58C', '#E58A7D', '#C4A7E7'];
   fetch('/api/platform/packs').then(r => r.json()).then(list => {
     const extra = ['Logistique', 'Accueil et services', 'Hôtellerie', 'Transport', 'Facility management'];
     const items = list.map(p => [p.label, p.id]).concat(extra.map(l => [l, 'generic']));
-    const html = items.map(([l, id], i) => `<a class="chip" href="/signup?pack=${encodeURIComponent(id)}" style="color:inherit;text-decoration:none"><b style="width:9px;height:9px;border-radius:50%;background:${COLORS[i % COLORS.length]};display:inline-block"></b>${esc(l)}</a>`).join('');
+    const html = items.map(([l, id], i) => `<a class="chip" href="/signup?pack=${encodeURIComponent(id)}" style="text-decoration:none">${esc(window.pearTr ? window.pearTr(l) : l)}</a>`).join('');
     const track = $('#track');
     if (track) track.innerHTML = html + html;
     const foot = $('#foot-packs');

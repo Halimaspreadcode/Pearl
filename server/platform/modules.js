@@ -17,7 +17,7 @@ const MODULES = [
   { id: 'core', label: 'Socle', always: true,
     desc: 'Tableau de bord, paramètres, équipe, accès, annonces.',
     pages: ['dashboard', 'config', 'equipe', 'cfg-annonces', 'audit', 'mon-espace', 'mes-today'],
-    api: ['status', 'version', 'config', 'team', 'fo-access', 'user-prefs', 'presence', 'audit', 'announcements',
+    api: ['home', 'status', 'version', 'config', 'team', 'fo-access', 'user-prefs', 'presence', 'audit', 'announcements',
       'bo', 'kpi-config', 'dashboard', 'export', 'platform', 'parties', 'fo', 'holidays', 'sites'] },
   { id: 'tickets', label: 'Tickets et délais', depends: ['core'],
     desc: 'Suivi des tickets par site, délais, suggestions, qualité des données, observations, passation.',

@@ -2,13 +2,84 @@
   "id": "retail-network",
   "label": "Réseau d'agences / magasins",
   "desc": "Remontées des points de vente, plannings par agence, absences, objectifs commerciaux, rapports consolidés.",
-  "modules": ["core", "tickets", "planning", "absences", "objectives", "academy", "reporting", "mailing", "ideas"],
+  "modules": [
+    "core",
+    "tickets",
+    "planning",
+    "absences",
+    "objectives",
+    "academy",
+    "reporting",
+    "mailing",
+    "ideas"
+  ],
   "config": {
-    "domains": ["Caisse", "Stock", "Sécurité", "Client", "Locaux"],
-    "ticket_statuses": ["Open", "In Progress", "On Hold", "Resolved", "Closed"],
-    "ticket_priorities": ["P1", "P2", "P3"],
-    "sla_hours": { "Remontée P1": 4, "Remontée P2": 24, "Remontée P3": 72 },
+    "domains": [
+      "Caisse",
+      "Stock",
+      "Sécurité",
+      "Client",
+      "Locaux"
+    ],
+    "ticket_statuses": [
+      "Open",
+      "In Progress",
+      "On Hold",
+      "Resolved",
+      "Closed"
+    ],
+    "ticket_priorities": [
+      "P1",
+      "P2",
+      "P3"
+    ],
+    "sla_hours": {
+      "Remontée P1": 4,
+      "Remontée P2": 24,
+      "Remontée P3": 72
+    },
     "leave_entitlement_days": 25
   },
-  "sites": [{ "code": "AG01", "name": "Agence 1" }]
+  "sites": [
+    {
+      "code": "AG01",
+      "name": "Agence 1"
+    }
+  ],
+  "home": {
+    "metrics": [
+      {
+        "label": "Chiffre d'affaires",
+        "format": "currency",
+        "unit": "€",
+        "agg": "sum",
+        "freq": "week",
+        "better": "up"
+      },
+      {
+        "label": "Panier moyen",
+        "format": "currency",
+        "unit": "€",
+        "agg": "avg",
+        "freq": "week",
+        "better": "up"
+      },
+      {
+        "label": "Fréquentation",
+        "format": "number",
+        "agg": "sum",
+        "freq": "week",
+        "better": "up"
+      },
+      {
+        "label": "Satisfaction client",
+        "format": "percent",
+        "unit": "%",
+        "agg": "avg",
+        "freq": "month",
+        "better": "up",
+        "target": 90
+      }
+    ]
+  }
 }

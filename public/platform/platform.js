@@ -12,7 +12,7 @@ window.esc = function (v) {
   });
 };
 
-window.PEARL_LOGO = '<img src="/img/pear-logo.svg" alt="" aria-hidden="true" style="width:30px;height:30px">';
+window.PEARL_LOGO = '';
 
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('[data-logo]').forEach(function (el) { el.insertAdjacentHTML('afterbegin', window.PEARL_LOGO); });

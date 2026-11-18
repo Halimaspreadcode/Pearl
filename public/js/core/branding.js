@@ -18,6 +18,8 @@
       document.querySelectorAll('.sidebar-brand-name').forEach(el => { el.textContent = nom; });
     }
     document.querySelectorAll('.sidebar-brand-sub').forEach(el => { el.textContent = b.tagline || ''; });
+    // Sans logo importé : l'initiale de l'organisation, pas un pictogramme.
+    if (nom) document.querySelectorAll('.sidebar-mono').forEach(el => { el.textContent = String(nom).trim().charAt(0).toUpperCase() || 'P'; });
     if (b.logo) {
       document.querySelectorAll('.sidebar-logo').forEach(svg => {
         const img = document.createElement('img');

@@ -103,14 +103,16 @@
 .m-mail .ok { margin-left: auto; color: #6DD58C; font-weight: 700; font-size: 11px; }
 
 /* ── Bandeau défilant ── */
-.marquee { margin: 120px 0 0; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+.marquee { margin: 120px 0 0; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
 .marquee .track { display: flex; gap: 12px; width: max-content; animation: slide 38s linear infinite; }
 .marquee:hover .track { animation-play-state: paused; }
 @keyframes slide { to { transform: translateX(-50%); } }
-.chip { display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 18px; border-radius: 999px; background: var(--card);
-  border: 1px solid var(--line); font-weight: 600; font-size: 14.5px; white-space: nowrap; }
-.chip i { font-style: normal; font-size: 18px; }
+.marquee .track { gap: 64px; }
+.chip { display: inline-flex; align-items: center; font-weight: 500; font-size: clamp(22px, 2.6vw, 34px); letter-spacing: -.02em;
+  white-space: nowrap; color: var(--mute) !important; opacity: .55; transition: opacity .25s, color .25s; }
+.chip:hover { opacity: 1; color: var(--ink) !important; }
+.rail-p { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: #F4F4F2; color: #0B0B0D; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
 
 /* ── Sections ── */
 .l-sec { max-width: 1180px; margin: 0 auto; padding: 120px 16px 0; }
@@ -264,3 +266,23 @@
 @media (max-width: 640px) {
   .split-visual { min-height: 320px; }
 }
+
+/* ── Épuré : une seule teinte d'accent, des surfaces neutres ──
+   La couleur ne sert plus qu'à guider le regard (titres en accent, CTA). */
+.blob { opacity: .28; filter: blur(110px); }
+.blob.b3 { opacity: .12; }
+:root[data-theme="light"] .blob { opacity: .16; }
+.tile .ico { background: var(--line) !important; color: var(--ink) !important; }
+.tile::before, .tile::after { display: none !important; }
+.float .dot { background: var(--line) !important; }
+.float .dot svg { stroke: var(--ink) !important; }
+.m-row .tg { background: rgba(255,255,255,.06); color: var(--mute); }
+.m-row .s { background: rgba(255,255,255,.06); color: var(--ink); font-weight: 600; }
+.m-kpi { --d: #93AFCB !important; }
+.m-cal .c.m { background: rgba(147,175,203,.55); } .m-cal .c.a { background: rgba(147,175,203,.32); } .m-cal .c.n { background: rgba(147,175,203,.75); } .m-cal .c.o { background: rgba(255,255,255,.1); }
+.l-kicker { color: var(--mute); font-weight: 600; letter-spacing: .14em; font-size: 12px; }
+.btn.glow::after { opacity: .35; }
+.quote .who i { display: none; }
+.l-title em { background: linear-gradient(100deg, #E8F3F0 0%, #9EE6D5 100%) !important; -webkit-background-clip: text !important; background-clip: text !important; }
+:root[data-theme="light"] .l-title em { background: linear-gradient(100deg, #26251F 0%, #2E8F7B 100%) !important; -webkit-background-clip: text !important; background-clip: text !important; }
+.l-h2 em { color: var(--mute); }

@@ -2,13 +2,87 @@
   "id": "field-maintenance",
   "label": "Maintenance & interventions terrain",
   "desc": "Interventions avec délais contractuels, astreintes par zone, suivi des techniciens.",
-  "modules": ["core", "tickets", "planning", "absences", "objectives", "academy", "reporting", "mailing"],
+  "modules": [
+    "core",
+    "tickets",
+    "planning",
+    "absences",
+    "objectives",
+    "academy",
+    "reporting",
+    "mailing"
+  ],
   "config": {
-    "domains": ["Électricité", "CVC", "Plomberie", "Équipements", "Bâtiment"],
-    "ticket_statuses": ["Open", "In Progress", "On Hold", "Resolved", "Closed"],
-    "ticket_priorities": ["P1", "P2", "P3", "P4"],
-    "sla_hours": { "Panne P1": 4, "Panne P2": 24, "Préventif P3": { "hours": 80, "mode": "business" }, "Préventif P4": { "hours": 160, "mode": "business" } },
+    "domains": [
+      "Électricité",
+      "CVC",
+      "Plomberie",
+      "Équipements",
+      "Bâtiment"
+    ],
+    "ticket_statuses": [
+      "Open",
+      "In Progress",
+      "On Hold",
+      "Resolved",
+      "Closed"
+    ],
+    "ticket_priorities": [
+      "P1",
+      "P2",
+      "P3",
+      "P4"
+    ],
+    "sla_hours": {
+      "Panne P1": 4,
+      "Panne P2": 24,
+      "Préventif P3": {
+        "hours": 80,
+        "mode": "business"
+      },
+      "Préventif P4": {
+        "hours": 160,
+        "mode": "business"
+      }
+    },
     "leave_entitlement_days": 25
   },
-  "sites": [{ "code": "NORD", "name": "Zone Nord" }, { "code": "SUD", "name": "Zone Sud" }]
+  "sites": [
+    {
+      "code": "NORD",
+      "name": "Zone Nord"
+    },
+    {
+      "code": "SUD",
+      "name": "Zone Sud"
+    }
+  ],
+  "home": {
+    "metrics": [
+      {
+        "label": "Interventions réalisées",
+        "format": "number",
+        "agg": "sum",
+        "freq": "week",
+        "better": "up"
+      },
+      {
+        "label": "Délai moyen d'intervention",
+        "format": "number",
+        "unit": "h",
+        "agg": "avg",
+        "freq": "week",
+        "better": "down",
+        "target": 24
+      },
+      {
+        "label": "Chiffre d'affaires",
+        "format": "currency",
+        "unit": "€",
+        "agg": "sum",
+        "freq": "month",
+        "better": "up"
+      }
+    ]
+  }
 }

@@ -94,3 +94,6 @@
 .sb-powered b{font-weight:650;color:var(--m3-on-surface,inherit)}
 
 #page-organisation .org-kpi em a{color:var(--m3-primary);text-decoration:none;font-weight:600}
+
+/* Initiale de l'organisation dans la barre latérale (sans logo importé) */
+.sidebar-mono{display:grid!important;place-items:center;border-radius:7px;background:var(--m3-on-surface,#eee);color:var(--m3-surf-1,#111);font-weight:700;font-size:12px;line-height:1;letter-spacing:0}

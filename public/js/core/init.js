@@ -207,7 +207,7 @@ function renderPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const el = document.getElementById(`page-${page}`);
   if (el) el.classList.add('active');
-  if (page === 'dashboard')      renderDashboard();
+  if (page === 'dashboard')      { renderDashboard(); if (typeof renderHome === 'function') renderHome(); }
   if (page === 'site')           renderTracker(activeSiteKey());
   if (page === 'global')         renderGlobalTracker();
   if (page === 'observations')   renderObservations();

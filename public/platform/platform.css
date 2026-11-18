@@ -65,7 +65,7 @@ a:hover { text-decoration: underline; }
 
 /* ── Barre du haut ── */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; margin-bottom: 18px; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; color: var(--ink); }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 22px; letter-spacing: -.035em; color: var(--ink); }
 .brand:hover { text-decoration: none; }
 .brand svg { width: 30px; height: 30px; }
 .nav { display: flex; align-items: center; gap: 8px; }

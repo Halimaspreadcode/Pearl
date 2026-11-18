@@ -44,6 +44,7 @@
 <link rel="stylesheet" href="/css/m3-global.css">
 <link rel="stylesheet" href="/css/pages/trackers.css">
 <link rel="stylesheet" href="/css/pages/organisation.css">
+<link rel="stylesheet" href="/css/pages/home.css">
 <link rel="stylesheet" href="/css/pages/observations.css">
 <link rel="stylesheet" href="/css/pages/approvals.css">
 <link rel="stylesheet" href="/css/pages/weekly-progress.css">
@@ -84,10 +85,10 @@
   <nav class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-brand">
-        <img class="sidebar-logo" src="/img/pear-logo.svg" alt="" aria-hidden="true">
+        <span class="sidebar-logo sidebar-mono" aria-hidden="true">P</span>
         <div>
           <div class="sidebar-brand-name">Pear</div>
-          <div class="sidebar-brand-sub">Front Office</div>
+          <div class="sidebar-brand-sub"></div>
         </div>
       </div>
       <button type="button" class="sb-rail-toggle" id="sb-rail-toggle"
@@ -448,6 +449,11 @@
         <div class="page-title" id="dash-quote"></div>
         <div class="page-sub" id="dash-date"></div>
       </div>
+
+      <!-- Tableau de bord composable (js/pages/dashboard/home.js) : les blocs
+           choisis par l'organisation. Le tableau des tickets ci-dessous n'est
+           affiché que si le bloc « Détail des tickets » est dans la grille. -->
+      <div id="home"></div>
 
       <!-- Tout le contenu du dashboard, dans un grand bloc arrondi posé sur le fond. -->
       <div class="dash-panel">
@@ -2695,6 +2701,7 @@
 <script src="/js/pages/dashboard/dashboard.js"></script>
 <script src="/js/pages/dashboard/dashboard-bento.js"></script>
 <script src="/js/pages/dashboard/dashboard-charts.js"></script>
+<script src="/js/pages/dashboard/home.js"></script>
 <script src="/js/core/sky.js"></script>
 <script src="/js/components/global-search.js"></script>
 <script src="/js/pages/tracker.js"></script>

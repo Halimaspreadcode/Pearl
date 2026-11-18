@@ -2,13 +2,88 @@
   "id": "call-center",
   "label": "Centre de contact",
   "desc": "Réclamations clients avec délais de réponse, plannings de plateau, absences, montée en compétence par quiz.",
-  "modules": ["core", "tickets", "planning", "absences", "objectives", "academy", "reporting", "mailing", "ideas"],
+  "modules": [
+    "core",
+    "tickets",
+    "planning",
+    "absences",
+    "objectives",
+    "academy",
+    "reporting",
+    "mailing",
+    "ideas"
+  ],
   "config": {
-    "domains": ["Facturation", "Livraison", "Produit", "Compte client", "Autre"],
-    "ticket_statuses": ["Open", "In Progress", "On Hold", "Resolved", "Closed"],
-    "ticket_priorities": ["P1", "P2", "P3"],
-    "sla_hours": { "Réclamation P1": 2, "Réclamation P2": 24, "Réclamation P3": 72, "Rappel P1": 1, "Rappel P2": 4, "Rappel P3": 24 },
+    "domains": [
+      "Facturation",
+      "Livraison",
+      "Produit",
+      "Compte client",
+      "Autre"
+    ],
+    "ticket_statuses": [
+      "Open",
+      "In Progress",
+      "On Hold",
+      "Resolved",
+      "Closed"
+    ],
+    "ticket_priorities": [
+      "P1",
+      "P2",
+      "P3"
+    ],
+    "sla_hours": {
+      "Réclamation P1": 2,
+      "Réclamation P2": 24,
+      "Réclamation P3": 72,
+      "Rappel P1": 1,
+      "Rappel P2": 4,
+      "Rappel P3": 24
+    },
     "leave_entitlement_days": 25
   },
-  "sites": [{ "code": "PLAT1", "name": "Plateau 1" }]
+  "sites": [
+    {
+      "code": "PLAT1",
+      "name": "Plateau 1"
+    }
+  ],
+  "home": {
+    "metrics": [
+      {
+        "label": "Appels traités",
+        "format": "number",
+        "agg": "sum",
+        "freq": "day",
+        "better": "up"
+      },
+      {
+        "label": "Taux de décroché",
+        "format": "percent",
+        "unit": "%",
+        "agg": "avg",
+        "freq": "day",
+        "better": "up",
+        "target": 90
+      },
+      {
+        "label": "Durée moyenne de traitement",
+        "format": "number",
+        "unit": "min",
+        "agg": "avg",
+        "freq": "day",
+        "better": "down"
+      },
+      {
+        "label": "Satisfaction client",
+        "format": "percent",
+        "unit": "%",
+        "agg": "avg",
+        "freq": "week",
+        "better": "up",
+        "target": 85
+      }
+    ]
+  }
 }
